@@ -73,7 +73,6 @@ public class GlobalControllerAdvice {
 	 *
 	 * @param ex      Exception
 	 * @param request HttpServletRequest
-	 * @return {@link ResponseEntity<GenericResponse<List< ErrorDetail>}
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GenericResponse<List<ErrorDetail>>> handlerMethodArgumentNotValidException(
