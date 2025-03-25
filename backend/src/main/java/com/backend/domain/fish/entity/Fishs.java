@@ -1,5 +1,11 @@
 package com.backend.domain.fish.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.backend.domain.fish.domain.SpawnLocation;
 import com.backend.global.baseentity.BaseEntity;
 
@@ -38,10 +44,8 @@ public class Fishs extends BaseEntity {
 	@Column(nullable = false)
 	private String icon;
 
-	//TODO 추후 방법 고민 후 다시 추가 예정
-	/*@Column(nullable = false)
-	private List<Long> spawnSeason = new ArrayList<>();*/
-
+	@JdbcTypeCode(SqlTypes.JSON)
+	private List<Long> spawnSeason = new ArrayList<>();
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 10)

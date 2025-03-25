@@ -2,6 +2,10 @@ package com.backend.domain.shipfishposts.entity;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
+import java.util.List;
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import com.backend.global.baseentity.BaseEntity;
 
@@ -35,8 +39,8 @@ public class ShipFishPosts extends BaseEntity {
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String content;
 
-	//TODO 추후 컬렉션으로 여러 이미지 받게끔 바꿔야함
-	private String images;
+	@JdbcTypeCode(SqlTypes.JSON)
+	private List<String> images;
 
 	@Column(nullable = false)
 	private BigDecimal price;
