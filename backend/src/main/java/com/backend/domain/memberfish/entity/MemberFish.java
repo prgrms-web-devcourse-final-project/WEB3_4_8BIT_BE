@@ -37,4 +37,7 @@ public class MemberFish extends BaseEntity {
 
 	@Column(nullable = false)
 	private Long fishPointId;
+
+	@Column(nullable = false)
+	private Long memberId;
 }
