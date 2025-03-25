@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class MemberFish extends BaseEntity {
+public class MemberFishs extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,4 +40,7 @@ public class MemberFish extends BaseEntity {
 
 	@Column(nullable = false)
 	private Long memberId;
+
+	@Column(nullable = false)
+	private Long fishId;
 }
