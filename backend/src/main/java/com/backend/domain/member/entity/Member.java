@@ -49,5 +49,4 @@ public class Member extends BaseEntity {
 
 	@Column(nullable = false)
 	private Boolean isAddInfo;
-
 }
