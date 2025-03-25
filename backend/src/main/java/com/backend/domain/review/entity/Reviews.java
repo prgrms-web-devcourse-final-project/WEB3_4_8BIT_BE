@@ -1,5 +1,8 @@
 package com.backend.domain.review.entity;
 
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -32,7 +35,7 @@ public class Reviews extends BaseEntity {
 	@Column(nullable = false, columnDefinition ="TEXT", length = 200)
 	private String content;
 
-	//TODO 이미지 추후 여러개 받을건지 정해야 함
+	@JdbcTypeCode(SqlTypes.JSON)
 	private String image;
 
 	@Column(nullable = false)
