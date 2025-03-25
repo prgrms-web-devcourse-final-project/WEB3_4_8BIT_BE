@@ -23,4 +23,6 @@ public class Captains extends Members {
 
 	@Column(unique = true, nullable = false, length = 30) //추후 찾아보고 length 맞춰서 바꿔야함
 	private String shipLicenseNumber;
+
+	private Long shipId;
 }
