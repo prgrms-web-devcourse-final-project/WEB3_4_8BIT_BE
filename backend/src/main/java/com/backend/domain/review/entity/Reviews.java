@@ -1,4 +1,4 @@
-package com.backend.domain.review;
+package com.backend.domain.review.entity;
 
 import com.backend.global.baseentity.BaseEntity;
 
