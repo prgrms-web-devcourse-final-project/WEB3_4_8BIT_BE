@@ -1,6 +1,4 @@
-package com.backend.domain.memberfish.entity;
-
-import org.hibernate.annotations.ColumnDefault;
+package com.backend.domain.fishpoint.entity;
 
 import com.backend.global.baseentity.BaseEntity;
 
@@ -22,19 +20,21 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class MemberFish extends BaseEntity {
+public class FishPoint extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long memberFishId;
-
-	@Column(nullable = false)
-	@ColumnDefault("0")
-	private Integer count;
-
-	@Column(nullable = false)
-	private Integer length;
-
-	@Column(nullable = false)
 	private Long fishPointId;
+
+	@Column(unique = true, nullable = false, length = 50)
+	private String fishPointName;
+
+	@Column(nullable = false)
+	private Double longitude;
+
+	@Column(nullable = false)
+	private Double latitude;
+
+	@Column(nullable = false)
+	private Boolean isBan;
 }
