@@ -35,7 +35,7 @@ public class Member extends BaseEntity {
 	@Column(nullable = false, length = 10)
 	private String name;
 
-	@Column(unique = true, nullable = false, length = 30)
+	@Column(unique = true, length = 30)
 	private String nickname;
 
 	@Column(unique = true, nullable = false, length = 13)
@@ -46,5 +46,8 @@ public class Member extends BaseEntity {
 	private MemberRole role;
 
 	private String profileImg;
+
+	@Column(nullable = false)
+	private Boolean isAddInfo;
 
 }
