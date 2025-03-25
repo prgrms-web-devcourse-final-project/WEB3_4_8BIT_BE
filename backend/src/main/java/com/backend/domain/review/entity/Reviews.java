@@ -37,4 +37,6 @@ public class Reviews extends BaseEntity {
 
 	@Column(nullable = false)
 	private Long memberId;
+
+	//TODO 게시글이랑 중간테이블 생성
 }
