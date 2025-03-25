@@ -53,9 +53,9 @@ public class ShipFishPosts extends BaseEntity {
 
 	//TODO 추후 분 정보 입력
 
-	//TODO 추후 컬렉션으로 수정 예정
+	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(nullable = false)
-	private Long fishId;
+	private List<Long> fishId;
 
 	private Double reviewEverRate;
 }
