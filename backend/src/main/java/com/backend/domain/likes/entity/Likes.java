@@ -28,4 +28,6 @@ public class Likes extends BaseEntity {
 
 	@Column(nullable = false)
 	private Long memberId;
+
+	//TODO 하드 딜리트, 소프트 딜리트 고민
 }
