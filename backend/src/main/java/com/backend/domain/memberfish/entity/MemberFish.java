@@ -34,4 +34,6 @@ public class MemberFish extends BaseEntity {
 
 	@Column(nullable = false)
 	private Integer length;
+
+	//낚시 포인트 추가해야함
 }
