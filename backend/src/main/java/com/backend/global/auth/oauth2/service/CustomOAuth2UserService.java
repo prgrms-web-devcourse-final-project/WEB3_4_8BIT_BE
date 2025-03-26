@@ -12,8 +12,11 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.domain.Provider;
 import com.backend.domain.member.entity.Members;
+import com.backend.domain.member.exception.MembersErrorCode;
+import com.backend.domain.member.exception.MembersException;
 import com.backend.domain.member.repository.MembersRepository;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.auth.oauth2.userinfo.KakaoOAuth2UserInfo;
@@ -36,12 +39,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 		OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
-		// 현재 진행중인 서비스를 구분하기 위해 문자열로 받음
+		// 현재 로그인 시도 중인 OAuth2 서비스의 식별자 (ex: "kakao", "naver")
 		String registrationId = userRequest.getClientRegistration().getRegistrationId();
 		log.debug("Provider: {}", registrationId);
 		log.debug("OAuth2User attributes: {}", oAuth2User.getAttributes());
 
-		// OAuth2 로그인 시 키가 되는 필드값 (PK)
+		// 사용자 정보를 식별하기 위한 OAuth2의 기본 키 필드명 (ex: "id", "sub")
 		String usernameAttributeName = userRequest.getClientRegistration()
 			.getProviderDetails()
 			.getUserInfoEndpoint()
@@ -52,7 +55,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		OAuth2UserInfo userInfo = switch (registrationId.toLowerCase()) {
 			case "naver" -> new NaverOauth2UserInfo(oAuth2User.getAttributes());
 			case "kakao" -> new KakaoOAuth2UserInfo(oAuth2User.getAttributes());
-			default -> throw new OAuth2AuthenticationException("지원하지 않는 소셜 로그인입니다: " + registrationId);
+			default -> throw new MembersException(MembersErrorCode.UNSUPPORTED_PROVIDER);
 		};
 
 		log.debug("Extracted user info - id:{}, email: {}, name: {}",
@@ -76,31 +79,60 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		Optional<Members> optionalMember = membersRepository
 			.findByProviderAndProviderId(provider, userInfo.getId());
 
+		// 전화번호 포맷팅 (카카오의 경우)
+		String formattedPhone = registrationId.equalsIgnoreCase("kakao")
+			? formatPhoneNumber(userInfo.getPhoneNumber())
+			: userInfo.getPhoneNumber();
+
 		if (optionalMember.isPresent()) {
-			//TODO 기존 회원 처리
 			Members member = optionalMember.get();
-			// member.updateOAuth2Profile(
-			// 	userInfo.getName(),
-			// 	userInfo.getImageUrl()
-			// );
+
+			// 다른 플랫폼으로 가입된 계정이라면 예외 처리
+			validateProviderConflict(registrationId, member);
+
+			member.updateUserProfile(
+				userInfo.getName(),
+				userInfo.getImageUrl(),
+				formattedPhone
+			);
 			return member;
 		} else {
 			// 신규 회원 가입
 			Members member = Members.builder()
 				.email(userInfo.getEmail())
 				.name(userInfo.getName())
+				.profileImg(userInfo.getImageUrl())
+				.phone(formattedPhone)
 				.providerId(userInfo.getId())
 				.provider(provider)
-				.profileImg(userInfo.getImageUrl())
+				.isAddInfo(false)
+				.role(MemberRole.USER)
 				.build();
 			return membersRepository.save(member);
 		}
 	}
 
 	/**
+	 * 기존 회원의 소셜 로그인 provider와 현재 로그인 시도한 provider가 다른 경우 예외를 발생시킨다.
+	 * 예를 들어, 네이버로 가입된 사용자가 카카오로 로그인 시도할 경우 충돌로 간주한다.
+	 *
+	 * @param member 기존 회원 엔티티
+	 * @param registrationId 현재 로그인 시도 중인 OAuth2 provider ID (ex: "kakao", "naver")
+	 * @throws MembersException PROVIDER_CONFLICT 예외 발생
+	 */
+
+	private static void validateProviderConflict(String registrationId, Members member) {
+		if (member.getProvider().name().equalsIgnoreCase(registrationId)) {
+			log.warn("이미 다른 플랫폼으로 가입된 계정입니다. 기존: {}, 현재: {}", member.getProvider().name(), registrationId);
+			throw new MembersException(MembersErrorCode.PROVIDER_CONFLICT);
+		}
+	}
+
+	/**
 	 * registrationId를 Provider Enum 처리
+	 *
 	 * @param registrationId OAuth2 서비스 구분 ID (ex: kakao, google)
-	 * @throws OAuth2AuthenticationException 지원하지 않는 OAuth2 제공자
+	 * @throws OAuth2AuthenticationException 지원하지 않는 OAuth2 Provider
 	 */
 	private Provider getProvider(String registrationId) {
 		try {
@@ -110,4 +142,20 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			throw new OAuth2AuthenticationException("지원하지 않는 소셜 로그인입니다: " + registrationId);
 		}
 	}
+
+	/**
+	 * 카카오에서 받아온 전화번호를 한국 휴대폰 형식으로 변환하는 유틸 메서드.
+	 * 예: "+82 10-1234-5678" → "010-1234-5678"
+	 *
+	 * @param rawPhone 카카오에서 전달받은 원본 전화번호 문자열
+	 * @return 포맷팅된 전화번호 (ex: 010-1234-5678), 값이 없을 경우 null 반환
+	 */
+	private String formatPhoneNumber(String rawPhone) {
+		if (rawPhone == null)
+			return null;
+
+		// 국가번호 +82를 0으로 대체하고, 앞뒤 공백 제거
+		return rawPhone.replace("+82 ", "0").trim();
+	}
+
 }
