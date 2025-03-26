@@ -1,4 +1,4 @@
-name: Build Test
+name: Build and Test
 
 on:
   pull_request:
@@ -9,42 +9,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    services:
-      docker:
-        image: docker:19.03.12
-        options: --privileged
+
     steps:
-      - name: Checkout code
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          version: latest
-
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
           distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
 
       - name: Grant execute permission for gradlew
-        working-directory: ./backend
-        run: chmod +x ./gradlew
+        run: chmod +x gradlew
+        working-directory: backend  # backend 폴더로 이동
 
-      - name: Set up Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
-      - name: Start services with Docker Compose
-        working-directory: ./backend
-        run: docker-compose -f docker-compose.yml up -d
-
-      - name: Build with Gradle
-        working-directory: ./backend
-        run: ./gradlew clean build
-
-      - name: Stop services after build
-        working-directory: ./backend
-        run: docker-compose down
+      - name: Run Tests
+        run: ./gradlew test --no-daemon
+        working-directory: backend
