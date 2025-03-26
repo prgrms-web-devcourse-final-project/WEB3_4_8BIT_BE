@@ -5,7 +5,6 @@ on:
       - '.github/workflows/**'
       - 'backend/src/**'
       - 'backend/build.gradle'
-      - 'backend/build.gradle.kts'
       - 'backend/Dockerfile'
     branches:
       - dev
