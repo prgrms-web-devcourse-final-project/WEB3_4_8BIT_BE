@@ -9,7 +9,7 @@ import com.backend.global.storage.exception.StorageException;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -17,6 +17,15 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.backend.domain.shipfishposts.exception.ShipFishPostsException;
+import com.backend.global.exception.GlobalErrorCode;
+import com.backend.global.exception.GlobalException;
+import com.backend.global.response.ErrorDetail;
+import com.backend.global.response.GenericResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * GlobalControllerAdvice
@@ -49,6 +58,26 @@ public class GlobalControllerAdvice {
 	}
 
 	/**
+	 * ShipFishPostsException 처리 핸들러 입니다.
+	 *
+	 * @param shipFishPostsException {@link ShipFishPostsException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(ShipFishPostsException.class)
+	public ResponseEntity<GenericResponse<Void>> handleShipFishPostsException(
+		ShipFishPostsException shipFishPostsException) {
+		log.error("handleShipFishPostsException: ", shipFishPostsException);
+
+		GenericResponse<Void> response = GenericResponse.fail(
+			shipFishPostsException.getShipFishPostsErrorCode().getCode(),
+			shipFishPostsException.getMessage()
+		);
+
+		return ResponseEntity.status(shipFishPostsException.getStatus().value())
+			.body(response);
+	}
+
+	/**
 	 * StorageException 처리 핸들러 입니다.
 	 *
 	 * @param storageException {@link StorageException}
@@ -73,7 +102,7 @@ public class GlobalControllerAdvice {
 	 *
 	 * @param ex      Exception
 	 * @param request HttpServletRequest
-	 * @return {@link ResponseEntity<GenericResponse<List< ErrorDetail>}
+	 * @return {@link ResponseEntity<GenericResponse<List<com.backend.global.response.ErrorDetail>}
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GenericResponse<List<ErrorDetail>>> handlerMethodArgumentNotValidException(
