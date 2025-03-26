@@ -3,6 +3,7 @@ package com.backend.domain.auth.service;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import com.backend.global.auth.exception.JwtAuthenticationErrorCode;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.auth.jwt.JwtTokenProvider;
 
@@ -46,7 +47,7 @@ public class AuthService {
 	private void validateAccessToken(String accessToken) {
 		if (jwtTokenProvider.isBlacklisted(accessToken)) {
 			log.warn("블랙리스트된 토큰 사용");
-			throw new JwtAuthenticationException("유효하지 않은 토큰입니다.");
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.INVALID_TOKEN);
 		}
 	}
 
@@ -55,7 +56,7 @@ public class AuthService {
 		String refreshToken = redisTemplate.opsForValue().get("RT:" + userId);
 		if (refreshToken == null) {
 			log.warn("RefreshToken 없음: userId={}", userId);
-			throw new JwtAuthenticationException("Refresh Token이 존재하지 않습니다.");
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.TOKEN_NOT_FOUND);
 		}
 	}
 }
