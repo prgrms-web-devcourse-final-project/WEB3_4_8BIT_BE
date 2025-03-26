@@ -1,6 +1,7 @@
 package com.backend.domain.member.entity;
 
 import com.backend.domain.member.domain.MemberRole;
+import com.backend.domain.member.domain.Provider;
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -49,6 +50,13 @@ public class Members extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false, length = 10)
 	private MemberRole role;
+
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Provider provider;
+
+	@Column(nullable = false, unique = true)
+	private String providerId;
 
 	private String profileImg;
 
