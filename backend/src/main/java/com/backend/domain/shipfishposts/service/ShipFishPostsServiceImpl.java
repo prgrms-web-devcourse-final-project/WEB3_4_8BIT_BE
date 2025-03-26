@@ -18,6 +18,7 @@ public class ShipFishPostsServiceImpl implements ShipFishPostsService {
 
 	@Override
 	public Long save(ShipFishPostsRequest.Create requestDto) {
+
 		long durationMinutes = Duration.between(requestDto.startDate(), requestDto.endDate()).toMinutes();
 
 		ShipFishPosts entity = ShipFishPosts.from(requestDto, durationMinutes);
