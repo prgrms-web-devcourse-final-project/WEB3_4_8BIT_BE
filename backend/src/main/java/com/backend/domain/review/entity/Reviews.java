@@ -32,7 +32,7 @@ public class Reviews extends BaseEntity {
 	@Column(nullable = false)
 	private Integer rating;
 
-	@Column(nullable = false, columnDefinition ="TEXT", length = 200)
+	@Column(nullable = false, columnDefinition = "TEXT", length = 200)
 	private String content;
 
 	@JdbcTypeCode(SqlTypes.JSON)
@@ -41,5 +41,6 @@ public class Reviews extends BaseEntity {
 	@Column(nullable = false)
 	private Long memberId;
 
-	//TODO 게시글이랑 중간테이블 생성
+	@Column(nullable = false)
+	private Long shipFishPostId;
 }
