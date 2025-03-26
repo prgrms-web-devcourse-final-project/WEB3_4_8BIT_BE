@@ -1,5 +1,6 @@
 package com.backend.global.advice;
 
+import com.backend.domain.shipfishposts.exception.ShipFishPostsException;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.response.ErrorDetail;
@@ -44,6 +45,20 @@ public class GlobalControllerAdvice {
 
 		return ResponseEntity.status(globalException.getStatus().value())
 			.body(genericResponse);
+	}
+
+	@ExceptionHandler(ShipFishPostsException.class)
+	public ResponseEntity<GenericResponse<Void>> handleShipFishPostsException(
+			ShipFishPostsException shipFishPostsException) {
+		log.error("handleShipFishPostsException: ", shipFishPostsException);
+
+		GenericResponse<Void> response = GenericResponse.fail(
+				shipFishPostsException.getShipFishPostsErrorCode().getCode(),
+				shipFishPostsException.getMessage()
+		);
+
+		return ResponseEntity.status(shipFishPostsException.getStatus().value())
+				.body(response);
 	}
 
 	/**
