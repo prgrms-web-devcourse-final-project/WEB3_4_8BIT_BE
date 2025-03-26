@@ -37,11 +37,17 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    // Swagger
+    //Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1'
 
-    // S3
-    implementation("software.amazon.awssdk:s3:2.20.50")
+    // Spring Security & OAuth2
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.5'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
