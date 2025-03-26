@@ -3,6 +3,7 @@ package com.backend.domain.shipfishposts.service;
 import java.time.Duration;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
 import com.backend.domain.shipfishposts.entity.ShipFishPosts;
@@ -17,6 +18,7 @@ public class ShipFishPostsServiceImpl implements ShipFishPostsService {
 	private final ShipFishPostsRepositoryImpl shipFishPostsRepositoryImpl;
 
 	@Override
+	@Transactional
 	public Long save(ShipFishPostsRequest.Create requestDto) {
 
 		long durationMinutes = Duration.between(requestDto.startDate(), requestDto.endDate()).toMinutes();
