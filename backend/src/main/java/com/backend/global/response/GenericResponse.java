@@ -21,14 +21,16 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
 public class GenericResponse<T> {
-
-	private final ZonedDateTime timestamp;
+	@Builder.Default
+	private final ZonedDateTime timestamp = ZonedDateTime.now();
 	private final boolean isSuccess;
+
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private final int code;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private final T data;
 	private final String message;
-
 
 	/**
 	 * 요청이 성공하고 data, message 있을 때
