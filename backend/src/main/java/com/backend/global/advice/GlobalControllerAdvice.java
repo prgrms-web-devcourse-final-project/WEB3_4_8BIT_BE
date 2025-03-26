@@ -4,6 +4,8 @@ import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.response.ErrorDetail;
 import com.backend.global.response.GenericResponse;
+import com.backend.global.storage.exception.StorageException;
+
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,11 +49,31 @@ public class GlobalControllerAdvice {
 	}
 
 	/**
+	 * StorageException 처리 핸들러 입니다.
+	 *
+	 * @param storageException {@link StorageException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(StorageException.class)
+	public ResponseEntity<GenericResponse<Void>> handlerStorageException(
+		StorageException storageException) {
+		log.error("handlerStorageException: ", storageException);
+
+		GenericResponse<Void> genericResponse = GenericResponse.fail(
+			storageException.getStorageErrorCode().getCode(),
+			storageException.getMessage()
+		);
+
+		return ResponseEntity.status(storageException.getStatus().value())
+			.body(genericResponse);
+	}
+
+	/**
 	 * Validation 예외 처리 핸들러 입니다.
 	 *
 	 * @param ex      Exception
 	 * @param request HttpServletRequest
-	 * @return {@link ResponseEntity<GenericResponse<List<com.backend.global.response.ErrorDetail>}
+	 * @return {@link ResponseEntity<GenericResponse<List< ErrorDetail>}
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GenericResponse<List<ErrorDetail>>> handlerMethodArgumentNotValidException(

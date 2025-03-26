@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.backend.global.storage.dto.request.FileUploadRequest;
 import com.backend.global.storage.dto.response.FileUploadResponse;
+import com.backend.global.storage.exception.StorageErrorCode;
+import com.backend.global.storage.exception.StorageException;
 
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
@@ -72,13 +74,12 @@ public class S3StorageService implements StorageService {
 	 * 파일 검증 (크기 및 MIME 타입)
 	 */
 	private void validateFile(long fileSize, String contentType) {
-		// TODO 커스텀 예외 처리 추후에 수정
 		if (fileSize <= 0 || fileSize > MAX_FILE_SIZE) {
-			throw new IllegalArgumentException("파일 크기가 허용된 최대 크기(10MB)를 초과했습니다.");
+			throw new StorageException(StorageErrorCode.FILE_SIZE_EXCEEDED);
 		}
 
 		if (!ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
-			throw new IllegalArgumentException("지원하지 않는 파일 형식입니다. (허용된 형식: PNG, JPEG, JPG)");
+			throw new StorageException(StorageErrorCode.UNSUPPORTED_FILE_TYPE);
 		}
 	}
 
