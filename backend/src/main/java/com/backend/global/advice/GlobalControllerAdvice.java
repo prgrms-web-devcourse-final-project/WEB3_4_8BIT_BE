@@ -49,6 +49,47 @@ public class GlobalControllerAdvice {
 	}
 
 	/**
+	 * JwtAuthenticationException 처리 핸들러입니다.
+	 *
+	 * @param jwtAuthenticationException {@link JwtAuthenticationException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(JwtAuthenticationException.class)
+	public ResponseEntity<GenericResponse<Void>> handleJwtAuthenticationException(
+		JwtAuthenticationException jwtAuthenticationException) {
+		log.error("handleJwtAuthenticationException: ", jwtAuthenticationException);
+
+		GenericResponse<Void> genericResponse = GenericResponse.fail(
+			jwtAuthenticationException.getJwtAuthenticationErrorCode().getCode(),
+			jwtAuthenticationException.getMessage()
+		);
+
+		return ResponseEntity.status(jwtAuthenticationException.getStatus().value())
+			.body(genericResponse);
+	}
+
+	/**
+	 * MembersException 처리 핸들러입니다.
+	 *
+	 * @param membersException {@link MembersException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(MembersException.class)
+	public ResponseEntity<GenericResponse<Void>> handleMembersException(
+		MembersException membersException) {
+		log.error("handleMembersException: ", membersException);
+
+		GenericResponse<Void> genericResponse = GenericResponse.fail(
+			membersException.getMembersErrorCode().getCode(),
+			membersException.getMessage()
+		);
+
+		return ResponseEntity.status(membersException.getStatus().value())
+			.body(genericResponse);
+	}
+
+
+	/**
 	 * StorageException 처리 핸들러 입니다.
 	 *
 	 * @param storageException {@link StorageException}
@@ -73,6 +114,7 @@ public class GlobalControllerAdvice {
 	 *
 	 * @param ex      Exception
 	 * @param request HttpServletRequest
+	 * @return {@link ResponseEntity<GenericResponse<List<com.backend.global.response.ErrorDetail>}
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GenericResponse<List<ErrorDetail>>> handlerMethodArgumentNotValidException(

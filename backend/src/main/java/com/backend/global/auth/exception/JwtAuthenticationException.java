@@ -7,14 +7,14 @@ import lombok.Getter;
 @Getter
 public class JwtAuthenticationException extends RuntimeException {
 
-	private final HttpStatus status;
+	private final JwtAuthenticationErrorCode jwtAuthenticationErrorCode;
 
-	public JwtAuthenticationException(String message) {
-		this(message, HttpStatus.UNAUTHORIZED);
+	public JwtAuthenticationException(JwtAuthenticationErrorCode jwtAuthenticationErrorCode) {
+		super(jwtAuthenticationErrorCode.getMessage());
+		this.jwtAuthenticationErrorCode = jwtAuthenticationErrorCode;
 	}
 
-	public JwtAuthenticationException(String message, HttpStatus status) {
-		super(message);
-		this.status = status;
+	public HttpStatus getStatus() {
+		return jwtAuthenticationErrorCode.getHttpStatus();
 	}
 }
