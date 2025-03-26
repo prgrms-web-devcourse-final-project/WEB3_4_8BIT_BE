@@ -29,6 +29,7 @@ jobs:
     - name: Build with Gradle
       run: |
         cd backend
+        mkdir src/main/resources/
         echo '${{ secrets.APPLICATION_YML }}' > src/main/resources/application.yml
         chmod +x gradlew
         ./gradlew bootJar
