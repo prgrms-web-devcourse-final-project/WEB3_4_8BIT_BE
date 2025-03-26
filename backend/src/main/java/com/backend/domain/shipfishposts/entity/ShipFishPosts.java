@@ -7,6 +7,7 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -33,6 +34,13 @@ public class ShipFishPosts extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long shipFishPostId;
 
+	// Todo : user 정보 등록 ( member Id & Name )
+	// @Column(nullable = false)
+	// private Long memberId;
+	//
+	// @Column(nullable = false)
+	// private String memberName;
+
 	@Column(nullable = false, length = 50)
 	private String subject;
 
@@ -51,11 +59,31 @@ public class ShipFishPosts extends BaseEntity {
 	@Column(nullable = false)
 	private ZonedDateTime endDate;
 
-	//TODO 추후 분 정보 입력
+	@Column(nullable = false)
+	private Long durationMinute;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(nullable = false)
 	private List<Long> fishId;
 
+	@Column(nullable = false)
+	private Long shipId;
+
 	private Double reviewEverRate;
+
+	public static ShipFishPosts from(ShipFishPostsRequest.Create requestDto, Long durationMinute) {
+
+		return ShipFishPosts.builder()
+			.subject(requestDto.subject())
+			.content(requestDto.content())
+			.images(requestDto.images())
+			.price(requestDto.price())
+			.startDate(requestDto.startDate())
+			.endDate(requestDto.endDate())
+			.durationMinute(durationMinute)
+			.fishId(requestDto.fishIds())
+			.shipId(requestDto.shipId())
+			.reviewEverRate(0D)
+			.build();
+	}
 }
