@@ -17,6 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import com.backend.global.auth.exception.JwtAuthenticationErrorCode;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 
@@ -88,7 +89,7 @@ public class JwtTokenProvider {
 			log.debug("Token is expired, skipping blacklist");
 		} catch (Exception e) {
 			log.error("Failed to add token to blacklist", e);
-			throw new JwtAuthenticationException("토큰 블랙리스트 등록 실패");
+			throw new JwtAuthenticationException((JwtAuthenticationErrorCode.BLACK_LIST_FAIL));
 		}
 	}
 
@@ -155,17 +156,18 @@ public class JwtTokenProvider {
 			return true;
 		} catch (SecurityException | MalformedJwtException e) {
 			log.error("Invalid JWT signature: {}", e.getMessage());
-			throw new JwtAuthenticationException("잘못된 JWT 서명입니다.");
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.INVALID_SIGNATURE);
 		} catch (ExpiredJwtException e) {
 			log.error("Expired JWT token: {}", e.getMessage());
-			throw new JwtAuthenticationException("만료된 JWT 토큰입니다.");
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.EXPIRED_TOKEN);
 		} catch (UnsupportedJwtException e) {
 			log.error("Unsupported JWT token: {}", e.getMessage());
-			throw new JwtAuthenticationException("지원되지 않는 JWT 토큰입니다.");
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.UNSUPPORTED_TOKEN);
 		} catch (IllegalArgumentException e) {
 			log.error("JWT claims string is empty: {}", e.getMessage());
-			throw new JwtAuthenticationException("JWT 토큰이 잘못되었습니다.");
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.EMPTY_CLAIMS);
 		}
+
 	}
 
 	private Claims parseClaims(String token) {
@@ -179,7 +181,7 @@ public class JwtTokenProvider {
 			// 만료된 토큰이어도 Claims 반환
 			return e.getClaims();
 		} catch (Exception e) {
-			throw new JwtAuthenticationException("유효하지 않은 토큰입니다.");
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.INVALID_TOKEN);
 		}
 	}
 
@@ -190,7 +192,7 @@ public class JwtTokenProvider {
 			// 만료된 토큰이어도 서명이 유효하면 ID 반환
 			return Long.valueOf(e.getClaims().getSubject());
 		} catch (Exception e) {
-			throw new JwtAuthenticationException("유효하지 않은 토큰입니다.");
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.INVALID_TOKEN);
 		}
 	}
 
