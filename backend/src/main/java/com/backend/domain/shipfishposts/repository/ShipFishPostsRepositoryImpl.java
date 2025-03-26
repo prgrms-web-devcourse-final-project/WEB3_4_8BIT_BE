@@ -1,13 +1,20 @@
 package com.backend.domain.shipfishposts.repository;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+
+import com.backend.domain.shipfishposts.entity.ShipFishPosts;
+
+import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class ShipFishPostsRepositoryImpl {
+public class ShipFishPostsRepositoryImpl implements ShipFishPostsRepository {
 
-    private final JPAQueryFactory jpaQueryFactory;
+	private final ShipFishPostsJpaRepository shipFishPostsJpaRepository;
+	private final ShipFishPostsQueryRepository shipFishPostsQueryRepository;
+
+	public ShipFishPosts save(ShipFishPosts shipFishPosts) {
+		return shipFishPostsJpaRepository.save(shipFishPosts);
+	}
 
 }
