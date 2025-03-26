@@ -12,9 +12,8 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class MembersRepositoryImpl implements MembersRepository{
-
-	private MembersJpaRepository membersJpaRepository;
-	private MembersQueryRepository membersQueryRepository;
+	private final MembersJpaRepository membersJpaRepository;
+	private final MembersQueryRepository membersQueryRepository;
 
 	@Override
 	public Members save(Members members){
