@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
+@Tag(name = "선상낚시 게시글")
 @RestController
 @RequestMapping("/api/v1/ship-post")
 @RequiredArgsConstructor
@@ -24,7 +25,6 @@ public class ShipFishPostsController {
 
 	private final ShipFishPostsService shipFishPostsService;
 
-	@Tag(name = "선상낚시 게시글 > 게시글 생성 API 명세")
 	@Operation(
 		summary = "선상 낚시 게시글 생성",
 		description = "유저가 새로운 선상 낚시 게시글을 생성할 때 사용하는 API"
