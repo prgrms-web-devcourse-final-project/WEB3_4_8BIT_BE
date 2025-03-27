@@ -22,6 +22,7 @@ import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.auth.oauth2.userinfo.KakaoOAuth2UserInfo;
 import com.backend.global.auth.oauth2.userinfo.NaverOauth2UserInfo;
 import com.backend.global.auth.oauth2.userinfo.OAuth2UserInfo;
+import com.backend.global.exception.GlobalException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -116,14 +117,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	 * registrationId를 Provider Enum 처리
 	 *
 	 * @param registrationId OAuth2 서비스 구분 ID (ex: kakao, google)
-	 * @throws OAuth2AuthenticationException 지원하지 않는 OAuth2 Provider
+	 * @throws MembersException 지원하지 않는 OAuth2 Provider
 	 */
 	private Provider getProvider(String registrationId) {
 		try {
 			return Provider.valueOf(registrationId.toUpperCase());
-		} catch (IllegalArgumentException e) {
-			log.debug("Unsupported OAuth2 provider: {}", registrationId);
-			throw new OAuth2AuthenticationException("지원하지 않는 소셜 로그인입니다: " + registrationId);
+		} catch (GlobalException e) {
+			throw new MembersException(MembersErrorCode.UNSUPPORTED_PROVIDER);
 		}
 	}
 
