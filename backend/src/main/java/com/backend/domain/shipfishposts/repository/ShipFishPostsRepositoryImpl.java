@@ -15,6 +15,7 @@ public class ShipFishPostsRepositoryImpl implements ShipFishPostsRepository {
 
 	@Override
 	public ShipFishPosts save(ShipFishPosts shipFishPosts) {
+
 		return shipFishPostsJpaRepository.save(shipFishPosts);
 	}
 
