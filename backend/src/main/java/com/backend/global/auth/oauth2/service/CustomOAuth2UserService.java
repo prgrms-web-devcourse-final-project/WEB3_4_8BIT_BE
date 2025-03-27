@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserServ
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,38 +46,57 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	@Override
 	@Transactional
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-		OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
-		OAuth2User oAuth2User = delegate.loadUser(userRequest);
+		try {
+			OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
+			OAuth2User oAuth2User = delegate.loadUser(userRequest);
 
-		// 현재 로그인 시도 중인 OAuth2 서비스의 식별자 (ex: "kakao", "naver")
-		String registrationId = userRequest.getClientRegistration().getRegistrationId();
-		log.debug("Provider: {}, OAuth2User attributes: {}", registrationId,oAuth2User.getAttributes());
+			// 현재 로그인 시도 중인 OAuth2 서비스의 식별자 (ex: "kakao", "naver")
+			String registrationId = userRequest.getClientRegistration().getRegistrationId();
+			log.debug("Provider: {}, OAuth2User attributes: {}", registrationId, oAuth2User.getAttributes());
 
-		// 사용자 정보를 식별하기 위한 OAuth2의 기본 키 필드명 (ex: "id", "sub")
-		String usernameAttributeName = userRequest.getClientRegistration()
-			.getProviderDetails()
-			.getUserInfoEndpoint()
-			.getUserNameAttributeName();
-		log.debug("Username attribute name: {}", usernameAttributeName);
+			// 사용자 정보를 식별하기 위한 OAuth2의 기본 키 필드명 (ex: "id", "sub")
+			String usernameAttributeName = userRequest.getClientRegistration()
+				.getProviderDetails()
+				.getUserInfoEndpoint()
+				.getUserNameAttributeName();
+			log.debug("Username attribute name: {}", usernameAttributeName);
 
-		// OAuth2UserInfo 객체 생성
-		OAuth2UserInfo userInfo = switch (registrationId.toLowerCase()) {
-			case "naver" -> new NaverOauth2UserInfo(oAuth2User.getAttributes());
-			case "kakao" -> new KakaoOAuth2UserInfo(oAuth2User.getAttributes());
-			default -> throw new MembersException(MembersErrorCode.UNSUPPORTED_PROVIDER);
-		};
+			// OAuth2UserInfo 객체 생성
+			OAuth2UserInfo userInfo = switch (registrationId.toLowerCase()) {
+				case "naver" -> new NaverOauth2UserInfo(oAuth2User.getAttributes());
+				case "kakao" -> new KakaoOAuth2UserInfo(oAuth2User.getAttributes());
+				default -> throw new MembersException(MembersErrorCode.UNSUPPORTED_PROVIDER);
+			};
 
-		// 유저 정보 저장 또는 업데이트
-		Members member = saveOrUpdate(userInfo, registrationId);
-		log.debug("Saved/Updated member - id: {}, email: {}", member.getMemberId(), member.getEmail());
+			// 유저 정보 저장 또는 업데이트
+			Members member = saveOrUpdate(userInfo, registrationId);
+			log.debug("Saved/Updated member - id: {}, email: {}", member.getMemberId(), member.getEmail());
 
-		return new CustomOAuth2User(
-			Collections.singleton(new SimpleGrantedAuthority(member.getRole().name())),
-			oAuth2User.getAttributes(),
-			usernameAttributeName,
-			member.getMemberId(),
-			member.getEmail()
-		);
+			return new CustomOAuth2User(
+				Collections.singleton(new SimpleGrantedAuthority(member.getRole().name())),
+				oAuth2User.getAttributes(),
+				usernameAttributeName,
+				member.getMemberId(),
+				member.getEmail()
+			);
+		} catch (MembersException ex) {
+			log.error("OAuth2 로그인 중 MembersException 발생: {}", ex.getMessage());
+
+			throw new OAuth2AuthenticationException(
+				new OAuth2Error(
+					String.valueOf(ex.getMembersErrorCode().getCode()),
+					ex.getMembersErrorCode().getMessage(),
+					null
+				),
+				ex
+			);
+		} catch (Exception ex) {
+			log.error("OAuth2 로그인 중 예상치 못한 예외 발생: {}", ex.getMessage());
+			throw new OAuth2AuthenticationException(
+				new OAuth2Error("OAUTH2_UNKNOWN", "OAuth2 로그인 중 오류가 발생했습니다.", null),
+				ex
+			);
+		}
 	}
 
 	/**
@@ -112,6 +132,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 				userInfo.getName(),
 				userInfo.getImageUrl()
 			);
+
 			return member;
 		} else {
 			// 신규 회원 가입
@@ -125,6 +146,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 				.isAddInfo(false)
 				.role(MemberRole.USER)
 				.build();
+
 			return membersRepository.save(member);
 		}
 	}
@@ -156,8 +178,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		if (rawPhone == null)
 			return null;
 
-		// 국가번호 +82를 0으로 대체하고, 앞뒤 공백 제거
 		return rawPhone.replace("+82 ", "0").trim();
 	}
-
 }
