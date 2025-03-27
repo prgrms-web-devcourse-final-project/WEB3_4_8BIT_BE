@@ -6,6 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class ShipFishPostsException extends RuntimeException {
+
 	private final ShipFishPostsErrorCode shipFishPostsErrorCode;
 
 	public ShipFishPostsException(final ShipFishPostsErrorCode shipFishPostsErrorCode) {
@@ -14,6 +15,7 @@ public class ShipFishPostsException extends RuntimeException {
 	}
 
 	public HttpStatus getStatus() {
+
 		return shipFishPostsErrorCode.getHttpStatus();
 	}
 }
