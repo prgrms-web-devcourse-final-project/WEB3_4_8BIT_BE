@@ -1,13 +1,8 @@
 package com.backend.global.advice;
 
-import com.backend.global.exception.GlobalErrorCode;
-import com.backend.global.exception.GlobalException;
-import com.backend.global.response.ErrorDetail;
-import com.backend.global.response.GenericResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -15,6 +10,14 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.backend.global.exception.GlobalErrorCode;
+import com.backend.global.exception.GlobalException;
+import com.backend.global.response.ErrorDetail;
+import com.backend.global.response.GenericResponse;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * GlobalControllerAdvice
