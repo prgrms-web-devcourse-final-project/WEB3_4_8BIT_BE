@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,16 +20,22 @@ import lombok.Getter;
 public class GenericResponse<T> {
 
 	@Builder.Default
+	@Schema(example = "2025-03-27T15:19:31.902266+09:00", description = "요청 시간")
 	private final ZonedDateTime timestamp = ZonedDateTime.now();
+
+	@Schema(example = "true", description = "성공 여부")
 	private final boolean isSuccess;
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private final int code;
+	@Schema(example = "1001", description = "커스텀 코드 (예외 발생시 사용), (없을 시 반환 X)")
+	private final Integer code;
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@Schema(example = "\"testData\": \"testData\"", description = "응답 데이터 (없을시 반환 X)")
 	private final T data;
 
 	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@Schema(example = "testMessage", description = "응답 데이터 (없을시 반환 X)")
 	private final String message;
 
 	/**
