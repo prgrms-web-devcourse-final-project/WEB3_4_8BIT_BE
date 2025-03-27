@@ -122,7 +122,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	private Provider getProvider(String registrationId) {
 		try {
 			return Provider.valueOf(registrationId.toUpperCase());
-		} catch (GlobalException e) {
+		} catch (Exception e) {
 			throw new MembersException(MembersErrorCode.UNSUPPORTED_PROVIDER);
 		}
 	}
