@@ -75,25 +75,29 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	}
 
 	private Members saveOrUpdate(OAuth2UserInfo userInfo, String registrationId) {
-		Provider provider = getProvider(registrationId);
-		Optional<Members> optionalMember = membersRepository
-			.findByProviderAndProviderId(provider, userInfo.getId());
-
 		// 전화번호 포맷팅 (카카오의 경우)
 		String formattedPhone = registrationId.equalsIgnoreCase("kakao")
 			? formatPhoneNumber(userInfo.getPhoneNumber())
 			: userInfo.getPhoneNumber();
 
+		Provider provider = getProvider(registrationId);
+
+		Optional<Members> optionalMember = membersRepository
+			.findByPhone(formattedPhone);
+
 		if (optionalMember.isPresent()) {
 			Members member = optionalMember.get();
 
-			// 다른 플랫폼으로 가입된 계정이라면 예외 처리
-			validateProviderConflict(registrationId, member);
+			// 현재 로그인 시도한 provider가 다르면 예외
+			if (!member.getProvider().equals(provider)) {
+				log.warn("같은 전화번호로 다른 플랫폼 가입 시도! 기존: {}, 시도: {}", member.getProvider(), provider);
+				throw new MembersException(MembersErrorCode.PROVIDER_CONFLICT);
+			}
 
+			// 같은 플랫폼이면 기존 유저 정보 업데이트
 			member.updateUserProfile(
 				userInfo.getName(),
-				userInfo.getImageUrl(),
-				formattedPhone
+				userInfo.getImageUrl()
 			);
 			return member;
 		} else {
@@ -109,22 +113,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 				.role(MemberRole.USER)
 				.build();
 			return membersRepository.save(member);
-		}
-	}
-
-	/**
-	 * 기존 회원의 소셜 로그인 provider와 현재 로그인 시도한 provider가 다른 경우 예외를 발생시킨다.
-	 * 예를 들어, 네이버로 가입된 사용자가 카카오로 로그인 시도할 경우 충돌로 간주한다.
-	 *
-	 * @param member 기존 회원 엔티티
-	 * @param registrationId 현재 로그인 시도 중인 OAuth2 provider ID (ex: "kakao", "naver")
-	 * @throws MembersException PROVIDER_CONFLICT 예외 발생
-	 */
-
-	private static void validateProviderConflict(String registrationId, Members member) {
-		if (member.getProvider().name().equalsIgnoreCase(registrationId)) {
-			log.warn("이미 다른 플랫폼으로 가입된 계정입니다. 기존: {}, 현재: {}", member.getProvider().name(), registrationId);
-			throw new MembersException(MembersErrorCode.PROVIDER_CONFLICT);
 		}
 	}
 

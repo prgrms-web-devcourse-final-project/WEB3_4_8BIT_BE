@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import com.backend.domain.member.domain.Provider;
 import com.backend.domain.member.entity.Members;
 
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,7 @@ public class MembersRepositoryImpl implements MembersRepository{
 	}
 
 	@Override
-	public Optional<Members> findByProviderAndProviderId(Provider provider, String providerId){
-		return membersJpaRepository.findByProviderAndProviderId(provider, providerId);
+	public Optional<Members> findByPhone(String phone){
+		return membersJpaRepository.findByPhone(phone);
 	}
 }
