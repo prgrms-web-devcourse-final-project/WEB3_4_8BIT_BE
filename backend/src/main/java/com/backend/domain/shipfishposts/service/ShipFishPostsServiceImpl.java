@@ -5,6 +5,7 @@ import java.time.Duration;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.shipfishposts.dto.converter.ShipFishPostsConverter;
 import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
 import com.backend.domain.shipfishposts.entity.ShipFishPosts;
 import com.backend.domain.shipfishposts.repository.ShipFishPostsRepository;
@@ -23,7 +24,7 @@ public class ShipFishPostsServiceImpl implements ShipFishPostsService {
 
 		long durationMinutes = Duration.between(requestDto.startDate(), requestDto.endDate()).toMinutes();
 
-		ShipFishPosts entity = ShipFishPosts.from(requestDto, durationMinutes);
+		ShipFishPosts entity = ShipFishPostsConverter.fromShipFishPostsRequestCreate(requestDto, durationMinutes);
 
 		return shipFishPostsRepository.save(entity).getShipFishPostId();
 	}
