@@ -13,6 +13,7 @@ public class ShipFishPostsRepositoryImpl implements ShipFishPostsRepository {
 	private final ShipFishPostsJpaRepository shipFishPostsJpaRepository;
 	private final ShipFishPostsQueryRepository shipFishPostsQueryRepository;
 
+	@Override
 	public ShipFishPosts save(ShipFishPosts shipFishPosts) {
 		return shipFishPostsJpaRepository.save(shipFishPosts);
 	}

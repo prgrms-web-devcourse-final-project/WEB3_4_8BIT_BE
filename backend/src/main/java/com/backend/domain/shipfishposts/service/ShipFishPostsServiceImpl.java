@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
 import com.backend.domain.shipfishposts.entity.ShipFishPosts;
-import com.backend.domain.shipfishposts.repository.ShipFishPostsRepositoryImpl;
+import com.backend.domain.shipfishposts.repository.ShipFishPostsRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ShipFishPostsServiceImpl implements ShipFishPostsService {
 
-	private final ShipFishPostsRepositoryImpl shipFishPostsRepositoryImpl;
+	private final ShipFishPostsRepository shipFishPostsRepository;
 
 	@Override
 	@Transactional
@@ -25,6 +25,6 @@ public class ShipFishPostsServiceImpl implements ShipFishPostsService {
 
 		ShipFishPosts entity = ShipFishPosts.from(requestDto, durationMinutes);
 
-		return shipFishPostsRepositoryImpl.save(entity).getShipFishPostId();
+		return shipFishPostsRepository.save(entity).getShipFishPostId();
 	}
 }
