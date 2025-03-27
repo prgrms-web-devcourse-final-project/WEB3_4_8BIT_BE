@@ -102,7 +102,8 @@ public class S3StorageService implements StorageService {
 	 * @author vdvhk12
 	 */
 	private void validateFile(long fileSize, String contentType) {
-		if (fileSize <= 0 || fileSize > maxFileSize.toBytes()) {
+		// TODO 지금은 일단 커스텀 예외로 잡고, 추후에 Validation 으로 파일 크기를 검증
+		if (fileSize > maxFileSize.toBytes()) {
 			throw new StorageException(StorageErrorCode.FILE_SIZE_EXCEEDED);
 		}
 
