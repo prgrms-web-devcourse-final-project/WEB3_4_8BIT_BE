@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.util.unit.DataSize;
 
 import com.backend.global.storage.dto.request.FileUploadRequest;
 import com.backend.global.storage.dto.response.FileUploadResponse;
@@ -21,7 +22,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 @Primary
 public class S3StorageService implements StorageService {
 
-	private static final long MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB 제한
 	private static final List<String> ALLOWED_CONTENT_TYPES = List.of(
 		"image/png",
 		"image/jpeg",
@@ -30,14 +30,26 @@ public class S3StorageService implements StorageService {
 
 	private final S3Presigner s3Presigner;
 	private final String bucketName;
+	private final DataSize maxFileSize;
 
-	public S3StorageService(S3Presigner s3Presigner, @Value("${aws.s3.bucket-name}") String bucketName) {
+	public S3StorageService(
+		S3Presigner s3Presigner,
+		@Value("${aws.s3.bucket-name}") String bucketName,
+		@Value("${aws.s3.max-file-size}") DataSize maxFileSize
+	) {
 		this.s3Presigner = s3Presigner;
 		this.bucketName = bucketName;
+		this.maxFileSize = maxFileSize;
 	}
 
 	/**
-	 * 여러 개의 파일에 대한 Presigned URL 생성
+	 * 여러 개의 파일에 대한 presigned URL 생성 메서드
+	 *
+	 * @param domain 파일이 사용되는 도메인
+	 * @param files 파일 정보 리스트
+	 * @return {@link List<FileUploadResponse>}
+	 * @implSpec 도메인과 파일 정보를 받아서 PresignedURL을 생성 후 리턴
+	 * @author vdvhk12
 	 */
 	@Override
 	public List<FileUploadResponse> generateUploadUrls(String domain, List<FileUploadRequest> files) {
@@ -46,6 +58,17 @@ public class S3StorageService implements StorageService {
 			.toList();
 	}
 
+	/**
+	 * 하나의 파일에 대한 presigned URL 생성 메서드
+	 *
+	 * @param domain 파일이 사용되는 도메인
+	 * @param fileName 파일 이름
+	 * @param fileSize 파일 크기
+	 * @param contentType 파일 타입
+	 * @return {@link FileUploadResponse}
+	 * @implSpec 도메인, 파일명, 파일 크기, 파일 타입을 받아서 검증 후, PresignedURL을 생성하고 리턴
+	 * @author vdvhk12
+	 */
 	@Override
 	public FileUploadResponse generateUploadUrl(String domain, String fileName, Long fileSize, String contentType) {
 		// 파일 크기, MIME 타입 검증
@@ -71,10 +94,15 @@ public class S3StorageService implements StorageService {
 	}
 
 	/**
-	 * 파일 검증 (크기 및 MIME 타입)
+	 * 파일 검증(크기 및 MIME 타입)
+	 *
+	 * @param fileSize 파일 크기
+	 * @param contentType 파일 타입
+	 * @implSpec 파일 크기와 파일 타입을 검증 후 예외 처리
+	 * @author vdvhk12
 	 */
 	private void validateFile(long fileSize, String contentType) {
-		if (fileSize <= 0 || fileSize > MAX_FILE_SIZE) {
+		if (fileSize <= 0 || fileSize > maxFileSize.toBytes()) {
 			throw new StorageException(StorageErrorCode.FILE_SIZE_EXCEEDED);
 		}
 
@@ -84,7 +112,13 @@ public class S3StorageService implements StorageService {
 	}
 
 	/**
-	 * 파일명 생성
+	 * 파일명 중복 방지를 위한 파일명 생성
+	 *
+	 * @param domain 파일이 사용되는 도메인
+	 * @param originalFileName 파일 이름
+	 * @return String
+	 * @implSpec 도메인, 파일명을 받아서 도메인과 랜덤 값을 추가해 파일명 생성 후 리턴
+	 * @author vdvhk12
 	 */
 	private String generateFileName(String domain, String originalFileName) {
 		return domain + "/" + UUID.randomUUID().toString().replace("-", "") + "-" + originalFileName;
