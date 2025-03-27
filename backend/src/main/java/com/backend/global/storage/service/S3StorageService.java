@@ -7,7 +7,6 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
-import org.springframework.util.unit.DataSize;
 
 import com.backend.global.storage.dto.request.FileUploadRequest;
 import com.backend.global.storage.dto.response.FileUploadResponse;
@@ -30,31 +29,28 @@ public class S3StorageService implements StorageService {
 
 	private final S3Presigner s3Presigner;
 	private final String bucketName;
-	private final DataSize maxFileSize;
 
 	public S3StorageService(
 		S3Presigner s3Presigner,
-		@Value("${aws.s3.bucket-name}") String bucketName,
-		@Value("${aws.s3.max-file-size}") DataSize maxFileSize
+		@Value("${aws.s3.bucket-name}") String bucketName
 	) {
 		this.s3Presigner = s3Presigner;
 		this.bucketName = bucketName;
-		this.maxFileSize = maxFileSize;
 	}
 
 	/**
 	 * 여러 개의 파일에 대한 presigned URL 생성 메서드
 	 *
 	 * @param domain 파일이 사용되는 도메인
-	 * @param files 파일 정보 리스트
+	 * @param request 파일 정보 리스트
 	 * @return {@link List<FileUploadResponse>}
 	 * @implSpec 도메인과 파일 정보를 받아서 PresignedURL을 생성 후 리턴
 	 * @author vdvhk12
 	 */
 	@Override
-	public List<FileUploadResponse> generateUploadUrls(String domain, List<FileUploadRequest> files) {
-		return files.stream()
-			.map(file -> generateUploadUrl(domain, file.fileName(), file.fileSize(), file.contentType()))
+	public List<FileUploadResponse> generateUploadUrls(String domain, List<FileUploadRequest.File> request) {
+		return request.stream()
+			.map(file -> generateUploadUrl(domain, file))
 			.toList();
 	}
 
@@ -62,27 +58,25 @@ public class S3StorageService implements StorageService {
 	 * 하나의 파일에 대한 presigned URL 생성 메서드
 	 *
 	 * @param domain 파일이 사용되는 도메인
-	 * @param fileName 파일 이름
-	 * @param fileSize 파일 크기
-	 * @param contentType 파일 타입
+	 * @param file 파일 정보
 	 * @return {@link FileUploadResponse}
 	 * @implSpec 도메인, 파일명, 파일 크기, 파일 타입을 받아서 검증 후, PresignedURL을 생성하고 리턴
 	 * @author vdvhk12
 	 */
 	@Override
-	public FileUploadResponse generateUploadUrl(String domain, String fileName, Long fileSize, String contentType) {
-		// 파일 크기, MIME 타입 검증
-		validateFile(fileSize, contentType);
+	public FileUploadResponse generateUploadUrl(String domain, FileUploadRequest.File file) {
+		// MIME 타입 검증
+		validateFile(file.contentType());
 
 		// 파일명 생성
-		String newFileName = generateFileName(domain, fileName);
+		String newFileName = generateFileName(domain, file.fileName());
 
 		// Presigned URL 생성 요청
 		PutObjectRequest objectRequest = PutObjectRequest.builder()
 			.bucket(bucketName)
 			.key(newFileName)
-			.contentLength(fileSize)
-			.contentType(contentType)
+			.contentLength(file.fileSize())
+			.contentType(file.contentType())
 			.build();
 
 		PresignedPutObjectRequest presignedRequest = s3Presigner.presignPutObject(b -> b
@@ -94,19 +88,13 @@ public class S3StorageService implements StorageService {
 	}
 
 	/**
-	 * 파일 검증(크기 및 MIME 타입)
+	 * 파일 검증(MIME 타입)
 	 *
-	 * @param fileSize 파일 크기
 	 * @param contentType 파일 타입
-	 * @implSpec 파일 크기와 파일 타입을 검증 후 예외 처리
+	 * @implSpec 파일 타입을 검증 후 예외 처리
 	 * @author vdvhk12
 	 */
-	private void validateFile(long fileSize, String contentType) {
-		// TODO 지금은 일단 커스텀 예외로 잡고, 추후에 Validation 으로 파일 크기를 검증
-		if (fileSize > maxFileSize.toBytes()) {
-			throw new StorageException(StorageErrorCode.FILE_SIZE_EXCEEDED);
-		}
-
+	private void validateFile(String contentType) {
 		if (!ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
 			throw new StorageException(StorageErrorCode.UNSUPPORTED_FILE_TYPE);
 		}
