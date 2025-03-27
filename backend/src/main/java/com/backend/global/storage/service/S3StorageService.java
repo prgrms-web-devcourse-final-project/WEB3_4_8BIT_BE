@@ -73,7 +73,6 @@ public class S3StorageService implements StorageService {
 	 * 파일 검증(MIME 타입)
 	 *
 	 * @param contentType 파일 타입
-	 * @implSpec 파일 타입을 검증 후 예외 처리
 	 * @author vdvhk12
 	 */
 	private void validateFile(String contentType) {
@@ -88,7 +87,6 @@ public class S3StorageService implements StorageService {
 	 * @param domain 파일이 사용되는 도메인
 	 * @param originalFileName 파일 이름
 	 * @return String
-	 * @implSpec 도메인, 파일명을 받아서 도메인과 랜덤 값을 추가해 파일명 생성 후 리턴
 	 * @author vdvhk12
 	 */
 	private String generateFileName(String domain, String originalFileName) {
