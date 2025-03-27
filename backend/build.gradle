@@ -40,6 +40,9 @@ dependencies {
     // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1'
 
+    // S3
+    implementation("software.amazon.awssdk:s3:2.20.50")
+
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
