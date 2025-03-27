@@ -41,8 +41,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 		// 현재 로그인 시도 중인 OAuth2 서비스의 식별자 (ex: "kakao", "naver")
 		String registrationId = userRequest.getClientRegistration().getRegistrationId();
-		log.debug("Provider: {}", registrationId);
-		log.debug("OAuth2User attributes: {}", oAuth2User.getAttributes());
+		log.debug("Provider: {}, OAuth2User attributes: {}", registrationId,oAuth2User.getAttributes());
 
 		// 사용자 정보를 식별하기 위한 OAuth2의 기본 키 필드명 (ex: "id", "sub")
 		String usernameAttributeName = userRequest.getClientRegistration()
@@ -57,9 +56,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			case "kakao" -> new KakaoOAuth2UserInfo(oAuth2User.getAttributes());
 			default -> throw new MembersException(MembersErrorCode.UNSUPPORTED_PROVIDER);
 		};
-
-		log.debug("Extracted user info - id:{}, email: {}, name: {}",
-			userInfo.getId(), userInfo.getEmail(), userInfo.getName());
 
 		// 유저 정보 저장 또는 업데이트
 		Members member = saveOrUpdate(userInfo, registrationId);
