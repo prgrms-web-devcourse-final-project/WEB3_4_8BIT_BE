@@ -12,16 +12,20 @@ import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediasRequest;
 import com.backend.domain.fishencyclopedia.service.FishEncyclopediasService;
 import com.backend.global.response.GenericResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/fish/encyclopedias")
 @RequiredArgsConstructor
+@Tag(name = "물고기 도감 API")
 public class FishEncyclopediasController {
 
 	private final FishEncyclopediasService fishEncyclopediasService;
 
+	@Operation(summary = "물고기 도감 추가하기", description = "물고기 도감 추가시 사용하는 API")
 	@PostMapping
 	public ResponseEntity<GenericResponse<Void>> save(
 		@RequestBody @Valid FishEncyclopediasRequest.Create create
