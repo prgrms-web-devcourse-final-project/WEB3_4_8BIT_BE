@@ -30,19 +30,19 @@ public class FishEncyclopedias extends BaseEntity {
 	private Long fishEncyclopediaId;
 
 	@Column(nullable = false)
-	@ColumnDefault("0")
-	@Builder.Default
-	private Integer count = 0;
+	private Long fishId;
 
 	@Column(nullable = false)
 	private Integer length;
+
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	@Builder.Default
+	private Integer count = 0;
 
 	@Column(nullable = false)
 	private Long fishPointId;
 
 	@Column(nullable = false)
 	private Long memberId;
-
-	@Column(nullable = false)
-	private Long fishId;
 }
