@@ -15,17 +15,17 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
 import com.backend.domain.shipfishposts.entity.ShipFishPosts;
-import com.backend.domain.shipfishposts.repository.ShipFishPostsRepositoryImpl;
+import com.backend.domain.shipfishposts.repository.ShipFishPostsRepository;
 import com.backend.domain.shipfishposts.util.ShipFishPostsUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipFishPostsServiceTest {
 
 	@InjectMocks
-	private ShipFishPostsServiceImpl shipFishPostsServiceImpl;
+	private ShipFishPostsServiceImpl shipFishPostsService;
 
 	@Mock
-	private ShipFishPostsRepositoryImpl shipFishPostsRepositoryImpl;
+	private ShipFishPostsRepository shipFishPostsRepository;
 
 	@Test
 	@DisplayName("선상 낚시 게시글 저장 [Service] - Success")
@@ -40,9 +40,9 @@ public class ShipFishPostsServiceTest {
 		ReflectionTestUtils.setField(givenShipFishPosts, "shipFishPostId", 1L);
 
 		// When
-		when(shipFishPostsRepositoryImpl.save(any(ShipFishPosts.class))).thenReturn(givenShipFishPosts);
+		when(shipFishPostsRepository.save(any(ShipFishPosts.class))).thenReturn(givenShipFishPosts);
 
-		Long savedId = shipFishPostsServiceImpl.save(givenRequestDto);
+		Long savedId = shipFishPostsService.save(givenRequestDto);
 
 		// Then
 		assertThat(savedId).isEqualTo(1L);

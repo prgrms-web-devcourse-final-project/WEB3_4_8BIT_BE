@@ -20,7 +20,7 @@ import com.backend.global.config.QuerydslConfig;
 public class ShipFishPostsRepositoryTest {
 
 	@Autowired
-	private ShipFishPostsRepositoryImpl shipFishPostsRepositoryImpl;
+	private ShipFishPostsRepository shipFishPostsRepository;
 
 	@Test
 	@DisplayName("선상 낚시 게시글 저장 [Repository] - Success")
@@ -29,7 +29,7 @@ public class ShipFishPostsRepositoryTest {
 		ShipFishPosts givenShipFishPosts = ShipFishPostsUtil.createShipFishPostsWithNullableId();
 
 		// When
-		ShipFishPosts saved = shipFishPostsRepositoryImpl.save(givenShipFishPosts);
+		ShipFishPosts saved = shipFishPostsRepository.save(givenShipFishPosts);
 
 		// Then
 		assertThat(saved).isNotNull();
