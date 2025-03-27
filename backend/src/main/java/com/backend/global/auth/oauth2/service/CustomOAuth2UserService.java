@@ -22,7 +22,6 @@ import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.auth.oauth2.userinfo.KakaoOAuth2UserInfo;
 import com.backend.global.auth.oauth2.userinfo.NaverOauth2UserInfo;
 import com.backend.global.auth.oauth2.userinfo.OAuth2UserInfo;
-import com.backend.global.exception.GlobalException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +33,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 	private final MembersRepository membersRepository;
 
+	/**
+	 * OAuth2 사용자 요청을 처리하여 인증된 사용자 정보를 반환하는 메서드
+	 *
+	 * @param userRequest OAuth2 인증 요청 정보
+	 * @return 인증된 {@link OAuth2User} 객체
+	 * @throws OAuth2AuthenticationException OAuth2 인증 과정 중 예외 발생 시
+	 * @implSpec 사용자 정보를 Provider에 맞게 처리하고 해당 회원 정보를 저장 또는 업데이트한 뒤
+	 * 커스텀 OAuth2User 객체를 생성해 반환
+	 */
 	@Override
 	@Transactional
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -71,6 +79,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 		);
 	}
 
+	/**
+	 * OAuth2 사용자 정보를 기반으로 회원을 저장하거나 업데이트하는 메서드
+	 *
+	 * @param userInfo OAuth2에서 가져온 사용자 정보 객체
+	 * @param registrationId OAuth2 공급자 식별자 (예: "kakao", "naver")
+	 * @return 저장되거나 업데이트된 {@link Members} 객체
+	 * @implSpec 전화번호로 회원을 조회하고 존재하면 업데이트 / 없으면 회원을 새로 생성함
+	 */
 	private Members saveOrUpdate(OAuth2UserInfo userInfo, String registrationId) {
 		// 전화번호 포맷팅 (카카오의 경우)
 		String formattedPhone = registrationId.equalsIgnoreCase("kakao")
@@ -114,10 +130,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	}
 
 	/**
-	 * registrationId를 Provider Enum 처리
+	 * registrationId 값을 Enum으로 변환하는 유틸 메서드
 	 *
-	 * @param registrationId OAuth2 서비스 구분 ID (ex: kakao, google)
-	 * @throws MembersException 지원하지 않는 OAuth2 Provider
+	 * @param registrationId OAuth2 공급자 식별자 (예: "kakao", "naver")
+	 * @return {@link Provider} Enum 값
+	 * @throws MembersException 지원하지 않는 Provider일 경우 예외 발생
+	 * @implSpec registrationId를 대문자로 변환하여 Enum으로 매핑
 	 */
 	private Provider getProvider(String registrationId) {
 		try {
@@ -128,7 +146,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	}
 
 	/**
-	 * 카카오에서 받아온 전화번호를 한국 휴대폰 형식으로 변환하는 유틸 메서드.
+	 * 카카오에서 받아온 전화번호를 한국 휴대폰 형식으로 변환하는 유틸 메서드
 	 * 예: "+82 10-1234-5678" → "010-1234-5678"
 	 *
 	 * @param rawPhone 카카오에서 전달받은 원본 전화번호 문자열
