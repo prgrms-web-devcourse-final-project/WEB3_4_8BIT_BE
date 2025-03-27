@@ -18,14 +18,14 @@ repositories {
 }
 
 dependencies {
-    //Jpa
+    // Jpa
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    //Mysql
+    // Mysql
     implementation 'com.mysql:mysql-connector-j:9.1.0'
 
-    //Validation
+    // Validation
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     // Querydsl
@@ -37,7 +37,7 @@ dependencies {
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
-    //Swagger
+    // Swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1'
 
     // Lombok
@@ -47,11 +47,15 @@ dependencies {
     // 테스트용 H2
     runtimeOnly 'com.h2database:h2'
 
-    //Test 라이브러리
+    // Test 라이브러리
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
+    
+    // Fixture Monkey
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.10")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-jakarta-validation:1.1.10")
 }
 
 tasks.named('test') {
