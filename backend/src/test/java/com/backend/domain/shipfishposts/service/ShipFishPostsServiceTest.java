@@ -13,13 +13,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.backend.domain.shipfishposts.Util.BaseTest;
+import com.backend.domain.shipfishposts.dto.converter.ShipFishPostsConverter;
 import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
 import com.backend.domain.shipfishposts.entity.ShipFishPosts;
 import com.backend.domain.shipfishposts.repository.ShipFishPostsRepository;
-import com.backend.domain.shipfishposts.util.ShipFishPostsUtil;
 
 @ExtendWith(MockitoExtension.class)
-public class ShipFishPostsServiceTest {
+public class ShipFishPostsServiceTest extends BaseTest {
 
 	@InjectMocks
 	private ShipFishPostsServiceImpl shipFishPostsService;
@@ -31,16 +32,18 @@ public class ShipFishPostsServiceTest {
 	@DisplayName("선상 낚시 게시글 저장 [Service] - Success")
 	void t01() {
 		//Given
-		ShipFishPostsRequest.Create givenRequestDto = ShipFishPostsUtil.createShipFishPostsRequestCreate();
+		ShipFishPostsRequest.Create givenRequestDto =
+			fixtureMonkeyValidation.giveMeOne(ShipFishPostsRequest.Create.class);
 
 		Long durationMinute = Duration.between(givenRequestDto.startDate(), givenRequestDto.endDate()).toMinutes();
 
-		ShipFishPosts givenShipFishPosts = ShipFishPosts.from(givenRequestDto, durationMinute);
+		ShipFishPosts givenShipFishPosts = ShipFishPostsConverter.fromShipFishPostsRequestCreate(givenRequestDto,
+			durationMinute);
 
 		ReflectionTestUtils.setField(givenShipFishPosts, "shipFishPostId", 1L);
 
 		// When
-		when(shipFishPostsRepository.save(any(ShipFishPosts.class))).thenReturn(givenShipFishPosts);
+		when(shipFishPostsRepository.save(givenShipFishPosts)).thenReturn(givenShipFishPosts);
 
 		Long savedId = shipFishPostsService.save(givenRequestDto);
 

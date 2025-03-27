@@ -11,13 +11,16 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Repository;
 
+import com.backend.domain.shipfishposts.Util.BaseTest;
 import com.backend.domain.shipfishposts.entity.ShipFishPosts;
-import com.backend.domain.shipfishposts.util.ShipFishPostsUtil;
 import com.backend.global.config.QuerydslConfig;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Import(QuerydslConfig.class)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
-public class ShipFishPostsRepositoryTest {
+public class ShipFishPostsRepositoryTest extends BaseTest {
 
 	@Autowired
 	private ShipFishPostsRepository shipFishPostsRepository;
@@ -26,7 +29,10 @@ public class ShipFishPostsRepositoryTest {
 	@DisplayName("선상 낚시 게시글 저장 [Repository] - Success")
 	void t01() {
 		// Given
-		ShipFishPosts givenShipFishPosts = ShipFishPostsUtil.createShipFishPostsWithNullableId();
+		ShipFishPosts givenShipFishPosts = fixtureMonkeyBuilder
+			.giveMeBuilder(ShipFishPosts.class)
+			.set("shipFishPostId", null)
+			.sample();
 
 		// When
 		ShipFishPosts saved = shipFishPostsRepository.save(givenShipFishPosts);
