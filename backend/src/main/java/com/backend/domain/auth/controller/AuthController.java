@@ -30,7 +30,7 @@ public class AuthController {
 	private final CookieUtil cookieUtil;
 
 	@PostMapping("/refresh")
-	@Operation(summary = "AccessToken 재발급")
+	@Operation(summary = "AccessToken 재발급하기", description = "AccessToken 만료시 재발급해주는 API")
 	public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
 		String accessToken = cookieUtil.extractTokenFromCookie(request);
 
@@ -54,7 +54,7 @@ public class AuthController {
 	}
 
 	@PostMapping("/logout")
-	@Operation(summary = "로그아웃")
+	@Operation(summary = "로그아웃하기", description = "로그아웃시 쿠키 삭제 및 블랙리스트 처리 API")
 	public GenericResponse<String> logout(HttpServletRequest request, HttpServletResponse response) {
 		String accessToken = cookieUtil.extractTokenFromCookie(request);
 
