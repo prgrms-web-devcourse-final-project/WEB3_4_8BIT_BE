@@ -51,10 +51,17 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		String accessToken = jwtTokenProvider.createAccessToken(authentication);
 		ResponseCookie cookie = cookieUtil.createAccessTokenCookie(accessToken);
 
-		// Refresh Token 생성 및 Redis 저장 (7일)
-		String refreshToken = jwtTokenProvider.createRefreshToken();
-		redisTemplate.opsForValue()
-			.set("RT:" + userId, refreshToken, refreshTokenValidityInSeconds, TimeUnit.SECONDS);
+		String refreshTokenKey = "RT:" + userId;
+		String existingRefreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
+
+		//refreshtoken 발급 및 저장
+		if (existingRefreshToken == null || jwtTokenProvider.isRefreshTokenExpired(existingRefreshToken)) {
+			String refreshToken = jwtTokenProvider.createRefreshToken();
+			redisTemplate.opsForValue().set(refreshTokenKey, refreshToken, refreshTokenValidityInSeconds, TimeUnit.SECONDS);
+			log.debug("새로운 Refresh Token 발급 및 저장 완료");
+		} else {
+			log.debug("기존 Refresh Token 유지");
+		}
 
 		// 쿠키 추가
 		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

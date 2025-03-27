@@ -206,5 +206,24 @@ public class JwtTokenProvider {
 			.map(GrantedAuthority::getAuthority)
 			.collect(Collectors.joining(","));
 	}
+
+	/**
+	 * refreshtoken이 만료여부 확인하는 메서드
+	 *
+	 * @param token refresh token
+	 * @return true: 만료되었거나 유효하지 않은 경우 / false: 아직 유효한 경우
+	 */
+	public boolean isRefreshTokenExpired(String token) {
+		try {
+			Claims claims = Jwts.parser()
+				.verifyWith(key)
+				.build()
+				.parseSignedClaims(token)
+				.getPayload();
+			return claims.getExpiration().before(new Date());
+		} catch (Exception e) {
+			return true; // 파싱 오류 = 만료 또는 유효하지 않음
+		}
+	}
 }
 
