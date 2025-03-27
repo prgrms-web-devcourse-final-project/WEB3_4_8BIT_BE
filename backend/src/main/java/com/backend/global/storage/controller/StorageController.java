@@ -14,6 +14,8 @@ import com.backend.global.storage.dto.request.FileUploadRequest;
 import com.backend.global.storage.dto.response.FileUploadResponse;
 import com.backend.global.storage.service.StorageService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,7 +26,17 @@ public class StorageController {
 	private final StorageService storageService;
 
 	@PostMapping("/presigned-urls")
-	public ResponseEntity<GenericResponse<?>> getPresignedUrls(
+	@Operation(
+		summary = "Presigned URL 생성",
+		description = "파일 업로드를 위한 presigned URL 리스트를 생성합니다.",
+		parameters = {
+			@Parameter(
+				name = "domain",
+				description = "해당 파일 또는 이미지가 사용될 도메인 (예: profile, review 등)",
+				required = true)
+		}
+	)
+	public ResponseEntity<GenericResponse<List<FileUploadResponse>>> getPresignedUrls(
 		@RequestParam String domain,
 		@RequestBody List<FileUploadRequest> files
 	) {
