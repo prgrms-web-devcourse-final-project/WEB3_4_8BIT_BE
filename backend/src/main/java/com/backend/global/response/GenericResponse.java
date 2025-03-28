@@ -2,12 +2,10 @@ package com.backend.global.response;
 
 import java.time.ZonedDateTime;
 
-import org.springframework.http.HttpStatus;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -18,77 +16,102 @@ import lombok.Getter;
  * @author Kim Dong O
  */
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(access = AccessLevel.PRIVATE)
 public class GenericResponse<T> {
 
-	private final ZonedDateTime timestamp;
+	@Builder.Default
+	@Schema(example = "2025-03-27T15:19:31.902266+09:00", description = "요청 시간")
+	private final ZonedDateTime timestamp = ZonedDateTime.now();
+
+	@Schema(example = "true", description = "성공 여부")
 	private final boolean isSuccess;
+
 	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private final int code;
+	@Schema(example = "1001", description = "커스텀 코드 (예외 발생시 사용), (없을 시 반환 X)")
+	private final Integer code;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@Schema(example = "\"testData\": \"testData\"", description = "응답 데이터 (없을시 반환 X)")
 	private final T data;
+
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	@Schema(example = "testMessage", description = "응답 데이터 (없을시 반환 X)")
 	private final String message;
 
-
 	/**
-	 * 요청이 성공하고 data, message 있을 때
+	 * isSuccess, data, message 있을 때
 	 *
-	 * @param data    반환 데이터
-	 * @param message 반환 메세지
+	 * @param isSuccess 성공 여부
+	 * @param data      반환 데이터
+	 * @param message   반환 메세지
 	 * @return {@link GenericResponse<T>}
 	 */
-	public static <T> GenericResponse<T> ok(T data, String message) {
+	public static <T> GenericResponse<T> of(boolean isSuccess, T data, String message) {
 		return GenericResponse.<T>builder()
-			.isSuccess(true)
+			.isSuccess(isSuccess)
 			.data(data)
 			.message(message)
 			.build();
 	}
 
 	/**
-	 * 요청이 성공하고 data 있을 때
+	 * isSuccess, data 있을 때
 	 *
-	 * @param data    반환 데이터
+	 * @param isSuccess 성공 여부
+	 * @param data      반환 데이터
 	 * @return {@link GenericResponse<T>}
 	 */
-	public static <T> GenericResponse<T> ok(T data) {
+	public static <T> GenericResponse<T> of(boolean isSuccess, T data) {
 		return GenericResponse.<T>builder()
-			.isSuccess(true)
+			.isSuccess(isSuccess)
 			.data(data)
 			.build();
 	}
 
 	/**
-	 * 요청이 성공하고 data, message 있을 때
+	 * isSuccess, message 있을 때
 	 *
-	 * @param message 반환 메세지
+	 * @param isSuccess 성공 여부
+	 * @param message   반환 메세지
 	 * @return {@link GenericResponse<T>}
 	 */
-	public static <T> GenericResponse<T> ok(String message) {
+	public static <T> GenericResponse<T> of(boolean isSuccess, String message) {
 		return GenericResponse.<T>builder()
-			.isSuccess(true)
+			.isSuccess(isSuccess)
 			.message(message)
 			.build();
 	}
 
 	/**
-	 * 요청이 성공했을 때
-	 * <p>code 기본 값 : 200</p>
+	 * isSuccess 있을 때
 	 *
+	 * @param isSuccess 성공 여부
 	 * @return {@link GenericResponse<T>}
 	 */
-	public static <T> GenericResponse<T> ok() {
+	public static <T> GenericResponse<T> of(boolean isSuccess) {
 		return GenericResponse.<T>builder()
-			.isSuccess(true)
+			.isSuccess(isSuccess)
 			.build();
 	}
 
 	/**
-	 * 요청이 실패하고 code, data, message 있을 때
-	 *
-	 * @param code    응답 코드 값
-	 * @param data    반환 데이터
-	 * @param message 반환 메세지
+	 * isSuccess, message 있을 때
+	 * @param data      응답 데이터
+	 * @param message   반환 메세지
+	 * @return {@link GenericResponse<T>}
+	 */
+	public static <T> GenericResponse<T> fail(T data, String message) {
+		return GenericResponse.<T>builder()
+			.isSuccess(false)
+			.message(message)
+			.build();
+	}
+
+	/**
+	 * isSuccess, message 있을 때
+	 * @param data      응답 데이터
+	 * @param code      응답 코드
+	 * @param message   반환 메세지
 	 * @return {@link GenericResponse<T>}
 	 */
 	public static <T> GenericResponse<T> fail(int code, T data, String message) {
@@ -101,25 +124,9 @@ public class GenericResponse<T> {
 	}
 
 	/**
-	 * 요청이 실패하고 code, data 있을 때
-	 *
-	 * @param code    응답 코드 값
-	 * @param data    반환 데이터
-	 * @return {@link GenericResponse<T>}
-	 */
-	public static <T> GenericResponse<T> fail(int code, T data) {
-		return GenericResponse.<T>builder()
-			.isSuccess(false)
-			.code(code)
-			.data(data)
-			.build();
-	}
-
-	/**
-	 * 요청이 실패하고 code, message 있을 때
-	 *
-	 * @param code    응답 코드 값
-	 * @param message 반환 메세지
+	 * isSuccess, message 있을 때
+	 * @param code      응답 코드
+	 * @param message   반환 메세지
 	 * @return {@link GenericResponse<T>}
 	 */
 	public static <T> GenericResponse<T> fail(int code, String message) {
@@ -127,79 +134,6 @@ public class GenericResponse<T> {
 			.isSuccess(false)
 			.code(code)
 			.message(message)
-			.build();
-	}
-
-	/**
-	 * 요청이 실패하고 code 있을 때
-	 *
-	 * @param code    응답 코드 값
-	 * @return {@link GenericResponse<T>}
-	 */
-	public static <T> GenericResponse<T> fail(int code) {
-		return GenericResponse.<T>builder()
-			.isSuccess(false)
-			.code(code)
-			.build();
-	}
-
-	/**
-	 * 요청이 실패하고 data, message 있을 때
-	 * <p>code 기본 값 : 400</p>
-	 *
-	 * @param data    반환 데이터
-	 * @param message 반환 메세지
-	 * @return {@link GenericResponse<T>}
-	 */
-	public static <T> GenericResponse<T> fail(T data, String message) {
-		return GenericResponse.<T>builder()
-			.isSuccess(false)
-			.code(HttpStatus.BAD_REQUEST.value())
-			.message(message)
-			.data(data)
-			.build();
-	}
-
-	/**
-	 * 요청이 실패하고 message 있을 때
-	 * <p>code 기본 값 : 400</p>
-	 *
-	 * @param message 반환 메세지
-	 * @return {@link GenericResponse<T>}
-	 */
-	public static <T> GenericResponse<T> fail(String message) {
-		return GenericResponse.<T>builder()
-			.isSuccess(false)
-			.code(HttpStatus.BAD_REQUEST.value())
-			.message(message)
-			.build();
-	}
-
-	/**
-	 * 요청이 실패하고 data 있을 때
-	 * <p>code 기본 값 : 400</p>
-	 *
-	 * @param data    반환 데이터
-	 * @return {@link GenericResponse<T>}
-	 */
-	public static <T> GenericResponse<T> fail(T data) {
-		return GenericResponse.<T>builder()
-			.isSuccess(false)
-			.code(HttpStatus.BAD_REQUEST.value())
-			.data(data)
-			.build();
-	}
-
-	/**
-	 * 요청이 실패했을 때
-	 * <p>code 기본 값 : 400</p>
-	 *
-	 * @return {@link GenericResponse<T>}
-	 */
-	public static <T> GenericResponse<T> fail() {
-		return GenericResponse.<T>builder()
-			.isSuccess(false)
-			.code(HttpStatus.BAD_REQUEST.value())
 			.build();
 	}
 }

@@ -30,6 +30,6 @@ public class StorageController {
 		@RequestBody @Valid FileUploadRequest.Request request
 	) {
 		List<FileUploadResponse> response = storageService.generateUploadUrls(request.domain(), request.files());
-		return ResponseEntity.ok(GenericResponse.ok(response));
+		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
 }
