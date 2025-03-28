@@ -34,8 +34,8 @@ public class CookieUtil {
 
 	public ResponseCookie createAccessTokenCookie(String token) {
 		ResponseCookie cookie = ResponseCookie.from("accessToken", token)
-			.httpOnly(false)
-			.secure(false)
+			.httpOnly(true)
+			.secure(true)
 			.sameSite("Lax")
 			.path("/")
 			.maxAge(refreshTokenValidityInSeconds)
@@ -47,8 +47,8 @@ public class CookieUtil {
 
 	public ResponseCookie createLogoutCookie() {
 		return ResponseCookie.from("accessToken", "")
-			.httpOnly(false)
-			.secure(false)
+			.httpOnly(true)
+			.secure(true)
 			.sameSite("Lax")
 			.path("/")
 			.maxAge(0)
