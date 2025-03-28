@@ -19,17 +19,17 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@Tag(name = "review", description = "리뷰 API")
+@Tag(name = "선상 낚시 리뷰 API")
 @RequestMapping("/api/v1/reservations/{id}/reviews")
 public class ReviewController {
 
 	private final ReviewService reviewService;
 
 	@PostMapping
-	@Operation(summary = "리뷰 작성", description = "리뷰 작성 API")
+	@Operation(summary = "선상 낚시 리뷰 생성", description = "내 예약에서 선상 낚시에 대한 리뷰 작성할 때 사용하는 API")
 	public ResponseEntity<GenericResponse<Long>> createReview(
 		@PathVariable Long id,
-		@RequestBody @Valid ReviewRequest.Create request
+		@RequestBody @Valid ReviewRequest.CreateReview request
 	) {
 		// TODO 추후에 리뷰 ID를 리턴할지 게시글 ID를 리턴할지 결정되면 수정
 		return ResponseEntity.status(HttpStatus.CREATED)

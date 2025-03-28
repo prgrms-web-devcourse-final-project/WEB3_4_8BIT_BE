@@ -21,7 +21,7 @@ public class ReviewServiceImpl implements ReviewService {
 	// TODO 리뷰 작성 후 리뷰 상세 페이지로 이동하는지, 아니면 게시글 상세보기로 이동하는지 확인 필요, 추후 수정
 	@Override
 	@Transactional
-	public Long save(final Long reservationId, final ReviewRequest.Create request) {
+	public Long save(final Long reservationId, final ReviewRequest.CreateReview request) {
 
 		// 리뷰 중복 검증 TODO 예약 검증은 선상 낚시 예약 기능 구현 이후에 추가
 		if(reviewRepository.existsByReservationId(reservationId)) {

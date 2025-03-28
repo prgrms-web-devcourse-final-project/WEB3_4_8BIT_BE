@@ -8,7 +8,7 @@ import jakarta.validation.constraints.NotNull;
 
 public class ReviewRequest {
 
-	public record Create (
+	public record CreateReview (
 
 		@NotNull(message = "별점은 필수 항목입니다.")
 		@Schema(description = "별점", example = "5")
