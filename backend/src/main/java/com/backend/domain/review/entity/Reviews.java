@@ -1,5 +1,7 @@
 package com.backend.domain.review.entity;
 
+import java.util.List;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -36,7 +38,7 @@ public class Reviews extends BaseEntity {
 	private String content;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	private String image;
+	private List<String> images;
 
 	@Column(nullable = false)
 	private Long memberId;
