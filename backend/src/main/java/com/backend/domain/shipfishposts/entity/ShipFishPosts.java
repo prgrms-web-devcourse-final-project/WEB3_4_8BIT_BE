@@ -1,7 +1,6 @@
 package com.backend.domain.shipfishposts.entity;
 
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -36,9 +35,6 @@ public class ShipFishPosts extends BaseEntity {
 	// Todo : user 정보 등록 ( member Id & Name )
 	// @Column(nullable = false)
 	// private Long memberId;
-	//
-	// @Column(nullable = false)
-	// private String memberName;
 
 	@Column(nullable = false, length = 50)
 	private String subject;
@@ -50,16 +46,22 @@ public class ShipFishPosts extends BaseEntity {
 	private List<String> images;
 
 	@Column(nullable = false)
-	private BigDecimal price;
+	private Long price;
 
 	@Column(nullable = false)
-	private ZonedDateTime startDate;
+	private String location;
 
 	@Column(nullable = false)
-	private ZonedDateTime endDate;
+	private LocalTime startTime;
 
 	@Column(nullable = false)
-	private Long durationMinute;
+	private LocalTime endTime;
+
+	@Column(nullable = false)
+	private String durationTime;
+
+	@Column(nullable = false)
+	private Integer guestMaxCount;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(nullable = false)

@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishposts.dto.converter;
+package com.backend.domain.shipfishposts.converter;
 
 import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
 import com.backend.domain.shipfishposts.entity.ShipFishPosts;
@@ -6,24 +6,26 @@ import com.backend.domain.shipfishposts.entity.ShipFishPosts;
 public class ShipFishPostsConverter {
 
 	/**
+	 * 선상 낚시 게시글 생성 Dto를 Entity로 변환한다.
 	 *
 	 * @param requestDto
-	 * @param durationMinute
+	 * @param durationTime
 	 * @return {@link ShipFishPosts}
-	 * @implSpec 선상 낚시 게시글 생성 Dto를 Entity로 변환한다.
 	 */
 	public static ShipFishPosts fromShipFishPostsRequestCreate(
 		ShipFishPostsRequest.Create requestDto,
-		Long durationMinute) {
+		String durationTime) {
 
 		return ShipFishPosts.builder()
 			.subject(requestDto.subject())
 			.content(requestDto.content())
 			.images(requestDto.images())
 			.price(requestDto.price())
-			.startDate(requestDto.startDate())
-			.endDate(requestDto.endDate())
-			.durationMinute(durationMinute)
+			.location(requestDto.location())
+			.startTime(requestDto.startTime())
+			.endTime(requestDto.endTime())
+			.durationTime(durationTime)
+			.guestMaxCount(requestDto.maxGuestCount())
 			.fishId(requestDto.fishIds())
 			.shipId(requestDto.shipId())
 			.reviewEverRate(0D)
