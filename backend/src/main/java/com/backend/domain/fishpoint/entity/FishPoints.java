@@ -1,5 +1,7 @@
 package com.backend.domain.fishpoint.entity;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -8,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,8 +29,11 @@ public class FishPoints extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long fishPointId;
 
-	@Column(unique = true, nullable = false, length = 50)
+	@Column(nullable = false, length = 50)
 	private String fishPointName;
+
+	@Column(nullable = false, length = 50)
+	private String fishPointDetailName;
 
 	@Column(nullable = false)
 	private Double longitude;
@@ -36,5 +42,7 @@ public class FishPoints extends BaseEntity {
 	private Double latitude;
 
 	@Column(nullable = false)
-	private Boolean isBan;
+	@ColumnDefault("false")
+	@Builder.Default
+	private Boolean isBan = false;
 }
