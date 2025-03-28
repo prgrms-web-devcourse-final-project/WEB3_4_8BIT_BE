@@ -1,7 +1,5 @@
 package com.backend.global.auth.jwt;
 
-import java.io.IOException;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -10,7 +8,6 @@ import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.util.CookieUtil;
 
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +19,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
 	private final CookieUtil cookieUtil;
+
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) {
+		String path = request.getRequestURI();
+		return path.startsWith("/swagger-ui")
+			|| path.startsWith("/v3/api-docs")
+			|| path.startsWith("/swagger-resources")
+			|| path.startsWith("/webjars");
+	}
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -59,8 +65,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			filterChain.doFilter(request, response);
 
+		} catch (JwtAuthenticationException e) {
+			log.warn("JWT 인증 예외 발생: {}", e.getMessage());
+			throw e;
+
 		} catch (Exception e) {
-			log.debug("사용자 인증 정보를 설정할 수 없음: {}", e.getMessage());
+			log.warn("사용자 인증 정보를 설정할 수 없음: {}", e.getMessage());
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 	}
