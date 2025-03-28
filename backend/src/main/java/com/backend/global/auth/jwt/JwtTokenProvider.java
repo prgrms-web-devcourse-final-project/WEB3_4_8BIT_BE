@@ -17,6 +17,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import com.backend.domain.member.entity.Members;
+import com.backend.domain.member.exception.MembersErrorCode;
+import com.backend.domain.member.exception.MembersException;
+import com.backend.domain.member.repository.MembersRepository;
 import com.backend.global.auth.exception.JwtAuthenticationErrorCode;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
@@ -38,6 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtTokenProvider {
 
 	private final RedisTemplate<String, String> redisTemplate;
+	private final MembersRepository membersRepository;
 
 	@Value("${jwt.secret}")
 	private String secretKey;
@@ -127,7 +132,10 @@ public class JwtTokenProvider {
 	public Authentication getAuthentication(String token) {
 		Claims claims = parseClaims(token);  // 수정된 parseClaims 사용
 		Long userId = Long.valueOf(claims.getSubject());
-		String email = claims.get("email", String.class);
+
+		Members members = membersRepository.findById(userId)
+			.orElseThrow(() -> new MembersException(MembersErrorCode.MEMBER_NOT_FOUND));
+
 
 		Collection<? extends GrantedAuthority> authorities =
 			Arrays.stream(claims.get("auth").toString().split(","))
@@ -137,12 +145,12 @@ public class JwtTokenProvider {
 		CustomOAuth2User principal = new CustomOAuth2User(
 			authorities, // 권한 정보
 			Map.of(
-				"id", userId,
-				"email", email
+				"id", members.getMemberId(),
+				"email", members.getEmail()
 			), // OAuth2 속성
 			"id", // nameAttributeKey
-			userId, // id
-			email // email
+			members.getMemberId(), // id
+			members.getEmail() // email
 		);
 		return new UsernamePasswordAuthenticationToken(principal, "", authorities);
 	}
