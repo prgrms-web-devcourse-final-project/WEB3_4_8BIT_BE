@@ -12,6 +12,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -25,6 +27,12 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
+@Table(	// 복합 unique 키 설정, 게시글당 1개의 리뷰만 등록 가능
+	name = "reviews",
+	uniqueConstraints = {
+		@UniqueConstraint(columnNames = {"member_id", "ship_fish_post_id"})
+	}
+)
 public class Reviews extends BaseEntity {
 
 	@Id

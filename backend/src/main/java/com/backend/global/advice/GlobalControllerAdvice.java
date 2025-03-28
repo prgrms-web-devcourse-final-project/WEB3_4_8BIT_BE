@@ -92,6 +92,26 @@ public class GlobalControllerAdvice {
 	}
 
 	/**
+	 * ReviewException 처리 핸들러 입니다.
+	 *
+	 * @param reviewException {@link ReviewException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(ReviewException.class)
+	public ResponseEntity<GenericResponse<Void>> handlerReviewException(
+		ReviewException reviewException) {
+		log.error("handlerReviewException: ", reviewException);
+
+		GenericResponse<Void> genericResponse = GenericResponse.fail(
+			reviewException.getReviewErrorCode().getCode(),
+			reviewException.getMessage()
+		);
+
+		return ResponseEntity.status(reviewException.getStatus().value())
+			.body(genericResponse);
+	}
+
+	/**
 	 * Validation 예외 처리 핸들러 입니다.
 	 *
 	 * @param ex      Exception

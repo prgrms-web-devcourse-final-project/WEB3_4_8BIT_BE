@@ -32,6 +32,7 @@ public class ReviewController {
 		@RequestBody @Valid ReviewRequest.Create request
 	) {
 		// TODO 추후에 리뷰 ID를 리턴할지 게시글 ID를 리턴할지 결정되면 수정
-		return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.ok(reviewService.createReview(id, request)));
+		return ResponseEntity.status(HttpStatus.CREATED)
+			.body(GenericResponse.ok(reviewService.createReview(id, request)));
 	}
 }
