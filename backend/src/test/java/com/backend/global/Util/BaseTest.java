@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishposts.Util;
+package com.backend.global.Util;
 
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.navercorp.fixturemonkey.api.introspector.BuilderArbitraryIntrospector;

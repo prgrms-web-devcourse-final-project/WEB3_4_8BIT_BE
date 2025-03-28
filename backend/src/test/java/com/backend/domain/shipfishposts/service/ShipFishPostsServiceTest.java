@@ -13,11 +13,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.backend.domain.shipfishposts.Util.BaseTest;
-import com.backend.domain.shipfishposts.dto.converter.ShipFishPostsConverter;
+import com.backend.domain.shipfishposts.converter.ShipFishPostsConverter;
 import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
 import com.backend.domain.shipfishposts.entity.ShipFishPosts;
 import com.backend.domain.shipfishposts.repository.ShipFishPostsRepository;
+import com.backend.global.Util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipFishPostsServiceTest extends BaseTest {
@@ -35,7 +35,15 @@ public class ShipFishPostsServiceTest extends BaseTest {
 		ShipFishPostsRequest.Create givenRequestDto =
 			fixtureMonkeyValidation.giveMeOne(ShipFishPostsRequest.Create.class);
 
-		Long durationMinute = Duration.between(givenRequestDto.startDate(), givenRequestDto.endDate()).toMinutes();
+		Duration durationTime = Duration.between(givenRequestDto.startTime(), givenRequestDto.endTime());
+
+		if (durationTime.isNegative()) {
+			durationTime = durationTime.plusDays(1);
+		}
+
+		long totalMinutes = durationTime.toMinutes();
+
+		String durationMinute = String.format("%02d:%02d", totalMinutes / 60, totalMinutes % 60);
 
 		ShipFishPosts givenShipFishPosts = ShipFishPostsConverter.fromShipFishPostsRequestCreate(givenRequestDto,
 			durationMinute);
@@ -43,7 +51,7 @@ public class ShipFishPostsServiceTest extends BaseTest {
 		ReflectionTestUtils.setField(givenShipFishPosts, "shipFishPostId", 1L);
 
 		// When
-		when(shipFishPostsRepository.save(givenShipFishPosts)).thenReturn(givenShipFishPosts);
+		when(shipFishPostsRepository.save(any(ShipFishPosts.class))).thenReturn(givenShipFishPosts);
 
 		Long savedId = shipFishPostsService.save(givenRequestDto);
 

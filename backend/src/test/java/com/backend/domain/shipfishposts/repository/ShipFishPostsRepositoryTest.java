@@ -11,8 +11,8 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Repository;
 
-import com.backend.domain.shipfishposts.Util.BaseTest;
 import com.backend.domain.shipfishposts.entity.ShipFishPosts;
+import com.backend.global.Util.BaseTest;
 import com.backend.global.config.QuerydslConfig;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +32,7 @@ public class ShipFishPostsRepositoryTest extends BaseTest {
 		ShipFishPosts givenShipFishPosts = fixtureMonkeyBuilder
 			.giveMeBuilder(ShipFishPosts.class)
 			.set("shipFishPostId", null)
+			.set("subject", "1555")
 			.sample();
 
 		// When
