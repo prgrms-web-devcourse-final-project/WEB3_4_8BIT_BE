@@ -56,7 +56,7 @@ public class SecurityConfig {
 				.authenticationEntryPoint((request, response, authException) -> {
 					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 					response.setContentType("application/json; charset=utf-8");
-					response.getWriter().write("{\"message\": \"인증되지 않은 사용자입니다.\"");
+					response.getWriter().write("{\"message\": \"인증되지 않은 사용자입니다.\"}");
 				})
 			)
 
