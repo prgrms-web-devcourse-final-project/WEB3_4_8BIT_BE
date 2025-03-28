@@ -25,10 +25,7 @@ public class ShipFishingPostController {
 
 	private final ShipFishingPostService shipFishingPostService;
 
-	@Operation(
-		summary = "선상 낚시 게시글 생성",
-		description = "유저가 새로운 선상 낚시 게시글을 생성할 때 사용하는 API"
-	)
+	@Operation(summary = "선상 낚시 게시글 생성", description = "유저가 새로운 선상 낚시 게시글을 생성할 때 사용하는 API")
 	@PostMapping
 	public ResponseEntity<GenericResponse<Void>> createShipFishPost(
 		@RequestBody @Valid ShipFishingPostRequest.Create requestDto) {
@@ -37,7 +34,6 @@ public class ShipFishingPostController {
 
 		Long shipFishPostsId = shipFishingPostService.save(requestDto);
 
-		return ResponseEntity.created(URI.create(shipFishPostsId.toString())).build();
+		return ResponseEntity.created(URI.create(shipFishPostsId.toString())).body(GenericResponse.of(true));
 	}
-
 }

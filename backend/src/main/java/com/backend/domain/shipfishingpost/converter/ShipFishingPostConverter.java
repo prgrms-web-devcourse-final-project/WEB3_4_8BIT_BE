@@ -12,8 +12,7 @@ public class ShipFishingPostConverter {
 	 * @param durationTime
 	 * @return {@link ShipFishingPost}
 	 */
-	public static ShipFishingPost fromShipFishPostsRequestCreate(
-		ShipFishingPostRequest.Create requestDto,
+	public static ShipFishingPost fromShipFishPostsRequestCreate(ShipFishingPostRequest.Create requestDto,
 		String durationTime) {
 
 		return ShipFishingPost.builder()
