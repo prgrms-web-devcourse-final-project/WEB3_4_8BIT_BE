@@ -14,6 +14,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CookieUtil {
 
+	@Value("${cookie.httpOnly}")
+	private boolean httpOnly;
+
+	@Value("${cookie.secure}")
+	private boolean secure;
+
 	@Value("${jwt.refresh-token-expire-time-seconds}")
 	private long refreshTokenValidityInSeconds;
 
@@ -31,11 +37,10 @@ public class CookieUtil {
 		return null;
 	}
 
-
 	public ResponseCookie createAccessTokenCookie(String token) {
 		ResponseCookie cookie = ResponseCookie.from("accessToken", token)
-			.httpOnly(true)
-			.secure(true)
+			.httpOnly(httpOnly)
+			.secure(secure)
 			.sameSite("Lax")
 			.path("/")
 			.maxAge(refreshTokenValidityInSeconds)
@@ -47,8 +52,8 @@ public class CookieUtil {
 
 	public ResponseCookie createLogoutCookie() {
 		return ResponseCookie.from("accessToken", "")
-			.httpOnly(true)
-			.secure(true)
+			.httpOnly(httpOnly)
+			.secure(secure)
 			.sameSite("Lax")
 			.path("/")
 			.maxAge(0)
