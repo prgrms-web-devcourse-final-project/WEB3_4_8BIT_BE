@@ -1,6 +1,6 @@
 package com.backend.global.advice;
 
-import com.backend.domain.member.exception.MembersException;
+import com.backend.domain.member.exception.MemberException;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
@@ -73,20 +73,20 @@ public class GlobalControllerAdvice {
 	/**
 	 * MembersException 처리 핸들러입니다.
 	 *
-	 * @param membersException {@link MembersException}
+	 * @param memberException {@link MemberException}
 	 * @return {@link ResponseEntity<GenericResponse>}
 	 */
-	@ExceptionHandler(MembersException.class)
+	@ExceptionHandler(MemberException.class)
 	public ResponseEntity<GenericResponse<Void>> handleMembersException(
-		MembersException membersException) {
-		log.error("handleMembersException: ", membersException);
+		MemberException memberException) {
+		log.error("handleMembersException: ", memberException);
 
 		GenericResponse<Void> genericResponse = GenericResponse.fail(
-			membersException.getMembersErrorCode().getCode(),
-			membersException.getMessage()
+			memberException.getMemberErrorCode().getCode(),
+			memberException.getMessage()
 		);
 
-		return ResponseEntity.status(membersException.getStatus().value())
+		return ResponseEntity.status(memberException.getStatus().value())
 			.body(genericResponse);
 	}
 

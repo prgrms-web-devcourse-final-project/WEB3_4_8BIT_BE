@@ -11,10 +11,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import com.backend.domain.member.entity.Members;
-import com.backend.domain.member.exception.MembersErrorCode;
-import com.backend.domain.member.exception.MembersException;
-import com.backend.domain.member.repository.MembersRepository;
+import com.backend.domain.member.entity.Member;
+import com.backend.domain.member.exception.MemberErrorCode;
+import com.backend.domain.member.exception.MemberException;
+import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.auth.jwt.JwtTokenProvider;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.response.GenericResponse;
@@ -34,7 +34,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
 	private final JwtTokenProvider jwtTokenProvider;
 	private final RedisTemplate<String, String> redisTemplate;
-	private final MembersRepository membersRepository;
+	private final MemberRepository memberRepository;
 	private final CookieUtil cookieUtil;
 	private final ObjectMapper objectMapper;
 
@@ -51,8 +51,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		CustomOAuth2User oAuth2User = (CustomOAuth2User)authentication.getPrincipal();
 		Long userId = oAuth2User.getId();
 
-		Members member = membersRepository.findById(userId)
-			.orElseThrow(() -> new MembersException(MembersErrorCode.MEMBER_NOT_FOUND));
+		Member member = memberRepository.findById(userId)
+			.orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 		log.debug("OAuth2 로그인 성공 - userId: {}, email: {}", userId, oAuth2User.getEmail());
 

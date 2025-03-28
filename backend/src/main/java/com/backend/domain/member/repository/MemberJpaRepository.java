@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.backend.domain.member.entity.Members;
+import com.backend.domain.member.entity.Member;
 
-public interface MembersJpaRepository extends JpaRepository<Members, Long> {
+public interface MemberJpaRepository extends JpaRepository<Member, Long> {
 
 	/**
 	 * 소셜 회원가입 여부 확인
@@ -14,5 +14,5 @@ public interface MembersJpaRepository extends JpaRepository<Members, Long> {
 	 * @param phone 회원 핸드폰 번호
 	 * @return Members 회원
 	 */
-	Optional<Members> findByPhone(String phone);
+	Optional<Member> findByPhone(String phone);
 }

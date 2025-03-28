@@ -15,10 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.domain.Provider;
-import com.backend.domain.member.entity.Members;
-import com.backend.domain.member.exception.MembersErrorCode;
-import com.backend.domain.member.exception.MembersException;
-import com.backend.domain.member.repository.MembersRepository;
+import com.backend.domain.member.entity.Member;
+import com.backend.domain.member.exception.MemberErrorCode;
+import com.backend.domain.member.exception.MemberException;
+import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.auth.oauth2.userinfo.KakaoOAuth2UserInfo;
 import com.backend.global.auth.oauth2.userinfo.NaverOauth2UserInfo;
@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequest, OAuth2User> {
 
-	private final MembersRepository membersRepository;
+	private final MemberRepository memberRepository;
 
 	/**
 	 * OAuth2 사용자 요청을 처리하여 인증된 사용자 정보를 반환하는 메서드
@@ -65,11 +65,11 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			OAuth2UserInfo userInfo = switch (registrationId.toLowerCase()) {
 				case "naver" -> new NaverOauth2UserInfo(oAuth2User.getAttributes());
 				case "kakao" -> new KakaoOAuth2UserInfo(oAuth2User.getAttributes());
-				default -> throw new MembersException(MembersErrorCode.UNSUPPORTED_PROVIDER);
+				default -> throw new MemberException(MemberErrorCode.UNSUPPORTED_PROVIDER);
 			};
 
 			// 유저 정보 저장 또는 업데이트
-			Members member = saveOrUpdate(userInfo, registrationId);
+			Member member = saveOrUpdate(userInfo, registrationId);
 			log.debug("Saved/Updated member - id: {}, email: {}", member.getMemberId(), member.getEmail());
 
 			return new CustomOAuth2User(
@@ -79,13 +79,13 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 				member.getMemberId(),
 				member.getEmail()
 			);
-		} catch (MembersException ex) {
+		} catch (MemberException ex) {
 			log.error("OAuth2 로그인 중 MembersException 발생: {}", ex.getMessage());
 
 			throw new OAuth2AuthenticationException(
 				new OAuth2Error(
-					String.valueOf(ex.getMembersErrorCode().getCode()),
-					ex.getMembersErrorCode().getMessage(),
+					String.valueOf(ex.getMemberErrorCode().getCode()),
+					ex.getMemberErrorCode().getMessage(),
 					null
 				),
 				ex
@@ -104,10 +104,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	 *
 	 * @param userInfo OAuth2에서 가져온 사용자 정보 객체
 	 * @param registrationId OAuth2 공급자 식별자 (예: "kakao", "naver")
-	 * @return 저장되거나 업데이트된 {@link Members} 객체
+	 * @return 저장되거나 업데이트된 {@link Member} 객체
 	 * @implSpec 전화번호로 회원을 조회하고 존재하면 업데이트 / 없으면 회원을 새로 생성함
 	 */
-	private Members saveOrUpdate(OAuth2UserInfo userInfo, String registrationId) {
+	private Member saveOrUpdate(OAuth2UserInfo userInfo, String registrationId) {
 		// 전화번호 포맷팅 (카카오의 경우)
 		String formattedPhone = registrationId.equalsIgnoreCase("kakao")
 			? formatPhoneNumber(userInfo.getPhoneNumber())
@@ -115,16 +115,16 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 		Provider provider = getProvider(registrationId);
 
-		Optional<Members> optionalMember = membersRepository
+		Optional<Member> optionalMember = memberRepository
 			.findByPhone(formattedPhone);
 
 		if (optionalMember.isPresent()) {
-			Members member = optionalMember.get();
+			Member member = optionalMember.get();
 
 			// 현재 로그인 시도한 provider가 다르면 예외
 			if (!member.getProvider().equals(provider)) {
 				log.warn("같은 전화번호로 다른 플랫폼 가입 시도! 기존: {}, 시도: {}", member.getProvider(), provider);
-				throw new MembersException(MembersErrorCode.PROVIDER_CONFLICT);
+				throw new MemberException(MemberErrorCode.PROVIDER_CONFLICT);
 			}
 
 			// 같은 플랫폼이면 기존 유저 정보 업데이트
@@ -136,7 +136,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			return member;
 		} else {
 			// 신규 회원 가입
-			Members member = Members.builder()
+			Member member = Member.builder()
 				.email(userInfo.getEmail())
 				.name(userInfo.getName())
 				.profileImg(userInfo.getImageUrl())
@@ -147,7 +147,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 				.role(MemberRole.USER)
 				.build();
 
-			return membersRepository.save(member);
+			return memberRepository.save(member);
 		}
 	}
 
@@ -156,14 +156,14 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 	 *
 	 * @param registrationId OAuth2 공급자 식별자 (예: "kakao", "naver")
 	 * @return {@link Provider} Enum 값
-	 * @throws MembersException 지원하지 않는 Provider일 경우 예외 발생
+	 * @throws MemberException 지원하지 않는 Provider일 경우 예외 발생
 	 * @implSpec registrationId를 대문자로 변환하여 Enum으로 매핑
 	 */
 	private Provider getProvider(String registrationId) {
 		try {
 			return Provider.valueOf(registrationId.toUpperCase());
 		} catch (Exception e) {
-			throw new MembersException(MembersErrorCode.UNSUPPORTED_PROVIDER);
+			throw new MemberException(MemberErrorCode.UNSUPPORTED_PROVIDER);
 		}
 	}
 

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class MembersQueryRepository {
+public class MemberQueryRepository {
 
 	private JPAQueryFactory queryFactory;
 

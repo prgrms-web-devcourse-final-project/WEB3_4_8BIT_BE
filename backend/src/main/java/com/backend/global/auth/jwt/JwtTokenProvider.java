@@ -17,10 +17,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import com.backend.domain.member.entity.Members;
-import com.backend.domain.member.exception.MembersErrorCode;
-import com.backend.domain.member.exception.MembersException;
-import com.backend.domain.member.repository.MembersRepository;
+import com.backend.domain.member.entity.Member;
+import com.backend.domain.member.exception.MemberErrorCode;
+import com.backend.domain.member.exception.MemberException;
+import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.auth.exception.JwtAuthenticationErrorCode;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 public class JwtTokenProvider {
 
 	private final RedisTemplate<String, String> redisTemplate;
-	private final MembersRepository membersRepository;
+	private final MemberRepository memberRepository;
 
 	@Value("${jwt.secret}")
 	private String secretKey;
@@ -133,8 +133,8 @@ public class JwtTokenProvider {
 		Claims claims = parseClaims(token);  // 수정된 parseClaims 사용
 		Long userId = Long.valueOf(claims.getSubject());
 
-		Members members = membersRepository.findById(userId)
-			.orElseThrow(() -> new MembersException(MembersErrorCode.MEMBER_NOT_FOUND));
+		Member member = memberRepository.findById(userId)
+			.orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
 
 		Collection<? extends GrantedAuthority> authorities =
@@ -145,12 +145,12 @@ public class JwtTokenProvider {
 		CustomOAuth2User principal = new CustomOAuth2User(
 			authorities, // 권한 정보
 			Map.of(
-				"id", members.getMemberId(),
-				"email", members.getEmail()
+				"id", member.getMemberId(),
+				"email", member.getEmail()
 			), // OAuth2 속성
 			"id", // nameAttributeKey
-			members.getMemberId(), // id
-			members.getEmail() // email
+			member.getMemberId(), // id
+			member.getEmail() // email
 		);
 		return new UsernamePasswordAuthenticationToken(principal, "", authorities);
 	}

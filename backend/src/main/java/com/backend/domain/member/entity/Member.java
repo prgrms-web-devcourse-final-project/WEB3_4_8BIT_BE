@@ -29,7 +29,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "member_type")
-public class Members extends BaseEntity {
+public class Member extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

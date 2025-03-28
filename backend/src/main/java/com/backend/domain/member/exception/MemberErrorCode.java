@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum MembersErrorCode {
+public enum MemberErrorCode {
 
 	PROVIDER_CONFLICT(HttpStatus.CONFLICT, 3001, "이미 다른 소셜 계정으로 가입된 계정입니다."),
 	UNSUPPORTED_PROVIDER(HttpStatus.BAD_REQUEST, 3002, "지원하지 않는 소셜 로그인입니다."),
