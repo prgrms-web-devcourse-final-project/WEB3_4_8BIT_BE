@@ -1,7 +1,6 @@
-package com.backend.domain.shipfishposts.entity;
+package com.backend.domain.shipfishingpost.entity;
 
-import java.math.BigDecimal;
-import java.time.ZonedDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import org.hibernate.annotations.JdbcTypeCode;
@@ -27,11 +26,15 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class ShipFishPosts extends BaseEntity {
+public class ShipFishingPost extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long shipFishPostId;
+	private Long shipFishingPostId;
+
+	// Todo : user 정보 등록 ( member Id & Name )
+	// @Column(nullable = false)
+	// private Long memberId;
 
 	@Column(nullable = false, length = 50)
 	private String subject;
@@ -43,19 +46,31 @@ public class ShipFishPosts extends BaseEntity {
 	private List<String> images;
 
 	@Column(nullable = false)
-	private BigDecimal price;
+	private Long price;
 
 	@Column(nullable = false)
-	private ZonedDateTime startDate;
+	private String location;
 
 	@Column(nullable = false)
-	private ZonedDateTime endDate;
+	private LocalTime startTime;
 
-	//TODO 추후 분 정보 입력
+	@Column(nullable = false)
+	private LocalTime endTime;
+
+	@Column(nullable = false)
+	private String durationTime;
+
+	@Column(nullable = false)
+	private Integer guestMaxCount;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(nullable = false)
 	private List<Long> fishId;
+
+	@Column(nullable = false)
+	private Long shipId;
+
+	private Long viewCount;
 
 	private Double reviewEverRate;
 }
