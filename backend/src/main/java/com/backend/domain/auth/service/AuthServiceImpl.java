@@ -1,12 +1,17 @@
 package com.backend.domain.auth.service;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
 
 import com.backend.global.auth.exception.JwtAuthenticationErrorCode;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.auth.jwt.JwtTokenProvider;
+import com.backend.global.util.CookieUtil;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,32 +22,48 @@ public class AuthServiceImpl implements AuthService {
 
 	private final JwtTokenProvider jwtTokenProvider;
 	private final RedisTemplate<String, String> redisTemplate;
+	private final CookieUtil cookieUtil;
 
 	@Override
-	public String refreshAccessToken(String accessToken) {
+	public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
+		String accessToken = cookieUtil.extractTokenFromCookie(request);
+
+		if (accessToken == null) {
+			log.error("토큰이 요청에 없습니다(auth/refresh)");
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.TOKEN_NOT_FOUND);
+		}
+
 		validateAccessToken(accessToken);
-
 		Long userId = jwtTokenProvider.getUserIdFromExpiredToken(accessToken);
-
 		validateRefreshToken(userId);
 
 		String newAccessToken = jwtTokenProvider.refreshAccessToken(accessToken);
 		log.debug("New access token created for userId: {}", userId);
 
-		jwtTokenProvider.addToBlacklist(accessToken);
-		log.debug("새 토큰 발급: userId={}", userId);
+		ResponseCookie cookie = cookieUtil.createAccessTokenCookie(newAccessToken);
+		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-		return newAccessToken;
+		log.debug("AccessToken 재발급 및 쿠키 설정 완료 - userId={}", userId);
 	}
 
 	@Override
-	public void logout(String accessToken) {
+	public void logout(HttpServletRequest request, HttpServletResponse response) {
+		String accessToken = cookieUtil.extractTokenFromCookie(request);
+
+		if (accessToken == null) {
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.TOKEN_NOT_FOUND);
+		}
+
 		validateAccessToken(accessToken);
 
 		Long userId = jwtTokenProvider.getUserIdFromExpiredToken(accessToken);
 		jwtTokenProvider.addToBlacklist(accessToken);
-
 		redisTemplate.delete("RT:" + userId);
+
+		ResponseCookie cookie = cookieUtil.createLogoutCookie();
+		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+		log.debug("로그아웃 처리 완료 - userId: {}", userId);
 	}
 
 	/**
