@@ -1,22 +1,22 @@
-package com.backend.domain.shipfishposts.converter;
+package com.backend.domain.shipfishingpost.converter;
 
-import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
-import com.backend.domain.shipfishposts.entity.ShipFishPosts;
+import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
+import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 
-public class ShipFishPostsConverter {
+public class ShipFishingPostConverter {
 
 	/**
 	 * 선상 낚시 게시글 생성 Dto를 Entity로 변환한다.
 	 *
 	 * @param requestDto
 	 * @param durationTime
-	 * @return {@link ShipFishPosts}
+	 * @return {@link ShipFishingPost}
 	 */
-	public static ShipFishPosts fromShipFishPostsRequestCreate(
-		ShipFishPostsRequest.Create requestDto,
+	public static ShipFishingPost fromShipFishPostsRequestCreate(
+		ShipFishingPostRequest.Create requestDto,
 		String durationTime) {
 
-		return ShipFishPosts.builder()
+		return ShipFishingPost.builder()
 			.subject(requestDto.subject())
 			.content(requestDto.content())
 			.images(requestDto.images())

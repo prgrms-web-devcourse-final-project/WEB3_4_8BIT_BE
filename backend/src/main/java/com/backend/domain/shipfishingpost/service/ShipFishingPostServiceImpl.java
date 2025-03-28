@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishposts.service;
+package com.backend.domain.shipfishingpost.service;
 
 import java.time.Duration;
 import java.time.LocalTime;
@@ -6,10 +6,10 @@ import java.time.LocalTime;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.backend.domain.shipfishposts.converter.ShipFishPostsConverter;
-import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
-import com.backend.domain.shipfishposts.entity.ShipFishPosts;
-import com.backend.domain.shipfishposts.repository.ShipFishPostsRepository;
+import com.backend.domain.shipfishingpost.converter.ShipFishingPostConverter;
+import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
+import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
+import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,24 +17,24 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ShipFishPostsServiceImpl implements ShipFishPostsService {
+public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
-	private final ShipFishPostsRepository shipFishPostsRepository;
+	private final ShipFishingPostRepository shipFishingPostRepository;
 
 	@Override
 	@Transactional
-	public Long save(final ShipFishPostsRequest.Create requestDto) {
+	public Long save(final ShipFishingPostRequest.Create requestDto) {
 
 		String durationTime = durationToString(requestDto.startTime(), requestDto.endTime());
 
-		ShipFishPosts entity = ShipFishPostsConverter.fromShipFishPostsRequestCreate(requestDto, durationTime);
+		ShipFishingPost entity = ShipFishingPostConverter.fromShipFishPostsRequestCreate(requestDto, durationTime);
 
 		// Todo : 예약 불가날짜 관리 로직 필요
 		// requestDto.unavailableDates();
 
 		log.debug("Save ship fish posts: {}", entity);
 
-		return shipFishPostsRepository.save(entity).getShipFishPostId();
+		return shipFishingPostRepository.save(entity).getShipFishingPostId();
 	}
 
 	/**

@@ -11,7 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.backend.domain.shipfishposts.exception.ShipFishPostsException;
+import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.response.ErrorDetail;
@@ -52,22 +52,22 @@ public class GlobalControllerAdvice {
 	}
 
 	/**
-	 * ShipFishPostsException 처리 핸들러 입니다.
+	 * ShipFishingPostException 처리 핸들러 입니다.
 	 *
-	 * @param shipFishPostsException {@link ShipFishPostsException}
+	 * @param shipFishingPostException {@link ShipFishingPostException}
 	 * @return {@link ResponseEntity<GenericResponse>}
 	 */
-	@ExceptionHandler(ShipFishPostsException.class)
+	@ExceptionHandler(ShipFishingPostException.class)
 	public ResponseEntity<GenericResponse<Void>> handleShipFishPostsException(
-		ShipFishPostsException shipFishPostsException) {
-		log.error("handleShipFishPostsException: ", shipFishPostsException);
+		ShipFishingPostException shipFishingPostException) {
+		log.error("handleShipFishPostsException: ", shipFishingPostException);
 
 		GenericResponse<Void> response = GenericResponse.fail(
-			shipFishPostsException.getShipFishPostsErrorCode().getCode(),
-			shipFishPostsException.getMessage()
+			shipFishingPostException.getShipFishingPostErrorCode().getCode(),
+			shipFishingPostException.getMessage()
 		);
 
-		return ResponseEntity.status(shipFishPostsException.getStatus().value())
+		return ResponseEntity.status(shipFishingPostException.getStatus().value())
 			.body(response);
 	}
 

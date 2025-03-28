@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishposts.repository;
+package com.backend.domain.shipfishingpost.repository;
 
 import org.springframework.stereotype.Repository;
 
@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 
 @Repository
 @RequiredArgsConstructor
-public class ShipFishPostsQueryRepository {
+public class ShipFishingPostQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 

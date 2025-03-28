@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishposts.exception;
+package com.backend.domain.shipfishingpost.exception;
 
 import org.springframework.http.HttpStatus;
 
@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ShipFishPostsErrorCode {
+public enum ShipFishingPostErrorCode {
 
 	POSTS_NOT_FOUND(HttpStatus.NOT_FOUND, 7001, "게시글 정보가 존재하지 않음");
 

@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishposts.controller;
+package com.backend.domain.shipfishingpost.controller;
 
 import java.net.URI;
 
@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
-import com.backend.domain.shipfishposts.service.ShipFishPostsService;
+import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
+import com.backend.domain.shipfishingpost.service.ShipFishingPostService;
 import com.backend.global.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,13 +17,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "선상낚시 게시글")
+@Tag(name = "선상 낚시 게시글 API")
 @RestController
 @RequestMapping("/api/v1/ship-post")
 @RequiredArgsConstructor
-public class ShipFishPostsController {
+public class ShipFishingPostController {
 
-	private final ShipFishPostsService shipFishPostsService;
+	private final ShipFishingPostService shipFishingPostService;
 
 	@Operation(
 		summary = "선상 낚시 게시글 생성",
@@ -31,11 +31,11 @@ public class ShipFishPostsController {
 	)
 	@PostMapping
 	public ResponseEntity<GenericResponse<Void>> createShipFishPost(
-		@RequestBody @Valid ShipFishPostsRequest.Create requestDto) {
+		@RequestBody @Valid ShipFishingPostRequest.Create requestDto) {
 
 		// Todo : UserDetails
 
-		Long shipFishPostsId = shipFishPostsService.save(requestDto);
+		Long shipFishPostsId = shipFishingPostService.save(requestDto);
 
 		return ResponseEntity.created(URI.create(shipFishPostsId.toString())).build();
 	}

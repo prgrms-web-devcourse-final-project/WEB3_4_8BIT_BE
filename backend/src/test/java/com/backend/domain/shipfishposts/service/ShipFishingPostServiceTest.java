@@ -13,27 +13,28 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
-import com.backend.domain.shipfishposts.converter.ShipFishPostsConverter;
-import com.backend.domain.shipfishposts.dto.request.ShipFishPostsRequest;
-import com.backend.domain.shipfishposts.entity.ShipFishPosts;
-import com.backend.domain.shipfishposts.repository.ShipFishPostsRepository;
+import com.backend.domain.shipfishingpost.converter.ShipFishingPostConverter;
+import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
+import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
+import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
+import com.backend.domain.shipfishingpost.service.ShipFishingPostServiceImpl;
 import com.backend.global.Util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
-public class ShipFishPostsServiceTest extends BaseTest {
+public class ShipFishingPostServiceTest extends BaseTest {
 
 	@InjectMocks
-	private ShipFishPostsServiceImpl shipFishPostsService;
+	private ShipFishingPostServiceImpl shipFishingPostService;
 
 	@Mock
-	private ShipFishPostsRepository shipFishPostsRepository;
+	private ShipFishingPostRepository shipFishingPostRepository;
 
 	@Test
 	@DisplayName("선상 낚시 게시글 저장 [Service] - Success")
 	void t01() {
 		//Given
-		ShipFishPostsRequest.Create givenRequestDto =
-			fixtureMonkeyValidation.giveMeOne(ShipFishPostsRequest.Create.class);
+		ShipFishingPostRequest.Create givenRequestDto =
+			fixtureMonkeyValidation.giveMeOne(ShipFishingPostRequest.Create.class);
 
 		Duration durationTime = Duration.between(givenRequestDto.startTime(), givenRequestDto.endTime());
 
@@ -45,15 +46,15 @@ public class ShipFishPostsServiceTest extends BaseTest {
 
 		String durationMinute = String.format("%02d:%02d", totalMinutes / 60, totalMinutes % 60);
 
-		ShipFishPosts givenShipFishPosts = ShipFishPostsConverter.fromShipFishPostsRequestCreate(givenRequestDto,
+		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishPostsRequestCreate(givenRequestDto,
 			durationMinute);
 
-		ReflectionTestUtils.setField(givenShipFishPosts, "shipFishPostId", 1L);
+		ReflectionTestUtils.setField(givenShipFishingPost, "shipFishingPostId", 1L);
 
 		// When
-		when(shipFishPostsRepository.save(any(ShipFishPosts.class))).thenReturn(givenShipFishPosts);
+		when(shipFishingPostRepository.save(any(ShipFishingPost.class))).thenReturn(givenShipFishingPost);
 
-		Long savedId = shipFishPostsService.save(givenRequestDto);
+		Long savedId = shipFishingPostService.save(givenRequestDto);
 
 		// Then
 		assertThat(savedId).isEqualTo(1L);

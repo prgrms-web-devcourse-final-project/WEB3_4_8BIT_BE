@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishposts.dto.request;
+package com.backend.domain.shipfishingpost.dto.request;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -14,7 +14,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-public class ShipFishPostsRequest {
+public class ShipFishingPostRequest {
 
 	/**
 	 *{

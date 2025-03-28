@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishposts.entity;
+package com.backend.domain.shipfishingpost.entity;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -26,11 +26,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class ShipFishPosts extends BaseEntity {
+public class ShipFishingPost extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long shipFishPostId;
+	private Long shipFishingPostId;
 
 	// Todo : user 정보 등록 ( member Id & Name )
 	// @Column(nullable = false)
