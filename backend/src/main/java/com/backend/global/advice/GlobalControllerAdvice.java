@@ -1,5 +1,7 @@
 package com.backend.global.advice;
 
+import com.backend.domain.member.exception.MembersException;
+import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.response.ErrorDetail;
