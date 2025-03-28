@@ -1,26 +1,15 @@
 package com.backend.domain.review.service;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.backend.domain.review.converter.ReviewConverter;
 import com.backend.domain.review.dto.request.ReviewRequest;
-import com.backend.domain.review.entity.Reviews;
-import com.backend.domain.review.repository.ReviewRepository;
 
-import lombok.RequiredArgsConstructor;
+public interface ReviewService {
 
-@Service
-@RequiredArgsConstructor
-public class ReviewService {
-
-	private final ReviewRepository reviewRepository;
-
-	// TODO 리뷰 작성 후 리뷰 상세 페이지로 이동하는지, 아니면 게시글 상세보기로 이동하는지 확인 필요, 추후 수정
-	@Transactional
-	public Long createReview(Long shipFishPostId, ReviewRequest.Create request) {
-		Reviews review = ReviewConverter.fromReviewRequestCreate(shipFishPostId, request);
-		return reviewRepository.save(review).getReviewId();
-	}
-
+	/**
+	 * 선상 낚시 리뷰 생성
+	 *
+	 * @param shipFishPostId 선상낚시 게시글 ID
+	 * @param request 리뷰 작성 요청 DTO
+	 * @return 생성된 리뷰 ID
+	 */
+	Long createReview(Long shipFishPostId, ReviewRequest.Create request);
 }
