@@ -2,7 +2,7 @@ package com.backend.domain.fishencyclopedia.service;
 
 import org.springframework.stereotype.Service;
 
-import com.backend.domain.fishencyclopedia.dto.converter.FishEncyclopediasConverter;
+import com.backend.domain.fishencyclopedia.converter.FishEncyclopediasConverter;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediasRequest;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedias;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
