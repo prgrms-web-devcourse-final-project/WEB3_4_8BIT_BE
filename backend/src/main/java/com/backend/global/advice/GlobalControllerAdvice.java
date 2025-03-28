@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.backend.domain.review.exception.ReviewException;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
