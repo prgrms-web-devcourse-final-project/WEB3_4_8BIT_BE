@@ -2,9 +2,9 @@ package com.backend.domain.review.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.backend.domain.review.entity.Reviews;
+import com.backend.domain.review.entity.Review;
 
-public interface ReviewRepository extends JpaRepository<Reviews, Long> {
+public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-	boolean existsByMemberIdAndShipFishPostId(Long memberId, Long shipFishPostId);
+	boolean existsByReservationId(Long reservationId);
 }

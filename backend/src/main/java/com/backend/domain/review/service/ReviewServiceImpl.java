@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.review.converter.ReviewConverter;
 import com.backend.domain.review.dto.request.ReviewRequest;
-import com.backend.domain.review.entity.Reviews;
+import com.backend.domain.review.entity.Review;
 import com.backend.domain.review.exception.ReviewErrorCode;
 import com.backend.domain.review.exception.ReviewException;
 import com.backend.domain.review.repository.ReviewRepository;
@@ -24,11 +24,11 @@ public class ReviewServiceImpl implements ReviewService {
 	public Long createReview(Long reservationId, ReviewRequest.Create request) {
 
 		// 리뷰 중복 검증 TODO 게시글 id 검증은 선상 낚시 게시글 기능 구현 이후에 추가
-		if(reviewRepository.existsByMemberIdAndShipFishPostId(request.memberId(), reservationId)) {
+		if(reviewRepository.existsByReservationId(reservationId)) {
 			throw new ReviewException(ReviewErrorCode.DUPLICATE_REVIEW);
 		}
 
-		Reviews review = ReviewConverter.fromReviewRequestCreate(reservationId, request);
+		Review review = ReviewConverter.fromReviewRequestCreate(reservationId, request);
 		return reviewRepository.save(review).getReviewId();
 	}
 }

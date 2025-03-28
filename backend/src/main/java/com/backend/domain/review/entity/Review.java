@@ -30,10 +30,10 @@ import lombok.experimental.SuperBuilder;
 @Table(
 	name = "reviews",
 	uniqueConstraints = {
-		@UniqueConstraint(columnNames = {"book_fishing_trip_id"})
+		@UniqueConstraint(columnNames = {"reservation_id"})
 	}
 )
-public class Reviews extends BaseEntity {
+public class Review extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,8 +52,8 @@ public class Reviews extends BaseEntity {
 	private Long memberId;
 
 	@Column(nullable = false)
-	private Long shipFishPostId;
+	private Long shipFishingPostId;
 
 	@Column(nullable = false)
-	private Long bookFishingTripId;
+	private Long reservationId;
 }
