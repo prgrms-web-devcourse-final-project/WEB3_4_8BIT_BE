@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediasRequest;
-import com.backend.domain.fishencyclopedia.service.FishEncyclopediasService;
+import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
+import com.backend.domain.fishencyclopedia.service.FishEncyclopediaService;
 import com.backend.global.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,16 +21,15 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/v1/fish/encyclopedias")
 @RequiredArgsConstructor
 @Tag(name = "물고기 도감 API")
-public class FishEncyclopediasController {
+public class FishEncyclopediaController {
 
-	private final FishEncyclopediasService fishEncyclopediasService;
+	private final FishEncyclopediaService fishEncyclopediaService;
 
 	@Operation(summary = "물고기 도감 추가하기", description = "물고기 도감 추가시 사용하는 API")
 	@PostMapping
 	public ResponseEntity<GenericResponse<Void>> save(
-		@RequestBody @Valid FishEncyclopediasRequest.Create create
+		@RequestBody @Valid final FishEncyclopediaRequest.Create create
 	) {
-
 		//TODO 추후 수정 예정
 		// fishEncyclopediasService.save(create, )
 
