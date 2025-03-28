@@ -23,4 +23,9 @@ public class MembersRepositoryImpl implements MembersRepository{
 	public Optional<Members> findByPhone(String phone){
 		return membersJpaRepository.findByPhone(phone);
 	}
+
+	@Override
+	public Optional<Members> findById(Long id) {
+		return membersJpaRepository.findById(id);
+	}
 }
