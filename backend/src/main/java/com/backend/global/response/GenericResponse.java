@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
 
 /**
  * GenericResponse
@@ -104,6 +103,7 @@ public class GenericResponse<T> {
 	public static <T> GenericResponse<T> fail(T data, String message) {
 		return GenericResponse.<T>builder()
 			.isSuccess(false)
+			.data(data)
 			.message(message)
 			.build();
 	}
