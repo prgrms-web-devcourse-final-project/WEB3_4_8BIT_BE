@@ -3,9 +3,8 @@ package com.backend.domain.fishencyclopedia.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
 
-public class FishEncyclopediasRequest {
+public class FishEncyclopediaRequest {
 	/**
 	 * {
 	 * "fishId": 1,
@@ -18,7 +17,6 @@ public class FishEncyclopediasRequest {
 	 * @param fishPointId 낚시 포인트 ID
 	 * @author Kim Dong O
 	 */
-	@Builder
 	public record Create(
 		@NotNull(message = "물고기 ID는 필수 입력 항목입니다.")
 		@Schema(description = "물고기 ID", example = "1")
