@@ -87,7 +87,7 @@
         </rollingPolicy>
     </appender>
 
-    <springProfile name="local">
+    <springProfile name="default">
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="Debug"/>
@@ -101,16 +101,6 @@
         <root level="INFO">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="Info"/>
-            <appender-ref ref="Warn"/>
-            <appender-ref ref="Error"/>
-        </root>
-    </springProfile>
-
-    <springProfile name="prod">
-        <root level="INFO">
-            <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="Info"/>
-            <appender-ref ref="Debug"/>
             <appender-ref ref="Warn"/>
             <appender-ref ref="Error"/>
         </root>

@@ -8,10 +8,9 @@ import com.backend.global.response.ErrorDetail;
 import com.backend.global.response.GenericResponse;
 import com.backend.global.storage.exception.StorageException;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -19,6 +18,15 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
+import com.backend.global.exception.GlobalErrorCode;
+import com.backend.global.exception.GlobalException;
+import com.backend.global.response.ErrorDetail;
+import com.backend.global.response.GenericResponse;
+import com.backend.global.storage.exception.StorageException;
+
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * GlobalControllerAdvice
@@ -92,6 +100,26 @@ public class GlobalControllerAdvice {
 
 
 	/**
+	 * ShipFishingPostException 처리 핸들러 입니다.
+	 *
+	 * @param shipFishingPostException {@link ShipFishingPostException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(ShipFishingPostException.class)
+	public ResponseEntity<GenericResponse<Void>> handleShipFishPostsException(
+		ShipFishingPostException shipFishingPostException) {
+		log.error("handleShipFishPostsException: ", shipFishingPostException);
+
+		GenericResponse<Void> response = GenericResponse.fail(
+			shipFishingPostException.getShipFishingPostErrorCode().getCode(),
+			shipFishingPostException.getMessage()
+		);
+
+		return ResponseEntity.status(shipFishingPostException.getStatus().value())
+			.body(response);
+	}
+
+	/**
 	 * StorageException 처리 핸들러 입니다.
 	 *
 	 * @param storageException {@link StorageException}
@@ -116,12 +144,12 @@ public class GlobalControllerAdvice {
 	 *
 	 * @param ex      Exception
 	 * @param request HttpServletRequest
-	 * @return {@link ResponseEntity<GenericResponse<List<com.backend.global.response.ErrorDetail>}
+	 * @return {@link ResponseEntity<GenericResponse<List<ErrorDetail>}
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GenericResponse<List<ErrorDetail>>> handlerMethodArgumentNotValidException(
-		MethodArgumentNotValidException ex,
-		HttpServletRequest request) {
+		MethodArgumentNotValidException ex
+  ) {
 		log.error("handlerMethodArgumentNotValidException: ", ex);
 
 		BindingResult bindingResult = ex.getBindingResult();
