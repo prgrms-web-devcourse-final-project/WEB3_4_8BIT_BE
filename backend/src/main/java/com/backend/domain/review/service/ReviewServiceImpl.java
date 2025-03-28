@@ -21,14 +21,14 @@ public class ReviewServiceImpl implements ReviewService {
 	// TODO 리뷰 작성 후 리뷰 상세 페이지로 이동하는지, 아니면 게시글 상세보기로 이동하는지 확인 필요, 추후 수정
 	@Override
 	@Transactional
-	public Long createReview(Long shipFishPostId, ReviewRequest.Create request) {
+	public Long createReview(Long reservationId, ReviewRequest.Create request) {
 
 		// 리뷰 중복 검증 TODO 게시글 id 검증은 선상 낚시 게시글 기능 구현 이후에 추가
-		if(reviewRepository.existsByMemberIdAndShipFishPostId(request.memberId(), shipFishPostId)) {
+		if(reviewRepository.existsByMemberIdAndShipFishPostId(request.memberId(), reservationId)) {
 			throw new ReviewException(ReviewErrorCode.DUPLICATE_REVIEW);
 		}
 
-		Reviews review = ReviewConverter.fromReviewRequestCreate(shipFishPostId, request);
+		Reviews review = ReviewConverter.fromReviewRequestCreate(reservationId, request);
 		return reviewRepository.save(review).getReviewId();
 	}
 }

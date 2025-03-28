@@ -27,10 +27,10 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-@Table(	// 복합 unique 키 설정, 게시글당 1개의 리뷰만 등록 가능
+@Table(
 	name = "reviews",
 	uniqueConstraints = {
-		@UniqueConstraint(columnNames = {"member_id", "ship_fish_post_id"})
+		@UniqueConstraint(columnNames = {"book_fishing_trip_id"})
 	}
 )
 public class Reviews extends BaseEntity {
@@ -53,4 +53,7 @@ public class Reviews extends BaseEntity {
 
 	@Column(nullable = false)
 	private Long shipFishPostId;
+
+	@Column(nullable = false)
+	private Long bookFishingTripId;
 }
