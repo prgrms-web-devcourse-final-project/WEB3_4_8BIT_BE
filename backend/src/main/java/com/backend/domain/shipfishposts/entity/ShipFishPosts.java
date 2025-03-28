@@ -70,5 +70,7 @@ public class ShipFishPosts extends BaseEntity {
 	@Column(nullable = false)
 	private Long shipId;
 
+	private Long viewCount;
+
 	private Double reviewEverRate;
 }
