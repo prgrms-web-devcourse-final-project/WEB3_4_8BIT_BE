@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.backend.domain.fishencyclopedia.dto.converter.FishEncyclopediasConverter;
+import com.backend.domain.fishencyclopedia.converter.FishEncyclopediasConverter;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediasRequest;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedias;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
@@ -37,7 +37,7 @@ class FishEncyclopediasServiceTest {
 	public FishEncyclopediasServiceTest() {
 
 		fixtureMonkeyValidation = FixtureMonkey.builder()
-			.objectIntrospector(ConstructorPropertiesArbitraryIntrospector.INSTANCE)
+			.objectIntrospector(ConstructorPropertiesArbitraryIntrospector.INSTANCE) // 생성자 기반
 			.defaultNotNull(true) // 제외시 필드 null로 초기화
 			.plugin(new JakartaValidationPlugin()) //validation에 맞는 객체 생성
 			.build();
