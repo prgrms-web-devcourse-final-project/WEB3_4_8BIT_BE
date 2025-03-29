@@ -1,5 +1,13 @@
 package com.backend.global.advice;
 
+import com.backend.domain.member.exception.MemberException;
+import com.backend.global.auth.exception.JwtAuthenticationException;
+import com.backend.global.exception.GlobalErrorCode;
+import com.backend.global.exception.GlobalException;
+import com.backend.global.response.ErrorDetail;
+import com.backend.global.response.GenericResponse;
+import com.backend.global.storage.exception.StorageException;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +26,6 @@ import com.backend.global.response.ErrorDetail;
 import com.backend.global.response.GenericResponse;
 import com.backend.global.storage.exception.StorageException;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -50,6 +57,47 @@ public class GlobalControllerAdvice {
 		return ResponseEntity.status(globalException.getStatus().value())
 			.body(genericResponse);
 	}
+
+	/**
+	 * JwtAuthenticationException 처리 핸들러입니다.
+	 *
+	 * @param jwtAuthenticationException {@link JwtAuthenticationException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(JwtAuthenticationException.class)
+	public ResponseEntity<GenericResponse<Void>> handleJwtAuthenticationException(
+		JwtAuthenticationException jwtAuthenticationException) {
+		log.error("handleJwtAuthenticationException: ", jwtAuthenticationException);
+
+		GenericResponse<Void> genericResponse = GenericResponse.fail(
+			jwtAuthenticationException.getJwtAuthenticationErrorCode().getCode(),
+			jwtAuthenticationException.getMessage()
+		);
+
+		return ResponseEntity.status(jwtAuthenticationException.getStatus().value())
+			.body(genericResponse);
+	}
+
+	/**
+	 * MembersException 처리 핸들러입니다.
+	 *
+	 * @param memberException {@link MemberException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(MemberException.class)
+	public ResponseEntity<GenericResponse<Void>> handleMembersException(
+		MemberException memberException) {
+		log.error("handleMembersException: ", memberException);
+
+		GenericResponse<Void> genericResponse = GenericResponse.fail(
+			memberException.getMemberErrorCode().getCode(),
+			memberException.getMessage()
+		);
+
+		return ResponseEntity.status(memberException.getStatus().value())
+			.body(genericResponse);
+	}
+
 
 	/**
 	 * ShipFishingPostException 처리 핸들러 입니다.
@@ -96,12 +144,12 @@ public class GlobalControllerAdvice {
 	 *
 	 * @param ex      Exception
 	 * @param request HttpServletRequest
-	 * @return {@link ResponseEntity<GenericResponse<List<com.backend.global.response.ErrorDetail>}
+	 * @return {@link ResponseEntity<GenericResponse<List<ErrorDetail>}
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GenericResponse<List<ErrorDetail>>> handlerMethodArgumentNotValidException(
-		MethodArgumentNotValidException ex,
-		HttpServletRequest request) {
+		MethodArgumentNotValidException ex
+  ) {
 		log.error("handlerMethodArgumentNotValidException: ", ex);
 
 		BindingResult bindingResult = ex.getBindingResult();

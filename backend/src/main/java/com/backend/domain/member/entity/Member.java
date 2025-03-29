@@ -1,6 +1,7 @@
 package com.backend.domain.member.entity;
 
 import com.backend.domain.member.domain.MemberRole;
+import com.backend.domain.member.domain.Provider;
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -28,7 +29,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = false)
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "member_type")
-public class Members extends BaseEntity {
+public class Member extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,8 +51,20 @@ public class Members extends BaseEntity {
 	@Column(nullable = false, length = 10)
 	private MemberRole role;
 
+	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private Provider provider;
+
+	@Column(nullable = false, unique = true)
+	private String providerId;
+
 	private String profileImg;
 
 	@Column(nullable = false)
 	private Boolean isAddInfo;
+
+	public void updateUserProfile(String name, String profileImg) {
+		this.name = name;
+		this.profileImg = profileImg;
+	}
 }

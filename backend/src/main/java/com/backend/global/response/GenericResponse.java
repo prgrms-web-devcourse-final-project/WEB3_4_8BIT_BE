@@ -103,6 +103,7 @@ public class GenericResponse<T> {
 	public static <T> GenericResponse<T> fail(T data, String message) {
 		return GenericResponse.<T>builder()
 			.isSuccess(false)
+			.data(data)
 			.message(message)
 			.build();
 	}
