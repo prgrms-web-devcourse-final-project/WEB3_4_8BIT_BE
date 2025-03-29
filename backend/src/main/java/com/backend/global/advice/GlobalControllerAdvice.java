@@ -19,6 +19,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.backend.domain.review.exception.ReviewException;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
@@ -136,6 +137,26 @@ public class GlobalControllerAdvice {
 		);
 
 		return ResponseEntity.status(storageException.getStatus().value())
+			.body(genericResponse);
+	}
+
+	/**
+	 * ReviewException 처리 핸들러 입니다.
+	 *
+	 * @param reviewException {@link ReviewException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(ReviewException.class)
+	public ResponseEntity<GenericResponse<Void>> handlerReviewException(
+		ReviewException reviewException) {
+		log.error("handlerReviewException: ", reviewException);
+
+		GenericResponse<Void> genericResponse = GenericResponse.fail(
+			reviewException.getReviewErrorCode().getCode(),
+			reviewException.getMessage()
+		);
+
+		return ResponseEntity.status(reviewException.getStatus().value())
 			.body(genericResponse);
 	}
 
