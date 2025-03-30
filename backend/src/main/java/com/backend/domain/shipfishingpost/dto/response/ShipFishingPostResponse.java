@@ -3,21 +3,22 @@ package com.backend.domain.shipfishingpost.dto.response;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.backend.domain.ship.dto.response.ShipResponse;
 import com.querydsl.core.annotations.QueryProjection;
 
 public class ShipFishingPostResponse {
 
 	/**
 	 * {
-	 * "shipFishingPostId": 1L,
-	 * "subject": "게시글 제목",
-	 * "content": "게시글 내용",
-	 * "price": 80000
-	 * "imageList": ["http://example.com/image1.jpg", "http://example.com/image2.jpg"],
-	 * "startTime": "15:00"
-	 * "durationTime": "02:30"
-	 * "maxGuestCount": 10
-	 * "reviewEverRate": 4.7
+	 *   "shipFishingPostId": 1L,
+	 *   "subject": "게시글 제목",
+	 *   "content": "게시글 내용",
+	 *   "price": 80000
+	 *   "imageList": ["http://example.com/image1.jpg", "http://example.com/image2.jpg"],
+	 *   "startTime": "15:00"
+	 *   "durationTime": "02:30"
+	 *   "maxGuestCount": 10
+	 *   "reviewEverRate": 4.7
 	 * }
 	 *
 	 * @param shipFishingPostId 게시글 번호
@@ -43,5 +44,24 @@ public class ShipFishingPostResponse {
 		@QueryProjection
 		public Detail {
 		}
+	}
+
+	/**
+	 * {
+	 *     detailShipFishingPost{
+	 *     },
+	 *     detailShip{
+	 *     }
+	 * }
+	 *
+	 * @param detailShipFishingPost
+	 * @param detailShip
+	 */
+	public record DetailAll(
+		ShipFishingPostResponse.Detail detailShipFishingPost,
+		ShipResponse.Detail detailShip
+		// Todo : user 정보 추후 작성 예정
+		// Member.Detail detailMember
+	) {
 	}
 }
