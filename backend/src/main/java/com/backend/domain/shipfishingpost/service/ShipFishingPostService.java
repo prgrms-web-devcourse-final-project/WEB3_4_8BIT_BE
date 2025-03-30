@@ -13,7 +13,7 @@ public interface ShipFishingPostService {
 	 * @implSpec 선상 낚시 게시글 정보를 파라미터로 받고 저장한다.
 	 * @author swjoon
 	 */
-	Long save(ShipFishingPostRequest.Create requestDto);
+	Long saveShipFishingPost(final ShipFishingPostRequest.Create requestDto, final Long memberId);
 
 	/**
 	 * 선상 낚시 게시글 상세 조회 메서드
@@ -23,6 +23,16 @@ public interface ShipFishingPostService {
 	 * @implSpec 선상 낚시 게시글 번호를 파라미터로 받고 조회한다.
 	 * @author swjoon
 	 */
-	ShipFishingPostResponse.Detail getShipFishingPost(Long shipFishingPostId);
+	ShipFishingPostResponse.Detail getShipFishingPost(final Long shipFishingPostId);
+
+	/**
+	 * 선상 낚시 게시글 상세 조회 메서드 (게시글, 멤버, 선박 정보 포함)
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @return {@link ShipFishingPostResponse.DetailAll}
+	 * @implSpec 선상 낚시 게시글 번호를 파라미터로 받고 조회한다.
+	 * @author swjoon
+	 */
+	ShipFishingPostResponse.DetailAll getShipFishingPostAll(final Long shipFishingPostId);
 
 }
