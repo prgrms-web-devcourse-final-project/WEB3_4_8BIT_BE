@@ -45,7 +45,7 @@ public class ShipFishingPostController {
 
 	@GetMapping("/{id}")
 	@Operation(summary = "선상 낚시 게시글 상세 조회", description = "유저가 선상 낚시 게시글을 상세 조회할 때 사용하는 API")
-	@Parameter(name = "id", description = "조회할 선상 낚시 게시글 ID", example = "1")
+	@Parameter(name = "id", required = true, description = "조회할 선상 낚시 게시글 ID", example = "1")
 	public ResponseEntity<GenericResponse<ShipFishingPostResponse.DetailAll>> getShipFishPost(
 		@PathVariable("id") final Long shipFishPostsId
 	) {
