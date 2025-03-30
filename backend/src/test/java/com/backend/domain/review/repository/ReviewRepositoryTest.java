@@ -12,6 +12,8 @@ import com.backend.domain.review.entity.Review;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.util.BaseTest;
 
+import com.navercorp.fixturemonkey.ArbitraryBuilder;
+
 @DataJpaTest
 @Import({JpaAuditingConfig.class, ReviewRepositoryImpl.class})
 class ReviewRepositoryTest extends BaseTest {
@@ -19,14 +21,15 @@ class ReviewRepositoryTest extends BaseTest {
 	@Autowired
 	private ReviewRepository reviewRepository;
 
+	private final ArbitraryBuilder<Review> arbitraryBuilder = fixtureMonkeyBuilder
+		.giveMeBuilder(Review.class)
+		.set("reviewId", null);
+
 	@Test
 	@DisplayName("선상 낚시 리뷰 저장 [Repository] - Success")
 	void t01() {
 		// given
-		Review givenReview = fixtureMonkeyBuilder.giveMeBuilder(Review.class)
-			.set("reviewId", null)
-			.set("reservationId", 1L)
-			.sample();
+		Review givenReview = arbitraryBuilder.set("reservationId", 1L).sample();
 
 		// when
 		Review saved = reviewRepository.save(givenReview);
@@ -41,12 +44,7 @@ class ReviewRepositoryTest extends BaseTest {
 	void t02() {
 		// given
 		Long reservationId = 1L;
-
-		Review givenReview = fixtureMonkeyBuilder.giveMeBuilder(Review.class)
-			.set("reviewId", null)
-			.set("reservationId", reservationId)
-			.sample();
-
+		Review givenReview = arbitraryBuilder.set("reservationId", reservationId).sample();
 		reviewRepository.save(givenReview);
 
 		// when
