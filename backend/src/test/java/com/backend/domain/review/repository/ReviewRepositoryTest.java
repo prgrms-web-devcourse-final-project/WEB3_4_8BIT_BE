@@ -9,10 +9,11 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import com.backend.domain.review.entity.Review;
+import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.util.BaseTest;
 
 @DataJpaTest
-@Import(ReviewRepositoryImpl.class)
+@Import({JpaAuditingConfig.class, ReviewRepositoryImpl.class})
 class ReviewRepositoryTest extends BaseTest {
 
 	@Autowired
