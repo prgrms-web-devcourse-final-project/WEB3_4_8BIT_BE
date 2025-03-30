@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
@@ -43,20 +42,27 @@ public class ShipFishingPostServiceTest extends BaseTest {
 	@DisplayName("선상 낚시 게시글 저장 [Service] - Success")
 	void t01() {
 		// Given
-		ShipFishingPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeOne(
-			ShipFishingPostRequest.Create.class);
+		ShipFishingPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
+				ShipFishingPostRequest.Create.class)
+			.set("shipId", 1L)
+			.sample();
 
 		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class)
+			.set("shipId", 1L)
 			.set("memberId", 1L).sample();
 
 		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishPostsRequestCreate(givenRequestDto,
 			1L);
 
-		ReflectionTestUtils.setField(givenShipFishingPost, "shipFishingPostId", 1L);
+		ShipFishingPost savedShipFishingPost = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+			.set("shipFishingPostId", 1L)
+			.set("subject", givenShipFishingPost.getSubject())
+			.set("content", givenShipFishingPost.getContent())
+			.sample();
 
 		// When
-		when(shipRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(givenShip));
-		when(shipFishingPostRepository.save(any(ShipFishingPost.class))).thenReturn(givenShipFishingPost);
+		when(shipRepository.findById(1L)).thenReturn(Optional.of(givenShip));
+		when(shipFishingPostRepository.save(givenShipFishingPost)).thenReturn(savedShipFishingPost);
 
 		Long savedId = shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L);
 
@@ -88,17 +94,21 @@ public class ShipFishingPostServiceTest extends BaseTest {
 	@DisplayName("선상 낚시 게시글 저장 [SHIP_MISMATCH_MEMBER_ID] [Service] - Fail")
 	void t03() {
 		// Given
-		ShipFishingPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeOne(
-			ShipFishingPostRequest.Create.class);
+		ShipFishingPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
+				ShipFishingPostRequest.Create.class)
+			.set("shipId", 1L)
+			.sample();
 
 		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class)
-			.set("memberId", 2L).sample();
+			.set("shipId", 1L)
+			.set("memberId", 2L)
+			.sample();
 
 		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishPostsRequestCreate(givenRequestDto,
 			1L);
 
 		// When
-		when(shipRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(givenShip));
+		when(shipRepository.findById(1L)).thenReturn(Optional.of(givenShip));
 
 		// Then
 		assertThatThrownBy(() -> shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L))
