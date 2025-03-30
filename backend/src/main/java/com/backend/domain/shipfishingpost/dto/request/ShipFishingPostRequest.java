@@ -18,17 +18,17 @@ public class ShipFishingPostRequest {
 
 	/**
 	 *{
-	 *   "subject": "게시글 제목",
-	 *   "content": "게시글 내용",
-	 *   "price": 80000,
-	 *   "location": "부산",
-	 *   "startTime": "15:00",
-	 *   "endTime": "17:30",
-	 *   "maxGuestCount": 10,
-	 *   "shipId": 10,
-	 *   "images": ["http://example.com/image1.jpg", "http://example.com/image2.jpg"],
-	 *   "fishIds": [1, 2, 3],
-	 *   "unavailableDates": ["2025-03-25", "2025-03-26"]
+	 * "subject": "게시글 제목",
+	 * "content": "게시글 내용",
+	 * "price": 80000,
+	 * "location": "부산",
+	 * "startTime": "15:00",
+	 * "endTime": "17:30",
+	 * "maxGuestCount": 10,
+	 * "shipId": 10,
+	 * "images": ["http://example.com/image1.jpg", "http://example.com/image2.jpg"],
+	 * "fishIds": [1, 2, 3],
+	 * "unavailableDates": ["2025-03-25", "2025-03-26"]
 	 *}
 	 *
 	 * @param subject "게시글 제목"
@@ -76,7 +76,7 @@ public class ShipFishingPostRequest {
 
 		@Positive(message = "최대 인원은 0 명 이상이어야 합니다.")
 		@Schema(description = "최대 인원", example = "10")
-		Integer maxGuestCount,
+		Long maxGuestCount,
 
 		@NotNull(message = "배 등록 번호는 필수 항목입니다.")
 		@Schema(description = "배 Id 값 (entity)", example = "10")

@@ -1,8 +1,10 @@
 package com.backend.domain.shipfishingpost.entity;
 
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -14,6 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,7 +46,7 @@ public class ShipFishingPost extends BaseEntity {
 	private String content;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	private List<String> images;
+	private List<String> imageList;
 
 	@Column(nullable = false)
 	private Long price;
@@ -58,10 +61,10 @@ public class ShipFishingPost extends BaseEntity {
 	private LocalTime endTime;
 
 	@Column(nullable = false)
-	private String durationTime;
+	private LocalTime durationTime;
 
 	@Column(nullable = false)
-	private Integer guestMaxCount;
+	private Long maxGuestCount;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(nullable = false)
@@ -70,7 +73,18 @@ public class ShipFishingPost extends BaseEntity {
 	@Column(nullable = false)
 	private Long shipId;
 
-	private Long viewCount;
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	@Builder.Default
+	private Long viewCount = 0L;
 
-	private Double reviewEverRate;
+	@Column(nullable = false)
+	@ColumnDefault("0.00")
+	@Builder.Default
+	private Double reviewEverRate = 0D;
+
+	public void setDurationTime() {
+		long minutes = ChronoUnit.MINUTES.between(startTime, endTime);
+		durationTime = LocalTime.MIDNIGHT.plusMinutes(minutes);
+	}
 }
