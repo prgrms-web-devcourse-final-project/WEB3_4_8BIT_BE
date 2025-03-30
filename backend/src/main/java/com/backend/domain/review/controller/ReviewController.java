@@ -29,7 +29,7 @@ public class ReviewController {
 	@Operation(summary = "선상 낚시 리뷰 생성", description = "내 예약에서 선상 낚시에 대한 리뷰 작성할 때 사용하는 API")
 	public ResponseEntity<GenericResponse<Void>> createReview(
 		@PathVariable final Long id,
-		@RequestBody @Valid final ReviewRequest.CreateReview request
+		@RequestBody @Valid final ReviewRequest.Create request
 	) {
 		reviewService.save(id, request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.of(true));

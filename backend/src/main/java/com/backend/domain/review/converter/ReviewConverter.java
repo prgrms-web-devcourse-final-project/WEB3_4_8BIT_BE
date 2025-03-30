@@ -8,7 +8,7 @@ import lombok.Builder;
 @Builder
 public class ReviewConverter {
 
-	public static Review fromReviewRequestCreate(Long reservationId, ReviewRequest.CreateReview request) {
+	public static Review fromReviewRequestCreate(Long reservationId, ReviewRequest.Create request) {
 
 		return Review.builder()
 			.reservationId(reservationId)

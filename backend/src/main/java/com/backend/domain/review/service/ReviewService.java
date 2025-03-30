@@ -11,5 +11,5 @@ public interface ReviewService {
 	 * @param request 리뷰 작성 요청 DTO
 	 * @return 생성된 리뷰 ID
 	 */
-	Long save(Long reservationId, ReviewRequest.CreateReview request);
+	Long save(Long reservationId, ReviewRequest.Create request);
 }

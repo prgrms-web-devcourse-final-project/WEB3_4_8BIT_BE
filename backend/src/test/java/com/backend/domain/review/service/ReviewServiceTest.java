@@ -34,7 +34,7 @@ public class ReviewServiceTest extends BaseTest {
 	void t01() {
 	    //given
 		Long reservationId = 1L;
-		ReviewRequest.CreateReview givenRequest = fixtureMonkeyValidation.giveMeOne(ReviewRequest.CreateReview.class);
+		ReviewRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(ReviewRequest.Create.class);
 
 		Review givenReview = ReviewConverter.fromReviewRequestCreate(reservationId, givenRequest);
 		ReflectionTestUtils.setField(givenReview, "reviewId", 1L);
@@ -56,7 +56,7 @@ public class ReviewServiceTest extends BaseTest {
 	void t02() {
 		// given
 		Long reservationId = 1L;
-		ReviewRequest.CreateReview givenRequest = fixtureMonkeyValidation.giveMeOne(ReviewRequest.CreateReview.class);
+		ReviewRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(ReviewRequest.Create.class);
 
 		given(reviewRepository.existsByReservationId(reservationId)).willReturn(true);
 
