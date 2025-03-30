@@ -1,14 +1,15 @@
 package com.backend.domain.shipfishingpost.repository;
 
+import static com.backend.domain.ship.entity.QShip.*;
+import static com.backend.domain.shipfishingpost.entity.QShipFishingPost.*;
+
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.ship.dto.response.ShipResponse;
-import com.backend.domain.ship.entity.QShip;
 import com.backend.domain.shipfishingpost.dto.response.QShipFishingPostResponse_Detail;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
-import com.backend.domain.shipfishingpost.entity.QShipFishingPost;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -21,8 +22,6 @@ public class ShipFishingPostQueryRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	public Optional<ShipFishingPostResponse.Detail> findDetailById(final Long shipFishingPostId) {
-
-		QShipFishingPost shipFishingPost = QShipFishingPost.shipFishingPost;
 
 		ShipFishingPostResponse.Detail detail = jpaQueryFactory
 			.select(new QShipFishingPostResponse_Detail(
@@ -44,9 +43,6 @@ public class ShipFishingPostQueryRepository {
 	}
 
 	public Optional<ShipFishingPostResponse.DetailAll> findDetailAllById(final Long shipFishingPostId) {
-
-		QShipFishingPost shipFishingPost = QShipFishingPost.shipFishingPost;
-		QShip ship = QShip.ship;
 
 		ShipFishingPostResponse.DetailAll detailAll = jpaQueryFactory
 			.select(Projections.constructor(
