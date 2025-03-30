@@ -8,7 +8,6 @@ import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
-import com.backend.domain.member.entity.Members;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +18,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 	private final FishEncyclopediaRepository fishEncyclopediaRepository;
 
 	@Override
-	public Long save(final FishEncyclopediaRequest.Create create, Members members) {
+	public Long save(final FishEncyclopediaRequest.Create create, final Long memberId) {
 		//Fish, FishPoint 존재하는지 검증
 		//TODO 추후 로직 구현 후 주석 풀 예정
 		/*existsFishId(create.fishId());
@@ -27,7 +26,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 
 		FishEncyclopedia fishEncyclopedia = FishEncyclopediaConverter.fromFishEncyclopediasRequestCreate(
 			create,
-			members.getMemberId()
+			memberId
 		);
 
 		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.save(fishEncyclopedia);
