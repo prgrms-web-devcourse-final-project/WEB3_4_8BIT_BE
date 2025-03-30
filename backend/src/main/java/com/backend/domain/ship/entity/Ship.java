@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -14,17 +15,18 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+@Table(name = "ships")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class Ships extends BaseEntity {
+public class Ship extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long shipsId;
+	private Long shipId;
 
 	@Column(nullable = false, length = 30)
 	private String shipName;
@@ -32,6 +34,9 @@ public class Ships extends BaseEntity {
 	//TODO 추후 길이 수정 예정
 	@Column(unique = true, nullable = false, length = 30)
 	private String shipNumber;
+
+	@Column(nullable = false)
+	private Long memberId;
 
 	@Column(nullable = false, length = 30)
 	private String departurePort;
