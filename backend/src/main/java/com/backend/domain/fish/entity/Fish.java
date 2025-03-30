@@ -6,13 +6,10 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
-import com.backend.domain.fish.domain.SpawnLocation;
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -49,7 +46,6 @@ public class Fish extends BaseEntity {
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<Long> spawnSeason = new ArrayList<>();
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false, length = 10)
-	private SpawnLocation spawnLocation;
+	@Column(nullable = false, length = 50)
+	private String spawnLocation;
 }
