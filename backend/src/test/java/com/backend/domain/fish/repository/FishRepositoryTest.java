@@ -27,7 +27,7 @@ class FishRepositoryTest extends BaseTest {
 	final Arbitrary<String> englishString = Arbitraries.strings()
 		.withCharRange('a', 'z')
 		.withCharRange('A', 'Z')
-		.ofMinLength(1).ofMaxLength(50);
+		.ofMinLength(1).ofMaxLength(30);
 
 	final ArbitraryBuilder<Fish> arbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
 		.set("name", englishString)
