@@ -74,5 +74,95 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.success").value(true));
 	}
 
+	@Test
+	@DisplayName("물고기 도감 저장 [fishId Null] [Controller] - Fail")
+	@WithMockCustomUser
+	void t02() throws Exception {
+		// Given
+		FishEncyclopediaRequest.Create givenCreate = arbitraryBuilder.set("fishId", null).sample();
 
+		// When
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fish/encyclopedias")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(givenCreate)));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.data[0].field").value("fishId"))
+			.andExpect(jsonPath("$.data[0].reason").value("물고기 ID는 필수 항목입니다."))
+			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("물고기 도감 저장 [length Null] [Controller] - Fail")
+	@WithMockCustomUser
+	void t03() throws Exception {
+		// Given
+		FishEncyclopediaRequest.Create givenCreate = arbitraryBuilder.set("length", null).sample();
+
+		// When
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fish/encyclopedias")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(givenCreate)));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.data[0].field").value("length"))
+			.andExpect(jsonPath("$.data[0].reason").value("물고기 길이는 필수 항목입니다."))
+			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("물고기 도감 저장 [length Min] [Controller] - Fail")
+	@WithMockCustomUser
+	void t04() throws Exception {
+		// Given
+		FishEncyclopediaRequest.Create givenCreate = arbitraryBuilder.set("length", 0).sample();
+
+		// When
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fish/encyclopedias")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(givenCreate)));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.data[0].field").value("length"))
+			.andExpect(jsonPath("$.data[0].reason").value("물고기 길이는 1cm 이상이어야 합니다."))
+			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("물고기 도감 저장 [fishPointId Null] [Controller] - Fail")
+	@WithMockCustomUser
+	void t05() throws Exception {
+		// Given
+		FishEncyclopediaRequest.Create givenCreate = arbitraryBuilder.set("fishPointId", null).sample();
+
+		// When
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fish/encyclopedias")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(givenCreate)));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.data[0].field").value("fishPointId"))
+			.andExpect(jsonPath("$.data[0].reason").value("낚시 포인트 ID는 필수 항목입니다."))
+			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
+			.andExpect(jsonPath("$.success").value(false));
+	}
 }
