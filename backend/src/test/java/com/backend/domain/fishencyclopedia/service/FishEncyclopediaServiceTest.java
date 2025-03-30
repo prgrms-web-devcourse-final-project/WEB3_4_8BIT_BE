@@ -15,38 +15,17 @@ import com.backend.domain.fishencyclopedia.converter.FishEncyclopediaConverter;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
-import com.backend.domain.member.entity.Members;
-
-import com.navercorp.fixturemonkey.FixtureMonkey;
-import com.navercorp.fixturemonkey.api.introspector.BuilderArbitraryIntrospector;
-import com.navercorp.fixturemonkey.api.introspector.ConstructorPropertiesArbitraryIntrospector;
-import com.navercorp.fixturemonkey.jakarta.validation.plugin.JakartaValidationPlugin;
+import com.backend.domain.member.entity.Member;
+import com.backend.global.Util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
-class FishEncyclopediaServiceTest {
+class FishEncyclopediaServiceTest extends BaseTest {
 
 	@Mock
 	private FishEncyclopediaRepository fishEncyclopediaRepository;
 
 	@InjectMocks
 	private FishEncyclopediaServiceImpl fishEncyclopediasService;
-
-	private final FixtureMonkey fixtureMonkeyValidation;
-	private final FixtureMonkey fixtureMonkeyBuilder;
-
-	public FishEncyclopediaServiceTest() {
-
-		fixtureMonkeyValidation = FixtureMonkey.builder()
-			.objectIntrospector(ConstructorPropertiesArbitraryIntrospector.INSTANCE) // 생성자 기반
-			.defaultNotNull(true) // 제외시 필드 null로 초기화
-			.plugin(new JakartaValidationPlugin()) //validation에 맞는 객체 생성
-			.build();
-
-		fixtureMonkeyBuilder = FixtureMonkey.builder()
-			.objectIntrospector(BuilderArbitraryIntrospector.INSTANCE)
-			.defaultNotNull(true)
-			.build();
-	}
 
 	@Test
 	@DisplayName("물고기 도감 저장 [Service] - Success")
@@ -55,24 +34,24 @@ class FishEncyclopediaServiceTest {
 		FishEncyclopediaRequest.Create givenCreate = fixtureMonkeyValidation.giveMeOne(
 			FishEncyclopediaRequest.Create.class);
 
-		Members givenMembers = fixtureMonkeyBuilder.giveMeOne(Members.class);
+		Member givenMember = fixtureMonkeyBuilder.giveMeOne(Member.class);
 
 		FishEncyclopedia givenFromFishEncyclopedia = FishEncyclopediaConverter.fromFishEncyclopediasRequestCreate(
 			givenCreate,
-			givenMembers.getMemberId()
+			givenMember.getMemberId()
 		);
 
 		FishEncyclopedia givenFishEncyclopedia = fixtureMonkeyBuilder.giveMeBuilder(FishEncyclopedia.class)
 			.set("fishId", givenCreate.fishId())
 			.set("length", givenCreate.length())
 			.set("fishPointId", givenCreate.fishPointId())
-			.set("memberId", givenMembers.getMemberId())
+			.set("memberId", givenMember.getMemberId())
 			.sample();
 
 		Mockito.when(fishEncyclopediaRepository.save(givenFromFishEncyclopedia)).thenReturn(givenFishEncyclopedia);
 
 		//when
-		Long savedId = fishEncyclopediasService.save(givenCreate, givenMembers);
+		Long savedId = fishEncyclopediasService.save(givenCreate, givenMember.getMemberId());
 
 		//then
 		assertThat(savedId).isEqualTo(givenFishEncyclopedia.getFishEncyclopediaId());
