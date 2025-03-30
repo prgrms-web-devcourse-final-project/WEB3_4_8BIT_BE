@@ -35,6 +35,6 @@ public class FileUploadRequest {
 
 		@NotEmpty
 		@Valid
-		List<File> files
+		List<File> fileList
 	) {}
 }
