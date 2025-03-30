@@ -43,12 +43,12 @@ public class ReviewServiceTest extends BaseTest {
 		given(reviewRepository.save(any(Review.class))).willReturn(givenReview);
 
 		//when
-		Long result = reviewServiceImpl.save(reservationId, givenRequest);
+		Long savedReviewId = reviewServiceImpl.save(reservationId, givenRequest);
 
 	    //then
 		verify(reviewRepository).existsByReservationId(reservationId);
 		verify(reviewRepository).save(any(Review.class));
-		assertThat(result).isEqualTo(1L);
+		assertThat(savedReviewId).isEqualTo(1L);
 	}
 
 	@Test

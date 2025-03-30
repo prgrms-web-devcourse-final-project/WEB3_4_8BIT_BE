@@ -32,11 +32,11 @@ class ReviewRepositoryTest extends BaseTest {
 		Review givenReview = arbitraryBuilder.set("reservationId", 1L).sample();
 
 		// when
-		Review saved = reviewRepository.save(givenReview);
+		Review savedReview = reviewRepository.save(givenReview);
 
 		// then
-		assertThat(saved).isNotNull();
-		assertThat(saved.getReviewId()).isNotNull();
+		assertThat(savedReview).isNotNull();
+		assertThat(savedReview.getReviewId()).isNotNull();
 	}
 
 	@Test
