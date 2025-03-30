@@ -58,16 +58,16 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			.set("memberId", givenMember.getMemberId())
 			.sample();
 
-		when(fishEncyclopediaRepository.save(givenFromFishEncyclopedia)).thenReturn(givenFishEncyclopedia);
+		when(fishEncyclopediaRepository.createFishEncyclopedia(givenFromFishEncyclopedia)).thenReturn(givenFishEncyclopedia);
 		when(fishPointRepository.existsById(givenFishEncyclopedia.getFishPointId())).thenReturn(true);
 		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(true);
 
 		// When
-		Long savedId = fishEncyclopediasService.save(givenCreate, givenMember.getMemberId());
+		Long savedId = fishEncyclopediasService.createFishEncyclopedia(givenCreate, givenMember.getMemberId());
 
 		// Then
 		assertThat(savedId).isEqualTo(givenFishEncyclopedia.getFishEncyclopediaId());
-		verify(fishEncyclopediaRepository, times(1)).save(givenFromFishEncyclopedia);
+		verify(fishEncyclopediaRepository, times(1)).createFishEncyclopedia(givenFromFishEncyclopedia);
 	}
 
 	@Test
@@ -90,7 +90,7 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		when(fishPointRepository.existsById(givenFishEncyclopedia.getFishPointId())).thenReturn(false);
 
 		// When & Then
-		assertThatThrownBy(() -> fishEncyclopediasService.save(givenCreate, givenMember.getMemberId()))
+		assertThatThrownBy(() -> fishEncyclopediasService.createFishEncyclopedia(givenCreate, givenMember.getMemberId()))
 			.isExactlyInstanceOf(FishEncyclopediaException.class)
 			.hasMessage(FishEncyclopediaErrorCode.NOT_EXISTS_FISH_POINT.getMessage());
 	}
@@ -114,7 +114,7 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(false);
 
 		// When & Then
-		assertThatThrownBy(() -> fishEncyclopediasService.save(givenCreate, givenMember.getMemberId()))
+		assertThatThrownBy(() -> fishEncyclopediasService.createFishEncyclopedia(givenCreate, givenMember.getMemberId()))
 			.isExactlyInstanceOf(FishEncyclopediaException.class)
 			.hasMessage(FishEncyclopediaErrorCode.NOT_EXISTS_FISH.getMessage());
 	}

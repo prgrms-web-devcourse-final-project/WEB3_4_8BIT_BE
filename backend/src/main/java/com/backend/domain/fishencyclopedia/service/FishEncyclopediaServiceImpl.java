@@ -24,7 +24,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 	private final FishRepository fishRepository;
 
 	@Override
-	public Long save(final FishEncyclopediaRequest.Create create, final Long memberId) {
+	public Long createFishEncyclopedia(final FishEncyclopediaRequest.Create create, final Long memberId) {
 		//Fish, FishPoint 존재하는지 검증
 		existsFishId(create.fishId());
 		existsFishPointId(create.fishPointId());
@@ -34,7 +34,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 			memberId
 		);
 
-		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.save(fishEncyclopedia);
+		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.createFishEncyclopedia(fishEncyclopedia);
 
 		log.debug("물고기 도감 저장: {}", savedFishEncyclopedia);
 

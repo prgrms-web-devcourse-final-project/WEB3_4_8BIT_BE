@@ -29,7 +29,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 			.sample();
 
 		//when
-		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.save(givenFishEncyclopedia);
+		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.createFishEncyclopedia(givenFishEncyclopedia);
 
 		//then
 		assertThat(savedFishEncyclopedia.getFishEncyclopediaId()).isNotNull();

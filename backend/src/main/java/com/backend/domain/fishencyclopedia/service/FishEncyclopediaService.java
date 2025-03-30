@@ -13,5 +13,5 @@ public interface FishEncyclopediaService {
 	 * @implSpec FishEncyclopediasRequest 받아서 저장 후 ID 값 반환
 	 * @author Kim Dong O
 	 */
-	Long save(final FishEncyclopediaRequest.Create create, final Long memberId);
+	Long createFishEncyclopedia(final FishEncyclopediaRequest.Create create, final Long memberId);
 }

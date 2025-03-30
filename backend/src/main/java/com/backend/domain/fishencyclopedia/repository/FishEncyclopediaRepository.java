@@ -12,5 +12,5 @@ public interface FishEncyclopediaRepository {
 	 * @implSpec FishEncyclopedia 받아서 저장 후 저장된 엔티티 반환
 	 * @author Kim Dong O
 	 */
-	FishEncyclopedia save(final FishEncyclopedia fishEncyclopedia);
+	FishEncyclopedia createFishEncyclopedia(final FishEncyclopedia fishEncyclopedia);
 }

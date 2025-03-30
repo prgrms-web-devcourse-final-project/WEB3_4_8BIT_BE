@@ -55,7 +55,7 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		);
 
 		Long givenSaveFishEncyclopediaId = 1L;
-		when(fishEncyclopediaService.save(givenCreate, 1L)).thenReturn(givenSaveFishEncyclopediaId);
+		when(fishEncyclopediaService.createFishEncyclopedia(givenCreate, 1L)).thenReturn(givenSaveFishEncyclopediaId);
 
 		// When
 		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fish/encyclopedias")

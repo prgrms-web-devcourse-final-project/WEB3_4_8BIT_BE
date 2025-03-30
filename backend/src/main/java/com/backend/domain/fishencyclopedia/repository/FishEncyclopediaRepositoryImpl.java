@@ -12,7 +12,7 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 	private final FishEncyclopediaJpaRepository fishEncyclopediaJpaRepository;
 
 	@Override
-	public FishEncyclopedia save(final FishEncyclopedia fishEncyclopedia) {
+	public FishEncyclopedia createFishEncyclopedia(final FishEncyclopedia fishEncyclopedia) {
 		return fishEncyclopediaJpaRepository.save(fishEncyclopedia);
 	}
 }
