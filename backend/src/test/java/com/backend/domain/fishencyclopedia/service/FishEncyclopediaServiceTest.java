@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.fishencyclopedia.converter.FishEncyclopediaConverter;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
@@ -28,6 +29,9 @@ class FishEncyclopediaServiceTest extends BaseTest {
 
 	@Mock
 	private FishPointRepository fishPointRepository;
+
+	@Mock
+	private FishRepository fishRepository;
 
 	@InjectMocks
 	private FishEncyclopediaServiceImpl fishEncyclopediasService;
@@ -56,6 +60,7 @@ class FishEncyclopediaServiceTest extends BaseTest {
 
 		when(fishEncyclopediaRepository.save(givenFromFishEncyclopedia)).thenReturn(givenFishEncyclopedia);
 		when(fishPointRepository.existsById(givenFishEncyclopedia.getFishPointId())).thenReturn(true);
+		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(true);
 
 		// When
 		Long savedId = fishEncyclopediasService.save(givenCreate, givenMember.getMemberId());
@@ -66,18 +71,13 @@ class FishEncyclopediaServiceTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("물고기 도감 저장 [Fish Not Exists] [Service] - Fail")
+	@DisplayName("물고기 도감 저장 [FishPoint Not Exists] [Service] - Fail")
 	void t02() {
 		// Given
 		FishEncyclopediaRequest.Create givenCreate = fixtureMonkeyValidation.giveMeOne(
 			FishEncyclopediaRequest.Create.class);
 
 		Member givenMember = fixtureMonkeyBuilder.giveMeOne(Member.class);
-
-		FishEncyclopedia givenFromFishEncyclopedia = FishEncyclopediaConverter.fromFishEncyclopediasRequestCreate(
-			givenCreate,
-			givenMember.getMemberId()
-		);
 
 		FishEncyclopedia givenFishEncyclopedia = fixtureMonkeyBuilder.giveMeBuilder(FishEncyclopedia.class)
 			.set("fishId", givenCreate.fishId())
@@ -95,13 +95,26 @@ class FishEncyclopediaServiceTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("물고기 도감 저장 [FishPoint Not Exists] [Service] - Fail")
+	@DisplayName("물고기 도감 저장 [Fish Not Exists] [Service] - Fail")
 	void t03() {
-		//given
+		// Given
+		FishEncyclopediaRequest.Create givenCreate = fixtureMonkeyValidation.giveMeOne(
+			FishEncyclopediaRequest.Create.class);
 
-		//when
+		Member givenMember = fixtureMonkeyBuilder.giveMeOne(Member.class);
 
-		//then
+		FishEncyclopedia givenFishEncyclopedia = fixtureMonkeyBuilder.giveMeBuilder(FishEncyclopedia.class)
+			.set("fishId", givenCreate.fishId())
+			.set("length", givenCreate.length())
+			.set("fishPointId", givenCreate.fishPointId())
+			.set("memberId", givenMember.getMemberId())
+			.sample();
 
+		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(false);
+
+		// When & Then
+		assertThatThrownBy(() -> fishEncyclopediasService.save(givenCreate, givenMember.getMemberId()))
+			.isExactlyInstanceOf(FishEncyclopediaException.class)
+			.hasMessage(FishEncyclopediaErrorCode.NOT_EXISTS_FISH.getMessage());
 	}
 }

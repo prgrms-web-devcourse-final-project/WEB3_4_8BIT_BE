@@ -2,6 +2,7 @@ package com.backend.domain.fishencyclopedia.service;
 
 import org.springframework.stereotype.Service;
 
+import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.fishencyclopedia.converter.FishEncyclopediaConverter;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
@@ -11,19 +12,21 @@ import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 
 	private final FishEncyclopediaRepository fishEncyclopediaRepository;
 	private final FishPointRepository fishPointRepository;
+	private final FishRepository fishRepository;
 
 	@Override
 	public Long save(final FishEncyclopediaRequest.Create create, final Long memberId) {
 		//Fish, FishPoint 존재하는지 검증
-		//TODO 추후 로직 구현 후 주석 풀 예정
-		// existsFishId(create.fishId());
+		existsFishId(create.fishId());
 		existsFishPointId(create.fishPointId());
 
 		FishEncyclopedia fishEncyclopedia = FishEncyclopediaConverter.fromFishEncyclopediasRequestCreate(
@@ -32,6 +35,8 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		);
 
 		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.save(fishEncyclopedia);
+
+		log.debug("물고기 도감 저장: {}", savedFishEncyclopedia);
 
 		return savedFishEncyclopedia.getFishEncyclopediaId();
 	}
@@ -43,7 +48,10 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 	 * @throws FishEncyclopediaException 물고기가 존재하지 않을 때 발생
 	 */
 	private void existsFishId(final Long fishId) {
-		boolean result = false;
+
+		boolean result = fishRepository.existsById(fishId);
+
+		log.debug("물고기 존재 여부: {}", result);
 
 		if (!result) {
 			throw new FishEncyclopediaException(FishEncyclopediaErrorCode.NOT_EXISTS_FISH);
@@ -57,7 +65,10 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 	 * @throws FishEncyclopediaException 낚시 포인트가 존재하지 않을 때 발생
 	 */
 	private void existsFishPointId(final Long fishPointId) {
+
 		boolean result = fishPointRepository.existsById(fishPointId);
+
+		log.debug("낚시 포인트 존재 여부: {}", result);
 
 		if (!result) {
 			throw new FishEncyclopediaException(FishEncyclopediaErrorCode.NOT_EXISTS_FISH_POINT);
