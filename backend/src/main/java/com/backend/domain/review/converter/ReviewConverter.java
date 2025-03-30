@@ -14,7 +14,7 @@ public class ReviewConverter {
 			.reservationId(reservationId)
 			.rating(request.rating())
 			.content(request.content())
-			.images(request.images())
+			.imageList(request.imageList())
 			.memberId(request.memberId())
 			.shipFishingPostId(request.shipFishingPostId())
 			.build();

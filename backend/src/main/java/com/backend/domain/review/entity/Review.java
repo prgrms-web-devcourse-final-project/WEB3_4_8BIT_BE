@@ -46,7 +46,7 @@ public class Review extends BaseEntity {
 	private String content;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	private List<String> images;
+	private List<String> imageList;
 
 	@Column(nullable = false)
 	private Long memberId;

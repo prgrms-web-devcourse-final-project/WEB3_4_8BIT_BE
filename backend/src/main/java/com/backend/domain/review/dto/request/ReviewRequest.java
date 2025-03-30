@@ -19,7 +19,7 @@ public class ReviewRequest {
 		String content,
 
 		@Schema(description = "이미지", example = "[\"https://example.com/image1.jpg\", \"s3에 이미지 업로드 후 리턴 받은 URL\"]")
-		List<String> images,
+		List<String> imageList,
 
 		@NotNull(message = "선상 낚시 게시글 ID는 필수 항목입니다.")
 		@Schema(description = "선상 낚시 게시글 ID", example = "1")
