@@ -12,13 +12,10 @@ import com.backend.domain.fishpoint.entity.FishPoint;
 import com.backend.global.Util.BaseTest;
 import com.backend.global.config.JpaAuditingConfig;
 
-import lombok.extern.slf4j.Slf4j;
-
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
 @Import({FishPointRepositoryImpl.class, JpaAuditingConfig.class})
 @DataJpaTest
-@Slf4j
 class FishPointRepositoryTest extends BaseTest {
 
 	@Autowired
@@ -33,8 +30,6 @@ class FishPointRepositoryTest extends BaseTest {
 	void t01() {
 		// Given
 		FishPoint givenFishPoint = arbitraryBuilder.set("fishPointId", null).sample();
-
-		log.info(givenFishPoint.toString());
 
 		// When
 		FishPoint savedFishPoint = fishPointRepository.save(givenFishPoint);
