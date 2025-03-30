@@ -1,13 +1,5 @@
 package com.backend.global.advice;
 
-import com.backend.domain.member.exception.MemberException;
-import com.backend.global.auth.exception.JwtAuthenticationException;
-import com.backend.global.exception.GlobalErrorCode;
-import com.backend.global.exception.GlobalException;
-import com.backend.global.response.ErrorDetail;
-import com.backend.global.response.GenericResponse;
-import com.backend.global.storage.exception.StorageException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +11,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.backend.domain.member.exception.MemberException;
+import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
+import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.response.ErrorDetail;
@@ -98,6 +93,25 @@ public class GlobalControllerAdvice {
 			.body(genericResponse);
 	}
 
+	/**
+	 * ShipException 처리 핸들러 입니다.
+	 *
+	 * @param shipException {@link ShipException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(ShipException.class)
+	public ResponseEntity<GenericResponse<Void>> handleShipException(
+		ShipException shipException) {
+		log.error("handleShipException: ", shipException);
+
+		GenericResponse<Void> response = GenericResponse.fail(
+			shipException.getShipErrorCode().getCode(),
+			shipException.getMessage()
+		);
+
+		return ResponseEntity.status(shipException.getStatus().value())
+			.body(response);
+	}
 
 	/**
 	 * ShipFishingPostException 처리 핸들러 입니다.
@@ -106,7 +120,7 @@ public class GlobalControllerAdvice {
 	 * @return {@link ResponseEntity<GenericResponse>}
 	 */
 	@ExceptionHandler(ShipFishingPostException.class)
-	public ResponseEntity<GenericResponse<Void>> handleShipFishPostsException(
+	public ResponseEntity<GenericResponse<Void>> handleShipFishingPostsException(
 		ShipFishingPostException shipFishingPostException) {
 		log.error("handleShipFishPostsException: ", shipFishingPostException);
 
@@ -142,14 +156,13 @@ public class GlobalControllerAdvice {
 	/**
 	 * Validation 예외 처리 핸들러 입니다.
 	 *
-	 * @param ex      Exception
-	 * @param request HttpServletRequest
+	 * @param ex      MethodArgumentNotValidException
 	 * @return {@link ResponseEntity<GenericResponse<List<ErrorDetail>}
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GenericResponse<List<ErrorDetail>>> handlerMethodArgumentNotValidException(
 		MethodArgumentNotValidException ex
-  ) {
+	) {
 		log.error("handlerMethodArgumentNotValidException: ", ex);
 
 		BindingResult bindingResult = ex.getBindingResult();
