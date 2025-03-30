@@ -15,6 +15,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+@Table(name = "ship_fish_posts")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -35,9 +37,8 @@ public class ShipFishingPost extends BaseEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long shipFishingPostId;
 
-	// Todo : user 정보 등록 ( member Id & Name )
-	// @Column(nullable = false)
-	// private Long memberId;
+	@Column(nullable = false)
+	private Long memberId;
 
 	@Column(nullable = false, length = 50)
 	private String subject;
@@ -68,9 +69,9 @@ public class ShipFishingPost extends BaseEntity {
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(nullable = false)
-	private List<Long> fishId;
+	private List<Long> fishList;
 
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private Long shipId;
 
 	@Column(nullable = false)
