@@ -11,7 +11,9 @@ import com.backend.domain.review.exception.ReviewException;
 import com.backend.domain.review.repository.ReviewRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
@@ -28,6 +30,9 @@ public class ReviewServiceImpl implements ReviewService {
 		}
 
 		Review review = ReviewConverter.fromReviewRequestCreate(reservationId, request);
-		return reviewRepository.save(review).getReviewId();
+		Review savedReview = reviewRepository.save(review);
+
+		log.debug("선상 낚시 리뷰 저장: {}", savedReview);
+		return savedReview.getReviewId();
 	}
 }
