@@ -6,14 +6,18 @@ import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 public class ShipFishingPostConverter {
 
 	/**
-	 * 선상 낚시 게시글 생성 Dto를 Entity로 변환한다.
+	 * 선상 낚시 게시글 생성 Dto 를 Entity 로 변환한다.
 	 *
-	 * @param requestDto
+	 * @param requestDto {@link ShipFishingPostRequest.Create}
+	 * @param memberId {@link Long}
 	 * @return {@link ShipFishingPost}
 	 */
-	public static ShipFishingPost fromShipFishPostsRequestCreate(ShipFishingPostRequest.Create requestDto) {
+	public static ShipFishingPost fromShipFishPostsRequestCreate(
+		final ShipFishingPostRequest.Create requestDto,
+		final Long memberId) {
 
 		ShipFishingPost shipFishingPost = ShipFishingPost.builder()
+			.memberId(memberId)
 			.subject(requestDto.subject())
 			.content(requestDto.content())
 			.imageList(requestDto.images())
@@ -22,7 +26,7 @@ public class ShipFishingPostConverter {
 			.startTime(requestDto.startTime())
 			.endTime(requestDto.endTime())
 			.maxGuestCount(requestDto.maxGuestCount())
-			.fishId(requestDto.fishIds())
+			.fishList(requestDto.fishList())
 			.shipId(requestDto.shipId())
 			.build();
 

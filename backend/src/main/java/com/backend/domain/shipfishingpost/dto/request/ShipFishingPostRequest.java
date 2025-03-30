@@ -40,7 +40,7 @@ public class ShipFishingPostRequest {
 	 * @param maxGuestCount 최대 인원 수
 	 * @param shipId 게시글에 올릴 배 번호
 	 * @param images 등록한 사진 리스트
-	 * @param fishIds 목적 어종 리스트
+	 * @param fishList 목적 어종 리스트
 	 * @param unavailableDates 예약 불가능 날짜 리스트
 	 */
 	public record Create(
@@ -86,14 +86,14 @@ public class ShipFishingPostRequest {
 		List<String> images,
 
 		@Schema(description = "물고기 Id 리스트", example = "[1, 2, 3]")
-		List<Long> fishIds,
+		List<Long> fishList,
 
 		@Schema(description = "예약 불가 날짜 리스트", example = "[\"2025-03-25\", \"2025-03-26\"]")
 		List<LocalDate> unavailableDates
 	) {
 		public Create {
 			images = (images == null) ? new ArrayList<>() : images;
-			fishIds = (fishIds == null) ? new ArrayList<>() : fishIds;
+			fishList = (fishList == null) ? new ArrayList<>() : fishList;
 			unavailableDates = (unavailableDates == null) ? new ArrayList<>() : unavailableDates;
 		}
 	}
