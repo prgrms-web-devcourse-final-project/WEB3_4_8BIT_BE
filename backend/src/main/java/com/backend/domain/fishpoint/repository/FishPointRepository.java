@@ -12,7 +12,7 @@ public interface FishPointRepository {
 	 * @implSpec fishPointId로 데이터가 있는지 확인 후 결과 반한
 	 * @author Kim Dong O
 	 */
-	boolean existsById(Long fishPointId);
+	boolean existsById(final Long fishPointId);
 
 	/**
 	 * 낚시 포인트 저장 메소드
@@ -22,5 +22,5 @@ public interface FishPointRepository {
 	 * @implSpec FishPoint 받아서 저장 후 저장된 엔티티 반환
 	 * @author Kim Dong O
 	 */
-	FishPoint save(FishPoint fishPoint);
+	FishPoint save(final FishPoint fishPoint);
 }

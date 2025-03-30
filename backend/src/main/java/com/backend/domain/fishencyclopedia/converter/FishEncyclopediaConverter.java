@@ -14,7 +14,7 @@ public class FishEncyclopediaConverter {
 	 */
 	public static FishEncyclopedia fromFishEncyclopediasRequestCreate(
 		final FishEncyclopediaRequest.Create create,
-		Long memberId
+		final Long memberId
 	) {
 
 		return FishEncyclopedia.builder()

@@ -13,12 +13,12 @@ public class FishPointRepositoryImpl implements FishPointRepository {
 	private final FishPointJpaRepository fishPointJpaRepository;
 
 	@Override
-	public boolean existsById(Long fishPointId) {
+	public boolean existsById(final Long fishPointId) {
 		return fishPointJpaRepository.existsById(fishPointId);
 	}
 
 	@Override
-	public FishPoint save(FishPoint fishPoint) {
+	public FishPoint save(final FishPoint fishPoint) {
 		return fishPointJpaRepository.save(fishPoint);
 	}
 }
