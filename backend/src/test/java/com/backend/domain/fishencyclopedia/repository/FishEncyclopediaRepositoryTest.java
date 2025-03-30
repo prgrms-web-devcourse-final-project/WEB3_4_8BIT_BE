@@ -6,22 +6,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.springframework.stereotype.Repository;
 
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.global.config.JpaAuditingConfig;
 
-import lombok.extern.slf4j.Slf4j;
-
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.navercorp.fixturemonkey.api.introspector.BuilderArbitraryIntrospector;
 
-@Slf4j
-@Import(JpaAuditingConfig.class)
-@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
+@Import({FishEncyclopediaRepositoryImpl.class, JpaAuditingConfig.class})
+@DataJpaTest
 class FishEncyclopediaRepositoryTest {
 
 	private final FishEncyclopediaRepository fishEncyclopediaRepository;
