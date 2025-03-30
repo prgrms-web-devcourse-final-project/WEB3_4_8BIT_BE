@@ -86,6 +86,7 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			.set("memberId", givenMember.getMemberId())
 			.sample();
 
+		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(true);
 		when(fishPointRepository.existsById(givenFishEncyclopedia.getFishPointId())).thenReturn(false);
 
 		// When & Then
