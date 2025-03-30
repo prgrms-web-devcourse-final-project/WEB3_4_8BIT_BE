@@ -8,6 +8,7 @@ import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
+import com.backend.domain.fishpoint.repository.FishPointRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,13 +17,14 @@ import lombok.RequiredArgsConstructor;
 public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 
 	private final FishEncyclopediaRepository fishEncyclopediaRepository;
+	private final FishPointRepository fishPointRepository;
 
 	@Override
 	public Long save(final FishEncyclopediaRequest.Create create, final Long memberId) {
 		//Fish, FishPoint 존재하는지 검증
 		//TODO 추후 로직 구현 후 주석 풀 예정
-		/*existsFishId(create.fishId());
-		existsFishPointId(create.fishPointId());*/
+		// existsFishId(create.fishId());
+		existsFishPointId(create.fishPointId());
 
 		FishEncyclopedia fishEncyclopedia = FishEncyclopediaConverter.fromFishEncyclopediasRequestCreate(
 			create,
@@ -55,7 +57,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 	 * @throws FishEncyclopediaException 낚시 포인트가 존재하지 않을 때 발생
 	 */
 	private void existsFishPointId(final Long fishPointId) {
-		boolean result = false;
+		boolean result = fishPointRepository.existsById(fishPointId);
 
 		if (!result) {
 			throw new FishEncyclopediaException(FishEncyclopediaErrorCode.NOT_EXISTS_FISH_POINT);
