@@ -123,7 +123,7 @@ public class GlobalControllerAdvice {
 	 * @return {@link ResponseEntity<GenericResponse>}
 	 */
 	@ExceptionHandler(ShipFishingPostException.class)
-	public ResponseEntity<GenericResponse<Void>> handleShipFishingPostsException(
+	public ResponseEntity<GenericResponse<Void>> handleShipFishPostsException(
 		ShipFishingPostException shipFishingPostException) {
 		log.error("handleShipFishPostsException: ", shipFishingPostException);
 
@@ -206,7 +206,7 @@ public class GlobalControllerAdvice {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GenericResponse<List<ErrorDetail>>> handlerMethodArgumentNotValidException(
 		MethodArgumentNotValidException ex
-	) {
+  ) {
 		log.error("handlerMethodArgumentNotValidException: ", ex);
 
 		BindingResult bindingResult = ex.getBindingResult();
