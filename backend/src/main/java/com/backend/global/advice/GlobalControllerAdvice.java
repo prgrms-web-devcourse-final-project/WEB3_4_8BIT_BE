@@ -1,13 +1,5 @@
 package com.backend.global.advice;
 
-import com.backend.domain.member.exception.MemberException;
-import com.backend.global.auth.exception.JwtAuthenticationException;
-import com.backend.global.exception.GlobalErrorCode;
-import com.backend.global.exception.GlobalException;
-import com.backend.global.response.ErrorDetail;
-import com.backend.global.response.GenericResponse;
-import com.backend.global.storage.exception.StorageException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.backend.domain.review.exception.ReviewException;
+import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
+import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.response.ErrorDetail;
@@ -163,14 +157,13 @@ public class GlobalControllerAdvice {
 	/**
 	 * Validation 예외 처리 핸들러 입니다.
 	 *
-	 * @param ex      Exception
-	 * @param request HttpServletRequest
+	 * @param ex Exception
 	 * @return {@link ResponseEntity<GenericResponse<List<ErrorDetail>}
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GenericResponse<List<ErrorDetail>>> handlerMethodArgumentNotValidException(
 		MethodArgumentNotValidException ex
-  ) {
+	) {
 		log.error("handlerMethodArgumentNotValidException: ", ex);
 
 		BindingResult bindingResult = ex.getBindingResult();
