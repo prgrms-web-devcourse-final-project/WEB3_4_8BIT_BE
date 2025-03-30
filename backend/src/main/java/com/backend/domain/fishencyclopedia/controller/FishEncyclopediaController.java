@@ -3,6 +3,7 @@ package com.backend.domain.fishencyclopedia.controller;
 import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.service.FishEncyclopediaService;
+import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,15 +30,14 @@ public class FishEncyclopediaController {
 	@Operation(summary = "물고기 도감 추가하기", description = "물고기 도감 추가시 사용하는 API")
 	@PostMapping
 	public ResponseEntity<GenericResponse<Void>> save(
-		@RequestBody @Valid final FishEncyclopediaRequest.Create create
+		@RequestBody @Valid final FishEncyclopediaRequest.Create create,
+		@AuthenticationPrincipal final CustomOAuth2User customOAuth2User
 	) {
-		//TODO 추후 수정 예정
-		// fishEncyclopediasService.save(create, )
 
-		Long fishEncyclopediaId = 1L;
+		Long savedFishEncyclopediaId = fishEncyclopediaService.save(create, customOAuth2User.getId());
 
 		return ResponseEntity
-			.created(URI.create(fishEncyclopediaId.toString()))
-			.body(GenericResponse.ok());
+			.created(URI.create(savedFishEncyclopediaId.toString()))
+			.body(GenericResponse.of(true));
 	}
 }
