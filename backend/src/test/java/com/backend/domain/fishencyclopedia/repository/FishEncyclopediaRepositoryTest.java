@@ -9,27 +9,15 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
+import com.backend.global.Util.BaseTest;
 import com.backend.global.config.JpaAuditingConfig;
-
-import com.navercorp.fixturemonkey.FixtureMonkey;
-import com.navercorp.fixturemonkey.api.introspector.BuilderArbitraryIntrospector;
 
 @Import({FishEncyclopediaRepositoryImpl.class, JpaAuditingConfig.class})
 @DataJpaTest
-class FishEncyclopediaRepositoryTest {
-
-	private final FishEncyclopediaRepository fishEncyclopediaRepository;
-	private final FixtureMonkey fixtureMonkeyBuilder;
+class FishEncyclopediaRepositoryTest extends BaseTest {
 
 	@Autowired
-	public FishEncyclopediaRepositoryTest(FishEncyclopediaRepository fishEncyclopediaRepository) {
-		this.fishEncyclopediaRepository = fishEncyclopediaRepository;
-
-		fixtureMonkeyBuilder = FixtureMonkey.builder()
-			.objectIntrospector(BuilderArbitraryIntrospector.INSTANCE)
-			.defaultNotNull(true)
-			.build();
-	}
+	private FishEncyclopediaRepository fishEncyclopediaRepository;
 
 	@Test
 	@DisplayName("물고기 도감 저장 [Repository] - Success")
@@ -44,6 +32,6 @@ class FishEncyclopediaRepositoryTest {
 		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.save(givenFishEncyclopedia);
 
 		//then
-		assertThat(savedFishEncyclopedia).isNotNull();
+		assertThat(savedFishEncyclopedia.getFishEncyclopediaId()).isNotNull();
 	}
 }
