@@ -68,6 +68,9 @@ dependencies {
     // Fixture Monkey
     testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter:1.1.10")
     testImplementation("com.navercorp.fixturemonkey:fixture-monkey-jakarta-validation:1.1.10")
+
+    // Spring Security Test 라이브러리
+	testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
