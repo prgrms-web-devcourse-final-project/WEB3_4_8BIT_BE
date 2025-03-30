@@ -28,4 +28,9 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 		return shipFishingPostQueryRepository.findDetailById(fishingPostId);
 	}
 
+	@Override
+	public Optional<ShipFishingPostResponse.DetailAll> findDetailAllById(final Long shipFishingPostId) {
+
+		return shipFishingPostQueryRepository.findDetailAllById(shipFishingPostId);
+	}
 }

@@ -19,9 +19,18 @@ public interface ShipFishingPostRepository {
 	/**
 	 * 선상 낚시 게시글 상세 조회 메서드
 	 *
-	 * @param shipFishingPostId {@link ShipFishingPostResponse.Detail}
+	 * @param shipFishingPostId {@link Long}
 	 * @return {@link ShipFishingPostResponse.Detail}
 	 * @implSpec 선상 낚시 게시글 ID를 받아서 조회 후 ShipFishingPostResponse.Detail 을 반환한다.
 	 */
 	Optional<ShipFishingPostResponse.Detail> findDetailById(final Long shipFishingPostId);
+
+	/**
+	 * 선상 낚시 게시글 상세 조회 메서드 (게시글, 멤버, 선박 정보 포함)
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @return {@link ShipFishingPostResponse.DetailAll}
+	 * @implSpec 선상 낚시 게시글 ID를 받아서 조회 후 ShipFishingPostResponse.DetailAll 을 반환한다.
+	 */
+	Optional<ShipFishingPostResponse.DetailAll> findDetailAllById(final Long shipFishingPostId);
 }
