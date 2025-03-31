@@ -2,25 +2,41 @@ package com.backend.domain.shipfishposts.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import com.backend.domain.fish.entity.Fish;
+import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.repository.ShipRepository;
+import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
-import com.backend.global.util.BaseTest;
+import com.backend.domain.shipfishingpostfish.entity.ShipFishingPostFish;
+import com.backend.domain.shipfishingpostfish.repository.ShipFishingPostFishRepository;
 import com.backend.global.config.QuerydslConfig;
+import com.backend.global.exception.GlobalErrorCode;
+import com.backend.global.exception.GlobalException;
+import com.backend.global.util.BaseTest;
+import com.backend.global.util.pageutil.Page;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +44,7 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
 @Slf4j
 @Import(QuerydslConfig.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 public class ShipFishingPostRepositoryTest extends BaseTest {
 
@@ -35,11 +52,32 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 	private ShipRepository shipRepository;
 
 	@Autowired
+	private FishRepository fishRepository;
+
+	@Autowired
 	private ShipFishingPostRepository shipFishingPostRepository;
+
+	@Autowired
+	private ShipFishingPostFishRepository shipFishingPostFishRepository;
 
 	private final ArbitraryBuilder<ShipFishingPost> arbitraryBuilder = fixtureMonkeyBuilder
 		.giveMeBuilder(ShipFishingPost.class)
 		.set("subject", "1555");
+
+	@BeforeAll
+	void init() {
+		for (int i = 0; i < 20; i++) {
+			fishRepository.save(
+				fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
+					.set("fishId", null)
+					.set("description", "test description")
+					.set("icon", "icon")
+					.set("spawnLocation", "test")
+					.set("name", String.format("fish %d", i))
+					.sample()
+			);
+		}
+	}
 
 	@Test
 	@DisplayName("선상 낚시 게시글 저장 [Repository] - Success")
@@ -139,5 +177,483 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		assertThat(shipDetail.parkingAvailable()).isEqualTo(savedShip.getParkingAvailable());
 
 		// Todo : 멤버 정보 검증
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [페이징 여부 확인] [Repository] - Success")
+	void t04() {
+		// given
+		for (long i = 1; i <= 14; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().build();
+
+		Pageable pageable = PageRequest.of(2, 6, Sort.by("createdAt").descending());
+
+		// when
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().size()).isEqualTo(2);
+		assertThat(savedPage.getPage()).isEqualTo(2);
+		assertThat(savedPage.getSize()).isEqualTo(6);
+		assertThat(savedPage.getTotalPages()).isEqualTo(3);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Condition - 대상 어종] [Repository] - Success")
+	void t05() {
+		// Given
+		List<ShipFishingPostFish> givenShipFishingPostFishList = new ArrayList<>();
+
+		for (long i = 1; i <= 14; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("fishList", List.of(i, i + 1))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			for (int j = 0; j < 2; j++) {
+				givenShipFishingPostFishList.add(fixtureMonkeyBuilder
+					.giveMeBuilder(ShipFishingPostFish.class)
+					.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+					.set("fishId", i + j)
+					.sample());
+			}
+		}
+
+		shipFishingPostFishRepository.saveAll(givenShipFishingPostFishList);
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().fishId(5L).build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().size()).isEqualTo(2);
+		assertThat(savedPage.getPage()).isEqualTo(0);
+		assertThat(savedPage.getSize()).isEqualTo(6);
+		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Condition - 가격 (minPrice)] [Repository] - Success")
+	void t06() {
+		// Given
+		for (long i = 1; i <= 14; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("price", 20000 * i)
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder()
+			.minPrice(200000L)
+			.build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().size()).isEqualTo(5);
+		assertThat(savedPage.getPage()).isEqualTo(0);
+		assertThat(savedPage.getSize()).isEqualTo(6);
+		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Condition - 가격 (maxPrice)] [Repository] - Success")
+	void t07() {
+		// Given
+		for (long i = 1; i <= 14; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("price", 20000 * i)
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder()
+			.maxPrice(200000L)
+			.build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().size()).isEqualTo(6);
+		assertThat(savedPage.getPage()).isEqualTo(0);
+		assertThat(savedPage.getSize()).isEqualTo(6);
+		assertThat(savedPage.getTotalPages()).isEqualTo(2);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Condition - 가격 (minPrice ~ maxPrice)] [Repository] - Success")
+	void t08() {
+		// Given
+		for (long i = 1; i <= 14; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("price", 20000 * i)
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder()
+			.minPrice(200000L)
+			.maxPrice(220000L)
+			.build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().size()).isEqualTo(2);
+		assertThat(savedPage.getPage()).isEqualTo(0);
+		assertThat(savedPage.getSize()).isEqualTo(6);
+		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Sort - price, desc] [Repository] - Success")
+	void t09() {
+		// Given
+		for (long i = 1; i <= 14; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("price", 20000 * i)
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("price").descending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().get(0).price()).isEqualTo(280000L);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Sort - price, asc] [Repository] - Success")
+	void t10() {
+		// Given
+		for (long i = 1; i <= 14; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("price", 20000 * i)
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("price").ascending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().get(0).price()).isEqualTo(20000L);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Condition - 평점] [Repository] - Success")
+	void t11() {
+		// Given
+		for (long i = 1; i <= 10; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("reviewEverRate", 0.5 * i)
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().minRating(3D).build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().size()).isEqualTo(5);
+		assertThat(savedPage.getPage()).isEqualTo(0);
+		assertThat(savedPage.getSize()).isEqualTo(6);
+		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Sort - reviewEverRate, desc] [Repository] - Success")
+	void t12() {
+		// Given
+		for (long i = 1; i <= 10; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("reviewEverRate", 0.5 * i)
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("reviewEverRate").descending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().get(0).reviewEverRate()).isEqualTo(5D);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Sort - reviewEverRate, asc] [Repository] - Success")
+	void t13() {
+		// Given
+		for (long i = 1; i <= 10; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("reviewEverRate", 0.5 * i)
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("reviewEverRate").ascending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().get(0).reviewEverRate()).isEqualTo(0.5D);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Condition - 소요 시간] [Repository] - Success")
+	void t14() {
+		// Given
+		for (long i = 1; i <= 10; i++) {
+			int hour = (int)(i / 2);
+			int minute = (int)(30 * i) % 60;
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("durationTime", LocalTime.of(hour, minute))
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder()
+			.duration(LocalTime.of(2, 30))
+			.build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().size()).isEqualTo(5);
+		assertThat(savedPage.getPage()).isEqualTo(0);
+		assertThat(savedPage.getSize()).isEqualTo(6);
+		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Condition - 출항 지역] [Repository] - Success")
+	void t15() {
+		// Given
+		for (long i = 1; i <= 20; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("location", String.format("test%d", i))
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().location("t2").build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().size()).isEqualTo(2);
+		assertThat(savedPage.getPage()).isEqualTo(0);
+		assertThat(savedPage.getSize()).isEqualTo(6);
+		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Search - keyword] [Repository] - Success")
+	void t16() {
+		// Given
+		for (long i = 1; i <= 20; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("subject", String.format("test%d", i))
+				.set("fishList", List.of(1L))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder()
+			.keyword("test2")
+			.build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+
+		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+			givenRequestDto, pageable);
+
+		// Then
+		assertThat(savedPage.getData().size()).isEqualTo(2);
+		assertThat(savedPage.getPage()).isEqualTo(0);
+		assertThat(savedPage.getSize()).isEqualTo(6);
+		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 목록 조회 [Sort - wrong] [Repository] - Fail")
+	void t17() {
+		// Given
+		for (long i = 1; i <= 20; i++) {
+			ShipFishingPost givenPost = arbitraryBuilder
+				.set("shipFishingPostId", null)
+				.set("shipId", i)
+				.set("location", String.format("test%d", i))
+				.sample();
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenPost);
+
+			shipFishingPostFishRepository.save(fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPostFish.class)
+				.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+				.set("fishId", 1L)
+				.sample());
+		}
+
+		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().build();
+
+		Pageable pageable = PageRequest.of(0, 6, Sort.by("wrong").descending());
+
+		// Then
+		assertThatThrownBy(() -> shipFishingPostRepository.findAllBySearchAndCondition(givenRequestDto, pageable))
+			.isInstanceOf(GlobalException.class)
+			.hasFieldOrPropertyWithValue("globalErrorCode", GlobalErrorCode.WRONG_SORT_CONDITION)
+			.hasMessageContaining(GlobalErrorCode.WRONG_SORT_CONDITION.getMessage());
 	}
 }
