@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.backend.domain.captain.exception.CaptainException;
+import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.review.exception.ReviewException;
@@ -94,6 +95,26 @@ public class GlobalControllerAdvice {
 
 		return ResponseEntity.status(memberException.getStatus().value())
 			.body(genericResponse);
+	}
+
+	/**
+	 * FishException 처리 핸들러 입니다.
+	 *
+	 * @param fishException {@link FishException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(FishException.class)
+	public ResponseEntity<GenericResponse<Void>> handleShipException(
+		FishException fishException) {
+		log.error("handleFishException: ", fishException);
+
+		GenericResponse<Void> response = GenericResponse.fail(
+			fishException.getFishErrorCode().getCode(),
+			fishException.getMessage()
+		);
+
+		return ResponseEntity.status(fishException.getStatus().value())
+			.body(response);
 	}
 
 	/**
@@ -219,6 +240,7 @@ public class GlobalControllerAdvice {
 	/**
 	 * Validation 예외 처리 핸들러 입니다.
 	 *
+	 * @param ex Exception
 	 * @param ex      MethodArgumentNotValidException
 	 * @return {@link ResponseEntity<GenericResponse<List<ErrorDetail>}
 	 */
