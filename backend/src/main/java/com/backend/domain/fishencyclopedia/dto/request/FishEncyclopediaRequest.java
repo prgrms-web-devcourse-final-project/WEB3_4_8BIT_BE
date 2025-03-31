@@ -38,6 +38,19 @@ public class FishEncyclopediaRequest {
 	) {
 	}
 
+	/**
+	 * {
+	 * 		"page": 0,
+	 * 		"size": 10,
+	 * 		"sort": "createdAt",
+	 * 		"order": "desc"
+	 * }
+	 *
+	 * @param page 페이지 번호
+	 * @param size 페이지 사이즈
+	 * @param sort 정렬 필드
+	 * @param order 정렬 기준
+	 */
 	public record PageRequest(
 		@Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.")
 		@Schema(description = "페이지 번호", example = "0")
@@ -50,7 +63,7 @@ public class FishEncyclopediaRequest {
 		@Schema(description = "정렬 필드 [createdAt, count, length] (default createdAt)", example = "createdAt")
 		String sort,
 
-		@Schema(description = "정렬 필드 [asc, desc] (default desc)", example = "desc")
+		@Schema(description = "정렬 기준 [asc, desc] (default desc)", example = "desc")
 		String order) {
 
 		public PageRequest {
