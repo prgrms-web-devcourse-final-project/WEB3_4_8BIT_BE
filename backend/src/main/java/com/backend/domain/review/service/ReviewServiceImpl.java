@@ -41,7 +41,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ReviewWithMemberResponse> getReviewListByPostId(Long postId) {
+	public List<ReviewWithMemberResponse> getReviewListByPostId(final Long postId) {
 
 		List<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(postId);
 
@@ -50,7 +50,8 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public List<ReviewWithMemberResponse> getReviewListByMemberId(Long memberId) {
+	@Transactional(readOnly = true)
+	public List<ReviewWithMemberResponse> getReviewListByMemberId(final Long memberId) {
 
 		List<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByMemberId(memberId);
 
