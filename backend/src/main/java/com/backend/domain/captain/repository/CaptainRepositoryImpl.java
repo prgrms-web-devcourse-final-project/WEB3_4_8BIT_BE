@@ -27,7 +27,7 @@ public class CaptainRepositoryImpl implements CaptainRepository {
 	}
 
 	@Override
-	public Optional<CaptainResponse.Detail> findDetailById(Long captainId) {
+	public Optional<CaptainResponse.Detail> findDetailById(final Long captainId) {
 		return captainQueryRepository.findDetailById(captainId);
 	}
 }
