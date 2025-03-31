@@ -28,5 +28,14 @@ public interface MemberService {
 	 */
 	MemberResponse.Detail getMemberDetail(final Long memberId);
 
-	Long updateMember(final Long memberId);
+	/**
+	 * 회원 정보 수정 메소드
+	 *
+	 * @param memberId 수정할 회원의 고유 ID
+	 * @param requestDto {@link MemberRequest.form} 수정할 회원 정보 DTO (닉네임, 프로필 이미지, 자기소개)
+	 * @return {@link Long} 수정된 회원의 ID
+	 * @throws MemberException 회원이 존재하지 않는 경우 예외 발생
+	 * @implSpec 회원 ID로 회원 엔티티를 조회한 후, 엔티티의 수정 메소드를 통해 회원 정보를 갱신한다.
+	 */
+	Long updateMember(final Long memberId, final MemberRequest.form requestDto);
 }

@@ -31,12 +31,13 @@ public class MemberServiceImpl implements MemberService {
 			throw new MemberException(MemberErrorCode.ALREADY_ADDED_INFO);
 		}
 
-		member.createAddInfo(requestDto.nickname(), requestDto.profileImg(), requestDto.description());
+		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.description());
 		log.debug("추가 정보저장에 성공하였습니다. 닉네임 :{} ", member.getNickname());
 
 		return member.getMemberId();
 	}
-  
+
+	@Override
 	public MemberResponse.Detail getMemberDetail(final Long memberId) {
 
 		Member member = getMember(memberId);
@@ -49,8 +50,15 @@ public class MemberServiceImpl implements MemberService {
 	}
 
 	@Override
-	public Long updateMember(Long memberId) {
-		return 0L;
+	@Transactional
+	public Long updateMember(Long memberId, final MemberRequest.form requestDto) {
+
+		Member member = getMember(memberId);
+
+		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.profileImg());
+		log.debug("회원 정보를 수정하였습니다. 닉네임 :{}", member.getNickname());
+
+		return member.getMemberId();
 	}
 
 	/**
