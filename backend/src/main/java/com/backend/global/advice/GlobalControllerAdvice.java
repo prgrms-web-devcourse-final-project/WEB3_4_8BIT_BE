@@ -199,7 +199,6 @@ public class GlobalControllerAdvice {
 	/**
 	 * Validation 예외 처리 핸들러 입니다.
 	 *
-	 * @param ex Exception
 	 * @param ex      MethodArgumentNotValidException
 	 * @return {@link ResponseEntity<GenericResponse<List<ErrorDetail>}
 	 */
