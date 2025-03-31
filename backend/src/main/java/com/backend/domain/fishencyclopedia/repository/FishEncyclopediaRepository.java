@@ -22,17 +22,16 @@ public interface FishEncyclopediaRepository {
 	 * 물고기 도감 상세 조회 메소드
 	 *
 	 * @param requestDto {@link FishEncyclopediaRequest.PageRequest}
-	 * @param fishPointId {@link Long}
 	 * @param fishId {@link Long}
 	 * @return {@link FishEncyclopedia}
-	 * @implSpec FishPointId, FishId가 일치하는 데이터 동적 조회 후 결과 반환
+	 * @implSpec FishId가 일치하는 데이터 동적 조회 후 결과 반환
 	 * Sort - length, sort, createdAt(default)
 	 * Order - ASC, DESC(default)
 	 * @author Kim Dong O
 	 */
 	Slice<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
 		final FishEncyclopediaRequest.PageRequest requestDto,
-		final Long fishPointId,
-		final Long fishId
+		final Long fishId,
+		final Long memberId
 	);
 }
