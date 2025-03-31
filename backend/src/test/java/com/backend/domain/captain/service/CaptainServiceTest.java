@@ -14,7 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.backend.domain.captain.dto.Request.CaptainRequest;
+import com.backend.domain.captain.dto.Response.CaptainResponse;
 import com.backend.domain.captain.entity.Captain;
+import com.backend.domain.captain.exception.CaptainErrorCode;
+import com.backend.domain.captain.exception.CaptainException;
 import com.backend.domain.captain.repository.CaptainRepository;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
@@ -22,6 +25,9 @@ import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.util.BaseTest;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @ExtendWith(MockitoExtension.class)
 class CaptainServiceTest extends BaseTest {
 
@@ -74,7 +80,6 @@ class CaptainServiceTest extends BaseTest {
 		verify(captainRepository, times(1)).save(any(Captain.class));
 	}
 
-
 	@Test
 	@DisplayName("선장 저장 [Member Not Exists] [Service] - Fail")
 	void t02() {
@@ -95,6 +100,47 @@ class CaptainServiceTest extends BaseTest {
 
 		verify(memberRepository, times(1)).findById(nonExistMemberId);
 		verify(captainRepository, never()).save(any());
+	}
+
+	@Test
+	@DisplayName("선장 상세 조회 [Service] - Success")
+	void t03() {
+		// Given
+		CaptainResponse.Detail givenResponseDto = fixtureMonkeyValidation.giveMeBuilder(CaptainResponse.Detail.class)
+			.set("memberId", 1L)
+			.set("name", "루피")
+			.set("nickname", "해적왕")
+			.set("description", "해적왕이 되고싶은 루피 입니다.")
+			.set("shipLicenseNumber", "1-2019123456")
+			.set("shipList", List.of(101L, 102L))
+			.sample();
+
+		when(captainRepository.findDetailById(givenResponseDto.memberId()))
+			.thenReturn(Optional.of(givenResponseDto));
+
+		// When
+		CaptainResponse.Detail result = captainService.getCaptainDetail(givenResponseDto.memberId());
+
+		// Then
+		verify(captainRepository, times(1)).findDetailById(givenResponseDto.memberId());
+		assertThat(result).isEqualTo(givenResponseDto);
+	}
+
+	@Test
+	@DisplayName("선장 상세 조회 [CAPTAIN_NOT_FOUND] [Service] - Fail")
+	void t04() {
+		// Given
+		Long invalidCaptainId = 999L;
+
+		when(captainRepository.findDetailById(invalidCaptainId)).thenReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> captainService.getCaptainDetail(invalidCaptainId))
+			.isInstanceOf(CaptainException.class)
+			.hasFieldOrPropertyWithValue("captainErrorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
+			.hasMessageContaining(CaptainErrorCode.CAPTAIN_NOT_FOUND.getMessage());
+
+		verify(captainRepository, times(1)).findDetailById(invalidCaptainId);
 	}
 
 }
