@@ -5,7 +5,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.captain.converter.CaptainConverter;
 import com.backend.domain.captain.dto.Request.CaptainRequest;
+import com.backend.domain.captain.dto.Response.CaptainResponse;
 import com.backend.domain.captain.entity.Captain;
+import com.backend.domain.captain.exception.CaptainErrorCode;
+import com.backend.domain.captain.exception.CaptainException;
 import com.backend.domain.captain.repository.CaptainRepository;
 import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.entity.Member;
@@ -40,6 +43,18 @@ public class CaptainServiceImpl implements CaptainService {
 		log.debug("[선장 등록 완료] : {}", captain);
 
 		return captainRepository.save(captain).getMemberId();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public CaptainResponse.Detail getCaptainDetail(final Long captainId) {
+
+		CaptainResponse.Detail detail = captainRepository.findDetailById(captainId)
+			.orElseThrow(() -> new CaptainException(CaptainErrorCode.CAPTAIN_NOT_FOUND));
+
+		log.debug("[선장 상세 조회] : {}", detail);
+
+		return detail;
 	}
 
 	/**
