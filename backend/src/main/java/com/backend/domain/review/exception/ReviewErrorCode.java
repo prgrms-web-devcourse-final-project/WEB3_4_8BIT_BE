@@ -15,8 +15,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ReviewErrorCode {
 
-	//선상 낚시 리뷰 에러 코드 400
-	DUPLICATE_REVIEW(HttpStatus.CONFLICT, 4001, "리뷰는 동일한 예약에 대해 한 번만 작성할 수 있습니다.");
+	//선상 낚시 리뷰 에러 코드 600
+	DUPLICATE_REVIEW(HttpStatus.CONFLICT, 6001, "리뷰는 동일한 예약에 대해 한 번만 작성할 수 있습니다.");
 
 	private final HttpStatus httpStatus;
 	private final Integer code;
