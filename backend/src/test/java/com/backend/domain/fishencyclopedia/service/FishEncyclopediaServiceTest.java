@@ -141,9 +141,10 @@ class FishEncyclopediaServiceTest extends BaseTest {
 
 		Member givenMember = fixtureMonkeyBuilder.giveMeOne(Member.class);
 
-		List<FishEncyclopediaResponse.Detail> givenDetailList = fixtureMonkeyBuilder
+		List<FishEncyclopediaResponse.Detail> givenDetailList = fixtureMonkeyRecord
 			.giveMeBuilder(FishEncyclopediaResponse.Detail.class)
 			.sampleList(7);
+
 		Pageable givenPageable = PageRequest.of(givenPageRequest.page(), givenPageRequest.size());
 
 		boolean givenHasNext = false;
