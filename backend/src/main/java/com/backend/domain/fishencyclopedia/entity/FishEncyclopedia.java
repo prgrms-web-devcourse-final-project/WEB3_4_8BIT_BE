@@ -1,7 +1,5 @@
 package com.backend.domain.fishencyclopedia.entity;
 
-import org.hibernate.annotations.ColumnDefault;
-
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -10,7 +8,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,9 +33,7 @@ public class FishEncyclopedia extends BaseEntity {
 	private Integer length;
 
 	@Column(nullable = false)
-	@ColumnDefault("0")
-	@Builder.Default
-	private Integer count = 0;
+	private Integer count;
 
 	@Column(nullable = false)
 	private Long fishPointId;
