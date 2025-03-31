@@ -53,7 +53,6 @@ public class FishEncyclopediaQueryRepository {
 			.orderBy(getOrderBy(requestDto))
 			.fetch();
 
-
         // 다음 페이지가 있는지 확인
         boolean hasNext = detailList.size() > requestDto.size();
 
