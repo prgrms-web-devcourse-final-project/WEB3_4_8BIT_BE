@@ -1,10 +1,12 @@
 package com.backend.domain.fishencyclopedia.service;
 
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.fishencyclopedia.converter.FishEncyclopediaConverter;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
+import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
@@ -24,13 +26,13 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 	private final FishRepository fishRepository;
 
 	@Override
-	public Long createFishEncyclopedia(final FishEncyclopediaRequest.Create create, final Long memberId) {
+	public Long createFishEncyclopedia(final FishEncyclopediaRequest.Create requestDto, final Long memberId) {
 		//Fish, FishPoint 존재하는지 검증
-		existsFishId(create.fishId());
-		existsFishPointId(create.fishPointId());
+		existsFishId(requestDto.fishId());
+		existsFishPointId(requestDto.fishPointId());
 
 		FishEncyclopedia fishEncyclopedia = FishEncyclopediaConverter.fromFishEncyclopediasRequestCreate(
-			create,
+			requestDto,
 			memberId
 		);
 
@@ -56,6 +58,15 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		if (!result) {
 			throw new FishEncyclopediaException(FishEncyclopediaErrorCode.NOT_EXISTS_FISH);
 		}
+	}
+
+	@Override
+	public Slice<FishEncyclopediaResponse.Detail> getDetailList(
+		FishEncyclopediaRequest.PageRequest requestDto,
+		Long fishId,
+		Long memberId
+	) {
+		return fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(requestDto, fishId, memberId);
 	}
 
 	/**
