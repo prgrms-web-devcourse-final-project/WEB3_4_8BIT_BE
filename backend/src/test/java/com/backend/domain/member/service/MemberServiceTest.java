@@ -14,11 +14,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.dto.MemberRequest;
+import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.util.BaseTest;
+
+import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest extends BaseTest {
@@ -28,6 +31,13 @@ class MemberServiceTest extends BaseTest {
 
 	@Mock
 	private MemberRepository memberRepository;
+
+	private final ArbitraryBuilder<Member> arbitraryBuilder = fixtureMonkeyBuilder
+		.giveMeBuilder(Member.class)
+		.set("phone", "010-1234-5678")
+		.set("email", "test@naver.com")
+		.set("role", MemberRole.USER)
+		.set("name", "test");
 
 	@Test
 	@DisplayName("회원 추가 정보 저장 [Service] - Success")
@@ -98,4 +108,33 @@ class MemberServiceTest extends BaseTest {
 		verify(memberRepository, times(1)).findById(alreadyAddedMember.getMemberId());
 	}
 
+	@Test
+	@DisplayName("회원 상세 정보 조회 [Service] - Success")
+	void t04() {
+		// Given
+		Long memberId = 1L;
+
+		Member givenMember = arbitraryBuilder
+			.set("memberId", memberId)
+			.set("profileImg", "http://example.com/profile.jpg")
+			.set("description", "자기소개입니다.")
+			.set("nickname", "닉네임")
+			.sample();
+
+		when(memberRepository.findById(memberId)).thenReturn(Optional.of(givenMember));
+
+		// When
+		MemberResponse.Detail result = memberService.getMemberDetail(memberId);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result.memberId()).isEqualTo(givenMember.getMemberId());
+		assertThat(result.name()).isEqualTo(givenMember.getName());
+		assertThat(result.email()).isEqualTo(givenMember.getEmail());
+		assertThat(result.nickname()).isEqualTo(givenMember.getNickname());
+		assertThat(result.phone()).isEqualTo(givenMember.getPhone());
+		assertThat(result.profileImg()).isEqualTo(givenMember.getProfileImg());
+		assertThat(result.description()).isEqualTo(givenMember.getDescription());
+		verify(memberRepository, times(1)).findById(memberId);
+	}
 }

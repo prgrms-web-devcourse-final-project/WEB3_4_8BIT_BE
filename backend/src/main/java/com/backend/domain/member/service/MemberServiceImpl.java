@@ -3,6 +3,9 @@ package com.backend.domain.member.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.member.converter.MemberConverter;
+import com.backend.domain.member.dto.MemberRequest;
+import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
@@ -34,7 +37,18 @@ public class MemberServiceImpl implements MemberService {
 
 		return member.getMemberId();
 	}
+  
+	public MemberResponse.Detail getMemberDetail(final Long memberId) {
 
+		Member member = getMember(memberId);
+
+		MemberResponse.Detail responseDto = MemberConverter.fromMemberToDetail(member);
+		log.debug("responseDto를 만들었습니다. 이름 : {}, 이메일 : {}, 닉네임 : {}", responseDto.name(), responseDto.email(),
+			responseDto.nickname());
+
+		return responseDto;
+	}
+  
 	/**
 	 * 회원 ID로 회원 엔티티를 조회하는 메소드
 	 *
