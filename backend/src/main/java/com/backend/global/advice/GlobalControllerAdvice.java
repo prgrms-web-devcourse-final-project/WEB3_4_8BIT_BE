@@ -15,7 +15,6 @@ import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.review.exception.ReviewException;
-import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.exception.GlobalErrorCode;
@@ -123,7 +122,7 @@ public class GlobalControllerAdvice {
 	 * @return {@link ResponseEntity<GenericResponse>}
 	 */
 	@ExceptionHandler(ShipFishingPostException.class)
-	public ResponseEntity<GenericResponse<Void>> handleShipFishPostsException(
+	public ResponseEntity<GenericResponse<Void>> handleShipFishingPostsException(
 		ShipFishingPostException shipFishingPostException) {
 		log.error("handleShipFishPostsException: ", shipFishingPostException);
 
