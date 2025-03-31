@@ -68,12 +68,12 @@ public class Member extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isAddInfo;
 
-	public void updateUserProfile(String name, String profileImg) {
+	public void updateUserProfile(final String name, final String profileImg) {
 		this.name = name;
 		this.profileImg = profileImg;
 	}
 
-	public void createAddInfo(String nickname, String profileImg, String description) {
+	public void createAddInfo(final String nickname, final String profileImg, final String description) {
 		this.nickname = nickname;
 		this.profileImg = profileImg;
 		this.description = description;
