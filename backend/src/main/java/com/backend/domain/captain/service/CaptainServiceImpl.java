@@ -31,7 +31,7 @@ public class CaptainServiceImpl implements CaptainService {
 		Member member = getMember(memberId);
 
 		// 2. 멤버 추가 정보 및 role 업데이트
-		member.createAddInfo(requestDto.nickname(), requestDto.profileImg(), requestDto.descrption());
+		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.descrption());
 		member.updateRole(MemberRole.CAPTAIN);
 
 		// 3. 선장 정보 생성 및 저장
