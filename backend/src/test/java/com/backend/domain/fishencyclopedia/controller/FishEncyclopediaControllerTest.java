@@ -51,6 +51,7 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		.giveMeBuilder(FishEncyclopediaRequest.Create.class)
 		.set("fishId", 1L)
 		.set("length", 10)
+		.set("count", 10)
 		.set("fishPointId", 1L);
 
 	@Test
