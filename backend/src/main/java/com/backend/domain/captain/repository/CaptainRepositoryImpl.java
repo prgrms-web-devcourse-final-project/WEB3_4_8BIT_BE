@@ -20,7 +20,7 @@ public class CaptainRepositoryImpl implements CaptainRepository {
 	}
 
 	@Override
-	public Optional<Captain> findById(Long captainId) {
+	public Optional<Captain> findById(final Long captainId) {
 		return captainJpaRepository.findById(captainId);
 	}
 }
