@@ -19,6 +19,7 @@ import java.util.List;
  * @param rating	별점
  * @param content	리뷰 내용
  * @param imageList	이미지
+ * @param shipFishingPostId 선상 낚시 게시글 ID
  * @param memberId	작성자 ID
  * @param nickname	작성자 닉네임
  * @param profileImg	작성자 프로필 이미지
@@ -29,6 +30,7 @@ public record ReviewWithMemberResponse(
 	Integer rating,
 	String content,
 	List<String> imageList,
+	Long shipFishingPostId,
 	Long memberId,
 	String nickname,
 	String profileImg,
