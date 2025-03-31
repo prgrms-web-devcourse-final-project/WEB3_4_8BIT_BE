@@ -43,3 +43,4 @@ out/
 /src/test/resources/application.yml
 /src/main/generated/
 /src/test/resources/application-test.yml
+/logs

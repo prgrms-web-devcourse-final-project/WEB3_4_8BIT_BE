@@ -68,9 +68,9 @@ public class Member extends BaseEntity {
 	@Column(nullable = false)
 	private Boolean isAddInfo;
 
-	public void updateUserProfile(final String name, final String profileImg) {
+	public void updateUserProfile(final String name, final String email) {
 		this.name = name;
-		this.profileImg = profileImg;
+		this.email = email;
 	}
 
 	public void createAddInfo(final String nickname, final String profileImg, final String description) {
@@ -78,5 +78,9 @@ public class Member extends BaseEntity {
 		this.profileImg = profileImg;
 		this.description = description;
 		this.isAddInfo = true;
+	}
+
+	public void updateRole(final MemberRole role) {
+		this.role = role;
 	}
 }
