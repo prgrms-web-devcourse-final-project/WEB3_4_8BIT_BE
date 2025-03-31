@@ -8,20 +8,20 @@ public class FishEncyclopediaConverter {
 	/**
 	 * 선상 낚시 게시글 생성 Dto를 Entity로 변환한다.
 	 *
-	 * @param create   {@link FishEncyclopediaRequest.Create}
+	 * @param requestDto   {@link FishEncyclopediaRequest.Create}
 	 * @param memberId {@link Long}
 	 * @return {@link FishEncyclopedia}
 	 */
 	public static FishEncyclopedia fromFishEncyclopediasRequestCreate(
-		final FishEncyclopediaRequest.Create create,
+		final FishEncyclopediaRequest.Create requestDto,
 		final Long memberId
 	) {
 
 		return FishEncyclopedia.builder()
-			.fishEncyclopediaId(create.fishId())
-			.length(create.length())
-			.count(create.count())
-			.fishPointId(create.fishPointId())
+			.fishEncyclopediaId(requestDto.fishId())
+			.length(requestDto.length())
+			.count(requestDto.count())
+			.fishPointId(requestDto.fishPointId())
 			.memberId(memberId)
 			.build();
 	}
