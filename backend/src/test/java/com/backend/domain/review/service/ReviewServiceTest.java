@@ -33,17 +33,18 @@ public class ReviewServiceTest extends BaseTest {
 	@DisplayName("리뷰 저장 [Service] - Success")
 	void t01() {
 	    //given
+		Long memberId = 1L;
 		Long reservationId = 1L;
 		ReviewRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(ReviewRequest.Create.class);
 
-		Review givenReview = ReviewConverter.fromReviewRequestCreate(reservationId, givenRequest);
+		Review givenReview = ReviewConverter.fromReviewRequestCreate(memberId, reservationId, givenRequest);
 		ReflectionTestUtils.setField(givenReview, "reviewId", 1L);
 
 		given(reviewRepository.existsByReservationId(reservationId)).willReturn(false);
 		given(reviewRepository.save(any(Review.class))).willReturn(givenReview);
 
 		//when
-		Long savedReviewId = reviewServiceImpl.save(reservationId, givenRequest);
+		Long savedReviewId = reviewServiceImpl.save(memberId, reservationId, givenRequest);
 
 	    //then
 		verify(reviewRepository).existsByReservationId(reservationId);
@@ -55,13 +56,14 @@ public class ReviewServiceTest extends BaseTest {
 	@DisplayName("리뷰 저장 [Service] - Fail (중복 리뷰)")
 	void t02() {
 		// given
+		Long memberId = 1L;
 		Long reservationId = 1L;
 		ReviewRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(ReviewRequest.Create.class);
 
 		given(reviewRepository.existsByReservationId(reservationId)).willReturn(true);
 
 		// when & then
-		assertThatThrownBy(() -> reviewServiceImpl.save(reservationId, givenRequest))
+		assertThatThrownBy(() -> reviewServiceImpl.save(memberId, reservationId, givenRequest))
 			.isInstanceOf(ReviewException.class)
 			.hasMessageContaining(ReviewErrorCode.DUPLICATE_REVIEW.getMessage());
 
