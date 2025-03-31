@@ -11,9 +11,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.review.exception.ReviewException;
+import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.exception.GlobalErrorCode;
@@ -175,8 +177,29 @@ public class GlobalControllerAdvice {
 	}
 
 	/**
+	 * FishEncyclopediaException 처리 핸들러 입니다.
+	 *
+	 * @param fishEncyclopediaException {@link FishEncyclopediaException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(FishEncyclopediaException.class)
+	public ResponseEntity<GenericResponse<Void>> handleFishEncyclopediaException(
+		FishEncyclopediaException fishEncyclopediaException) {
+		log.error("handleFishEncyclopediaException: ", fishEncyclopediaException);
+
+		GenericResponse<Void> genericResponse = GenericResponse.fail(
+			fishEncyclopediaException.getFishEncyclopediaErrorCode().getCode(),
+			fishEncyclopediaException.getMessage()
+		);
+
+		return ResponseEntity.status(fishEncyclopediaException.getStatus().value())
+			.body(genericResponse);
+	}
+
+	/**
 	 * Validation 예외 처리 핸들러 입니다.
 	 *
+	 * @param ex Exception
 	 * @param ex      MethodArgumentNotValidException
 	 * @return {@link ResponseEntity<GenericResponse<List<ErrorDetail>}
 	 */

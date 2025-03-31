@@ -1,0 +1,77 @@
+package com.backend.domain.fishencyclopedia.service;
+
+import org.springframework.stereotype.Service;
+
+import com.backend.domain.fish.repository.FishRepository;
+import com.backend.domain.fishencyclopedia.converter.FishEncyclopediaConverter;
+import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
+import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
+import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
+import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
+import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
+import com.backend.domain.fishpoint.repository.FishPointRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
+
+	private final FishEncyclopediaRepository fishEncyclopediaRepository;
+	private final FishPointRepository fishPointRepository;
+	private final FishRepository fishRepository;
+
+	@Override
+	public Long createFishEncyclopedia(final FishEncyclopediaRequest.Create create, final Long memberId) {
+		//Fish, FishPoint 존재하는지 검증
+		existsFishId(create.fishId());
+		existsFishPointId(create.fishPointId());
+
+		FishEncyclopedia fishEncyclopedia = FishEncyclopediaConverter.fromFishEncyclopediasRequestCreate(
+			create,
+			memberId
+		);
+
+		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.createFishEncyclopedia(fishEncyclopedia);
+
+		log.debug("물고기 도감 저장: {}", savedFishEncyclopedia);
+
+		return savedFishEncyclopedia.getFishEncyclopediaId();
+	}
+
+	/**
+	 * Fish가 존재하는지 검증하는 메소드 입니다.
+	 *
+	 * @param fishId
+	 * @throws FishEncyclopediaException 물고기가 존재하지 않을 때 발생
+	 */
+	private void existsFishId(final Long fishId) {
+
+		boolean result = fishRepository.existsById(fishId);
+
+		log.debug("물고기 존재 여부: {}", result);
+
+		if (!result) {
+			throw new FishEncyclopediaException(FishEncyclopediaErrorCode.NOT_EXISTS_FISH);
+		}
+	}
+
+	/**
+	 * FishPoint가 존재하는지 검증하는 메소드 입니다.
+	 *
+	 * @param fishPointId
+	 * @throws FishEncyclopediaException 낚시 포인트가 존재하지 않을 때 발생
+	 */
+	private void existsFishPointId(final Long fishPointId) {
+
+		boolean result = fishPointRepository.existsById(fishPointId);
+
+		log.debug("낚시 포인트 존재 여부: {}", result);
+
+		if (!result) {
+			throw new FishEncyclopediaException(FishEncyclopediaErrorCode.NOT_EXISTS_FISH_POINT);
+		}
+	}
+}

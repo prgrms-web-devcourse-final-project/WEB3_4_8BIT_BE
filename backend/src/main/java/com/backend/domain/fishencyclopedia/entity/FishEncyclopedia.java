@@ -1,4 +1,4 @@
-package com.backend.domain.memberfish.entity;
+package com.backend.domain.fishencyclopedia.entity;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,25 +23,26 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class MemberFishs extends BaseEntity {
+public class FishEncyclopedia extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long memberFishId;
+	private Long fishEncyclopediaId;
 
 	@Column(nullable = false)
-	@ColumnDefault("0")
-	private Integer count;
+	private Long fishId;
 
 	@Column(nullable = false)
 	private Integer length;
+
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	@Builder.Default
+	private Integer count = 0;
 
 	@Column(nullable = false)
 	private Long fishPointId;
 
 	@Column(nullable = false)
 	private Long memberId;
-
-	@Column(nullable = false)
-	private Long fishId;
 }
