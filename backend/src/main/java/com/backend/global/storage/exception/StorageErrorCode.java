@@ -15,9 +15,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum StorageErrorCode {
 
-	UNSUPPORTED_FILE_TYPE(HttpStatus.BAD_REQUEST, 4001, "지원하지 않는 파일 형식입니다. (허용된 형식: PNG, JPEG, JPG)");
+	//스토리지 에러 코드 500
+	UNSUPPORTED_FILE_TYPE(HttpStatus.BAD_REQUEST, 5001, "지원하지 않는 파일 형식입니다. (허용된 형식: PNG, JPEG, JPG)");
 
 	private final HttpStatus httpStatus;
-	private final int code;
+	private final Integer code;
 	private final String message;
 }

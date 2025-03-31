@@ -45,9 +45,15 @@ class MemberServiceTest extends BaseTest {
 		// Given
 		MemberRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Create.class);
 
-		Member givenMember = arbitraryBuilder
+		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", 1L)
 			.set("isAddInfo", false)
+			.set("memberId", null)
+			.set("phone", "010-1234-5678")
+			.set("email","test@naver.com")
+			.set("nickname","테스트")
+			.set("role", MemberRole.USER)
+			.set("name", "test")
 			.sample();
 
 		when(memberRepository.findById(givenMember.getMemberId())).thenReturn(Optional.of(givenMember));
@@ -87,9 +93,9 @@ class MemberServiceTest extends BaseTest {
 		// Given
 		MemberRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Create.class);
 
-		Member alreadyAddedMember = arbitraryBuilder
+		Member alreadyAddedMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", 1L)
-			.set("isAddInfo", true)
+			.set("isAddInfo", true) // 이미 추가된 상태
 			.sample();
 
 		when(memberRepository.findById(alreadyAddedMember.getMemberId())).thenReturn(Optional.of(alreadyAddedMember));

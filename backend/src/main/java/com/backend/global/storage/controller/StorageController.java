@@ -29,9 +29,9 @@ public class StorageController {
 	@PostMapping("/presigned-urls")
 	@Operation(summary = "Presigned URL 생성", description = "파일 업로드를 위한 presigned URL 리스트를 생성하는 API")
 	public ResponseEntity<GenericResponse<List<FileUploadResponse>>> getPresignedUrls(
-		@RequestBody @Valid FileUploadRequest.Request request
+		@RequestBody @Valid final FileUploadRequest.Request requestDto
 	) {
-		List<FileUploadResponse> response = storageService.generateUploadUrls(request.domain(), request.files());
+		List<FileUploadResponse> response = storageService.generateUploadUrls(requestDto.domain(), requestDto.fileList());
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
 }

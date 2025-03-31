@@ -39,14 +39,14 @@ public class S3StorageService implements StorageService {
 	}
 
 	@Override
-	public List<FileUploadResponse> generateUploadUrls(String domain, List<FileUploadRequest.File> request) {
+	public List<FileUploadResponse> generateUploadUrls(final String domain, final List<FileUploadRequest.File> request) {
 		return request.stream()
 			.map(file -> generateUploadUrl(domain, file))
 			.toList();
 	}
 
 	@Override
-	public FileUploadResponse generateUploadUrl(String domain, FileUploadRequest.File file) {
+	public FileUploadResponse generateUploadUrl(final String domain, final FileUploadRequest.File file) {
 		// MIME 타입 검증
 		validateFile(file.contentType());
 
@@ -75,7 +75,7 @@ public class S3StorageService implements StorageService {
 	 * @param contentType 파일 타입
 	 * @author vdvhk12
 	 */
-	private void validateFile(String contentType) {
+	private void validateFile(final String contentType) {
 		if (!ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
 			throw new StorageException(StorageErrorCode.UNSUPPORTED_FILE_TYPE);
 		}
@@ -89,7 +89,7 @@ public class S3StorageService implements StorageService {
 	 * @return String
 	 * @author vdvhk12
 	 */
-	private String generateFileName(String domain, String originalFileName) {
+	private String generateFileName(final String domain, final String originalFileName) {
 		return domain + "/" + UUID.randomUUID().toString().replace("-", "") + "-" + originalFileName;
 	}
 }
