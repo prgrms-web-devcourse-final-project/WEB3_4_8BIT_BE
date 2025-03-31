@@ -2,7 +2,6 @@ package com.backend.domain.fishencyclopedia.controller;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
@@ -28,6 +27,7 @@ import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse
 import com.backend.domain.fishencyclopedia.service.FishEncyclopediaService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
+import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -94,10 +94,10 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		resultActions
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("fishId"))
 			.andExpect(jsonPath("$.data[0].reason").value("물고기 ID는 필수 항목입니다."))
-			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
+			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
 	}
 
@@ -117,7 +117,7 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		resultActions
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("length"))
 			.andExpect(jsonPath("$.data[0].reason").value("물고기 길이는 필수 항목입니다."))
 			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
@@ -140,10 +140,10 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		resultActions
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("length"))
 			.andExpect(jsonPath("$.data[0].reason").value("물고기 길이는 1cm 이상이어야 합니다."))
-			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
+			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
 	}
 
@@ -163,10 +163,10 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		resultActions
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("fishPointId"))
 			.andExpect(jsonPath("$.data[0].reason").value("낚시 포인트 ID는 필수 항목입니다."))
-			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
+			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
 	}
 
@@ -214,7 +214,68 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.content.size()").value(7))
 			.andExpect(jsonPath("$.data.numberOfElements").value(7))
 			.andExpect(jsonPath("$.data.pageable.pageSize").value(givenPageRequest.size()))
-			.andExpect(jsonPath("$.data.pageable.pageNumber").value(givenPageRequest.page()))
-			.andDo(print());
+			.andExpect(jsonPath("$.data.pageable.pageNumber").value(givenPageRequest.page()));
+	}
+
+	@Test
+	@DisplayName("물고기 도감 상세 조회 [Size Min] [Controller] - Fail")
+	@WithMockCustomUser
+	void t07() throws Exception {
+		// Given
+		FishEncyclopediaRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
+			.giveMeBuilder(FishEncyclopediaRequest.PageRequest.class)
+			.set("size", -1)
+			.set("page", 0)
+			.sample();
+
+		Fish givenFish = fixtureMonkeyBuilder.giveMeOne(Fish.class);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
+			.param("page", givenPageRequest.page().toString())
+			.param("size", givenPageRequest.size().toString())
+			.param("sort", givenPageRequest.sort())
+			.param("order", givenPageRequest.order()));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
+			.andExpect(jsonPath("$.data[0].field").value("size"))
+			.andExpect(jsonPath("$.data[0].reason").value("페이지 사이즈는 0 이상이어야 합니다."))
+			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("물고기 도감 상세 조회 [Page Min] [Controller] - Fail")
+	@WithMockCustomUser
+	void t08() throws Exception {
+		// Given
+		FishEncyclopediaRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
+			.giveMeBuilder(FishEncyclopediaRequest.PageRequest.class)
+			.set("size", 1)
+			.set("page", -1)
+			.sample();
+
+		Fish givenFish = fixtureMonkeyBuilder.giveMeOne(Fish.class);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
+			.param("page", givenPageRequest.page().toString())
+			.param("size", givenPageRequest.size().toString())
+			.param("sort", givenPageRequest.sort())
+			.param("order", givenPageRequest.order()));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
+			.andExpect(jsonPath("$.data[0].field").value("page"))
+			.andExpect(jsonPath("$.data[0].reason").value("페이지 번호는 0 이상이어야 합니다."))
+			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
 	}
 }
