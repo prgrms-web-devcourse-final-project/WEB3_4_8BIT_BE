@@ -1,5 +1,7 @@
 package com.backend.domain.fishencyclopedia.service;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,8 @@ import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
+import com.backend.domain.fishencyclopediamaxlength.entity.FishEncyclopediaMaxLength;
+import com.backend.domain.fishencyclopediamaxlength.repository.FishEncyclopediaMaxLengthRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -24,6 +28,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 
 	private final FishEncyclopediaRepository fishEncyclopediaRepository;
 	private final FishPointRepository fishPointRepository;
+	private final FishEncyclopediaMaxLengthRepository fishEncyclopediaMaxLengthRepository;
 	private final FishRepository fishRepository;
 
 	@Override
@@ -38,7 +43,24 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 			memberId
 		);
 
-		//TODO 추후 최대 길이 값 검증 추가해야함
+		// 물고기 최대 길이 값 조회
+		Optional<FishEncyclopediaMaxLength> findEncyclopediaMaxLength = fishEncyclopediaMaxLengthRepository
+			.findByFishIdAndMemberId(
+				requestDto.fishId(),
+				memberId
+			);
+
+		// 비어있다면 객체 생성
+		FishEncyclopediaMaxLength encyclopediaMaxLength = findEncyclopediaMaxLength
+			.orElse(FishEncyclopediaMaxLength.builder()
+				.fishId(requestDto.fishId())
+				.memberId(memberId)
+				.build());
+ 		// 최대 값 갱신
+		encyclopediaMaxLength.setBestLength(requestDto.length());
+
+		// 새로 생성된 객체일 가능성이 있어 명시
+		fishEncyclopediaMaxLengthRepository.save(encyclopediaMaxLength);
 
 		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.createFishEncyclopedia(fishEncyclopedia);
 
@@ -54,7 +76,12 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		final Long fishId,
 		final Long memberId
 	) {
-		return fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(requestDto, fishId, memberId);
+		Slice<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
+			requestDto, fishId, memberId);
+
+		log.debug("물고기 도감 상세 조회: {}", findDetailList);
+
+		return findDetailList;
 	}
 
 	/**
