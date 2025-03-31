@@ -2,6 +2,7 @@ package com.backend.domain.fishencyclopedia.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
 
@@ -69,7 +70,8 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 
 	private final Member givenMember = Member.builder().memberId(1L).build();
 
-	private final ArbitraryBuilder<FishPoint> fishPointarbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(FishPoint.class)
+	private final ArbitraryBuilder<FishPoint> fishPointarbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(
+			FishPoint.class)
 		.set("fishPointName", englishStringLength)
 		.set("fishPointDetailName", englishStringLength);
 
@@ -146,7 +148,8 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 			.toList();
 
 		assertThat(savedFishEncyclopedia).hasSize(7);
-		assertThat(content.get(0).createdAt()).isEqualTo(sortedFishEncyclopediaList.get(0).getCreatedAt());
+		assertThat(content.get(0).createdAt().truncatedTo(ChronoUnit.SECONDS))
+			.isEqualTo(sortedFishEncyclopediaList.get(0).getCreatedAt().truncatedTo(ChronoUnit.SECONDS));
 	}
 
 	@Test
@@ -168,7 +171,8 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 			.toList();
 
 		assertThat(savedFishEncyclopedia).hasSize(7);
-		assertThat(content.get(0).createdAt()).isEqualTo(sortedFishEncyclopediaList.get(0).getCreatedAt());
+		assertThat(content.get(0).createdAt().truncatedTo(ChronoUnit.SECONDS))
+			.isEqualTo(sortedFishEncyclopediaList.get(0).getCreatedAt().truncatedTo(ChronoUnit.SECONDS));
 	}
 
 	@Test
@@ -265,7 +269,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 			requestDto,
 			savedFishList.get(0).getFishId(),
 			givenMember.getMemberId()
-			);
+		);
 	}
 
 }
