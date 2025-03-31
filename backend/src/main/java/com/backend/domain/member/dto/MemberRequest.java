@@ -17,7 +17,7 @@ public class MemberRequest {
 	 * @param profileImg 유저 프로필 이미지 URL (선택)
 	 * @param description 유저 자기소개 (선택)
 	 */
-	public record form(
+	public record Form(
 		@NotBlank(message = "닉네임은 필수 항목입니다.")
 		@Size(max = 30, message = "닉네임은 최대 30자까지 가능합니다.")
 		@Schema(description = "유저 닉네임", example = "낚시중인낚시왕")

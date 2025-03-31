@@ -23,7 +23,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional
-	public Long saveAddInfo(final Long memberId, final MemberRequest.form requestDto) {
+	public Long saveAddInfo(final Long memberId, final MemberRequest.Form requestDto) {
 
 		Member member = getMember(memberId);
 
@@ -51,7 +51,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional
-	public Long updateMember(Long memberId, final MemberRequest.form requestDto) {
+	public Long updateMember(Long memberId, final MemberRequest.Form requestDto) {
 
 		Member member = getMember(memberId);
 

@@ -11,12 +11,12 @@ public interface MemberService {
 	 * 회원 추가 정보 저장 메소드
 	 *
 	 * @param memberId 회원의 고유 ID
-	 * @param requestDto {@link MemberRequest.form} 회원 추가 정보 (닉네임, 프로필 이미지, 자기소개)
+	 * @param requestDto {@link MemberRequest.Form} 회원 추가 정보 (닉네임, 프로필 이미지, 자기소개)
 	 * @return {@link Long} memberId - 저장된 회원의 ID
 	 * @throws MemberException 이미 추가 정보가 등록된 경우 예외 발생
 	 * @implSpec 회원의 추가 정보를 최초 1회 저장하며, 이미 저장된 경우 예외를 던진다.
 	 */
-	Long saveAddInfo(final Long memberId, final MemberRequest.form requestDto);
+	Long saveAddInfo(final Long memberId, final MemberRequest.Form requestDto);
 
 	/**
 	 * 회원 상세 정보 조회 메소드
@@ -32,10 +32,10 @@ public interface MemberService {
 	 * 회원 정보 수정 메소드
 	 *
 	 * @param memberId 수정할 회원의 고유 ID
-	 * @param requestDto {@link MemberRequest.form} 수정할 회원 정보 DTO (닉네임, 프로필 이미지, 자기소개)
+	 * @param requestDto {@link MemberRequest.Form} 수정할 회원 정보 DTO (닉네임, 프로필 이미지, 자기소개)
 	 * @return {@link Long} 수정된 회원의 ID
 	 * @throws MemberException 회원이 존재하지 않는 경우 예외 발생
 	 * @implSpec 회원 ID로 회원 엔티티를 조회한 후, 엔티티의 수정 메소드를 통해 회원 정보를 갱신한다.
 	 */
-	Long updateMember(final Long memberId, final MemberRequest.form requestDto);
+	Long updateMember(final Long memberId, final MemberRequest.Form requestDto);
 }

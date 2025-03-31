@@ -43,7 +43,7 @@ class MemberServiceTest extends BaseTest {
 	@DisplayName("회원 추가 정보 저장 [Service] - Success")
 	void t01() {
 		// Given
-		MemberRequest.form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.form.class);
+		MemberRequest.Form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Form.class);
 
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", 1L)
@@ -75,7 +75,7 @@ class MemberServiceTest extends BaseTest {
 	void t02() {
 		// Given
 		Long invalidMemberId = 600L;
-		MemberRequest.form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.form.class);
+		MemberRequest.Form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Form.class);
 
 		when(memberRepository.findById(invalidMemberId)).thenReturn(Optional.empty());
 
@@ -91,7 +91,7 @@ class MemberServiceTest extends BaseTest {
 	@DisplayName("회원 추가 정보 저장 [ALREADY_ADDED_INFO] [Service] - Fail")
 	void t03() {
 		// Given
-		MemberRequest.form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.form.class);
+		MemberRequest.Form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Form.class);
 
 		Member alreadyAddedMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", 1L)
@@ -143,7 +143,7 @@ class MemberServiceTest extends BaseTest {
 	void t05() {
 		// Given
 		Long memberId = 1L;
-		MemberRequest.form givenRequest = new MemberRequest.form("수정된닉네임", "http://new.url/profile.jpg", "수정된 자기소개");
+		MemberRequest.Form givenRequest = new MemberRequest.Form("수정된닉네임", "http://new.url/profile.jpg", "수정된 자기소개");
 
 		Member givenMember = arbitraryBuilder
 			.set("memberId", memberId)
