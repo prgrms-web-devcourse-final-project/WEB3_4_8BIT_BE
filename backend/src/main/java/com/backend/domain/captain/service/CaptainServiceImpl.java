@@ -37,8 +37,7 @@ public class CaptainServiceImpl implements CaptainService {
 		// 3. 선장 정보 생성 및 저장
 		Captain captain = CaptainConverter.fromMemberAndCaptainRequestCreate(requestDto, member);
 
-		log.debug("[선장 등록 완료] memberId={}, license={}, shipList={}",
-			member.getMemberId(), captain.getShipLicenseNumber(), captain.getShipList());
+		log.debug("[선장 등록 완료] : {}", captain);
 
 		return captainRepository.save(captain).getMemberId();
 	}
@@ -56,8 +55,7 @@ public class CaptainServiceImpl implements CaptainService {
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-		log.debug("[멤버 조회] memberId={} , email={}, name={}", member.getMemberId(), member.getEmail(),
-			member.getName());
+		log.debug("[멤버 조회] : {}", member);
 		return member;
 	}
 }
