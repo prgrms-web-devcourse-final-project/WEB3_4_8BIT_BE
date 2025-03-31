@@ -18,7 +18,7 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
-import com.backend.global.Util.BaseTest;
+import com.backend.global.util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceTest extends BaseTest {

@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Import;
 
 import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.entity.Member;
-import com.backend.global.Util.BaseTest;
+import com.backend.global.util.BaseTest;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
 
