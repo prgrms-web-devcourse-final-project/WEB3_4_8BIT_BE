@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
+import com.backend.domain.member.exception.MemberException;
+import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.review.exception.ReviewException;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
@@ -95,13 +97,33 @@ public class GlobalControllerAdvice {
 	}
 
 	/**
+	 * ShipException 처리 핸들러 입니다.
+	 *
+	 * @param shipException {@link ShipException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(ShipException.class)
+	public ResponseEntity<GenericResponse<Void>> handleShipException(
+		ShipException shipException) {
+		log.error("handleShipException: ", shipException);
+
+		GenericResponse<Void> response = GenericResponse.fail(
+			shipException.getShipErrorCode().getCode(),
+			shipException.getMessage()
+		);
+
+		return ResponseEntity.status(shipException.getStatus().value())
+			.body(response);
+	}
+
+	/**
 	 * ShipFishingPostException 처리 핸들러 입니다.
 	 *
 	 * @param shipFishingPostException {@link ShipFishingPostException}
 	 * @return {@link ResponseEntity<GenericResponse>}
 	 */
 	@ExceptionHandler(ShipFishingPostException.class)
-	public ResponseEntity<GenericResponse<Void>> handleShipFishPostsException(
+	public ResponseEntity<GenericResponse<Void>> handleShipFishingPostsException(
 		ShipFishingPostException shipFishingPostException) {
 		log.error("handleShipFishPostsException: ", shipFishingPostException);
 
@@ -178,6 +200,7 @@ public class GlobalControllerAdvice {
 	 * Validation 예외 처리 핸들러 입니다.
 	 *
 	 * @param ex Exception
+	 * @param ex      MethodArgumentNotValidException
 	 * @return {@link ResponseEntity<GenericResponse<List<ErrorDetail>}
 	 */
 	@ExceptionHandler(MethodArgumentNotValidException.class)

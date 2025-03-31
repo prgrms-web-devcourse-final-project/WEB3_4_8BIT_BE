@@ -18,17 +18,17 @@ public class ShipFishingPostRequest {
 
 	/**
 	 *{
-	 *   "subject": "게시글 제목",
-	 *   "content": "게시글 내용",
-	 *   "price": 80000,
-	 *   "location": "부산",
-	 *   "startTime": "15:00",
-	 *   "endTime": "17:30",
-	 *   "maxGuestCount": 10,
-	 *   "shipId": 10,
-	 *   "images": ["http://example.com/image1.jpg", "http://example.com/image2.jpg"],
-	 *   "fishIds": [1, 2, 3],
-	 *   "unavailableDates": ["2025-03-25", "2025-03-26"]
+	 * "subject": "게시글 제목",
+	 * "content": "게시글 내용",
+	 * "price": 80000,
+	 * "location": "부산",
+	 * "startTime": "15:00",
+	 * "endTime": "17:30",
+	 * "maxGuestCount": 10,
+	 * "shipId": 10,
+	 * "images": ["http://example.com/image1.jpg", "http://example.com/image2.jpg"],
+	 * "fishIds": [1, 2, 3],
+	 * "unavailableDates": ["2025-03-25", "2025-03-26"]
 	 *}
 	 *
 	 * @param subject "게시글 제목"
@@ -40,7 +40,7 @@ public class ShipFishingPostRequest {
 	 * @param maxGuestCount 최대 인원 수
 	 * @param shipId 게시글에 올릴 배 번호
 	 * @param images 등록한 사진 리스트
-	 * @param fishIds 목적 어종 리스트
+	 * @param fishList 목적 어종 리스트
 	 * @param unavailableDates 예약 불가능 날짜 리스트
 	 */
 	public record Create(
@@ -76,7 +76,7 @@ public class ShipFishingPostRequest {
 
 		@Positive(message = "최대 인원은 0 명 이상이어야 합니다.")
 		@Schema(description = "최대 인원", example = "10")
-		Integer maxGuestCount,
+		Long maxGuestCount,
 
 		@NotNull(message = "배 등록 번호는 필수 항목입니다.")
 		@Schema(description = "배 Id 값 (entity)", example = "10")
@@ -86,14 +86,14 @@ public class ShipFishingPostRequest {
 		List<String> images,
 
 		@Schema(description = "물고기 Id 리스트", example = "[1, 2, 3]")
-		List<Long> fishIds,
+		List<Long> fishList,
 
 		@Schema(description = "예약 불가 날짜 리스트", example = "[\"2025-03-25\", \"2025-03-26\"]")
 		List<LocalDate> unavailableDates
 	) {
 		public Create {
 			images = (images == null) ? new ArrayList<>() : images;
-			fishIds = (fishIds == null) ? new ArrayList<>() : fishIds;
+			fishList = (fishList == null) ? new ArrayList<>() : fishList;
 			unavailableDates = (unavailableDates == null) ? new ArrayList<>() : unavailableDates;
 		}
 	}
