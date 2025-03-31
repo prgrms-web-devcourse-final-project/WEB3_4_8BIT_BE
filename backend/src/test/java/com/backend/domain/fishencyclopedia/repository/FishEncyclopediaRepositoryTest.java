@@ -21,6 +21,7 @@ import com.backend.domain.fish.repository.FishJpaRepository;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
+import com.backend.domain.fishencyclopediamaxlength.repository.FishEncyclopediaMaxLengthJpaRepository;
 import com.backend.domain.fishpoint.entity.FishPoint;
 import com.backend.domain.fishpoint.repository.FishPointJpaRepository;
 import com.backend.domain.member.entity.Member;
@@ -32,8 +33,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
-@Import({FishEncyclopediaRepositoryImpl.class, FishEncyclopediaQueryRepository.class, JpaAuditingConfig.class,
-	QuerydslConfig.class})
+@Import({
+	FishEncyclopediaRepositoryImpl.class,
+	FishEncyclopediaQueryRepository.class,
+	JpaAuditingConfig.class,
+	QuerydslConfig.class
+})
 @DataJpaTest
 @Slf4j
 class FishEncyclopediaRepositoryTest extends BaseTest {
@@ -51,20 +56,23 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	private FishPointJpaRepository fishPointJpaRepository;
 
 	@Autowired
+	private FishEncyclopediaMaxLengthJpaRepository fishEncyclopediaMaxLengthJpaRepository;
+
+	@Autowired
 	private FishJpaRepository fishJpaRepository;
 
 	private List<FishPoint> savedFishPointList;
 	private List<Fish> savedFishList;
-	private List<FishEncyclopedia> savedFishEncyclopediasList1;
+	private List<FishEncyclopedia> savedFishEncyclopediasList;
 
-	final Arbitrary<String> englishStringLength = Arbitraries.strings()
+	private final Arbitrary<String> englishStringLength = Arbitraries.strings()
 		.withCharRange('a', 'z')
 		.withCharRange('A', 'Z')
 		.ofMinLength(1).ofMaxLength(10);
 
-	final Member givenMember = Member.builder().memberId(1L).build();
+	private final Member givenMember = Member.builder().memberId(1L).build();
 
-	final ArbitraryBuilder<FishPoint> fishPointarbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(FishPoint.class)
+	private final ArbitraryBuilder<FishPoint> fishPointarbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(FishPoint.class)
 		.set("fishPointName", englishStringLength)
 		.set("fishPointDetailName", englishStringLength);
 
@@ -102,7 +110,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 			.set("memberId", 2L)
 			.sampleList(10);
 
-		savedFishEncyclopediasList1 = fishEncyclopediaJpaRepository.saveAll(fishEncyclopediasList1);
+		savedFishEncyclopediasList = fishEncyclopediaJpaRepository.saveAll(fishEncyclopediasList1);
 	}
 
 	@Test
@@ -136,7 +144,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		// Then
 		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
 
-		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList1.stream()
+		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCreatedAt).reversed())
 			.toList();
 
@@ -158,7 +166,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		// Then
 		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
 
-		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList1.stream()
+		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCreatedAt))
 			.toList();
 
@@ -180,7 +188,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		// Then
 		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
 
-		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList1.stream()
+		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getLength).reversed())
 			.toList();
 
@@ -200,7 +208,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
-		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList1.stream()
+		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getLength))
 			.toList();
 
@@ -222,7 +230,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
-		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList1.stream()
+		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCount).reversed())
 			.toList();
 
@@ -244,7 +252,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
-		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList1.stream()
+		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCount))
 			.toList();
 
