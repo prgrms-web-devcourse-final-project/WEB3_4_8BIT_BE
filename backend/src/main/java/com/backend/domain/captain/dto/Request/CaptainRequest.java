@@ -5,6 +5,7 @@ import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 
 public class CaptainRequest {
@@ -44,6 +45,7 @@ public class CaptainRequest {
 		@Schema(description = "선박 운전 면허 번호", example = "1-2019123456")
 		String shipLicenseNumber,
 
+		@NotEmpty(message = "배는 최소 1개 등록해야합니다.")
 		@Schema(description = "소유한 배 Id 리스트 (entity)", example = "[1, 2, 3]")
 		List<Long> shipList
 	) {
