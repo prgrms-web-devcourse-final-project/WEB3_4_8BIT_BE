@@ -20,7 +20,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/v1/fish/encyclopedias")
+@RequestMapping("/api/v1/fishes")
 @RequiredArgsConstructor
 @Tag(name = "물고기 도감 API")
 public class FishEncyclopediaController {
@@ -28,7 +28,7 @@ public class FishEncyclopediaController {
 	private final FishEncyclopediaService fishEncyclopediaService;
 
 	@Operation(summary = "물고기 도감 추가하기", description = "물고기 도감 추가시 사용하는 API")
-	@PostMapping
+	@PostMapping("/encyclopedias")
 	public ResponseEntity<GenericResponse<Void>> createFishEncyclopedia(
 		@RequestBody @Valid final FishEncyclopediaRequest.Create create,
 		@AuthenticationPrincipal final CustomOAuth2User customOAuth2User
