@@ -50,8 +50,8 @@ class MemberServiceTest extends BaseTest {
 			.set("isAddInfo", false)
 			.set("memberId", null)
 			.set("phone", "010-1234-5678")
-			.set("email","test@naver.com")
-			.set("nickname","테스트")
+			.set("email", "test@naver.com")
+			.set("nickname", "테스트")
 			.set("role", MemberRole.USER)
 			.set("name", "test")
 			.sample();
@@ -135,6 +135,33 @@ class MemberServiceTest extends BaseTest {
 		assertThat(result.phone()).isEqualTo(givenMember.getPhone());
 		assertThat(result.profileImg()).isEqualTo(givenMember.getProfileImg());
 		assertThat(result.description()).isEqualTo(givenMember.getDescription());
+		verify(memberRepository, times(1)).findById(memberId);
+	}
+
+	@Test
+	@DisplayName("회원 정보 수정 [Service] - Success")
+	void t05() {
+		// Given
+		Long memberId = 1L;
+		MemberRequest.form givenRequest = new MemberRequest.form("수정된닉네임", "http://new.url/profile.jpg", "수정된 자기소개");
+
+		Member givenMember = arbitraryBuilder
+			.set("memberId", memberId)
+			.set("nickname", "이전닉네임")
+			.set("profileImg", "http://old.url/profile.jpg")
+			.set("description", "이전 자기소개")
+			.sample();
+
+		when(memberRepository.findById(memberId)).thenReturn(Optional.of(givenMember));
+
+		// When
+		Long updatedId = memberService.updateMember(memberId, givenRequest);
+
+		// Then
+		assertThat(updatedId).isEqualTo(memberId);
+		assertThat(givenMember.getNickname()).isEqualTo(givenRequest.nickname());
+		assertThat(givenMember.getProfileImg()).isEqualTo(givenRequest.profileImg());
+		assertThat(givenMember.getDescription()).isEqualTo(givenRequest.profileImg());
 		verify(memberRepository, times(1)).findById(memberId);
 	}
 }

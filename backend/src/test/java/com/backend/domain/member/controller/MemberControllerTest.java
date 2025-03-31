@@ -237,4 +237,30 @@ public class MemberControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.success").value(false));
 	}
 
+	@Test
+	@WithMockCustomUser
+	@DisplayName("회원 정보 수정 [Controller] - Success")
+	void t09() throws Exception {
+		// Given
+		MemberRequest.form updateRequest = new MemberRequest.form(
+			"변경된닉네임",
+			"http://example.com/new-profile.jpg",
+			"업데이트된 자기소개"
+		);
+		Long memberId = 1L;
+
+		when(memberService.updateMember(eq(memberId), any())).thenReturn(memberId);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/members")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(updateRequest)));
+
+		// Then
+		resultActions
+			.andExpect(status().isCreated())
+			.andExpect(header().exists("Location"))
+			.andExpect(header().string("Location", memberId.toString()))
+			.andExpect(jsonPath("$.success").value(true));
+	}
 }
