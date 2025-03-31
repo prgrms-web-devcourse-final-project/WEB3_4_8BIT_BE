@@ -1,7 +1,7 @@
 package com.backend.domain.review.repository;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
@@ -26,12 +26,12 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 	}
 
 	@Override
-	public List<ReviewWithMemberResponse> findReviewsWithMemberByPostId(Long postId) {
-		return reviewJpaRepository.findReviewsWithMemberByPostId(postId);
+	public Page<ReviewWithMemberResponse> findReviewsWithMemberByPostId(Long postId, Pageable pageable) {
+		return reviewJpaRepository.findReviewsWithMemberByPostId(postId, pageable);
 	}
 
 	@Override
-	public List<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(Long memberId) {
-		return reviewJpaRepository.findReviewsWithMemberByMemberId(memberId);
+	public Page<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(Long memberId, Pageable pageable) {
+		return reviewJpaRepository.findReviewsWithMemberByMemberId(memberId, pageable);
 	}
 }
