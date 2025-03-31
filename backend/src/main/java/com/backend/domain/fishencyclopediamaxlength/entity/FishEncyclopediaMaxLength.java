@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,5 +36,11 @@ public class FishEncyclopediaMaxLength extends BaseEntity {
 	private Long memberId;
 
 	@Column(nullable = false)
-	private Integer bestLength;
+	@Builder.Default
+	private Integer bestLength = 0;
+
+	//TODO 추후 테스트 코드 작성해야함
+	public void setBestLength(Integer bestLength) {
+		this.bestLength = this.bestLength > bestLength ? this.bestLength : bestLength;
+	}
 }
