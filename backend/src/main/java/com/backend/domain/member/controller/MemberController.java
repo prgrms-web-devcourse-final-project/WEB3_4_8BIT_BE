@@ -40,7 +40,7 @@ public class MemberController {
 		return ResponseEntity.created(URI.create(memberId.toString())).body(GenericResponse.of(true));
 	}
 
-	@GetMapping("")
+	@GetMapping
 	@Operation(summary = "회원 정보 조회", description = "현재 로그인된 사용자의 회원 정보를 조회하는 API")
 	public ResponseEntity<GenericResponse<MemberResponse.Detail>> getMemberDetail(
 		@AuthenticationPrincipal CustomOAuth2User user) {
