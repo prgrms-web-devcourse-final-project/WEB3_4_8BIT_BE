@@ -115,7 +115,7 @@ public class GenericResponse<T> {
 	 * @param message   반환 메세지
 	 * @return {@link GenericResponse<T>}
 	 */
-	public static <T> GenericResponse<T> fail(int code, T data, String message) {
+	public static <T> GenericResponse<T> fail(Integer code, T data, String message) {
 		return GenericResponse.<T>builder()
 			.isSuccess(false)
 			.code(code)
@@ -130,7 +130,7 @@ public class GenericResponse<T> {
 	 * @param message   반환 메세지
 	 * @return {@link GenericResponse<T>}
 	 */
-	public static <T> GenericResponse<T> fail(int code, String message) {
+	public static <T> GenericResponse<T> fail(Integer code, String message) {
 		return GenericResponse.<T>builder()
 			.isSuccess(false)
 			.code(code)

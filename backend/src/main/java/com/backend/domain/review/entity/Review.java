@@ -1,5 +1,7 @@
 package com.backend.domain.review.entity;
 
+import java.util.List;
+
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -10,6 +12,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,7 +27,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class Reviews extends BaseEntity {
+@Table(
+	name = "reviews",
+	uniqueConstraints = {
+		@UniqueConstraint(columnNames = {"reservation_id"})
+	}
+)
+public class Review extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,14 +42,18 @@ public class Reviews extends BaseEntity {
 	@Column(nullable = false)
 	private Integer rating;
 
-	@Column(nullable = false, columnDefinition ="TEXT", length = 200)
+	@Column(nullable = false, columnDefinition = "TEXT", length = 200)
 	private String content;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	private String image;
+	private List<String> imageList;
 
 	@Column(nullable = false)
 	private Long memberId;
 
-	//TODO 게시글이랑 중간테이블 생성
+	@Column(nullable = false)
+	private Long shipFishingPostId;
+
+	@Column(nullable = false)
+	private Long reservationId;
 }

@@ -19,7 +19,7 @@ import com.backend.domain.ship.repository.ShipRepository;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
-import com.backend.global.Util.BaseTest;
+import com.backend.global.util.BaseTest;
 import com.backend.global.config.QuerydslConfig;
 
 import lombok.extern.slf4j.Slf4j;

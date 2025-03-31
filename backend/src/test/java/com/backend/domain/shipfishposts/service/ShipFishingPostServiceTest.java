@@ -24,7 +24,7 @@ import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.domain.shipfishingpost.service.ShipFishingPostServiceImpl;
-import com.backend.global.Util.BaseTest;
+import com.backend.global.util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipFishingPostServiceTest extends BaseTest {

@@ -1,4 +1,4 @@
-package com.backend.global.Util;
+package com.backend.global.util;
 
 import com.navercorp.fixturemonkey.FixtureMonkey;
 import com.navercorp.fixturemonkey.api.introspector.BuilderArbitraryIntrospector;
