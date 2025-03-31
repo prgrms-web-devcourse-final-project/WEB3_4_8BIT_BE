@@ -73,11 +73,12 @@ public class Member extends BaseEntity {
 		this.email = email;
 	}
 
-	public void createAddInfo(final String nickname, final String profileImg, final String description) {
+	public void updateMember(final String nickname, final String profileImg, final String description) {
 		this.nickname = nickname;
 		this.profileImg = profileImg;
 		this.description = description;
-		this.isAddInfo = true;
+		if (!this.isAddInfo)
+			this.isAddInfo = true;
 	}
 
 	public void updateRole(final MemberRole role) {
