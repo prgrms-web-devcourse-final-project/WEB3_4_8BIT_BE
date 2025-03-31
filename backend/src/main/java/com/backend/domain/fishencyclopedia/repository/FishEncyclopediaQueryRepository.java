@@ -31,8 +31,8 @@ public class FishEncyclopediaQueryRepository {
 
 	public Slice<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
 		final FishEncyclopediaRequest.PageRequest requestDto,
-		final Long fishPointId,
-		final Long fishId) {
+		final Long fishId,
+		final Long memberId) {
 
 		Pageable pageable = PageRequest.of(requestDto.page(), requestDto.size());
 
@@ -47,9 +47,9 @@ public class FishEncyclopediaQueryRepository {
 			.from(fishEncyclopedia)
 			.leftJoin(fishPoint)
 			.on(fishEncyclopedia.fishPointId.eq(fishPoint.fishPointId))
-			.where(fishEncyclopedia.fishId.eq(fishId), fishEncyclopedia.fishPointId.eq(fishPointId))
 			.offset(pageable.getPageNumber())
 			.limit(pageable.getPageSize() + 1)
+			.where(fishEncyclopedia.fishId.eq(fishId), fishEncyclopedia.memberId.eq(memberId))
 			.orderBy(getOrderBy(requestDto))
 			.fetch();
 

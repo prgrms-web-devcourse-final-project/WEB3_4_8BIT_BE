@@ -23,9 +23,9 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 	@Override
 	public Slice<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
 		FishEncyclopediaRequest.PageRequest requestDto,
-		Long fishPointId,
-		Long fishId
+		Long fishId,
+		Long memberId
 	) {
-		return fishEncyclopediaQueryRepository.findDetailByAllByFishPointIdAndFishId(requestDto, fishPointId, fishId);
+		return fishEncyclopediaQueryRepository.findDetailByAllByFishPointIdAndFishId(requestDto, fishId, memberId);
 	}
 }
