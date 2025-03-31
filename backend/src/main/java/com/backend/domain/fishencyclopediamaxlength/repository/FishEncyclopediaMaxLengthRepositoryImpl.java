@@ -15,12 +15,17 @@ public class FishEncyclopediaMaxLengthRepositoryImpl implements FishEncyclopedia
 	private final FishEncyclopediaMaxLengthJpaRepository fishEncyclopediaMaxLengthJpaRepository;
 
 	@Override
-	public FishEncyclopediaMaxLength save(FishEncyclopediaMaxLength fishEncyclopediaMaxLength) {
+	public FishEncyclopediaMaxLength save(
+		final FishEncyclopediaMaxLength fishEncyclopediaMaxLength
+	) {
 		return fishEncyclopediaMaxLengthJpaRepository.save(fishEncyclopediaMaxLength);
 	}
 
 	@Override
-	public Optional<FishEncyclopediaMaxLength> findByFishIdAndMemberId(Long fishId, Long memberId) {
+	public Optional<FishEncyclopediaMaxLength> findByFishIdAndMemberId(
+		final Long fishId,
+		final Long memberId
+	) {
 		return fishEncyclopediaMaxLengthJpaRepository.findByFishIdAndMemberId(fishId, memberId);
 	}
 }

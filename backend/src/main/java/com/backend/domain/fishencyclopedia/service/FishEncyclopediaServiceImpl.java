@@ -50,9 +50,9 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 	@Override
 	@Transactional(readOnly = true)
 	public Slice<FishEncyclopediaResponse.Detail> getDetailList(
-		FishEncyclopediaRequest.PageRequest requestDto,
-		Long fishId,
-		Long memberId
+		final FishEncyclopediaRequest.PageRequest requestDto,
+		final Long fishId,
+		final Long memberId
 	) {
 		return fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(requestDto, fishId, memberId);
 	}
