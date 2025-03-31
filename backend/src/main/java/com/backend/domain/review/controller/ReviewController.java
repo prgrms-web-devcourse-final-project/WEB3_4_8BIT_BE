@@ -34,7 +34,7 @@ public class ReviewController {
 		@RequestBody @Valid final ReviewRequest.Create requestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
-		reviewService.save(user.getId(), reservationId, requestDto);
+		Long savedReviewId = reviewService.save(user.getId(), reservationId, requestDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.of(true));
 	}
 }
