@@ -1,8 +1,15 @@
 package com.backend.domain.shipfishingpost.service;
 
+import java.util.List;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.fish.entity.Fish;
+import com.backend.domain.fish.exception.FishErrorCode;
+import com.backend.domain.fish.exception.FishException;
+import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
@@ -14,6 +21,8 @@ import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
+import com.backend.domain.shipfishingpostfish.repository.ShipFishingPostFishRepository;
+import com.backend.global.util.pageutil.Page;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,8 +32,10 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
+	private final FishRepository fishRepository;
 	private final ShipRepository shipRepository;
 	private final ShipFishingPostRepository shipFishingPostRepository;
+	private final ShipFishingPostFishRepository shipFishingPostFishRepository;
 
 	@Override
 	@Transactional
@@ -35,13 +46,14 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 		// shipId 등록 여부 & 선박 소유자 정보 일치 검증
 		verifyShipOwnership(shipFishingPost.getShipId(), memberId);
 
+		verifyFishList(shipFishingPost.getFishList());
+
 		// Todo : 예약 불가날짜 관리 로직 필요
 		// requestDto.unavailableDates();
 
-		// Todo : Fish 랑 중간 테이블 생성 후 추가 로직 구현
-		// requestDto.fishList();
-
 		log.debug("Save ship fish posts: {}", shipFishingPost);
+
+		shipFishingPostRepository.save(shipFishingPost);
 
 		return shipFishingPostRepository.save(shipFishingPost).getShipFishingPostId();
 	}
@@ -60,6 +72,13 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
 	}
 
+	@Override
+	public Page<ShipFishingPostResponse.DetailPage> getShipFishingPostPage(
+		final ShipFishingPostRequest.Search requestDto,
+		final Pageable pageable) {
+		return shipFishingPostRepository.findAllBySearchAndCondition(requestDto, pageable);
+	}
+
 	/**
 	 * shipId 등록 여부 & 선박 소유자 정보 일치 검증 메서드
 	 *
@@ -73,6 +92,18 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 		if (!ship.getMemberId().equals(memberId)) {
 			throw new ShipException(ShipErrorCode.SHIP_MISMATCH_MEMBER_ID);
+		}
+	}
+
+	/**
+	 * 저장하려는 물고기 정보가 있는지 검증 메서드
+	 *
+	 * @param fishList {@link List}
+	 */
+	private void verifyFishList(final List<Long> fishList) {
+		List<Fish> findFishList = fishRepository.findAllById(fishList);
+		if (findFishList.size() != fishList.size()) {
+			throw new FishException(FishErrorCode.FISH_NOT_FOUND);
 		}
 	}
 }
