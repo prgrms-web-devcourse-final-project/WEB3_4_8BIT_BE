@@ -3,7 +3,9 @@ package com.backend.domain.member.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.member.converter.MemberConverter;
 import com.backend.domain.member.dto.MemberRequest;
+import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
@@ -33,6 +35,18 @@ public class MemberServiceImpl implements MemberService {
 		log.debug("추가 정보저장에 성공하였습니다. 닉네임 :{} ", member.getNickname());
 
 		return member.getMemberId();
+	}
+
+	@Override
+	public MemberResponse.Detail getMemberDetail(final Long memberId) {
+
+		Member member = getMember(memberId);
+
+		MemberResponse.Detail responseDto = MemberConverter.fromMemberToDetail(member);
+		log.debug("responseDto를 만들었습니다. 이름 : {}, 이메일 : {}, 닉네임 : {}", responseDto.name(), responseDto.email(),
+			responseDto.nickname());
+
+		return responseDto;
 	}
 
 	/**
