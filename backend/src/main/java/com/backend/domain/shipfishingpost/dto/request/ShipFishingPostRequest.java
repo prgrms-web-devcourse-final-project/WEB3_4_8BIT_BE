@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 public class ShipFishingPostRequest {
 
@@ -96,6 +97,33 @@ public class ShipFishingPostRequest {
 			fishList = (fishList == null) ? new ArrayList<>() : fishList;
 			unavailableDates = (unavailableDates == null) ? new ArrayList<>() : unavailableDates;
 		}
+	}
+
+	/**
+	 * 쿼리 파라미터 (검색 및 조건)
+	 *
+	 * @param minPrice - 최소 가격
+	 * @param maxPrice - 최대 가격
+	 * @param minRating - 최소 평점
+	 * @param location - 지역
+	 * @param fishId - 목적 어종
+	 * @param searchDate - 예약 가능 날짜 ?
+	 * @param keyword - 검색어
+	 * @param guestCount - 인원 수
+	 * @param duration - 소요 시간
+	 */
+	@Builder
+	public record Search(
+		Long minPrice,
+		Long maxPrice,
+		Double minRating,
+		String location,
+		Long fishId,
+		LocalDate searchDate,
+		String keyword,
+		Long guestCount,
+		LocalTime duration
+	) {
 	}
 
 }

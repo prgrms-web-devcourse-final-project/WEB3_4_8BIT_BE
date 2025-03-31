@@ -32,6 +32,7 @@ public class ShipFishingPostResponse {
 	 * @param reviewEverRate 평점
 	 */
 	public record Detail(
+		// Todo : 추후 찜하기 반영
 		Long shipFishingPostId,
 		String subject,
 		String content,
@@ -48,10 +49,8 @@ public class ShipFishingPostResponse {
 
 	/**
 	 * {
-	 *     detailShipFishingPost{
-	 *     },
-	 *     detailShip{
-	 *     }
+	 *     detailShipFishingPost
+	 *     detailShip
 	 * }
 	 *
 	 * @param detailShipFishingPost
@@ -61,7 +60,44 @@ public class ShipFishingPostResponse {
 		ShipFishingPostResponse.Detail detailShipFishingPost,
 		ShipResponse.Detail detailShip
 		// Todo : user 정보 추후 작성 예정
-		// Member.Detail detailMember
 	) {
 	}
+
+	/**
+	 *{
+	 *   "shipFishingPostId": 1,
+	 *   "subject": "게시글 제목",
+	 *   "location": "서울",
+	 *   "price": 80000,
+	 *   "startTime": "15:00",
+	 *   "endTime": "17:00",
+	 *   "durationTime": "02:00",
+	 *   "imageList": ["http://example.com/image1.jpg", "http://example.com/image2.jpg"],
+	 *   "reviewEverRate": 4.7
+	 * }
+	 *
+	 * @param shipFishingPostId - 게시글 id
+	 * @param subject - 게시글 제목
+	 * @param location - 지역
+	 * @param price - 금액
+	 * @param startTime - 시작시간
+	 * @param endTime - 종료시간
+	 * @param durationTime - 소요 시간
+	 * @param imageList - 사진 url
+	 * @param reviewEverRate - 평점
+	 */
+	public record DetailPage(
+		Long shipFishingPostId,
+		String subject,
+		String location,
+		Long price,
+		LocalTime startTime,
+		LocalTime endTime,
+		LocalTime durationTime,
+		// List<String> fishList,
+		List<String> imageList,
+		Double reviewEverRate
+	) {
+	}
+
 }
