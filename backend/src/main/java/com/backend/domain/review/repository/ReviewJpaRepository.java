@@ -1,7 +1,7 @@
 package com.backend.domain.review.repository;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -30,7 +30,7 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 		JOIN Member m ON r.memberId = m.memberId
 		WHERE r.shipFishingPostId = :postId
 		""")
-	List<ReviewWithMemberResponse> findReviewsWithMemberByPostId(@Param("postId") Long postId);
+	Page<ReviewWithMemberResponse> findReviewsWithMemberByPostId(@Param("postId") Long postId, Pageable pageable);
 
 	@Query(
 		"""
@@ -50,5 +50,5 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 		WHERE r.memberId = :memberId
 		"""
 	)
-	List<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(@Param("memberId") Long memberId);
+	Page<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(@Param("memberId") Long memberId, Pageable pageable);
 }

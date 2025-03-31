@@ -1,7 +1,8 @@
 package com.backend.domain.review.controller;
 
-import java.util.List;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.review.dto.request.ReviewRequest;
 import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
+import com.backend.domain.review.dto.response.ScrollResponse;
 import com.backend.domain.review.service.ReviewService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.response.GenericResponse;
@@ -44,19 +46,25 @@ public class ReviewController {
 
 	@GetMapping("/ship-posts/{postId}/reviews")
 	@Operation(summary = "선상 낚시 리뷰 조회", description = "게시글 ID로 리뷰를 조회하는 API")
-	public ResponseEntity<GenericResponse<List<ReviewWithMemberResponse>>> getReviewList(
-		@PathVariable final Long postId
+	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByPostId(
+		@PathVariable final Long postId,
+		@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
-		List<ReviewWithMemberResponse> reviewListByPostId = reviewService.getReviewListByPostId(postId);
-		return ResponseEntity.status(HttpStatus.OK).body(GenericResponse.of(true, reviewListByPostId));
+		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
+			reviewService.getReviewListByPostId(postId, pageable));
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(GenericResponse.of(true, scrollResponse));
 	}
 
 	@GetMapping("/members/{memberId}/reviews")
 	@Operation(summary = "내가 작성한 리뷰 조회", description = "회원 ID로 리뷰를 조회하는 API")
-	public ResponseEntity<GenericResponse<List<ReviewWithMemberResponse>>> getReviewList2(
-		@PathVariable final Long memberId
+	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByMemberId(
+		@PathVariable final Long memberId,
+		@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
 	) {
-		List<ReviewWithMemberResponse> reviewListByMemberId = reviewService.getReviewListByMemberId(memberId);
-		return ResponseEntity.status(HttpStatus.OK).body(GenericResponse.of(true, reviewListByMemberId));
+		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
+			reviewService.getReviewListByMemberId(memberId, pageable));
+		return ResponseEntity.status(HttpStatus.OK)
+			.body(GenericResponse.of(true, scrollResponse));
 	}
 }

@@ -1,6 +1,7 @@
 package com.backend.domain.review.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.backend.domain.review.dto.request.ReviewRequest;
 import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
@@ -21,15 +22,15 @@ public interface ReviewService {
 	 * 선상 낚시 리뷰 조회
 	 *
 	 * @param postId 게시글 ID
-	 * @return {@link List<ReviewWithMemberResponse>}
+	 * @return {@link Page<ReviewWithMemberResponse>}
 	 */
-	List<ReviewWithMemberResponse> getReviewListByPostId(Long postId);
+	Page<ReviewWithMemberResponse> getReviewListByPostId(Long postId, Pageable pageable);
 
 	/**
 	 * 내가 작성한 리뷰 조회
 	 *
 	 * @param memberId	회원 ID
-	 * @return {@link List<ReviewWithMemberResponse>}
+	 * @return {@link Page<ReviewWithMemberResponse>}
 	 */
-	List<ReviewWithMemberResponse> getReviewListByMemberId(Long memberId);
+	Page<ReviewWithMemberResponse> getReviewListByMemberId(Long memberId, Pageable pageable);
 }
