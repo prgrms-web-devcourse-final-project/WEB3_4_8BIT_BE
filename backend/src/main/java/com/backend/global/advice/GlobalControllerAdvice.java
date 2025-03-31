@@ -11,10 +11,11 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.backend.domain.captain.exception.CaptainException;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.member.exception.MemberException;
-import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.review.exception.ReviewException;
+import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.exception.GlobalErrorCode;
@@ -92,6 +93,26 @@ public class GlobalControllerAdvice {
 		);
 
 		return ResponseEntity.status(memberException.getStatus().value())
+			.body(genericResponse);
+	}
+
+	/**
+	 * CaptainException 처리 핸들러입니다.
+	 *
+	 * @param captainException {@link com.backend.domain.captain.exception.CaptainException}
+	 * @return {@link org.springframework.http.ResponseEntity < com.backend.global.response.GenericResponse >}
+	 */
+	@ExceptionHandler(CaptainException.class)
+	public ResponseEntity<GenericResponse<Void>> handleCaptainException(
+		CaptainException captainException) {
+		log.error("handleCaptainException: ", captainException);
+
+		GenericResponse<Void> genericResponse = GenericResponse.fail(
+			captainException.getCaptainErrorCode().getCode(),
+			captainException.getMessage()
+		);
+
+		return ResponseEntity.status(captainException.getStatus().value())
 			.body(genericResponse);
 	}
 
@@ -204,7 +225,7 @@ public class GlobalControllerAdvice {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<GenericResponse<List<ErrorDetail>>> handlerMethodArgumentNotValidException(
 		MethodArgumentNotValidException ex
-  ) {
+	) {
 		log.error("handlerMethodArgumentNotValidException: ", ex);
 
 		BindingResult bindingResult = ex.getBindingResult();
