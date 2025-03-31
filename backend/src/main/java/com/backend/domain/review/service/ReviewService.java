@@ -1,6 +1,9 @@
 package com.backend.domain.review.service;
 
+import java.util.List;
+
 import com.backend.domain.review.dto.request.ReviewRequest;
+import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
 
 public interface ReviewService {
 
@@ -13,4 +16,20 @@ public interface ReviewService {
 	 * @return 생성된 리뷰 ID
 	 */
 	Long save(Long memberId, Long reservationId, ReviewRequest.Create request);
+
+	/**
+	 * 선상 낚시 리뷰 조회
+	 *
+	 * @param postId 게시글 ID
+	 * @return {@link List<ReviewWithMemberResponse>}
+	 */
+	List<ReviewWithMemberResponse> getReviewListByPostId(Long postId);
+
+	/**
+	 * 내가 작성한 리뷰 조회
+	 *
+	 * @param memberId	회원 ID
+	 * @return {@link List<ReviewWithMemberResponse>}
+	 */
+	List<ReviewWithMemberResponse> getReviewListByMemberId(Long memberId);
 }
