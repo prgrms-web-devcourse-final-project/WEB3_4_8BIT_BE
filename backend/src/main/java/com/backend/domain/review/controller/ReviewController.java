@@ -48,7 +48,7 @@ public class ReviewController {
 	@Operation(summary = "선상 낚시 리뷰 조회", description = "게시글 ID로 리뷰를 조회하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByPostId(
 		@PathVariable final Long postId,
-		@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+		@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable
 	) {
 		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
 			reviewService.getReviewListByPostId(postId, pageable));
@@ -60,7 +60,7 @@ public class ReviewController {
 	@Operation(summary = "내가 작성한 리뷰 조회", description = "회원 ID로 리뷰를 조회하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByMemberId(
 		@PathVariable final Long memberId,
-		@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+		@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable
 	) {
 		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
 			reviewService.getReviewListByMemberId(memberId, pageable));
