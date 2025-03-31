@@ -1,10 +1,13 @@
 package com.backend.domain.review.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.review.converter.ReviewConverter;
 import com.backend.domain.review.dto.request.ReviewRequest;
+import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
 import com.backend.domain.review.entity.Review;
 import com.backend.domain.review.exception.ReviewErrorCode;
 import com.backend.domain.review.exception.ReviewException;
@@ -32,7 +35,26 @@ public class ReviewServiceImpl implements ReviewService {
 		Review review = ReviewConverter.fromReviewRequestCreate(memberId, reservationId, request);
 		Review savedReview = reviewRepository.save(review);
 
-		log.debug("선상 낚시 리뷰 저장: {}", savedReview);
+		log.debug("[리뷰 저장] 저장된 리뷰: {}", savedReview);
 		return savedReview.getReviewId();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<ReviewWithMemberResponse> getReviewListByPostId(Long postId) {
+
+		List<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(postId);
+
+		log.debug("[리뷰 조회] 게시글 ID {}의 리뷰 목록: {}", postId, reviewList);
+		return reviewList;
+	}
+
+	@Override
+	public List<ReviewWithMemberResponse> getReviewListByMemberId(Long memberId) {
+
+		List<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByMemberId(memberId);
+
+		log.debug("[리뷰 조회] 회원 ID {}의 리뷰 목록: {}", memberId, reviewList);
+		return reviewList;
 	}
 }
