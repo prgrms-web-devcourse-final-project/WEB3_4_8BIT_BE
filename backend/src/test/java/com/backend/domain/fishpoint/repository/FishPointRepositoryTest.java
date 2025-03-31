@@ -12,7 +12,7 @@ import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 
 import com.backend.domain.fishpoint.entity.FishPoint;
-import com.backend.global.Util.BaseTest;
+import com.backend.global.util.BaseTest;
 import com.backend.global.config.JpaAuditingConfig;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;

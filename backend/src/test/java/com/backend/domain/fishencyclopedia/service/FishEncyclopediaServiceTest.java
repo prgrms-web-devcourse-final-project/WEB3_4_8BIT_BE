@@ -19,7 +19,7 @@ import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.member.entity.Member;
-import com.backend.global.Util.BaseTest;
+import com.backend.global.util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
 class FishEncyclopediaServiceTest extends BaseTest {

@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
-import com.backend.global.Util.BaseTest;
+import com.backend.global.util.BaseTest;
 import com.backend.global.config.JpaAuditingConfig;
 
 @Import({FishEncyclopediaRepositoryImpl.class, JpaAuditingConfig.class})
