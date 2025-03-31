@@ -58,7 +58,7 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		when(fishEncyclopediaService.createFishEncyclopedia(givenCreate, 1L)).thenReturn(givenSaveFishEncyclopediaId);
 
 		// When
-		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fish/encyclopedias")
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fishes/encyclopedias")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(givenCreate)));
 
@@ -78,7 +78,7 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		FishEncyclopediaRequest.Create givenCreate = arbitraryBuilder.set("fishId", null).sample();
 
 		// When
-		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fish/encyclopedias")
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fishes/encyclopedias")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(givenCreate)));
 
@@ -101,7 +101,7 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		FishEncyclopediaRequest.Create givenCreate = arbitraryBuilder.set("length", null).sample();
 
 		// When
-		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fish/encyclopedias")
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fishes/encyclopedias")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(givenCreate)));
 
@@ -124,7 +124,7 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		FishEncyclopediaRequest.Create givenCreate = arbitraryBuilder.set("length", 0).sample();
 
 		// When
-		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fish/encyclopedias")
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fishes/encyclopedias")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(givenCreate)));
 
@@ -147,7 +147,7 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		FishEncyclopediaRequest.Create givenCreate = arbitraryBuilder.set("fishPointId", null).sample();
 
 		// When
-		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fish/encyclopedias")
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fishes/encyclopedias")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(givenCreate)));
 
