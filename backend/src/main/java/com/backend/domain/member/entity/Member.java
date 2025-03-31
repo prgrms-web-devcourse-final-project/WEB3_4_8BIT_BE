@@ -60,11 +60,21 @@ public class Member extends BaseEntity {
 
 	private String profileImg;
 
+	@Column(columnDefinition = "TEXT")
+	private String description;
+
 	@Column(nullable = false)
 	private Boolean isAddInfo;
 
 	public void updateUserProfile(String name, String profileImg) {
 		this.name = name;
 		this.profileImg = profileImg;
+	}
+
+	public void createAddInfo(String nickname, String profileImg, String description) {
+		this.nickname = nickname;
+		this.profileImg = profileImg;
+		this.description = description;
+		this.isAddInfo = true;
 	}
 }
