@@ -122,7 +122,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@Test
     @DisplayName("물고기 상세 조회 [Default] [Repository] - Success")
     void t02() {
-        // Given - 기본 정렬 (생성일 기준 내림차순)
+        // Given
         FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
                 null, null, null, null
         );
@@ -144,7 +144,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
     @Test
     @DisplayName("물고기 상세 조회 [Sort - Default] [Order - Asc] [Repository] - Success")
     void t03() {
-        // Given - 생성일 기준 오름차순 정렬
+        // Given
         FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
                 null, null, null, "ASC"
         );
@@ -166,7 +166,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
     @Test
     @DisplayName("물고기 상세 조회 [Sort - Length] [Order - Default] [Repository] - Success")
     void t04() {
-        // Given - 길이 기준 내림차순 정렬
+        // Given
         FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
                 null, null, "length", null
         );
@@ -188,7 +188,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
     @Test
     @DisplayName("물고기 상세 조회 [Sort - Length] [Order - ASC] [Repository] - Success")
     void t05() {
-        // Given - 길이 기준 오름차순 정렬
+        // Given
         FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
                 null, null, "length", "asc"
         );
@@ -210,7 +210,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
     @Test
     @DisplayName("물고기 상세 조회 [Sort - Count] [Order - Default] [Repository] - Success")
     void t06() {
-        // Given - 개수 기준 내림차순 정렬
+        // Given
         FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
                 null, null, "count", null
         );
@@ -221,6 +221,28 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
         // Then
         List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList1.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCount).reversed())
+			.toList();
+
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+
+		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content.get(0).count()).isEqualTo(sortedFishEncyclopediaList.get(0).getCount());
+    }
+
+	@Test
+    @DisplayName("물고기 상세 조회 [Sort - Count] [Order - Asc] [Repository] - Success")
+    void t07() {
+        // Given
+        FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
+                null, null, "count", "asc"
+        );
+
+        // When
+        Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+
+        // Then
+        List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList1.stream()
+			.sorted(Comparator.comparing(FishEncyclopedia::getCount))
 			.toList();
 
 		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
