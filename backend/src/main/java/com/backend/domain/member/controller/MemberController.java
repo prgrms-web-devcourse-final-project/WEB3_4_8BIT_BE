@@ -33,7 +33,7 @@ public class MemberController {
 	@Operation(summary = "추가 회원 정보 입력", description = "회원가입 후에 추가정보를 입력받는 API")
 	public ResponseEntity<GenericResponse<Void>> createAddInfo(
 		@AuthenticationPrincipal CustomOAuth2User user,
-		@RequestBody @Valid MemberRequest.Create requestDto) {
+		@RequestBody @Valid MemberRequest.form requestDto) {
 
 		Long memberId = memberService.saveAddInfo(user.getId(), requestDto);
 

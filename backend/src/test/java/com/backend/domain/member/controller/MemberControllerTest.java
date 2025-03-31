@@ -45,7 +45,7 @@ public class MemberControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t01() throws Exception {
 		// Given
-		MemberRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Create.class);
+		MemberRequest.form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.form.class);
 		Long memberId = 1L;
 
 		when(memberService.saveAddInfo(eq(memberId), any())).thenReturn(memberId);
@@ -68,7 +68,7 @@ public class MemberControllerTest extends BaseTest {
 	@DisplayName("회원 추가 정보 입력 [MEMBER_NOT_FOUND] [Controller] - Fail")
 	void t02() throws Exception {
 		// Given
-		MemberRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Create.class);
+		MemberRequest.form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.form.class);
 
 		doThrow(new MemberException(MemberErrorCode.MEMBER_NOT_FOUND))
 			.when(memberService).saveAddInfo(anyLong(), any());
@@ -91,7 +91,7 @@ public class MemberControllerTest extends BaseTest {
 	@DisplayName("회원 추가 정보 입력 [ALREADY_ADDED_INFO] [Controller] - Fail")
 	void t03() throws Exception {
 		// Given
-		MemberRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Create.class);
+		MemberRequest.form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.form.class);
 
 		doThrow(new MemberException(MemberErrorCode.ALREADY_ADDED_INFO))
 			.when(memberService).saveAddInfo(anyLong(), any());
@@ -114,7 +114,7 @@ public class MemberControllerTest extends BaseTest {
 	@DisplayName("회원 추가 정보 입력 [nickname null] [Controller] - Fail")
 	void t04() throws Exception {
 		// Given
-		MemberRequest.Create invalidRequest = new MemberRequest.Create(
+		MemberRequest.form invalidRequest = new MemberRequest.form(
 			"",
 			"http://example.com/profile.jpg",
 			"자기소개입니다."
@@ -140,7 +140,7 @@ public class MemberControllerTest extends BaseTest {
 	@DisplayName("회원 추가 정보 입력 [description null] [Controller] - Fail")
 	void t05() throws Exception {
 		// Given
-		MemberRequest.Create invalidRequest = new MemberRequest.Create(
+		MemberRequest.form invalidRequest = new MemberRequest.form(
 			"닉네임",
 			"http://example.com/profile.jpg",
 			""
@@ -167,7 +167,7 @@ public class MemberControllerTest extends BaseTest {
 	void t06() throws Exception {
 		// Given
 		String tooLongNickname = "a".repeat(31);
-		MemberRequest.Create invalidRequest = new MemberRequest.Create(
+		MemberRequest.form invalidRequest = new MemberRequest.form(
 			tooLongNickname,
 			"http://example.com/profile.jpg",
 			"자기소개입니다."

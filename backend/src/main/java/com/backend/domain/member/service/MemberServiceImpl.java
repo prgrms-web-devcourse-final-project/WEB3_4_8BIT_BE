@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.domain.member.converter.MemberConverter;
 import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.dto.MemberResponse;
-import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
@@ -24,7 +23,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional
-	public Long saveAddInfo(final Long memberId, final MemberRequest.Create requestDto) {
+	public Long saveAddInfo(final Long memberId, final MemberRequest.form requestDto) {
 
 		Member member = getMember(memberId);
 
@@ -48,7 +47,12 @@ public class MemberServiceImpl implements MemberService {
 
 		return responseDto;
 	}
-  
+
+	@Override
+	public Long updateMember(Long memberId) {
+		return 0L;
+	}
+
 	/**
 	 * 회원 ID로 회원 엔티티를 조회하는 메소드
 	 *
