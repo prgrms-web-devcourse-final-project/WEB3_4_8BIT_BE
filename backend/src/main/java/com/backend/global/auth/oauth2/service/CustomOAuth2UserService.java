@@ -130,7 +130,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			// 같은 플랫폼이면 기존 유저 정보 업데이트
 			member.updateUserProfile(
 				userInfo.getName(),
-				userInfo.getImageUrl()
+				userInfo.getEmail()
 			);
 
 			return member;
