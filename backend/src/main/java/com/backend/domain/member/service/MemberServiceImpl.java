@@ -6,7 +6,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.domain.member.converter.MemberConverter;
 import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.dto.MemberResponse;
-import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
@@ -24,7 +23,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional
-	public Long saveAddInfo(final Long memberId, final MemberRequest.Create requestDto) {
+	public Long saveAddInfo(final Long memberId, final MemberRequest.Form requestDto) {
 
 		Member member = getMember(memberId);
 
@@ -32,12 +31,13 @@ public class MemberServiceImpl implements MemberService {
 			throw new MemberException(MemberErrorCode.ALREADY_ADDED_INFO);
 		}
 
-		member.createAddInfo(requestDto.nickname(), requestDto.profileImg(), requestDto.description());
+		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.description());
 		log.debug("추가 정보저장에 성공하였습니다. 닉네임 :{} ", member.getNickname());
 
 		return member.getMemberId();
 	}
-  
+
+	@Override
 	public MemberResponse.Detail getMemberDetail(final Long memberId) {
 
 		Member member = getMember(memberId);
@@ -48,7 +48,19 @@ public class MemberServiceImpl implements MemberService {
 
 		return responseDto;
 	}
-  
+
+	@Override
+	@Transactional
+	public Long updateMember(Long memberId, final MemberRequest.Form requestDto) {
+
+		Member member = getMember(memberId);
+
+		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.profileImg());
+		log.debug("회원 정보를 수정하였습니다. 닉네임 :{}", member.getNickname());
+
+		return member.getMemberId();
+	}
+
 	/**
 	 * 회원 ID로 회원 엔티티를 조회하는 메소드
 	 *
