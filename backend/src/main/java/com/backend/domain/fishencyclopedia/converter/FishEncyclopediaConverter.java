@@ -20,6 +20,7 @@ public class FishEncyclopediaConverter {
 		return FishEncyclopedia.builder()
 			.fishEncyclopediaId(create.fishId())
 			.length(create.length())
+			.count(create.count())
 			.fishPointId(create.fishPointId())
 			.memberId(memberId)
 			.build();
