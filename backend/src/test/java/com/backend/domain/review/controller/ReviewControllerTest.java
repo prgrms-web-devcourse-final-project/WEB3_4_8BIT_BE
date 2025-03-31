@@ -48,11 +48,10 @@ class ReviewControllerTest extends BaseTest {
 	void t01() throws Exception {
 		// given
 		Long reservationId = 1L;
-		Long memberId = 10L;
 		ReviewRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(ReviewRequest.Create.class);
 
 		Long givenSavedReviewId = 1L;
-		when(reviewService.save(memberId, reservationId, givenRequest)).thenReturn(givenSavedReviewId);
+		when(reviewService.save(1L, reservationId, givenRequest)).thenReturn(givenSavedReviewId);
 
 		// when
 		ResultActions resultActions = mockMvc.perform(post("/api/v1/reservations/{reservationId}/reviews", reservationId)
@@ -66,7 +65,7 @@ class ReviewControllerTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("리뷰 생성 실패 [rating Null] [Controller] - Fail")
+	@DisplayName("선상 낚시 리뷰 저장 [rating Null] [Controller] - Fail")
 	@WithMockCustomUser
 	void createReview_fail_rating_null() throws Exception {
 		// given
@@ -88,7 +87,51 @@ class ReviewControllerTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("리뷰 생성 실패 [content Blank] [Controller] - Fail")
+	@DisplayName("선상 낚시 리뷰 저장 [rating < 1] [Controller] - Fail")
+	@WithMockCustomUser
+	void createReview_fail_rating_too_low() throws Exception {
+		// given
+		ReviewRequest.Create request = arbitraryBuilder.set("rating", 0).sample();
+
+		// when
+		ResultActions resultActions = mockMvc.perform(post("/api/v1/reservations/{reservationId}/reviews", 1L)
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(request)));
+
+		// then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.data[0].field").value("rating"))
+			.andExpect(jsonPath("$.data[0].reason").value("별점은 최소 1점 이상이어야 합니다."))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("선상 낚시 리뷰 저장 [rating > 5] [Controller] - Fail")
+	@WithMockCustomUser
+	void createReview_fail_rating_too_high() throws Exception {
+		// given
+		ReviewRequest.Create request = arbitraryBuilder.set("rating", 6).sample();
+
+		// when
+		ResultActions resultActions = mockMvc.perform(post("/api/v1/reservations/{reservationId}/reviews", 1L)
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(request)));
+
+		// then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.data[0].field").value("rating"))
+			.andExpect(jsonPath("$.data[0].reason").value("별점은 최대 5점 이하여야 합니다."))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("선상 낚시 리뷰 저장 [content Blank] [Controller] - Fail")
 	@WithMockCustomUser
 	void createReview_fail_content_blank() throws Exception {
 		// given
@@ -110,7 +153,7 @@ class ReviewControllerTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("리뷰 생성 실패 [shipFishingPostId Null] [Controller] - Fail")
+	@DisplayName("선상 낚시 리뷰 저장 [shipFishingPostId Null] [Controller] - Fail")
 	@WithMockCustomUser
 	void createReview_fail_shipFishingPostId_null() throws Exception {
 		// given
