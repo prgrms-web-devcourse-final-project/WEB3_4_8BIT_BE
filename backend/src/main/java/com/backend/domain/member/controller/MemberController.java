@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -47,6 +48,17 @@ public class MemberController {
 
 		MemberResponse.Detail responseDto = memberService.getMemberDetail(user.getId());
 
-		return ResponseEntity.ok(GenericResponse.of(true,responseDto));
+		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
+	}
+
+	@PutMapping
+	@Operation(summary = "회원 정보 수정", description = "현재 로그인된 사용자의 회원 정보를 수정하는 API")
+	public ResponseEntity<GenericResponse<Void>> updateMember(
+		@AuthenticationPrincipal CustomOAuth2User user,
+		@RequestBody @Valid MemberRequest.form requestDto) {
+
+		Long memberId = memberService.updateMember(user.getId(), requestDto);
+
+		return ResponseEntity.created(URI.create(memberId.toString())).body(GenericResponse.of(true));
 	}
 }
