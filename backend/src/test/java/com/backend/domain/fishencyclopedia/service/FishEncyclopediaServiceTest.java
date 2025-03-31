@@ -3,16 +3,24 @@ package com.backend.domain.fishencyclopedia.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 
+import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.fishencyclopedia.converter.FishEncyclopediaConverter;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
+import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
@@ -117,5 +125,47 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		assertThatThrownBy(() -> fishEncyclopediasService.createFishEncyclopedia(givenCreate, givenMember.getMemberId()))
 			.isExactlyInstanceOf(FishEncyclopediaException.class)
 			.hasMessage(FishEncyclopediaErrorCode.NOT_EXISTS_FISH.getMessage());
+	}
+
+	@Test
+	@DisplayName("물고기 도감 상세 조회 [Service] - Success")
+	void t04() {
+		// Given
+		FishEncyclopediaRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
+			.giveMeBuilder(FishEncyclopediaRequest.PageRequest.class)
+			.set("size", 10)
+			.set("page", 0)
+			.sample();
+
+		Fish givenFish = fixtureMonkeyBuilder.giveMeOne(Fish.class);
+
+		Member givenMember = fixtureMonkeyBuilder.giveMeOne(Member.class);
+
+		List<FishEncyclopediaResponse.Detail> givenDetailList = fixtureMonkeyBuilder
+			.giveMeBuilder(FishEncyclopediaResponse.Detail.class)
+			.sampleList(7);
+		Pageable givenPageable = PageRequest.of(givenPageRequest.page(), givenPageRequest.size());
+
+		boolean givenHasNext = false;
+
+		SliceImpl<FishEncyclopediaResponse.Detail> givenSlice = new SliceImpl<>(
+			givenDetailList,
+			givenPageable,
+			givenHasNext
+		);
+
+		when(fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
+			givenPageRequest,
+			givenFish.getFishId(),
+			givenMember.getMemberId())).thenReturn(givenSlice);
+
+		// When
+		Slice<FishEncyclopediaResponse.Detail> getDetailList = fishEncyclopediasService.getDetailList(givenPageRequest,
+			givenFish.getFishId(), givenMember.getMemberId());
+
+		// Then
+		assertThat(getDetailList.getContent()).hasSize(givenDetailList.size());
+		assertThat(getDetailList.getContent()).isEqualTo(givenDetailList);
+		assertThat(getDetailList.hasNext()).isFalse();
 	}
 }
