@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.entity.Member;
 import com.backend.global.Util.BaseTest;
 import com.backend.global.config.JpaAuditingConfig;
@@ -28,6 +29,9 @@ class MemberRepositoryTest extends BaseTest {
 		.giveMeBuilder(Member.class)
 		.set("memberId", null)
 		.set("phone", "010-1234-5678")
+		.set("email","test@naver.com")
+		.set("nickname","테스트")
+		.set("role", MemberRole.USER)
 		.set("name", "test");
 
 	@Test

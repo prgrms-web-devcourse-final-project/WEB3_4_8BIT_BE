@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
@@ -37,6 +38,12 @@ class MemberServiceTest extends BaseTest {
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", 1L)
 			.set("isAddInfo", false)
+			.set("memberId", null)
+			.set("phone", "010-1234-5678")
+			.set("email","test@naver.com")
+			.set("nickname","테스트")
+			.set("role", MemberRole.USER)
+			.set("name", "test")
 			.sample();
 
 		when(memberRepository.findById(givenMember.getMemberId())).thenReturn(Optional.of(givenMember));
