@@ -29,8 +29,6 @@ import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.util.BaseTest;
 
-import lombok.extern.slf4j.Slf4j;
-
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
 @Import({
@@ -40,7 +38,6 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 	QuerydslConfig.class
 })
 @DataJpaTest
-@Slf4j
 class FishEncyclopediaRepositoryTest extends BaseTest {
 
 	@Autowired
