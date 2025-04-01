@@ -11,7 +11,7 @@ import com.backend.domain.review.entity.Review;
 
 public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 
-	boolean existsByReservationId(Long reservationId);
+	boolean existsByReservationId(final Long reservationId);
 
 	@Query(
 		"""
@@ -30,7 +30,7 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 		JOIN Member m ON r.memberId = m.memberId
 		WHERE r.shipFishingPostId = :postId
 		""")
-	Page<ReviewWithMemberResponse> findReviewsWithMemberByPostId(@Param("postId") Long postId, Pageable pageable);
+	Page<ReviewWithMemberResponse> findReviewsWithMemberByPostId(@Param("postId") final Long postId, final Pageable pageable);
 
 	@Query(
 		"""
@@ -50,5 +50,5 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 		WHERE r.memberId = :memberId
 		"""
 	)
-	Page<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(@Param("memberId") Long memberId, Pageable pageable);
+	Page<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(@Param("memberId") final Long memberId, final Pageable pageable);
 }
