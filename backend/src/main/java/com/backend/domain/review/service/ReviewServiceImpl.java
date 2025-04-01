@@ -69,6 +69,7 @@ public class ReviewServiceImpl implements ReviewService {
 		validateReviewOwner(review, memberId);
 
 		reviewRepository.delete(review);
+		log.debug("리뷰가 삭제되었습니다. reviewId={}, 삭제한 회원 ID={}", reviewId, memberId);
 	}
 
 	private Review getReviewById(final Long reviewId) {
