@@ -2,6 +2,7 @@ package com.backend.domain.captain.dto.Response;
 
 import java.util.List;
 
+import com.backend.domain.member.domain.MemberRole;
 import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Builder;
@@ -18,6 +19,7 @@ public class CaptainResponse {
 	 *   "phone": "010-1234-5678",
 	 *   "profileImg": "http://example.com/profile.jpg",
 	 *   "description": "해적왕이 되고싶은 루피 입니다.",
+	 *   "role": "CAPTAIN",
 	 *   "shipLicenseNumber": "1-2019123456",
 	 *   "shipList": [1L, 2L, 3L]
 	 * }
@@ -29,6 +31,7 @@ public class CaptainResponse {
 	 * @param phone 전화번호
 	 * @param profileImg 프로필 이미지 URL
 	 * @param description 자기소개
+	 * @param role 역할
 	 * @param shipLicenseNumber 선박 운전 면허 번호
 	 * @param shipList 선장 보유 배 Id 목록
 	 */
@@ -41,6 +44,7 @@ public class CaptainResponse {
 		String phone,
 		String profileImg,
 		String description,
+		MemberRole role,
 		String shipLicenseNumber,
 		List<Long> shipList
 	) {

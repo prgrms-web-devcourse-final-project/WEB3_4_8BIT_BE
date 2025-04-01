@@ -1,7 +1,7 @@
 package com.backend.domain.captain.repository;
 
-import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.domain.captain.entity.QCaptain.*;
+import static com.backend.domain.member.entity.QMember.*;
 
 import java.util.Optional;
 
@@ -30,11 +30,13 @@ public class CaptainQueryRepository {
 				member.phone,
 				member.profileImg,
 				member.description,
+				member.role,
 				captain.shipLicenseNumber,
 				captain.shipList
 			))
 			.from(member)
-			.leftJoin(captain).on(member.memberId.eq(captain.memberId))
+			.leftJoin(captain)
+			.on(member.memberId.eq(captain.memberId))
 			.where(member.memberId.eq(captainId))
 			.fetchOne();
 
