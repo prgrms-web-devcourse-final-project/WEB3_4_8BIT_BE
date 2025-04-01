@@ -3,9 +3,9 @@ package com.backend.domain.fishencyclopedia.repository;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
-import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
+import com.backend.global.dto.GlobalRequest;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,10 +22,10 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 
 	@Override
 	public Slice<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
-		FishEncyclopediaRequest.PageRequest requestDto,
+		GlobalRequest.PageRequest pageRequestDto,
 		Long fishId,
 		Long memberId
 	) {
-		return fishEncyclopediaQueryRepository.findDetailByAllByFishPointIdAndFishId(requestDto, fishId, memberId);
+		return fishEncyclopediaQueryRepository.findDetailByAllByFishPointIdAndFishId(pageRequestDto, fishId, memberId);
 	}
 }

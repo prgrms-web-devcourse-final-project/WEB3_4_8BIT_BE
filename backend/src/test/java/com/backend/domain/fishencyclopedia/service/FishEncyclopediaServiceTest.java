@@ -30,6 +30,7 @@ import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
 import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.member.entity.Member;
+import com.backend.global.dto.GlobalRequest;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -203,8 +204,8 @@ class FishEncyclopediaServiceTest extends BaseTest {
 	@DisplayName("물고기 도감 상세 조회 [Service] - Success")
 	void t05() {
 		// Given
-		FishEncyclopediaRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
-			.giveMeBuilder(FishEncyclopediaRequest.PageRequest.class)
+		GlobalRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
+			.giveMeBuilder(GlobalRequest.PageRequest.class)
 			.set("size", 10)
 			.set("page", 0)
 			.sample();

@@ -13,9 +13,9 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
-import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.dto.response.QFishEncyclopediaResponse_Detail;
+import com.backend.global.dto.GlobalRequest;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
@@ -30,11 +30,11 @@ public class FishEncyclopediaQueryRepository {
 	private final JPAQueryFactory queryFactory;
 
 	public Slice<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
-		final FishEncyclopediaRequest.PageRequest requestDto,
+		final GlobalRequest.PageRequest pageRequestDto,
 		final Long fishId,
 		final Long memberId) {
 
-		Pageable pageable = PageRequest.of(requestDto.page(), requestDto.size());
+		Pageable pageable = PageRequest.of(pageRequestDto.page(), pageRequestDto.size());
 
 		List<FishEncyclopediaResponse.Detail> detailList = queryFactory.selectDistinct(
 				new QFishEncyclopediaResponse_Detail(
@@ -50,11 +50,11 @@ public class FishEncyclopediaQueryRepository {
 			.offset(pageable.getPageNumber())
 			.limit(pageable.getPageSize() + 1)
 			.where(fishEncyclopedia.fishId.eq(fishId), fishEncyclopedia.memberId.eq(memberId))
-			.orderBy(getOrderBy(requestDto))
+			.orderBy(getOrderBy(pageRequestDto))
 			.fetch();
 
         // 다음 페이지가 있는지 확인
-        boolean hasNext = detailList.size() > requestDto.size();
+        boolean hasNext = detailList.size() > pageRequestDto.size();
 
         if (hasNext) {
             detailList.remove(detailList.size() - 1);
@@ -66,12 +66,12 @@ public class FishEncyclopediaQueryRepository {
 	/**
 	 * 정렬할 필드와 정렬 방식을 OrderSpecifier로 반환합니다.
 	 *
-	 * @param requestDto
+	 * @param pageRequestDto
 	 * @return {@link OrderSpecifier}
 	 */
-	private OrderSpecifier<?> getOrderBy(FishEncyclopediaRequest.PageRequest requestDto) {
+	private OrderSpecifier<?> getOrderBy(GlobalRequest.PageRequest pageRequestDto) {
 		// 기본 정렬 방식 설정
-		Order queryOrder = Order.ASC.toString().equalsIgnoreCase(requestDto.order()) ?
+		Order queryOrder = Order.ASC.toString().equalsIgnoreCase(pageRequestDto.order()) ?
 				Order.ASC :
 				Order.DESC; // 기본 정렬은 DESC로 동작
 
@@ -84,9 +84,9 @@ public class FishEncyclopediaQueryRepository {
 
 		// fieldMap에 일치하는게 없다면 기본 값 createdAt로 설정
 		ComparableExpressionBase<?> sortField =
-			StringUtils.hasText(requestDto.sort()) && fieldMap.containsKey(
-				requestDto.sort()) ?
-				fieldMap.get(requestDto.sort()) : fishEncyclopedia.createdAt;
+			StringUtils.hasText(pageRequestDto.sort()) && fieldMap.containsKey(
+				pageRequestDto.sort()) ?
+				fieldMap.get(pageRequestDto.sort()) : fishEncyclopedia.createdAt;
 
 		return new OrderSpecifier<>(queryOrder, sortField);
 	}

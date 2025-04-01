@@ -19,7 +19,6 @@ import net.jqwik.api.Arbitrary;
 
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishJpaRepository;
-import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishpoint.entity.FishPoint;
@@ -27,6 +26,7 @@ import com.backend.domain.fishpoint.repository.FishPointJpaRepository;
 import com.backend.domain.member.entity.Member;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
+import com.backend.global.dto.GlobalRequest;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -129,7 +129,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Default] [Repository] - Success")
 	void t02() {
 		// Given
-		FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
+		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
 			null, null, null, null
 		);
 
@@ -152,7 +152,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Sort - Default] [Order - Asc] [Repository] - Success")
 	void t03() {
 		// Given
-		FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
+		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
 			null, null, null, "ASC"
 		);
 
@@ -175,7 +175,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Sort - Length] [Order - Default] [Repository] - Success")
 	void t04() {
 		// Given
-		FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
+		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
 			null, null, "length", null
 		);
 
@@ -197,7 +197,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Sort - Length] [Order - ASC] [Repository] - Success")
 	void t05() {
 		// Given
-		FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
+		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
 			null, null, "length", "asc"
 		);
 
@@ -219,7 +219,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Sort - Count] [Order - Default] [Repository] - Success")
 	void t06() {
 		// Given
-		FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
+		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
 			null, null, "count", null
 		);
 
@@ -241,7 +241,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Sort - Count] [Order - Asc] [Repository] - Success")
 	void t07() {
 		// Given
-		FishEncyclopediaRequest.PageRequest givenRequestDto = new FishEncyclopediaRequest.PageRequest(
+		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
 			null, null, "count", "asc"
 		);
 
@@ -260,9 +260,9 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	}
 
 	// 유틸리티 메서드
-	private Slice<FishEncyclopediaResponse.Detail> executeQuery(FishEncyclopediaRequest.PageRequest requestDto) {
+	private Slice<FishEncyclopediaResponse.Detail> executeQuery(GlobalRequest.PageRequest pageRequestDto) {
 		return fishEncyclopediaQueryRepository.findDetailByAllByFishPointIdAndFishId(
-			requestDto,
+			pageRequestDto,
 			savedFishList.get(0).getFishId(),
 			givenMember.getMemberId()
 		);
