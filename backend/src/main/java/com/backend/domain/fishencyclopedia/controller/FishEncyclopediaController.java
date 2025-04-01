@@ -36,10 +36,10 @@ public class FishEncyclopediaController {
 	@PostMapping("/encyclopedias")
 	public ResponseEntity<GenericResponse<Void>> createFishEncyclopedia(
 		@RequestBody @Valid final FishEncyclopediaRequest.Create create,
-		@AuthenticationPrincipal final CustomOAuth2User customOAuth2User
+		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		Long savedFishEncyclopediaId = fishEncyclopediaService.createFishEncyclopedia(create, customOAuth2User.getId());
+		Long savedFishEncyclopediaId = fishEncyclopediaService.createFishEncyclopedia(create, user.getId());
 
 		return ResponseEntity
 			.created(URI.create(savedFishEncyclopediaId.toString()))
@@ -52,11 +52,11 @@ public class FishEncyclopediaController {
 		@Parameter(description = "조회할 물고기의 ID", example = "1")
 		@PathVariable final Long fishId,
 		@Valid final FishEncyclopediaRequest.PageRequest requestDto,
-		@AuthenticationPrincipal final CustomOAuth2User customOAuth2User
+		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
 		Slice<FishEncyclopediaResponse.Detail> detailList = fishEncyclopediaService.getDetailList(requestDto, fishId,
-			customOAuth2User.getId());
+			user.getId());
 
 		return ResponseEntity.ok(GenericResponse.of(true, detailList));
 	}
