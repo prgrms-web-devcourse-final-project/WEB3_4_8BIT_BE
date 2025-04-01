@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -16,6 +15,7 @@ import org.springframework.util.StringUtils;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.dto.response.QFishEncyclopediaResponse_Detail;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
@@ -29,10 +29,11 @@ public class FishEncyclopediaQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
 
-	public Slice<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
+	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
 		final GlobalRequest.PageRequest pageRequestDto,
 		final Long fishId,
-		final Long memberId) {
+		final Long memberId
+	) {
 
 		Pageable pageable = PageRequest.of(pageRequestDto.page(), pageRequestDto.size());
 
@@ -60,7 +61,9 @@ public class FishEncyclopediaQueryRepository {
             detailList.remove(detailList.size() - 1);
         }
 
-		return new SliceImpl<>(detailList, pageable, hasNext);
+		SliceImpl<FishEncyclopediaResponse.Detail> detailSlice = new SliceImpl<>(detailList, pageable, hasNext);
+
+		return ScrollResponse.from(detailSlice);
 	}
 
 	/**

@@ -2,10 +2,11 @@ package com.backend.domain.fishencyclopedia.service;
 
 import java.util.Optional;
 
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
+import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
 import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.fishencyclopedia.converter.FishEncyclopediaConverter;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
@@ -14,10 +15,9 @@ import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
-import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
-import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,12 +72,12 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Slice<FishEncyclopediaResponse.Detail> getDetailList(
+	public ScrollResponse<FishEncyclopediaResponse.Detail> getDetailList(
 		final GlobalRequest.PageRequest pageRequestDto,
 		final Long fishId,
 		final Long memberId
 	) {
-		Slice<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
+		ScrollResponse<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
 			pageRequestDto, fishId, memberId);
 
 		log.debug("물고기 도감 상세 조회: {}", findDetailList);
