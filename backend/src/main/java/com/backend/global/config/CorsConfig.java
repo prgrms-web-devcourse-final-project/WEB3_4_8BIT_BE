@@ -16,7 +16,11 @@ public class CorsConfig {
 	public CorsConfigurationSource corsConfigurationSource() {
 		CorsConfiguration config = new CorsConfiguration();
 
-		config.setAllowedOriginPatterns(List.of("http://localhost:3000"));
+		config.setAllowedOriginPatterns(
+			List.of("http://localhost:3000/", 
+				"http://localhost:8080/", 
+				"https://api.mikki.kr/swagger-ui")
+		);
 
 		config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
 
