@@ -8,7 +8,6 @@ import org.springframework.data.domain.Slice;
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
-import com.backend.global.util.pageutil.Page;
 
 public interface ShipFishingPostRepository {
 

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
-import com.backend.global.util.pageutil.Page;
 
 import lombok.RequiredArgsConstructor;
 
