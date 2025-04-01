@@ -143,4 +143,46 @@ class CaptainServiceTest extends BaseTest {
 		verify(captainRepository, times(1)).findDetailById(invalidCaptainId);
 	}
 
+	@Test
+	@DisplayName("선장 보유 배 정보 수정 [Service] - Success")
+	void t05() {
+		// Given
+		Long captainId = 1L;
+		CaptainRequest.Update updateRequest = new CaptainRequest.Update(List.of(2L, 3L, 4L));
+
+		Captain existingCaptain = fixtureMonkeyBuilder.giveMeBuilder(Captain.class)
+			.set("memberId", captainId)
+			.set("shipList", List.of(1L))
+			.sample();
+
+		when(captainRepository.findById(captainId)).thenReturn(Optional.of(existingCaptain));
+
+		// When
+		Long updatedId = captainService.updateCaptainShipList(captainId, updateRequest);
+
+		// Then
+		assertThat(updatedId).isEqualTo(captainId);
+		assertThat(existingCaptain.getShipList()).isEqualTo(updateRequest.shipList());
+
+		verify(captainRepository, times(1)).findById(captainId);
+	}
+
+	@Test
+	@DisplayName("선장 보유 배 정보 수정 [CAPTAIN_NOT_FOUND] [Service] - Fail")
+	void t06() {
+		// Given
+		Long invalidCaptainId = 999L;
+		CaptainRequest.Update updateRequest = new CaptainRequest.Update(List.of(10L, 20L, 30L));
+
+		when(captainRepository.findById(invalidCaptainId)).thenReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> captainService.updateCaptainShipList(invalidCaptainId, updateRequest))
+			.isInstanceOf(CaptainException.class)
+			.hasFieldOrPropertyWithValue("captainErrorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
+			.hasMessageContaining(CaptainErrorCode.CAPTAIN_NOT_FOUND.getMessage());
+
+		verify(captainRepository, times(1)).findById(invalidCaptainId);
+	}
+
 }
