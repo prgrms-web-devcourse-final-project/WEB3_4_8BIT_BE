@@ -14,8 +14,8 @@ import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
-import com.backend.domain.fishencyclopediamaxlength.entity.FishEncyclopediaMaxLength;
-import com.backend.domain.fishencyclopediamaxlength.repository.FishEncyclopediaMaxLengthRepository;
+import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
+import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 
 	private final FishEncyclopediaRepository fishEncyclopediaRepository;
 	private final FishPointRepository fishPointRepository;
-	private final FishEncyclopediaMaxLengthRepository fishEncyclopediaMaxLengthRepository;
+	private final CatchMaxLengthRepository catchMaxLengthRepository;
 	private final FishRepository fishRepository;
 
 	@Override
@@ -44,15 +44,15 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		);
 
 		// 물고기 최대 길이 값 조회
-		Optional<FishEncyclopediaMaxLength> findEncyclopediaMaxLength = fishEncyclopediaMaxLengthRepository
+		Optional<CatchMaxLength> findEncyclopediaMaxLength = catchMaxLengthRepository
 			.findByFishIdAndMemberId(
 				requestDto.fishId(),
 				memberId
 			);
 
 		// 비어있다면 객체 생성
-		FishEncyclopediaMaxLength encyclopediaMaxLength = findEncyclopediaMaxLength
-			.orElse(FishEncyclopediaMaxLength.builder()
+		CatchMaxLength encyclopediaMaxLength = findEncyclopediaMaxLength
+			.orElse(CatchMaxLength.builder()
 				.fishId(requestDto.fishId())
 				.memberId(memberId)
 				.build());
@@ -60,7 +60,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		encyclopediaMaxLength.setBestLength(requestDto.length());
 
 		// 새로 생성된 객체일 가능성이 있어 명시
-		fishEncyclopediaMaxLengthRepository.save(encyclopediaMaxLength);
+		catchMaxLengthRepository.save(encyclopediaMaxLength);
 
 		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.createFishEncyclopedia(fishEncyclopedia);
 

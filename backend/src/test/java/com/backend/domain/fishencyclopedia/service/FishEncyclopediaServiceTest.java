@@ -26,8 +26,8 @@ import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
-import com.backend.domain.fishencyclopediamaxlength.entity.FishEncyclopediaMaxLength;
-import com.backend.domain.fishencyclopediamaxlength.repository.FishEncyclopediaMaxLengthRepository;
+import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
+import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.member.entity.Member;
 import com.backend.global.util.BaseTest;
@@ -47,7 +47,7 @@ class FishEncyclopediaServiceTest extends BaseTest {
 	private FishRepository fishRepository;
 
 	@Mock
-	private FishEncyclopediaMaxLengthRepository fishEncyclopediaMaxLengthRepository;
+	private CatchMaxLengthRepository catchMaxLengthRepository;
 
 	@InjectMocks
 	private FishEncyclopediaServiceImpl fishEncyclopediasService;
@@ -74,23 +74,23 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			.set("memberId", givenMember.getMemberId())
 			.sample();
 
-		ArbitraryBuilder<FishEncyclopediaMaxLength> arbitraryBuilder = fixtureMonkeyBuilder
-			.giveMeBuilder(FishEncyclopediaMaxLength.class)
+		ArbitraryBuilder<CatchMaxLength> arbitraryBuilder = fixtureMonkeyBuilder
+			.giveMeBuilder(CatchMaxLength.class)
 			.set("fishId", givenCreate.fishId())
 			.set("memberId", givenMember.getMemberId())
 			.set("bestLength", 4);
 
-		FishEncyclopediaMaxLength givenFishEncyclopediaMaxLength = arbitraryBuilder
+		CatchMaxLength givenCatchMaxLength = arbitraryBuilder
 			.sample();
 
 		when(fishEncyclopediaRepository.createFishEncyclopedia(givenFromFishEncyclopedia))
 			.thenReturn(givenFishEncyclopedia);
 		when(fishPointRepository.existsById(givenFishEncyclopedia.getFishPointId())).thenReturn(true);
 		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(true);
-		when(fishEncyclopediaMaxLengthRepository
+		when(catchMaxLengthRepository
 			.findByFishIdAndMemberId(givenCreate.fishId(), givenMember.getMemberId()))
-			.thenReturn(Optional.of(givenFishEncyclopediaMaxLength));
-		when(fishEncyclopediaMaxLengthRepository.save(givenFishEncyclopediaMaxLength))
+			.thenReturn(Optional.of(givenCatchMaxLength));
+		when(catchMaxLengthRepository.save(givenCatchMaxLength))
 			.thenReturn(arbitraryBuilder.set("fishEncyclopediaMaxLengthId", 1L).sample());
 
 		// When
@@ -123,9 +123,9 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			.set("memberId", givenMember.getMemberId())
 			.sample();
 
-		ArbitraryBuilder<FishEncyclopediaMaxLength> arbitraryBuilder = fixtureMonkeyBuilder
-			.giveMeBuilder(FishEncyclopediaMaxLength.class)
-			.set("fishEncyclopediaMaxLengthId", null)
+		ArbitraryBuilder<CatchMaxLength> arbitraryBuilder = fixtureMonkeyBuilder
+			.giveMeBuilder(CatchMaxLength.class)
+			.set("catchMaxLengthId", null)
 			.set("fishId", givenCreate.fishId())
 			.set("memberId", givenMember.getMemberId())
 			.set("bestLength", givenCreate.length());
@@ -134,10 +134,10 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			.thenReturn(givenFishEncyclopedia);
 		when(fishPointRepository.existsById(givenFishEncyclopedia.getFishPointId())).thenReturn(true);
 		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(true);
-		when(fishEncyclopediaMaxLengthRepository
+		when(catchMaxLengthRepository
 			.findByFishIdAndMemberId(givenCreate.fishId(), givenMember.getMemberId()))
 			.thenReturn(Optional.empty());
-		when(fishEncyclopediaMaxLengthRepository.save(arbitraryBuilder.sample()))
+		when(catchMaxLengthRepository.save(arbitraryBuilder.sample()))
 			.thenReturn(arbitraryBuilder.set("fishEncyclopediaMaxLengthId", 1L).sample());
 
 		// When
