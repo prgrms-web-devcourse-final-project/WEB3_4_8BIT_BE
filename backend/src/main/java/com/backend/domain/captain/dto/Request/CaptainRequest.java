@@ -12,13 +12,14 @@ public class CaptainRequest {
 
 	/**
 	 * {@code
+	 * {
 	 *   "profileImg": ["http://example.com/image1.jpg"],
 	 *   "nickname": "해적왕",
 	 *   "descrption": "자기 소개글 내용",
 	 *   "shipLicenseNumber": "1-2019123456",
 	 *   "shipList": [1, 2, 3]
 	 * }
-	 *
+	 *}
 	 * @param profileImg 프로필 이미지 URL 리스트 (선택값)
 	 * @param nickname 사용자 닉네임 (필수, 최대 15자)
 	 * @param descrption 자기 소개글 (필수)
