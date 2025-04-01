@@ -22,7 +22,6 @@ import com.backend.domain.fish.repository.FishJpaRepository;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
-import com.backend.domain.fishencyclopediamaxlength.repository.FishEncyclopediaMaxLengthJpaRepository;
 import com.backend.domain.fishpoint.entity.FishPoint;
 import com.backend.domain.fishpoint.repository.FishPointJpaRepository;
 import com.backend.domain.member.entity.Member;
@@ -52,9 +51,6 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 
 	@Autowired
 	private FishPointJpaRepository fishPointJpaRepository;
-
-	@Autowired
-	private FishEncyclopediaMaxLengthJpaRepository fishEncyclopediaMaxLengthJpaRepository;
 
 	@Autowired
 	private FishJpaRepository fishJpaRepository;

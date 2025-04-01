@@ -1,4 +1,4 @@
-package com.backend.domain.fishencyclopediamaxlength.entity;
+package com.backend.domain.catchmaxlength.entity;
 
 import com.backend.global.baseentity.BaseEntity;
 
@@ -16,18 +16,18 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "fish_encyclopedias_max_length")
+@Table(name = "catch_max_lengths")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(callSuper = false)
-public class FishEncyclopediaMaxLength extends BaseEntity {
+public class CatchMaxLength extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long fishEncyclopediaMaxLengthId;
+	private Long catchMaxLengthId;
 
 	@Column(nullable = false)
 	private Long fishId;
