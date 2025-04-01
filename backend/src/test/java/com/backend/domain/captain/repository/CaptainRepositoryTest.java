@@ -8,25 +8,42 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.backend.domain.captain.dto.Response.CaptainResponse;
 import com.backend.domain.captain.entity.Captain;
 import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.domain.Provider;
 import com.backend.domain.member.entity.Member;
+import com.backend.domain.member.repository.MemberQueryRepository;
 import com.backend.domain.member.repository.MemberRepository;
+import com.backend.domain.member.repository.MemberRepositoryImpl;
+import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
-@Import(QuerydslConfig.class)
-@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
+@DataJpaTest
+@EnableJpaRepositories(basePackages = {
+	"com.backend.domain.captain.repository",
+	"com.backend.domain.member.repository"
+})
+@EntityScan(basePackages = {
+	"com.backend.domain.captain.entity",
+	"com.backend.domain.member.entity"
+})
+@Import({
+	JpaAuditingConfig.class,
+	QuerydslConfig.class,
+	CaptainRepositoryImpl.class,
+	CaptainQueryRepository.class,
+	MemberRepositoryImpl.class,
+	MemberQueryRepository.class
+})
 class CaptainRepositoryTest extends BaseTest {
 
 	@Autowired
