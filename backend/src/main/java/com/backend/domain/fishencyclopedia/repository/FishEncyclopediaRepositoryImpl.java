@@ -5,7 +5,7 @@ import org.springframework.stereotype.Repository;
 
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
-import com.backend.global.dto.GlobalRequest;
+import com.backend.global.dto.request.GlobalRequest;
 
 import lombok.RequiredArgsConstructor;
 

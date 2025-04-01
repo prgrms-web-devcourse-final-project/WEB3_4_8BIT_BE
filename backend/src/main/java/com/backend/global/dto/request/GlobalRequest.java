@@ -1,4 +1,4 @@
-package com.backend.global.dto;
+package com.backend.global.dto.request;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import com.backend.global.dto.GlobalRequest;
+import com.backend.global.dto.request.GlobalRequest;
 
 class FishEncyclopediaRequestTest {
 
