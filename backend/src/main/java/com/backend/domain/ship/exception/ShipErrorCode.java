@@ -13,6 +13,6 @@ public enum ShipErrorCode {
 	SHIP_MISMATCH_MEMBER_ID(HttpStatus.BAD_REQUEST, 8002, "선박 소유자 정보가 일치하지 않음");
 
 	private final HttpStatus httpStatus;
-	private final int code;
+	private final Integer code;
 	private final String message;
 }

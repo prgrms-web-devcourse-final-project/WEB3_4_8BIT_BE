@@ -12,6 +12,6 @@ public enum ReservationErrorCode {
 	RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, 11001, "예약 정보가 존재 하지 않습니다.");
 
 	private final HttpStatus httpStatus;
-	private final int code;
+	private final Integer code;
 	private final String message;
 }
