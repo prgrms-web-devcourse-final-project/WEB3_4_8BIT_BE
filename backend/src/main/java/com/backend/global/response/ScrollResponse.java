@@ -1,4 +1,4 @@
-package com.backend.domain.review.dto.response;
+package com.backend.global.response;
 
 import java.util.List;
 

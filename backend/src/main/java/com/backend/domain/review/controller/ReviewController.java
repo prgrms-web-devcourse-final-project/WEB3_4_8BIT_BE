@@ -1,8 +1,5 @@
 package com.backend.domain.review.controller;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.review.dto.request.ReviewRequest;
 import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
-import com.backend.domain.review.dto.response.ScrollResponse;
+import com.backend.global.response.ScrollResponse;
 import com.backend.domain.review.service.ReviewService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.GlobalRequest;
