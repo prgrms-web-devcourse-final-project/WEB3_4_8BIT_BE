@@ -18,6 +18,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
@@ -203,14 +204,14 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		Pageable pageable = PageRequest.of(2, 6, Sort.by("createdAt").descending());
 
 		// when
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().size()).isEqualTo(2);
-		assertThat(savedPage.getPage()).isEqualTo(2);
-		assertThat(savedPage.getSize()).isEqualTo(6);
-		assertThat(savedPage.getTotalPages()).isEqualTo(3);
+		assertThat(savedSlice.getContent().size()).isEqualTo(2);
+		assertThat(savedSlice.getNumber()).isEqualTo(2);
+		assertThat(savedSlice.getSize()).isEqualTo(6);
+		assertThat(savedSlice.hasNext()).isEqualTo(false);
 	}
 
 	@Test
@@ -242,14 +243,14 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().size()).isEqualTo(2);
-		assertThat(savedPage.getPage()).isEqualTo(0);
-		assertThat(savedPage.getSize()).isEqualTo(6);
-		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+		assertThat(savedSlice.getContent().size()).isEqualTo(2);
+		assertThat(savedSlice.getNumber()).isEqualTo(0);
+		assertThat(savedSlice.getSize()).isEqualTo(6);
+		assertThat(savedSlice.hasNext()).isEqualTo(false);
 	}
 
 	@Test
@@ -278,14 +279,14 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().size()).isEqualTo(5);
-		assertThat(savedPage.getPage()).isEqualTo(0);
-		assertThat(savedPage.getSize()).isEqualTo(6);
-		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+		assertThat(savedSlice.getContent().size()).isEqualTo(5);
+		assertThat(savedSlice.getNumber()).isEqualTo(0);
+		assertThat(savedSlice.getSize()).isEqualTo(6);
+		assertThat(savedSlice.hasNext()).isEqualTo(false);
 	}
 
 	@Test
@@ -314,14 +315,14 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().size()).isEqualTo(6);
-		assertThat(savedPage.getPage()).isEqualTo(0);
-		assertThat(savedPage.getSize()).isEqualTo(6);
-		assertThat(savedPage.getTotalPages()).isEqualTo(2);
+		assertThat(savedSlice.getContent().size()).isEqualTo(6);
+		assertThat(savedSlice.getNumber()).isEqualTo(0);
+		assertThat(savedSlice.getSize()).isEqualTo(6);
+		assertThat(savedSlice.hasNext()).isEqualTo(true);
 	}
 
 	@Test
@@ -351,14 +352,14 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().size()).isEqualTo(2);
-		assertThat(savedPage.getPage()).isEqualTo(0);
-		assertThat(savedPage.getSize()).isEqualTo(6);
-		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+		assertThat(savedSlice.getContent().size()).isEqualTo(2);
+		assertThat(savedSlice.getNumber()).isEqualTo(0);
+		assertThat(savedSlice.getSize()).isEqualTo(6);
+		assertThat(savedSlice.hasNext()).isEqualTo(false);
 	}
 
 	@Test
@@ -385,11 +386,11 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("price").descending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().get(0).price()).isEqualTo(280000L);
+		assertThat(savedSlice.getContent().get(0).price()).isEqualTo(280000L);
 	}
 
 	@Test
@@ -416,11 +417,11 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("price").ascending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().get(0).price()).isEqualTo(20000L);
+		assertThat(savedSlice.getContent().get(0).price()).isEqualTo(20000L);
 	}
 
 	@Test
@@ -447,14 +448,14 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().size()).isEqualTo(5);
-		assertThat(savedPage.getPage()).isEqualTo(0);
-		assertThat(savedPage.getSize()).isEqualTo(6);
-		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+		assertThat(savedSlice.getContent().size()).isEqualTo(5);
+		assertThat(savedSlice.getNumber()).isEqualTo(0);
+		assertThat(savedSlice.getSize()).isEqualTo(6);
+		assertThat(savedSlice.hasNext()).isEqualTo(false);
 	}
 
 	@Test
@@ -481,11 +482,11 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("reviewEverRate").descending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().get(0).reviewEverRate()).isEqualTo(5D);
+		assertThat(savedSlice.getContent().get(0).reviewEverRate()).isEqualTo(5D);
 	}
 
 	@Test
@@ -512,11 +513,11 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("reviewEverRate").ascending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().get(0).reviewEverRate()).isEqualTo(0.5D);
+		assertThat(savedSlice.getContent().get(0).reviewEverRate()).isEqualTo(0.5D);
 	}
 
 	@Test
@@ -547,14 +548,14 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().size()).isEqualTo(5);
-		assertThat(savedPage.getPage()).isEqualTo(0);
-		assertThat(savedPage.getSize()).isEqualTo(6);
-		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+		assertThat(savedSlice.getContent().size()).isEqualTo(5);
+		assertThat(savedSlice.getNumber()).isEqualTo(0);
+		assertThat(savedSlice.getSize()).isEqualTo(6);
+		assertThat(savedSlice.hasNext()).isEqualTo(false);
 	}
 
 	@Test
@@ -581,14 +582,14 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().size()).isEqualTo(2);
-		assertThat(savedPage.getPage()).isEqualTo(0);
-		assertThat(savedPage.getSize()).isEqualTo(6);
-		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+		assertThat(savedSlice.getContent().size()).isEqualTo(2);
+		assertThat(savedSlice.getNumber()).isEqualTo(0);
+		assertThat(savedSlice.getSize()).isEqualTo(6);
+		assertThat(savedSlice.hasNext()).isEqualTo(false);
 	}
 
 	@Test
@@ -617,14 +618,14 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
 
-		Page<ShipFishingPostResponse.DetailPage> savedPage = shipFishingPostRepository.findAllBySearchAndCondition(
+		Slice<ShipFishingPostResponse.DetailPage> savedSlice = shipFishingPostRepository.findAllBySearchAndCondition(
 			givenRequestDto, pageable);
 
 		// Then
-		assertThat(savedPage.getData().size()).isEqualTo(2);
-		assertThat(savedPage.getPage()).isEqualTo(0);
-		assertThat(savedPage.getSize()).isEqualTo(6);
-		assertThat(savedPage.getTotalPages()).isEqualTo(1);
+		assertThat(savedSlice.getContent().size()).isEqualTo(2);
+		assertThat(savedSlice.getNumber()).isEqualTo(0);
+		assertThat(savedSlice.getSize()).isEqualTo(6);
+		assertThat(savedSlice.hasNext()).isEqualTo(false);
 	}
 
 	@Test

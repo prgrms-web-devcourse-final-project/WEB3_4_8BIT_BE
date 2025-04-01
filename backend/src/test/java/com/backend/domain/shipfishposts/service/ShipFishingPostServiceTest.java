@@ -15,6 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 
 import com.backend.domain.fish.entity.Fish;
@@ -31,6 +33,7 @@ import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.domain.shipfishingpost.service.ShipFishingPostServiceImpl;
+import com.backend.global.dto.GlobalRequest;
 import com.backend.global.util.BaseTest;
 import com.backend.global.util.pageutil.Page;
 
@@ -198,26 +201,34 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// Given
 		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().build();
 
-		Pageable pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
+		GlobalRequest.PageRequest givenPageRequestDto = fixtureMonkeyRecord
+			.giveMeBuilder(GlobalRequest.PageRequest.class)
+			.set("size", 10)
+			.set("page", 0)
+			.set("order", "DESC")
+			.set("sort", "createdAt")
+			.sample();
 
 		List<ShipFishingPostResponse.DetailPage> givenResponseDto = fixtureMonkeyBuilder
 			.giveMeBuilder(ShipFishingPostResponse.DetailPage.class)
 			.sampleList(5);
 
-		Page<ShipFishingPostResponse.DetailPage> pageResult = new Page<>(givenResponseDto, pageable.getPageNumber(),
-			pageable.getPageSize(), 5, 1);
+		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+
+		Slice<ShipFishingPostResponse.DetailPage> sliceResult = new SliceImpl<>(givenResponseDto, pageable, false);
 
 		// When
 		when(shipFishingPostRepository.findAllBySearchAndCondition(givenRequestDto, pageable))
-			.thenReturn(pageResult);
-		Page<ShipFishingPostResponse.DetailPage> resultPage = shipFishingPostServiceImpl.getShipFishingPostPage(
-			givenRequestDto, pageable);
+			.thenReturn(sliceResult);
+
+		Slice<ShipFishingPostResponse.DetailPage> resultPage = shipFishingPostServiceImpl.getShipFishingPostPage(
+			givenRequestDto, givenPageRequestDto);
 
 		// Then
 		verify(shipFishingPostRepository, times(1)).findAllBySearchAndCondition(givenRequestDto, pageable);
-		assertThat(resultPage.getData().size()).isEqualTo(5);
-		assertThat(resultPage.getPage()).isEqualTo(0);
-		assertThat(resultPage.getTotalPages()).isEqualTo(1);
+		assertThat(resultPage.getContent().size()).isEqualTo(5);
+		assertThat(resultPage.getNumber()).isEqualTo(0);
+		assertThat(resultPage.hasNext()).isEqualTo(false);
 	}
 
 	@Test
@@ -233,26 +244,36 @@ public class ShipFishingPostServiceTest extends BaseTest {
 			.keyword(null)
 			.build();
 
-		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+		GlobalRequest.PageRequest givenPageRequestDto = fixtureMonkeyRecord
+			.giveMeBuilder(GlobalRequest.PageRequest.class)
+			.set("size", 10)
+			.set("page", 0)
+			.set("order", "DESC")
+			.set("sort", "createdAt")
+			.sample();
 
 		List<ShipFishingPostResponse.DetailPage> givenResponseDto = fixtureMonkeyBuilder.giveMeBuilder(
 			ShipFishingPostResponse.DetailPage.class).sampleList(5);
+
+		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
+
+		Slice<ShipFishingPostResponse.DetailPage> sliceResult = new SliceImpl<>(givenResponseDto, pageable, false);
 
 		Page<ShipFishingPostResponse.DetailPage> pageResult = new Page<>(givenResponseDto, pageable.getPageNumber(),
 			pageable.getPageSize(), 5, 1);
 
 		when(shipFishingPostRepository.findAllBySearchAndCondition(givenRequestDto, pageable))
-			.thenReturn(pageResult);
+			.thenReturn(sliceResult);
 
 		// When
-		Page<ShipFishingPostResponse.DetailPage> resultPage = shipFishingPostServiceImpl.getShipFishingPostPage(
-			givenRequestDto, pageable);
+		Slice<ShipFishingPostResponse.DetailPage> resultPage = shipFishingPostServiceImpl.getShipFishingPostPage(
+			givenRequestDto, givenPageRequestDto);
 
 		// Then
 		verify(shipFishingPostRepository, times(1)).findAllBySearchAndCondition(givenRequestDto, pageable);
-		assertThat(resultPage.getData().size()).isEqualTo(5);
-		assertThat(resultPage.getPage()).isEqualTo(0);
-		assertThat(resultPage.getTotalPages()).isEqualTo(1);
+		assertThat(resultPage.getContent().size()).isEqualTo(5);
+		assertThat(resultPage.getNumber()).isEqualTo(0);
+		assertThat(resultPage.hasNext()).isEqualTo(false);
 	}
 
 	@Test
@@ -268,24 +289,31 @@ public class ShipFishingPostServiceTest extends BaseTest {
 			.keyword(null)
 			.build();
 
-		Pageable pageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+		GlobalRequest.PageRequest givenPageRequestDto = fixtureMonkeyRecord
+			.giveMeBuilder(GlobalRequest.PageRequest.class)
+			.set("size", 10)
+			.set("page", 0)
+			.set("order", "DESC")
+			.set("sort", "createdAt")
+			.sample();
+
+		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
 
 		List<ShipFishingPostResponse.DetailPage> givenResponseDto = Collections.emptyList();
 
-		Page<ShipFishingPostResponse.DetailPage> pageResult = new Page<>(givenResponseDto, pageable.getPageNumber(),
-			pageable.getPageSize(), 0, 1);
+		Slice<ShipFishingPostResponse.DetailPage> sliceResult = new SliceImpl<>(givenResponseDto, pageable, false);
 
 		when(shipFishingPostRepository.findAllBySearchAndCondition(givenRequestDto, pageable))
-			.thenReturn(pageResult);
+			.thenReturn(sliceResult);
 
 		// When
-		Page<ShipFishingPostResponse.DetailPage> resultPage = shipFishingPostServiceImpl.getShipFishingPostPage(
-			givenRequestDto, pageable);
+		Slice<ShipFishingPostResponse.DetailPage> resultPage = shipFishingPostServiceImpl.getShipFishingPostPage(
+			givenRequestDto, givenPageRequestDto);
 
 		// Then
 		verify(shipFishingPostRepository, times(1)).findAllBySearchAndCondition(givenRequestDto, pageable);
-		assertThat(resultPage.getData()).isEmpty();
-		assertThat(resultPage.getPage()).isEqualTo(0);
-		assertThat(resultPage.getTotalPages()).isEqualTo(1);
+		assertThat(resultPage.getContent()).isEmpty();
+		assertThat(resultPage.getNumber()).isEqualTo(0);
+		assertThat(resultPage.hasNext()).isEqualTo(false);
 	}
 }
