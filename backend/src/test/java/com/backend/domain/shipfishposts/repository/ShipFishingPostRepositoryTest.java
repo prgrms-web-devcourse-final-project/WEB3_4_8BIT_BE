@@ -37,7 +37,6 @@ import com.backend.global.config.QuerydslConfig;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.util.BaseTest;
-import com.backend.global.util.pageutil.Page;
 
 import lombok.extern.slf4j.Slf4j;
 
