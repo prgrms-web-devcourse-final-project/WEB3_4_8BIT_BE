@@ -16,7 +16,7 @@ public interface ReviewService {
 	 * @param request 리뷰 작성 요청 DTO
 	 * @return 생성된 리뷰 ID
 	 */
-	Long save(Long memberId, Long reservationId, ReviewRequest.Create request);
+	Long save(final Long memberId, final Long reservationId, final ReviewRequest.Create request);
 
 	/**
 	 * 선상 낚시 리뷰 조회
@@ -24,7 +24,7 @@ public interface ReviewService {
 	 * @param postId 게시글 ID
 	 * @return {@link Page<ReviewWithMemberResponse>}
 	 */
-	Page<ReviewWithMemberResponse> getReviewListByPostId(Long postId, Pageable pageable);
+	Page<ReviewWithMemberResponse> getReviewListByPostId(final Long postId, final Pageable pageable);
 
 	/**
 	 * 내가 작성한 리뷰 조회
@@ -32,5 +32,5 @@ public interface ReviewService {
 	 * @param memberId	회원 ID
 	 * @return {@link Page<ReviewWithMemberResponse>}
 	 */
-	Page<ReviewWithMemberResponse> getReviewListByMemberId(Long memberId, Pageable pageable);
+	Page<ReviewWithMemberResponse> getReviewListByMemberId(final Long memberId, final Pageable pageable);
 }
