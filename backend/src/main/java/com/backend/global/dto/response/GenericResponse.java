@@ -1,4 +1,4 @@
-package com.backend.global.response;
+package com.backend.global.dto.response;
 
 import java.time.ZonedDateTime;
 

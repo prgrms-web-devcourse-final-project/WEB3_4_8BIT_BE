@@ -20,8 +20,8 @@ import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
-import com.backend.global.response.ErrorDetail;
-import com.backend.global.response.GenericResponse;
+import com.backend.global.dto.response.ErrorDetail;
+import com.backend.global.dto.response.GenericResponse;
 import com.backend.global.storage.exception.StorageException;
 
 import lombok.extern.slf4j.Slf4j;

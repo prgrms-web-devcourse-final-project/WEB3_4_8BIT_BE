@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.review.dto.request.ReviewRequest;
 import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
-import com.backend.global.response.ScrollResponse;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.domain.review.service.ReviewService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.request.GlobalRequest;
-import com.backend.global.response.GenericResponse;
+import com.backend.global.dto.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

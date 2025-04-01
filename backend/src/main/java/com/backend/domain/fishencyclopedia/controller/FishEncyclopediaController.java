@@ -17,7 +17,7 @@ import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse
 import com.backend.domain.fishencyclopedia.service.FishEncyclopediaService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.request.GlobalRequest;
-import com.backend.global.response.GenericResponse;
+import com.backend.global.dto.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
