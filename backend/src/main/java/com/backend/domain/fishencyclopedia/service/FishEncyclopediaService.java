@@ -4,6 +4,7 @@ import org.springframework.data.domain.Slice;
 
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
+import com.backend.global.dto.GlobalRequest;
 
 public interface FishEncyclopediaService {
 
@@ -29,7 +30,7 @@ public interface FishEncyclopediaService {
 	 * @author Kim Dong O
 	 */
 	Slice<FishEncyclopediaResponse.Detail> getDetailList(
-		final FishEncyclopediaRequest.PageRequest requestDto,
+		final GlobalRequest.PageRequest pageRequestDto,
 		final Long fishId,
 		final Long memberId
 	);

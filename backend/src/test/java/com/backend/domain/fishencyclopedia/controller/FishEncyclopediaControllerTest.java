@@ -27,6 +27,7 @@ import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse
 import com.backend.domain.fishencyclopedia.service.FishEncyclopediaService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
+import com.backend.global.dto.GlobalRequest;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -176,8 +177,8 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t06() throws Exception {
 		// Given
-		FishEncyclopediaRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
-			.giveMeBuilder(FishEncyclopediaRequest.PageRequest.class)
+		GlobalRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
+			.giveMeBuilder(GlobalRequest.PageRequest.class)
 			.set("size", 10)
 			.set("page", 0)
 			.sample();
@@ -223,8 +224,8 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t07() throws Exception {
 		// Given
-		FishEncyclopediaRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
-			.giveMeBuilder(FishEncyclopediaRequest.PageRequest.class)
+		GlobalRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
+			.giveMeBuilder(GlobalRequest.PageRequest.class)
 			.set("size", -1)
 			.set("page", 0)
 			.sample();
@@ -254,8 +255,8 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t08() throws Exception {
 		// Given
-		FishEncyclopediaRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
-			.giveMeBuilder(FishEncyclopediaRequest.PageRequest.class)
+		GlobalRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
+			.giveMeBuilder(GlobalRequest.PageRequest.class)
 			.set("size", 1)
 			.set("page", -1)
 			.sample();

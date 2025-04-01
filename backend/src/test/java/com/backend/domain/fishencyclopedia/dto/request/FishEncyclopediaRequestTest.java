@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.*;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.backend.global.dto.GlobalRequest;
+
 class FishEncyclopediaRequestTest {
 
 	@Test
@@ -17,7 +19,7 @@ class FishEncyclopediaRequestTest {
 		String givenOrder = null;
 
 		// When
-		FishEncyclopediaRequest.PageRequest requestDto = new FishEncyclopediaRequest.PageRequest(
+		GlobalRequest.PageRequest requestDto = new GlobalRequest.PageRequest(
 			givenPage,
 			givenSize,
 			givenSort,
@@ -39,7 +41,7 @@ class FishEncyclopediaRequestTest {
 		String givenOrder = null;
 
 		// When
-		FishEncyclopediaRequest.PageRequest requestDto = new FishEncyclopediaRequest.PageRequest(
+		GlobalRequest.PageRequest requestDto = new GlobalRequest.PageRequest(
 			givenPage,
 			givenSize,
 			givenSort,
@@ -61,7 +63,7 @@ class FishEncyclopediaRequestTest {
 		String givenOrder = null;
 
 		// When
-		FishEncyclopediaRequest.PageRequest requestDto = new FishEncyclopediaRequest.PageRequest(
+		GlobalRequest.PageRequest requestDto = new GlobalRequest.PageRequest(
 			givenPage,
 			givenSize,
 			givenSort,

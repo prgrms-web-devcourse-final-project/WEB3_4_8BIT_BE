@@ -16,6 +16,7 @@ import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.service.FishEncyclopediaService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
+import com.backend.global.dto.GlobalRequest;
 import com.backend.global.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,11 +52,11 @@ public class FishEncyclopediaController {
 	public ResponseEntity<GenericResponse<Slice<FishEncyclopediaResponse.Detail>>> getDetailList(
 		@Parameter(description = "조회할 물고기의 ID", example = "1")
 		@PathVariable final Long fishId,
-		@Valid final FishEncyclopediaRequest.PageRequest requestDto,
+		@Valid final GlobalRequest.PageRequest pageRequestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		Slice<FishEncyclopediaResponse.Detail> detailList = fishEncyclopediaService.getDetailList(requestDto, fishId,
+		Slice<FishEncyclopediaResponse.Detail> detailList = fishEncyclopediaService.getDetailList(pageRequestDto, fishId,
 			user.getId());
 
 		return ResponseEntity.ok(GenericResponse.of(true, detailList));

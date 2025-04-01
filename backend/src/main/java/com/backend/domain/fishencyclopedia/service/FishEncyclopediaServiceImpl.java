@@ -17,6 +17,7 @@ import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository
 import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
 import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
+import com.backend.global.dto.GlobalRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -72,12 +73,12 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 	@Override
 	@Transactional(readOnly = true)
 	public Slice<FishEncyclopediaResponse.Detail> getDetailList(
-		final FishEncyclopediaRequest.PageRequest requestDto,
+		final GlobalRequest.PageRequest pageRequestDto,
 		final Long fishId,
 		final Long memberId
 	) {
 		Slice<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
-			requestDto, fishId, memberId);
+			pageRequestDto, fishId, memberId);
 
 		log.debug("물고기 도감 상세 조회: {}", findDetailList);
 
