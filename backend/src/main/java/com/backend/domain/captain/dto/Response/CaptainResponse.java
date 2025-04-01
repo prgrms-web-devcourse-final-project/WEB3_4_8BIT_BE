@@ -10,6 +10,7 @@ public class CaptainResponse {
 
 	/**
 	 * {@code
+	 * {
 	 *   "memberId": 1,
 	 *   "email": "test@naver.com",
 	 *   "name": "루피",
@@ -20,7 +21,7 @@ public class CaptainResponse {
 	 *   "shipLicenseNumber": "1-2019123456",
 	 *   "shipList": [1L, 2L, 3L]
 	 * }
-	 *
+	 *}
 	 * @param memberId 회원 ID
 	 * @param email 이메일
 	 * @param name 이름
@@ -51,10 +52,12 @@ public class CaptainResponse {
 
 	/**
 	 * {@code
+	 * {
 	 *   "nickname": "해적왕",
 	 *   "profileImg": "http://example.com/profile.jpg",
 	 *   "role": "CAPTAIN",
 	 *   "isAddInfo": "true"
+	 * }
 	 * }
 	 *
 	 * @param nickname 선장 닉네임
