@@ -15,6 +15,7 @@ import com.backend.domain.captain.exception.CaptainException;
 import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.member.exception.MemberException;
+import com.backend.domain.reservation.exception.ReservationException;
 import com.backend.domain.review.exception.ReviewException;
 import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
@@ -174,6 +175,26 @@ public class GlobalControllerAdvice {
 		);
 
 		return ResponseEntity.status(shipFishingPostException.getStatus().value())
+			.body(response);
+	}
+
+	/**
+	 * ReservationException 처리 핸들러 입니다.
+	 *
+	 * @param reservationException {@link ReservationException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(ReservationException.class)
+	public ResponseEntity<GenericResponse<Void>> handleShipFishingPostsException(
+		ReservationException reservationException) {
+		log.error("handleReservationException: ", reservationException);
+
+		GenericResponse<Void> response = GenericResponse.fail(
+			reservationException.getReservationErrorCode().getCode(),
+			reservationException.getMessage()
+		);
+
+		return ResponseEntity.status(reservationException.getStatus().value())
 			.body(response);
 	}
 
