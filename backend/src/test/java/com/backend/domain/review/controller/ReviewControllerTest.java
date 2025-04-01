@@ -213,7 +213,6 @@ class ReviewControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t8() throws Exception {
 		// given
-		Long memberId = 1L;
 		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<ReviewWithMemberResponse> givenResponse =
 			fixtureMonkeyValidation.giveMe(ReviewWithMemberResponse.class, 4);
@@ -221,11 +220,11 @@ class ReviewControllerTest extends BaseTest {
 		Page<ReviewWithMemberResponse> slicedPage =
 			new PageImpl<>(givenResponse.subList(0, 3), pageable, givenResponse.size());
 
-		when(reviewService.getReviewListByMemberId(eq(memberId), any(Pageable.class)))
+		when(reviewService.getReviewListByMemberId(eq(1L), any(Pageable.class)))
 			.thenReturn(slicedPage);
 
 		// when
-		ResultActions resultActions = mockMvc.perform(get("/api/v1/members/{memberId}/reviews", memberId)
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/members/reviews")
 			.contentType(MediaType.APPLICATION_JSON));
 
 		// then

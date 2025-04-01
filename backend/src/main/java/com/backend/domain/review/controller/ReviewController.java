@@ -56,14 +56,14 @@ public class ReviewController {
 			.body(GenericResponse.of(true, scrollResponse));
 	}
 
-	@GetMapping("/members/{memberId}/reviews")
+	@GetMapping("/members/reviews")
 	@Operation(summary = "내가 작성한 리뷰 조회", description = "회원 ID로 리뷰를 조회하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByMemberId(
-		@PathVariable final Long memberId,
-		@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable
+		@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable,
+		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
-			reviewService.getReviewListByMemberId(memberId, pageable));
+			reviewService.getReviewListByMemberId(user.getId(), pageable));
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(GenericResponse.of(true, scrollResponse));
 	}
