@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 
 import com.backend.domain.member.entity.Member;
@@ -141,7 +141,7 @@ class ReviewRepositoryTest extends BaseTest {
 		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 
 		// when
-		Page<ReviewWithMemberResponse> result = reviewRepository.findReviewsWithMemberByPostId(
+		Slice<ReviewWithMemberResponse> result = reviewRepository.findReviewsWithMemberByPostId(
 			givenPost.getShipFishingPostId(), pageable
 		);
 
@@ -161,7 +161,7 @@ class ReviewRepositoryTest extends BaseTest {
 		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 
 		// when
-		Page<ReviewWithMemberResponse> result = reviewRepository.findReviewsWithMemberByMemberId(
+		Slice<ReviewWithMemberResponse> result = reviewRepository.findReviewsWithMemberByMemberId(
 			givenMember.getMemberId(), pageable
 		);
 

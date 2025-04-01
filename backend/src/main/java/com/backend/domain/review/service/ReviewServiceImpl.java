@@ -1,7 +1,7 @@
 package com.backend.domain.review.service;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,9 +41,9 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<ReviewWithMemberResponse> getReviewListByPostId(final Long postId, final Pageable pageable) {
+	public Slice<ReviewWithMemberResponse> getReviewListByPostId(final Long postId, final Pageable pageable) {
 
-		Page<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(postId, pageable);
+		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(postId, pageable);
 
 		log.debug("[리뷰 조회] 게시글 ID {}의 리뷰 목록: {}", postId, reviewList);
 		return reviewList;
@@ -51,9 +51,9 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Page<ReviewWithMemberResponse> getReviewListByMemberId(final Long memberId, final Pageable pageable) {
+	public Slice<ReviewWithMemberResponse> getReviewListByMemberId(final Long memberId, final Pageable pageable) {
 
-		Page<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable);
+		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable);
 
 		log.debug("[리뷰 조회] 회원 ID {}의 리뷰 목록: {}", memberId, reviewList);
 		return reviewList;
