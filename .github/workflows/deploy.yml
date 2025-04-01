@@ -29,6 +29,7 @@ jobs:
     - name: Build with Gradle
       run: |
         cd backend
+        export baseUrl=${{ secrets.BASE_URL }}
         mkdir -p src/main/resources/
         mkdir -p src/test/resources/
         echo "${{ secrets.APPLICATION_DEV_YML }}" > src/main/resources/application-dev.yml
