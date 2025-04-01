@@ -233,4 +233,22 @@ class ReviewControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.content.length()").value(3));
 	}
+
+	@Test
+	@DisplayName("선상 낚시 리뷰 삭제 [Controller] - Success")
+	@WithMockCustomUser
+	void deleteReview_success() throws Exception {
+		// given
+		Long givenReviewId = 1L;
+
+		// when
+		ResultActions resultActions = mockMvc.perform(delete("/api/v1/reviews/{reviewId}", givenReviewId));
+
+		// then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true));
+
+		verify(reviewService).delete(1L, givenReviewId);
+	}
 }

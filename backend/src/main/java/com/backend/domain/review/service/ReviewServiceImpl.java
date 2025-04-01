@@ -58,4 +58,28 @@ public class ReviewServiceImpl implements ReviewService {
 		log.debug("[리뷰 조회] 회원 ID {}의 리뷰 목록: {}", memberId, reviewList);
 		return reviewList;
 	}
+
+	@Override
+	@Transactional
+	public void delete(final Long memberId, final Long reviewId) {
+		//리뷰 조회
+		Review review = getReviewById(reviewId);
+
+		//리뷰 삭제 권한 검증
+		validateReviewOwner(review, memberId);
+
+		reviewRepository.delete(review);
+		log.debug("리뷰가 삭제되었습니다. reviewId={}, 삭제한 회원 ID={}", reviewId, memberId);
+	}
+
+	private Review getReviewById(final Long reviewId) {
+		return reviewRepository.findById(reviewId)
+			.orElseThrow(() -> new ReviewException(ReviewErrorCode.NOT_FOUND_REVIEW));
+	}
+
+	private void validateReviewOwner(final Review review, final Long memberId) {
+		if (!review.getMemberId().equals(memberId)) {
+			throw new ReviewException(ReviewErrorCode.FORBIDDEN_REVIEW_DELETE);
+		}
+	}
 }

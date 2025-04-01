@@ -153,4 +153,69 @@ public class ReviewServiceTest extends BaseTest {
 		assertThat(result).isEmpty();
 		verify(reviewRepository).findReviewsWithMemberByMemberId(memberId, pageable);
 	}
+
+	@Test
+	@DisplayName("리뷰 삭제 [Service] - Success")
+	void t010() {
+		// given
+		Long givenMemberId = 1L;
+		Long givenReviewId = 10L;
+		Review givenReview = fixtureMonkeyBuilder
+			.giveMeBuilder(Review.class)
+			.set("reviewId", givenReviewId)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		given(reviewRepository.findById(givenReviewId)).willReturn(java.util.Optional.of(givenReview));
+
+		// when
+		reviewServiceImpl.delete(givenMemberId, givenReviewId);
+
+		// then
+		verify(reviewRepository).findById(givenReviewId);
+		verify(reviewRepository).delete(givenReview);
+	}
+
+	@Test
+	@DisplayName("리뷰 삭제 [Service] - Fail (리뷰가 존재하지 않음)")
+	void t11() {
+		// given
+		Long givenMemberId = 1L;
+		Long givenReviewId = 999L;
+
+		given(reviewRepository.findById(givenReviewId)).willReturn(java.util.Optional.empty());
+
+		// when & then
+		assertThatThrownBy(() -> reviewServiceImpl.delete(givenMemberId, givenReviewId))
+			.isInstanceOf(ReviewException.class)
+			.hasMessageContaining(ReviewErrorCode.NOT_FOUND_REVIEW.getMessage());
+
+		verify(reviewRepository).findById(givenReviewId);
+		verify(reviewRepository, never()).delete(any());
+	}
+
+	@Test
+	@DisplayName("리뷰 삭제 [Service] - Fail (작성자가 아님)")
+	void t12() {
+		// given
+		Long givenMemberId = 1L;
+		Long givenReviewId = 10L;
+		Long otherMemberId = 2L;
+
+		Review givenReview = fixtureMonkeyBuilder
+			.giveMeBuilder(Review.class)
+			.set("reviewId", givenReviewId)
+			.set("memberId", otherMemberId)
+			.sample();
+
+		given(reviewRepository.findById(givenReviewId)).willReturn(java.util.Optional.of(givenReview));
+
+		// when & then
+		assertThatThrownBy(() -> reviewServiceImpl.delete(givenMemberId, givenReviewId))
+			.isInstanceOf(ReviewException.class)
+			.hasMessageContaining(ReviewErrorCode.FORBIDDEN_REVIEW_DELETE.getMessage());
+
+		verify(reviewRepository).findById(givenReviewId);
+		verify(reviewRepository, never()).delete(any());
+	}
 }

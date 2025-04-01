@@ -5,6 +5,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.repository.query.Param;
 
 import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
+import java.util.Optional;
+
 import com.backend.domain.review.entity.Review;
 
 public interface ReviewRepository {
@@ -44,4 +46,19 @@ public interface ReviewRepository {
 	 * @implSpec 회원 ID를 기반으로 작성된 리뷰 조회
 	 */
 	Slice<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(@Param("memberId") final Long memberId, final Pageable pageable);
+
+	/**
+	 * 리뷰 조회
+	 *
+	 * @param id 리뷰 ID
+	 * @return {@link Optional<Review>}
+	 */
+	Optional<Review> findById(final Long id);
+
+	/**
+	 * 리뷰 삭제
+	 *
+	 * @param review 삭제할 리뷰
+	 */
+	void delete(final Review review);
 }

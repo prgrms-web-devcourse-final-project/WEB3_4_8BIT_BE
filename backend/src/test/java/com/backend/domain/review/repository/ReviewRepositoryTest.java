@@ -169,4 +169,35 @@ class ReviewRepositoryTest extends BaseTest {
 		assertThat(result).isNotEmpty();
 		assertThat(result).hasSize(2);
 	}
+
+	@Test
+	@DisplayName("리뷰 ID로 리뷰 조회 [Repository] - Success")
+	void t010() {
+		// given
+		Review givenReview = getReviewBuilder().set("reservationId", 1L).sample();
+		Review savedReview = reviewRepository.save(givenReview);
+
+		// when
+		Review foundReview = reviewRepository.findById(savedReview.getReviewId()).orElse(null);
+
+		// then
+		assertThat(foundReview).isNotNull();
+		assertThat(foundReview.getReviewId()).isEqualTo(savedReview.getReviewId());
+		assertThat(foundReview.getReservationId()).isEqualTo(savedReview.getReservationId());
+	}
+
+	@Test
+	@DisplayName("리뷰 삭제 [Repository] - Success")
+	void t011() {
+		// given
+		Review givenReview = getReviewBuilder().set("reservationId", 1L).sample();
+		Review savedReview = reviewRepository.save(givenReview);
+
+		// when
+		reviewRepository.delete(savedReview);
+
+		// then
+		boolean exists = reviewRepository.findById(savedReview.getReviewId()).isPresent();
+		assertThat(exists).isFalse();
+	}
 }
