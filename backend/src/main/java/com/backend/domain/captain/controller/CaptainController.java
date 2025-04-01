@@ -4,12 +4,14 @@ import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.captain.dto.Request.CaptainRequest;
+import com.backend.domain.captain.dto.Response.CaptainResponse;
 import com.backend.domain.captain.service.CaptainService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.response.GenericResponse;
@@ -38,5 +40,16 @@ public class CaptainController {
 
 		return ResponseEntity.created(URI.create(saveCaptainId.toString()))
 			.body(GenericResponse.of(true));
+	}
+
+	@GetMapping
+	@Operation(summary = "선장 정보 조회", description = "현재 로그인된 선장 정보를 조회하는 API")
+	public ResponseEntity<GenericResponse<CaptainResponse.Detail>> getCaptainDetail(
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		CaptainResponse.Detail responseDto = captainService.getCaptainDetail(user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
 	}
 }

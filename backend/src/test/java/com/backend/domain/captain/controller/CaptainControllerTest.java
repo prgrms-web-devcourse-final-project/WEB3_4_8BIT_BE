@@ -2,6 +2,7 @@ package com.backend.domain.captain.controller;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.contains;
 
 import java.util.List;
 
@@ -19,14 +20,20 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.backend.domain.captain.dto.Request.CaptainRequest;
+import com.backend.domain.captain.dto.Response.CaptainResponse;
+import com.backend.domain.captain.exception.CaptainErrorCode;
+import com.backend.domain.captain.exception.CaptainException;
 import com.backend.domain.captain.service.CaptainService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
+@Slf4j
 @WebMvcTest(CaptainController.class)
 @ExtendWith(MockitoExtension.class)
 @Import(TestSecurityConfig.class)
@@ -142,4 +149,62 @@ class CaptainControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data[0].reason").value("닉네임은 최대 30자까지 가능합니다."))
 			.andExpect(jsonPath("$.success").value(false));
 	}
+
+	@Test
+	@DisplayName("선장 상세 조회 [Controller] - Success")
+	@WithMockCustomUser
+	void t06() throws Exception {
+		// Given
+		Long memberId = 1L;
+		CaptainResponse.Detail givenResponse = fixtureMonkeyValidation.giveMeBuilder(CaptainResponse.Detail.class)
+			.set("memberId", memberId)
+			.set("email", "test@naver.com")
+			.set("name", "루피")
+			.set("nickname", "해적왕")
+			.set("profileImg", "http://example.com/image.jpg")
+			.set("description", "해적왕이 되고싶은 루피 입니다.")
+			.set("shipLicenseNumber", "1-2019123456")
+			.set("shipList", List.of(1L, 2L, 3L))
+			.sample();
+
+		when(captainService.getCaptainDetail(memberId)).thenReturn(givenResponse);
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/v1/members/captains")
+				.contentType(MediaType.APPLICATION_JSON));
+
+		log.info("{}", result);
+
+		// Then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.memberId").value(1L))
+			.andExpect(jsonPath("$.data.nickname").value("해적왕"))
+			.andExpect(jsonPath("$.data.name").value("루피"))
+			.andExpect(jsonPath("$.data.profileImg").value("http://example.com/image.jpg"))
+			.andExpect(jsonPath("$.data.description").value("해적왕이 되고싶은 루피 입니다."))
+			.andExpect(jsonPath("$.data.shipLicenseNumber").value("1-2019123456"))
+			.andExpect(jsonPath("$.data.shipList", contains(1, 2, 3)));
+	}
+
+	@Test
+	@DisplayName("선장 상세 조회 [CAPTAIN_NOT_FOUND] [Controller] - Fail")
+	@WithMockCustomUser
+	void t07() throws Exception {
+		// Given
+		doThrow(new CaptainException(CaptainErrorCode.CAPTAIN_NOT_FOUND))
+			.when(captainService).getCaptainDetail(anyLong());
+
+		// When
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/members/captains"));
+
+		// Then
+		result
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.code").value(CaptainErrorCode.CAPTAIN_NOT_FOUND.getCode()))
+			.andExpect(jsonPath("$.message").value(CaptainErrorCode.CAPTAIN_NOT_FOUND.getMessage()));
+	}
+
 }
