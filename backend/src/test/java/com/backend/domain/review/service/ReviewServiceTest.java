@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -91,7 +92,7 @@ public class ReviewServiceTest extends BaseTest {
 		given(reviewRepository.findReviewsWithMemberByPostId(postId, pageable)).willReturn(givenPage);
 
 		// when
-		Page<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(postId, pageable);
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(postId, pageable);
 
 		// then
 		assertThat(result).hasSize(2);
@@ -109,7 +110,7 @@ public class ReviewServiceTest extends BaseTest {
 		given(reviewRepository.findReviewsWithMemberByPostId(postId, pageable)).willReturn(emptyPage);
 
 		// when
-		Page<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(postId, pageable);
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(postId, pageable);
 
 		// then
 		assertThat(result).isEmpty();
@@ -128,7 +129,7 @@ public class ReviewServiceTest extends BaseTest {
 		given(reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable)).willReturn(givenPage);
 
 		// when
-		Page<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByMemberId(memberId, pageable);
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByMemberId(memberId, pageable);
 
 		// then
 		assertThat(result).hasSize(3);
@@ -146,7 +147,7 @@ public class ReviewServiceTest extends BaseTest {
 		given(reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable)).willReturn(emptyPage);
 
 		// when
-		Page<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByMemberId(memberId, pageable);
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByMemberId(memberId, pageable);
 
 		// then
 		assertThat(result).isEmpty();
