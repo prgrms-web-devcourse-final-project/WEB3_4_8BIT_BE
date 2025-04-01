@@ -14,8 +14,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.ship.entity.Ship;
-import com.backend.global.util.BaseTest;
 import com.backend.global.config.QuerydslConfig;
+import com.backend.global.util.BaseTest;
 
 import lombok.extern.slf4j.Slf4j;
 

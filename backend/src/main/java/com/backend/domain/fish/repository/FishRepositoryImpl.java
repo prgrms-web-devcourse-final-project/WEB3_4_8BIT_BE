@@ -1,5 +1,7 @@
 package com.backend.domain.fish.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.fish.entity.Fish;
@@ -19,5 +21,10 @@ public class FishRepositoryImpl implements FishRepository {
 	@Override
 	public Fish save(final Fish fish) {
 		return fishJpaRepository.save(fish);
+	}
+
+	@Override
+	public List<Fish> findAllById(final List<Long> fishIdList) {
+		return fishJpaRepository.findAllById(fishIdList);
 	}
 }

@@ -1,5 +1,7 @@
 package com.backend.domain.fish.repository;
 
+import java.util.List;
+
 import com.backend.domain.fish.entity.Fish;
 
 public interface FishRepository {
@@ -22,4 +24,14 @@ public interface FishRepository {
 	 * @author Kim Dong O
 	 */
 	Fish save(final Fish fish);
+
+	/**
+	 * Id 리스트와 일치하는 물고기 정보 조회 메소드
+	 *
+	 * @param fishIdList {@link List}
+	 * @return {@link List<Fish>}
+	 * @implSpec fishId 리스트를 받아서 일치하는 엔티티 반환
+	 * @author swjoon
+	 */
+	List<Fish> findAllById(final List<Long> fishIdList);
 }

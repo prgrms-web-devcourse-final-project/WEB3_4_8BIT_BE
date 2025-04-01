@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 public class ShipFishingPostRequest {
 
@@ -96,6 +97,42 @@ public class ShipFishingPostRequest {
 			fishList = (fishList == null) ? new ArrayList<>() : fishList;
 			unavailableDates = (unavailableDates == null) ? new ArrayList<>() : unavailableDates;
 		}
+	}
+
+	/**
+	 * 쿼리 파라미터 (검색 및 조건)
+	 *
+	 * @param minPrice - 최소 가격
+	 * @param maxPrice - 최대 가격
+	 * @param minRating - 최소 평점
+	 * @param location - 지역
+	 * @param fishId - 목적 어종
+	 * @param searchDate - 예약 가능 날짜 ?
+	 * @param keyword - 검색어
+	 * @param guestCount - 인원 수
+	 * @param duration - 소요 시간
+	 */
+	@Builder
+	public record Search(
+		@Schema(description = "최소 가격", example = "10000")
+		Long minPrice,
+		@Schema(description = "최대 가격", example = "500000")
+		Long maxPrice,
+		@Schema(description = "최소 평점", example = "4.5")
+		Double minRating,
+		@Schema(description = "위치 정보", example = "서울")
+		String location,
+		@Schema(description = "물고기 ID", example = "1")
+		Long fishId,
+		@Schema(description = "검색 날짜 (ISO 날짜 형식, 예: 2025-04-01)", example = "2025-04-01")
+		LocalDate searchDate,
+		@Schema(description = "검색 키워드", example = "낚시")
+		String keyword,
+		@Schema(description = "게스트 수", example = "2")
+		Long guestCount,
+		@Schema(description = "이용 시간 (ISO 시간 형식, 예: 01:30)", example = "01:30")
+		LocalTime duration
+	) {
 	}
 
 }

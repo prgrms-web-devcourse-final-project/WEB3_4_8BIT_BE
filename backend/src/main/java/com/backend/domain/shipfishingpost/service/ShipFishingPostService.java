@@ -1,7 +1,10 @@
 package com.backend.domain.shipfishingpost.service;
 
+import org.springframework.data.domain.Slice;
+
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
+import com.backend.global.dto.request.GlobalRequest;
 
 public interface ShipFishingPostService {
 
@@ -34,5 +37,8 @@ public interface ShipFishingPostService {
 	 * @author swjoon
 	 */
 	ShipFishingPostResponse.DetailAll getShipFishingPostAll(final Long shipFishingPostId);
+
+	Slice<ShipFishingPostResponse.DetailPage> getShipFishingPostPage(final ShipFishingPostRequest.Search requestDto,
+		final GlobalRequest.PageRequest pageRequestDto);
 
 }
