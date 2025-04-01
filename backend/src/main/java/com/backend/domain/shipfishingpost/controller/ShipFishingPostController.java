@@ -18,7 +18,7 @@ import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.domain.shipfishingpost.service.ShipFishingPostService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 
-import com.backend.global.dto.GlobalRequest;
+import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.dto.response.GenericResponse;
 

@@ -33,9 +33,8 @@ import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.domain.shipfishingpost.service.ShipFishingPostServiceImpl;
-import com.backend.global.dto.GlobalRequest;
+import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.util.BaseTest;
-import com.backend.global.util.pageutil.Page;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipFishingPostServiceTest extends BaseTest {
@@ -258,9 +257,6 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
 
 		Slice<ShipFishingPostResponse.DetailPage> sliceResult = new SliceImpl<>(givenResponseDto, pageable, false);
-
-		Page<ShipFishingPostResponse.DetailPage> pageResult = new Page<>(givenResponseDto, pageable.getPageNumber(),
-			pageable.getPageSize(), 5, 1);
 
 		when(shipFishingPostRepository.findAllBySearchAndCondition(givenRequestDto, pageable))
 			.thenReturn(sliceResult);

@@ -25,8 +25,7 @@ import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.domain.shipfishingpostfish.repository.ShipFishingPostFishRepository;
-import com.backend.global.dto.GlobalRequest;
-import com.backend.global.util.pageutil.Page;
+import com.backend.global.dto.request.GlobalRequest;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -123,7 +122,7 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 			pageRequestDto.page(),
 			pageRequestDto.size(),
 			Sort.by(Sort.Direction.fromString(
-				pageRequestDto.order().equals("asc") ? "asc" : "desc"),
+					pageRequestDto.order().equals("asc") ? "asc" : "desc"),
 				pageRequestDto.sort()));
 	}
 }

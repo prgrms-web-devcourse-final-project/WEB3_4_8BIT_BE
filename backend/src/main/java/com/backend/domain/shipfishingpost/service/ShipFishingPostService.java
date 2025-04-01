@@ -1,12 +1,10 @@
 package com.backend.domain.shipfishingpost.service;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
-import com.backend.global.dto.GlobalRequest;
-import com.backend.global.util.pageutil.Page;
+import com.backend.global.dto.request.GlobalRequest;
 
 public interface ShipFishingPostService {
 
