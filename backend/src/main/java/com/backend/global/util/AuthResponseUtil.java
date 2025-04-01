@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import org.springframework.http.ResponseCookie;
 
-import com.backend.global.response.GenericResponse;
+import com.backend.global.dto.response.GenericResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.http.HttpServletResponse;

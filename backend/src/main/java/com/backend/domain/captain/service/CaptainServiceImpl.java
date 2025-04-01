@@ -1,5 +1,7 @@
 package com.backend.domain.captain.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +35,10 @@ public class CaptainServiceImpl implements CaptainService {
 		// 1. 멤버 조회
 		Member member = getMember(memberId);
 
+		if (member.getIsAddInfo()) {
+			throw new MemberException(MemberErrorCode.ALREADY_ADDED_INFO);
+		}
+
 		// 2. 멤버 추가 정보 및 role 업데이트
 		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.descrption());
 		member.updateRole(MemberRole.CAPTAIN);
@@ -43,6 +49,17 @@ public class CaptainServiceImpl implements CaptainService {
 		log.debug("[선장 등록 완료] : {}", captain);
 
 		return captainRepository.save(captain).getMemberId();
+	}
+
+	@Override
+	public Long updateCaptainShipList(final Long captainId, final CaptainRequest.Update requestDto) {
+
+		Captain captain = getCaptain(captainId);
+
+		captain.updateShipList(requestDto.shipList());
+		log.debug("선장 배 리스트를 수정하였습니다. 업데이트된 배 리스트 : {}", captain.getShipList());
+
+		return captain.getMemberId();
 	}
 
 	@Override
@@ -72,5 +89,22 @@ public class CaptainServiceImpl implements CaptainService {
 
 		log.debug("[멤버 조회] : {}", member);
 		return member;
+	}
+
+	/**
+	 * 선장 ID로 선장 엔티티를 조회하는 메소드
+	 *
+	 * @param captainId 조회할 선장의 ID
+	 * @return {@link Captain} 조회된 선장 엔티티
+	 * @throws CaptainException 선장이 존재하지 않는 경우 예외 발생
+	 */
+
+	private Captain getCaptain(final Long captainId) {
+
+		Captain captain = captainRepository.findById(captainId)
+			.orElseThrow(() -> new CaptainException(CaptainErrorCode.CAPTAIN_NOT_FOUND));
+
+		log.debug("[선장 조회] : {}", captain);
+		return captain;
 	}
 }

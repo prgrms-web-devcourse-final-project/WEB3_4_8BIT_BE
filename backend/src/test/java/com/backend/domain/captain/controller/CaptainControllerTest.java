@@ -1,8 +1,9 @@
 package com.backend.domain.captain.controller;
 
+import static org.hamcrest.Matchers.contains;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.hamcrest.Matchers.contains;
 
 import java.util.List;
 
@@ -177,7 +178,8 @@ class CaptainControllerTest extends BaseTest {
 		log.info("{}", result);
 
 		// Then
-		result.andExpect(status().isOk())
+		result
+			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.memberId").value(1L))
 			.andExpect(jsonPath("$.data.nickname").value("해적왕"))
@@ -205,6 +207,55 @@ class CaptainControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.success").value(false))
 			.andExpect(jsonPath("$.code").value(CaptainErrorCode.CAPTAIN_NOT_FOUND.getCode()))
 			.andExpect(jsonPath("$.message").value(CaptainErrorCode.CAPTAIN_NOT_FOUND.getMessage()));
+	}
+
+	@Test
+	@WithMockCustomUser
+	@DisplayName("선장 배 정보 수정 [Controller] - Success")
+	void t09() throws Exception {
+		// Given
+		CaptainRequest.Update updateRequest = new CaptainRequest.Update(List.of(2L, 3L, 4L));
+
+		Long captainId = 1L;
+
+		when(captainService.updateCaptainShipList(eq(captainId), any())).thenReturn(captainId);
+
+		// When
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/members/captains")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(updateRequest)));
+
+		// Then
+		result
+			.andExpect(status().isCreated())
+			.andExpect(header().exists("Location"))
+			.andExpect(header().string("Location", captainId.toString()))
+			.andExpect(jsonPath("$.success").value(true));
+	}
+
+	@Test
+	@WithMockCustomUser
+	@DisplayName("선장 배 정보 수정 [shipList = null] [Controller] - Fail")
+	void t10() throws Exception {
+		// Given
+		String requestBody = """
+			{
+				"shipList": null
+			}
+			""";
+
+		// When
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/members/captains")
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(requestBody));
+
+		// Then
+		result
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.data[0].field").value("shipList"))
+			.andExpect(jsonPath("$.data[0].reason").value("배는 최소 1개 등록해야합니다."))
+			.andExpect(jsonPath("$.success").value(false));
 	}
 
 }

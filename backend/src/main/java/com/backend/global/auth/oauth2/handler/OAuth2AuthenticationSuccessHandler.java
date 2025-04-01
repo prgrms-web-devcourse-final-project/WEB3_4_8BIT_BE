@@ -19,7 +19,7 @@ import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.auth.jwt.JwtTokenProvider;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
-import com.backend.global.response.GenericResponse;
+import com.backend.global.dto.response.GenericResponse;
 import com.backend.global.util.AuthResponseUtil;
 import com.backend.global.util.CookieUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -108,7 +108,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 			// 1. 추가정보 미입력 상태
 			loginResponse.put("id", member.getMemberId());
 			loginResponse.put("name", member.getName());
-			loginResponse.put("nickname", member.getNickname());
 			loginResponse.put("profileImg", member.getProfileImg());
 			loginResponse.put("role", member.getRole().name());
 			loginResponse.put("provider", member.getProvider().name());

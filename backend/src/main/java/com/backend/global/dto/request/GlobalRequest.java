@@ -1,4 +1,7 @@
-package com.backend.global.dto;
+package com.backend.global.dto.request;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -36,6 +39,13 @@ public class GlobalRequest {
 		public PageRequest {
 			page = (page == null) ? 0 : page;
 			size = (size == null) ? 10 : size;
+		}
+
+		public Pageable toPageable() {
+			String sortBy = (sort == null || sort.isBlank()) ? "createdAt" : sort;
+			String sortOrder = (order == null || order.isBlank()) ? "desc" : order;
+			Sort.Direction direction = sortOrder.equalsIgnoreCase("asc") ? Sort.Direction.ASC : Sort.Direction.DESC;
+			return org.springframework.data.domain.PageRequest.of(page, size, Sort.by(direction, sortBy));
 		}
 	}
 }

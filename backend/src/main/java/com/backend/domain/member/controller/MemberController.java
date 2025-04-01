@@ -5,8 +5,8 @@ import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,7 +15,7 @@ import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.service.MemberService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
-import com.backend.global.response.GenericResponse;
+import com.backend.global.dto.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -51,7 +51,7 @@ public class MemberController {
 		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
 	}
 
-	@PutMapping
+	@PatchMapping
 	@Operation(summary = "회원 정보 수정", description = "현재 로그인된 사용자의 회원 정보를 수정하는 API")
 	public ResponseEntity<GenericResponse<Void>> updateMember(
 		@AuthenticationPrincipal CustomOAuth2User user,

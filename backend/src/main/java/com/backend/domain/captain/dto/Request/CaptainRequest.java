@@ -1,6 +1,5 @@
 package com.backend.domain.captain.dto.Request;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,7 +23,7 @@ public class CaptainRequest {
 	 * @param nickname 사용자 닉네임 (필수, 최대 15자)
 	 * @param descrption 자기 소개글 (필수)
 	 * @param shipLicenseNumber 선장 면허 번호 (필수)
-	 * @param shipList 등록할 배 ID 리스트 (필수, null인 경우 빈 리스트로 초기화)
+	 * @param shipList 등록할 배 ID 리스트 (필수, 최소 1개)
 	 */
 
 	public record Create(
@@ -50,8 +49,22 @@ public class CaptainRequest {
 		@Schema(description = "소유한 배 Id 리스트 (entity)", example = "[1, 2, 3]")
 		List<Long> shipList
 	) {
-		public Create {
-			shipList = (shipList == null) ? new ArrayList<>() : shipList;
-		}
+	}
+
+	//TODO 추후 선장 번호 수정 필요시 추가 예정
+	/**
+	 * {@code
+	 * {
+	 *   "shipList": [2, 3, 4]
+	 * }
+	 *}
+	 * @param shipList 수정할 배 ID 리스트 (필수, 최소 1개)
+	 */
+
+	public record Update(
+		@NotEmpty(message = "배는 최소 1개 등록해야합니다.")
+		@Schema(description = "수정할 배 Id 리스트 (entity)", example = "[2, 3, 4]")
+		List<Long> shipList
+	) {
 	}
 }
