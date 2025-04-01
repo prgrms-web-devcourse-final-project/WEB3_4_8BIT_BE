@@ -27,8 +27,13 @@ public class FishEncyclopediaRequest {
 		@Schema(description = "물고기 길이", example = "10")
 		Integer length,
 
-		@Schema(description = "낚시 포인트 ID", example = "2")
+		@Min(value = 1, message = "잡은 물고기 수는 1마리 이상이어야 합니다.")
+		@NotNull(message = "잡은 물고기 수는 필수 항목입니다.")
+		@Schema(description = "잡은 물고기 수", example = "2")
+		Integer count,
+
 		@NotNull(message = "낚시 포인트 ID는 필수 항목입니다.")
+		@Schema(description = "낚시 포인트 ID", example = "2")
 		Long fishPointId
 	) {
 	}
