@@ -18,6 +18,7 @@ import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
 import com.backend.domain.review.dto.response.ScrollResponse;
 import com.backend.domain.review.service.ReviewService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
+import com.backend.global.dto.GlobalRequest;
 import com.backend.global.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,10 +49,10 @@ public class ReviewController {
 	@Operation(summary = "선상 낚시 리뷰 조회", description = "게시글 ID로 리뷰를 조회하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByPostId(
 		@PathVariable final Long postId,
-		@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable
+		@Valid final GlobalRequest.PageRequest pageRequest
 	) {
 		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
-			reviewService.getReviewListByPostId(postId, pageable));
+			reviewService.getReviewListByPostId(postId, pageRequest.toPageable()));
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(GenericResponse.of(true, scrollResponse));
 	}
@@ -59,11 +60,11 @@ public class ReviewController {
 	@GetMapping("/members/reviews")
 	@Operation(summary = "내가 작성한 리뷰 조회", description = "회원 ID로 리뷰를 조회하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByMemberId(
-		@PageableDefault(size = 3, sort = "createdAt", direction = Sort.Direction.DESC) final Pageable pageable,
-		@AuthenticationPrincipal final CustomOAuth2User user
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@Valid final GlobalRequest.PageRequest pageRequest
 	) {
 		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
-			reviewService.getReviewListByMemberId(user.getId(), pageable));
+			reviewService.getReviewListByMemberId(user.getId(), pageRequest.toPageable()));
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(GenericResponse.of(true, scrollResponse));
 	}
