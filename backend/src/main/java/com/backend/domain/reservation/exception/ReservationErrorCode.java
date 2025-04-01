@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishingpost.exception;
+package com.backend.domain.reservation.exception;
 
 import org.springframework.http.HttpStatus;
 
@@ -7,9 +7,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ShipFishingPostErrorCode {
+public enum ReservationErrorCode {
 
-	POSTS_NOT_FOUND(HttpStatus.NOT_FOUND, 7001, "게시글 정보가 존재하지 않음");
+	RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, 11001, "예약 정보가 존재 하지 않습니다.");
 
 	private final HttpStatus httpStatus;
 	private final Integer code;
