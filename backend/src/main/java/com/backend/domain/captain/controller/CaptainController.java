@@ -14,7 +14,7 @@ import com.backend.domain.captain.dto.Request.CaptainRequest;
 import com.backend.domain.captain.dto.Response.CaptainResponse;
 import com.backend.domain.captain.service.CaptainService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
-import com.backend.global.response.GenericResponse;
+import com.backend.global.dto.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

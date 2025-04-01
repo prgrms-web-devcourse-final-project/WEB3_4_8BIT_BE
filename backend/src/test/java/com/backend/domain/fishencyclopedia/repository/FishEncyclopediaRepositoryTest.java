@@ -26,7 +26,7 @@ import com.backend.domain.fishpoint.repository.FishPointJpaRepository;
 import com.backend.domain.member.entity.Member;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
-import com.backend.global.dto.GlobalRequest;
+import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;

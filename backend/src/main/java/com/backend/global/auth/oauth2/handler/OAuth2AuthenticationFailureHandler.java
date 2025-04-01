@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 
-import com.backend.global.response.GenericResponse;
+import com.backend.global.dto.response.GenericResponse;
 import com.backend.global.util.AuthResponseUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 

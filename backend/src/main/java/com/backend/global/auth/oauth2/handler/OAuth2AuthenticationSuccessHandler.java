@@ -19,7 +19,7 @@ import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.auth.jwt.JwtTokenProvider;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
-import com.backend.global.response.GenericResponse;
+import com.backend.global.dto.response.GenericResponse;
 import com.backend.global.util.AuthResponseUtil;
 import com.backend.global.util.CookieUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;

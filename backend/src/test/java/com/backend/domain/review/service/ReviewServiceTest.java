@@ -3,16 +3,25 @@ package com.backend.domain.review.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import com.backend.domain.review.converter.ReviewConverter;
 import com.backend.domain.review.dto.request.ReviewRequest;
+import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
 import com.backend.domain.review.entity.Review;
 import com.backend.domain.review.exception.ReviewErrorCode;
 import com.backend.domain.review.exception.ReviewException;
@@ -69,5 +78,79 @@ public class ReviewServiceTest extends BaseTest {
 
 		verify(reviewRepository).existsByReservationId(reservationId);
 		verify(reviewRepository, never()).save(any());
+	}
+
+	@Test
+	@DisplayName("게시글 ID로 리뷰 목록 조회 [Service] - Success")
+	void t03() {
+		// given
+		Long postId = 1L;
+		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
+		List<ReviewWithMemberResponse> reviewList = fixtureMonkeyValidation.giveMe(ReviewWithMemberResponse.class, 2);
+		Page<ReviewWithMemberResponse> givenPage = new PageImpl<>(reviewList, pageable, reviewList.size());
+
+		given(reviewRepository.findReviewsWithMemberByPostId(postId, pageable)).willReturn(givenPage);
+
+		// when
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(postId, pageable);
+
+		// then
+		assertThat(result).hasSize(2);
+		verify(reviewRepository).findReviewsWithMemberByPostId(postId, pageable);
+	}
+
+	@Test
+	@DisplayName("게시글 ID로 리뷰 목록 조회 [Service] - Empty")
+	void t04() {
+		// given
+		Long postId = 999L;
+		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
+		Page<ReviewWithMemberResponse> emptyPage = Page.empty(pageable);
+
+		given(reviewRepository.findReviewsWithMemberByPostId(postId, pageable)).willReturn(emptyPage);
+
+		// when
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(postId, pageable);
+
+		// then
+		assertThat(result).isEmpty();
+		verify(reviewRepository).findReviewsWithMemberByPostId(postId, pageable);
+	}
+
+	@Test
+	@DisplayName("회원 ID로 리뷰 목록 조회 [Service] - Success")
+	void t05() {
+		// given
+		Long memberId = 1L;
+		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
+		List<ReviewWithMemberResponse> reviewList = fixtureMonkeyValidation.giveMe(ReviewWithMemberResponse.class, 3);
+		Page<ReviewWithMemberResponse> givenPage = new PageImpl<>(reviewList, pageable, reviewList.size());
+
+		given(reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable)).willReturn(givenPage);
+
+		// when
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByMemberId(memberId, pageable);
+
+		// then
+		assertThat(result).hasSize(3);
+		verify(reviewRepository).findReviewsWithMemberByMemberId(memberId, pageable);
+	}
+
+	@Test
+	@DisplayName("회원 ID로 리뷰 목록 조회 [Service] - Empty")
+	void t06() {
+		// given
+		Long memberId = 999L;
+		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
+		Page<ReviewWithMemberResponse> emptyPage = Page.empty(pageable);
+
+		given(reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable)).willReturn(emptyPage);
+
+		// when
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByMemberId(memberId, pageable);
+
+		// then
+		assertThat(result).isEmpty();
+		verify(reviewRepository).findReviewsWithMemberByMemberId(memberId, pageable);
 	}
 }

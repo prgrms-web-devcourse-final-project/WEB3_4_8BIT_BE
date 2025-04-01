@@ -15,7 +15,7 @@ import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.service.MemberService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
-import com.backend.global.response.GenericResponse;
+import com.backend.global.dto.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
