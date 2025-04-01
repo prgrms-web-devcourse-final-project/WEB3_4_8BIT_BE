@@ -210,6 +210,25 @@ class CaptainControllerTest extends BaseTest {
 	}
 
 	@Test
+	@DisplayName("선장 상세 조회 [NOT_CAPTAIN] [Controller] - Fail")
+	@WithMockCustomUser
+	void t08() throws Exception {
+		// Given
+		doThrow(new CaptainException(CaptainErrorCode.NOT_CAPTAIN))
+			.when(captainService).getCaptainDetail(anyLong());
+
+		// When
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/members/captains"));
+
+		// Then
+		result
+			.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.code").value(CaptainErrorCode.NOT_CAPTAIN.getCode()))
+			.andExpect(jsonPath("$.message").value(CaptainErrorCode.NOT_CAPTAIN.getMessage()));
+	}
+
+	@Test
 	@WithMockCustomUser
 	@DisplayName("선장 배 정보 수정 [Controller] - Success")
 	void t09() throws Exception {
