@@ -252,7 +252,7 @@ public class MemberControllerTest extends BaseTest {
 		when(memberService.updateMember(eq(memberId), any())).thenReturn(memberId);
 
 		// When
-		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.put("/api/v1/members")
+		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/members")
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(updateRequest)));
 
