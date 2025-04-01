@@ -37,7 +37,7 @@ public class Captain extends BaseEntity {
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<Long> shipList;
 
-	public void updateShipInfo(final List<Long> shipList) {
+	public void updateShipList(final List<Long> shipList) {
 		this.shipList = shipList != null ? shipList : new ArrayList<>();
 	}
 }

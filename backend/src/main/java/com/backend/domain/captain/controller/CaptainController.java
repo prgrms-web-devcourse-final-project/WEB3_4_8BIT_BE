@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,5 +52,17 @@ public class CaptainController {
 		CaptainResponse.Detail responseDto = captainService.getCaptainDetail(user.getId());
 
 		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
+	}
+
+	@PatchMapping
+	@Operation(summary = "선장 배 정보 수정", description = "현재 로그인된 선장의 배 정보를 수정하는 API")
+	public ResponseEntity<GenericResponse<Void>> updateCaptain(
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@RequestBody @Valid final CaptainRequest.Update requestDto
+	) {
+
+		Long captainId = captainService.updateCaptainShipList(user.getId(), requestDto);
+
+		return ResponseEntity.created(URI.create(captainId.toString())).body(GenericResponse.of(true));
 	}
 }
