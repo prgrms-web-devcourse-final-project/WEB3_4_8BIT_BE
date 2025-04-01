@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
@@ -102,7 +104,7 @@ public class ShipFishingPostQueryRepository {
 		return Optional.ofNullable(detailAll);
 	}
 
-	public Page<ShipFishingPostResponse.DetailPage> findDetailPage(
+	public Slice<ShipFishingPostResponse.DetailPage> findDetailPage(
 		final ShipFishingPostRequest.Search requestDto,
 		final Pageable pageable) {
 
@@ -127,25 +129,15 @@ public class ShipFishingPostQueryRepository {
 			.where(conditions)
 			.orderBy(getSortCondition(pageable, shipFishingPost))
 			.offset(pageable.getOffset())
-			.limit(pageable.getPageSize())
+			.limit(pageable.getPageSize() + 1) // 한 건 더 조회
 			.fetch();
 
-		Long totalCount = jpaQueryFactory
-			.select(shipFishingPost.shipFishingPostId.countDistinct())
-			.from(shipFishingPost)
-			.join(shipFishingPostFish)
-			.on(shipFishingPost.shipFishingPostId.eq(shipFishingPostFish.shipFishingPostId))
-			.where(conditions)
-			.fetchOne();
+		boolean hasNext = detailPages.size() > pageable.getPageSize();
+		if (hasNext) {
+			detailPages = detailPages.subList(0, pageable.getPageSize());
+		}
 
-		int totalPages = (int)Math.ceil((double)totalCount / pageable.getPageSize());
-		return new Page<>(
-			detailPages,
-			pageable.getPageNumber(),
-			pageable.getPageSize(),
-			totalCount.intValue(),
-			totalPages
-		);
+		return new SliceImpl<>(detailPages, pageable, hasNext);
 	}
 
 	private BooleanExpression buildConditions(final ShipFishingPostRequest.Search requestDto) {

@@ -3,6 +3,7 @@ package com.backend.domain.shipfishingpost.repository;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
@@ -46,6 +47,6 @@ public interface ShipFishingPostRepository {
 	 * @return {@link ShipFishingPostResponse.DetailPage}
 	 * @implSpec 여러 조건들과 검색 키워드를 통해 ShipFishingPostResponse.detailPage 을 페이징 하여 반환한다.
 	 */
-	Page<ShipFishingPostResponse.DetailPage> findAllBySearchAndCondition(final ShipFishingPostRequest.Search search,
+	Slice<ShipFishingPostResponse.DetailPage> findAllBySearchAndCondition(final ShipFishingPostRequest.Search search,
 		final Pageable pageable);
 }

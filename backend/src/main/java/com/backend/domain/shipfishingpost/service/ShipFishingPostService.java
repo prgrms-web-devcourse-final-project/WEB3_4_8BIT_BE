@@ -1,9 +1,11 @@
 package com.backend.domain.shipfishingpost.service;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
+import com.backend.global.dto.GlobalRequest;
 import com.backend.global.util.pageutil.Page;
 
 public interface ShipFishingPostService {
@@ -38,7 +40,7 @@ public interface ShipFishingPostService {
 	 */
 	ShipFishingPostResponse.DetailAll getShipFishingPostAll(final Long shipFishingPostId);
 
-	Page<ShipFishingPostResponse.DetailPage> getShipFishingPostPage(final ShipFishingPostRequest.Search requestDto,
-		final Pageable pageable);
+	Slice<ShipFishingPostResponse.DetailPage> getShipFishingPostPage(final ShipFishingPostRequest.Search requestDto,
+		final GlobalRequest.PageRequest pageRequestDto);
 
 }

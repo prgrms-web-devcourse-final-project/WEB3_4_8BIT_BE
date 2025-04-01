@@ -3,6 +3,7 @@ package com.backend.domain.shipfishingpost.repository;
 import java.util.Optional;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
@@ -38,7 +39,7 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 	}
 
 	@Override
-	public Page<ShipFishingPostResponse.DetailPage> findAllBySearchAndCondition(
+	public Slice<ShipFishingPostResponse.DetailPage> findAllBySearchAndCondition(
 		final ShipFishingPostRequest.Search search,
 		final Pageable pageable) {
 

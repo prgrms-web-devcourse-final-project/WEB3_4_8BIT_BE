@@ -2,7 +2,10 @@ package com.backend.domain.shipfishingpost.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,7 @@ import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.domain.shipfishingpostfish.repository.ShipFishingPostFishRepository;
+import com.backend.global.dto.GlobalRequest;
 import com.backend.global.util.pageutil.Page;
 
 import lombok.RequiredArgsConstructor;
@@ -73,9 +77,10 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	}
 
 	@Override
-	public Page<ShipFishingPostResponse.DetailPage> getShipFishingPostPage(
+	public Slice<ShipFishingPostResponse.DetailPage> getShipFishingPostPage(
 		final ShipFishingPostRequest.Search requestDto,
-		final Pageable pageable) {
+		final GlobalRequest.PageRequest pageRequestDto) {
+		Pageable pageable = convertPageable(pageRequestDto);
 		return shipFishingPostRepository.findAllBySearchAndCondition(requestDto, pageable);
 	}
 
@@ -105,5 +110,20 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 		if (findFishList.size() != fishList.size()) {
 			throw new FishException(FishErrorCode.FISH_NOT_FOUND);
 		}
+	}
+
+	/**
+	 * pageRequestDTO -> pageable
+	 *
+	 * @param pageRequestDto {@link }
+	 * @return {@link Pageable}
+	 */
+	private Pageable convertPageable(final GlobalRequest.PageRequest pageRequestDto) {
+		return PageRequest.of(
+			pageRequestDto.page(),
+			pageRequestDto.size(),
+			Sort.by(Sort.Direction.fromString(
+				pageRequestDto.order().equals("asc") ? "asc" : "desc"),
+				pageRequestDto.sort()));
 	}
 }
