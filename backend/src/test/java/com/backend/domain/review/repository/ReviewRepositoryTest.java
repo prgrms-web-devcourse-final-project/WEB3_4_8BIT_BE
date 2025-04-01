@@ -174,7 +174,7 @@ class ReviewRepositoryTest extends BaseTest {
 	@DisplayName("리뷰 ID로 리뷰 조회 [Repository] - Success")
 	void t010() {
 		// given
-		Review givenReview = arbitraryBuilder.set("reservationId", 1L).sample();
+		Review givenReview = getReviewBuilder().set("reservationId", 1L).sample();
 		Review savedReview = reviewRepository.save(givenReview);
 
 		// when
@@ -190,7 +190,7 @@ class ReviewRepositoryTest extends BaseTest {
 	@DisplayName("리뷰 삭제 [Repository] - Success")
 	void t011() {
 		// given
-		Review givenReview = arbitraryBuilder.set("reservationId", 1L).sample();
+		Review givenReview = getReviewBuilder().set("reservationId", 1L).sample();
 		Review savedReview = reviewRepository.save(givenReview);
 
 		// when

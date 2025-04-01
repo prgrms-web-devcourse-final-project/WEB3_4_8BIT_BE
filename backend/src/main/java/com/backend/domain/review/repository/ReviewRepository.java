@@ -46,7 +46,6 @@ public interface ReviewRepository {
 	 * @implSpec 회원 ID를 기반으로 작성된 리뷰 조회
 	 */
 	Slice<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(@Param("memberId") final Long memberId, final Pageable pageable);
-	boolean existsByReservationId(Long reservationId);
 
 	/**
 	 * 리뷰 조회

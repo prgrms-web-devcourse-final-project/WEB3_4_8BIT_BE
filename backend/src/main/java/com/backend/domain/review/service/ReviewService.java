@@ -33,7 +33,6 @@ public interface ReviewService {
 	 * @return {@link Slice<ReviewWithMemberResponse>}
 	 */
 	Slice<ReviewWithMemberResponse> getReviewListByMemberId(final Long memberId, final Pageable pageable);
-	Long save(Long memberId, Long reservationId, ReviewRequest.Create request);
 
 	/**
 	 * 선상 낚시 리뷰 삭제
