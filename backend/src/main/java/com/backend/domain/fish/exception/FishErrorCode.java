@@ -1,0 +1,17 @@
+package com.backend.domain.fish.exception;
+
+import org.springframework.http.HttpStatus;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
+public enum FishErrorCode {
+
+	FISH_NOT_FOUND(HttpStatus.NOT_FOUND, 10001, "물고기 정보가 존재하지 않음");
+
+	private final HttpStatus httpStatus;
+	private final int code;
+	private final String message;
+}

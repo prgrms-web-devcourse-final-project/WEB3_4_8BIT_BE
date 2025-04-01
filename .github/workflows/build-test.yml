@@ -1,0 +1,40 @@
+name: Build and Test
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Create application.yml
+        run: |
+          mkdir -p src/main/resources/
+          mkdir -p src/test/resources/
+          echo "${{ secrets.APPLICATION_YML }}" > src/main/resources/application.yml
+          echo "${{ secrets.APPLICATION_TEST_YML }}" > src/test/resources/application.yml
+          export baseUrl=http://localhost:8080
+        working-directory: backend
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+        working-directory: backend
+
+      - name: Run Tests
+        #run: ./gradlew test --no-daemon
+        run:  ./gradlew test -i
+        working-directory: backend
