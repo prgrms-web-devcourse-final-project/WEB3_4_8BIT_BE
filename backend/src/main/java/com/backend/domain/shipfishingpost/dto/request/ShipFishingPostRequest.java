@@ -114,14 +114,23 @@ public class ShipFishingPostRequest {
 	 */
 	@Builder
 	public record Search(
+		@Schema(description = "최소 가격", example = "10000")
 		Long minPrice,
+		@Schema(description = "최대 가격", example = "500000")
 		Long maxPrice,
+		@Schema(description = "최소 평점", example = "4.5")
 		Double minRating,
+		@Schema(description = "위치 정보", example = "서울")
 		String location,
+		@Schema(description = "물고기 ID", example = "1")
 		Long fishId,
+		@Schema(description = "검색 날짜 (ISO 날짜 형식, 예: 2025-04-01)", example = "2025-04-01")
 		LocalDate searchDate,
+		@Schema(description = "검색 키워드", example = "낚시")
 		String keyword,
+		@Schema(description = "게스트 수", example = "2")
 		Long guestCount,
+		@Schema(description = "이용 시간 (ISO 시간 형식, 예: 01:30)", example = "01:30")
 		LocalTime duration
 	) {
 	}
