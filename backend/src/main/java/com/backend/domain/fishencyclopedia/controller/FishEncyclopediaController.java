@@ -35,11 +35,11 @@ public class FishEncyclopediaController {
 	@Operation(summary = "물고기 도감 추가하기", description = "물고기 도감 추가시 사용하는 API")
 	@PostMapping("/encyclopedias")
 	public ResponseEntity<GenericResponse<Void>> createFishEncyclopedia(
-		@RequestBody @Valid final FishEncyclopediaRequest.Create create,
+		@RequestBody @Valid final FishEncyclopediaRequest.Create requestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		Long savedFishEncyclopediaId = fishEncyclopediaService.createFishEncyclopedia(create, user.getId());
+		Long savedFishEncyclopediaId = fishEncyclopediaService.createFishEncyclopedia(requestDto, user.getId());
 
 		return ResponseEntity
 			.created(URI.create(savedFishEncyclopediaId.toString()))
