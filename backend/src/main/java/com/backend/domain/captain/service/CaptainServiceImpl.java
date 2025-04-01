@@ -1,7 +1,5 @@
 package com.backend.domain.captain.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -68,6 +66,10 @@ public class CaptainServiceImpl implements CaptainService {
 
 		CaptainResponse.Detail detail = captainRepository.findDetailById(captainId)
 			.orElseThrow(() -> new CaptainException(CaptainErrorCode.CAPTAIN_NOT_FOUND));
+
+		if (detail.role() != MemberRole.CAPTAIN) {
+			throw new CaptainException(CaptainErrorCode.NOT_CAPTAIN);
+		}
 
 		log.debug("[선장 상세 조회] : {}", detail);
 

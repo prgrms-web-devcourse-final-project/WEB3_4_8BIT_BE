@@ -19,6 +19,7 @@ import com.backend.domain.captain.entity.Captain;
 import com.backend.domain.captain.exception.CaptainErrorCode;
 import com.backend.domain.captain.exception.CaptainException;
 import com.backend.domain.captain.repository.CaptainRepository;
+import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
@@ -111,6 +112,7 @@ class CaptainServiceTest extends BaseTest {
 			.set("name", "루피")
 			.set("nickname", "해적왕")
 			.set("description", "해적왕이 되고싶은 루피 입니다.")
+			.set("role", MemberRole.CAPTAIN)
 			.set("shipLicenseNumber", "1-2019123456")
 			.set("shipList", List.of(101L, 102L))
 			.sample();
@@ -144,8 +146,36 @@ class CaptainServiceTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("선장 보유 배 정보 수정 [Service] - Success")
+	@DisplayName("선장 상세 조회 [NOT_CAPTAIN] 일반 멤버가 접근 - Fail")
 	void t05() {
+		// Given
+		Long memberId = 1L;
+
+		// 일반 멤버 (선장이 아님)
+		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", memberId)
+			.set("role", MemberRole.USER)
+			.sample();
+
+		CaptainResponse.Detail givenResponseDto = fixtureMonkeyValidation.giveMeBuilder(CaptainResponse.Detail.class)
+			.set("memberId", memberId)
+			.sample();
+
+		when(captainRepository.findDetailById(memberId)).thenReturn(Optional.of(givenResponseDto));
+
+		// When & Then
+		assertThatThrownBy(() -> captainService.getCaptainDetail(memberId))
+			.isInstanceOf(CaptainException.class)
+			.hasFieldOrPropertyWithValue("captainErrorCode", CaptainErrorCode.NOT_CAPTAIN)
+			.hasMessageContaining(CaptainErrorCode.NOT_CAPTAIN.getMessage());
+
+		verify(captainRepository, times(1)).findDetailById(memberId);
+
+	}
+
+	@Test
+	@DisplayName("선장 보유 배 정보 수정 [Service] - Success")
+	void t06() {
 		// Given
 		Long captainId = 1L;
 		CaptainRequest.Update updateRequest = new CaptainRequest.Update(List.of(2L, 3L, 4L));
@@ -169,7 +199,7 @@ class CaptainServiceTest extends BaseTest {
 
 	@Test
 	@DisplayName("선장 보유 배 정보 수정 [CAPTAIN_NOT_FOUND] [Service] - Fail")
-	void t06() {
+	void t07() {
 		// Given
 		Long invalidCaptainId = 999L;
 		CaptainRequest.Update updateRequest = new CaptainRequest.Update(List.of(10L, 20L, 30L));
