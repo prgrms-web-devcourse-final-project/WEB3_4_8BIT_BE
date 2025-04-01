@@ -1,14 +1,8 @@
 package com.backend.domain.shipfishingpost.controller;
 
 import java.net.URI;
-import java.time.LocalDate;
-import java.time.LocalTime;
 
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
@@ -27,7 +20,6 @@ import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.response.GenericResponse;
-import com.backend.global.util.pageutil.Page;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
