@@ -67,13 +67,13 @@ public class FishEncyclopediaQueryRepository {
 	 * 정렬할 필드와 정렬 방식을 OrderSpecifier로 반환합니다.
 	 *
 	 * @param requestDto
-	 * @return {@link OrderSpecifier <?>}
+	 * @return {@link OrderSpecifier}
 	 */
 	private OrderSpecifier<?> getOrderBy(FishEncyclopediaRequest.PageRequest requestDto) {
 		// 기본 정렬 방식 설정
-		Order queryOrder =
-			Order.ASC.toString().equalsIgnoreCase(requestDto.order()) ?
-				Order.ASC : Order.DESC;
+		Order queryOrder = Order.ASC.toString().equalsIgnoreCase(requestDto.order()) ?
+				Order.ASC :
+				Order.DESC; // 기본 정렬은 DESC로 동작
 
 		// 정렬 필드를 매핑
 		Map<String, ComparableExpressionBase<?>> fieldMap = Map.of(
@@ -82,6 +82,7 @@ public class FishEncyclopediaQueryRepository {
 			"createdAt", fishEncyclopedia.createdAt
 		);
 
+		// fieldMap에 일치하는게 없다면 기본 값 createdAt로 설정
 		ComparableExpressionBase<?> sortField =
 			StringUtils.hasText(requestDto.sort()) && fieldMap.containsKey(
 				requestDto.sort()) ?
