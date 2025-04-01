@@ -38,12 +38,12 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 	}
 
 	@Override
-	public Optional<Review> findById(Long id) {
+	public Optional<Review> findById(final Long id) {
 		return reviewJpaRepository.findById(id);
 	}
 
 	@Override
-	public void delete(Review review) {
+	public void delete(final Review review) {
 		reviewJpaRepository.delete(review);
 	}
 }

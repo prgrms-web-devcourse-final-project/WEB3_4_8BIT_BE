@@ -53,12 +53,12 @@ public interface ReviewRepository {
 	 * @param id 리뷰 ID
 	 * @return {@link Optional<Review>}
 	 */
-	Optional<Review> findById(Long id);
+	Optional<Review> findById(final Long id);
 
 	/**
 	 * 리뷰 삭제
 	 *
 	 * @param review 삭제할 리뷰
 	 */
-	void delete(Review review);
+	void delete(final Review review);
 }

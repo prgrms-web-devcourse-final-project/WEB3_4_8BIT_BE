@@ -61,7 +61,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional
-	public void delete(Long memberId, Long reviewId) {
+	public void delete(final Long memberId, final Long reviewId) {
 		//리뷰 조회
 		Review review = getReviewById(reviewId);
 
@@ -71,12 +71,12 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewRepository.delete(review);
 	}
 
-	private Review getReviewById(Long reviewId) {
+	private Review getReviewById(final Long reviewId) {
 		return reviewRepository.findById(reviewId)
 			.orElseThrow(() -> new ReviewException(ReviewErrorCode.NOT_FOUND_REVIEW));
 	}
 
-	private void validateReviewOwner(Review review, Long memberId) {
+	private void validateReviewOwner(final Review review, final Long memberId) {
 		if (!review.getMemberId().equals(memberId)) {
 			throw new ReviewException(ReviewErrorCode.FORBIDDEN_REVIEW_DELETE);
 		}

@@ -40,5 +40,5 @@ public interface ReviewService {
 	 * @param memberId	작성자 ID
 	 * @param reviewId	리뷰 ID
 	 */
-	void delete(Long memberId, Long reviewId);
+	void delete(final Long memberId, final Long reviewId);
 }
