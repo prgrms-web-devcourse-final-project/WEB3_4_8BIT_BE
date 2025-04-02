@@ -20,5 +20,13 @@ public interface StorageRepository {
 	 * @param fileList 저장할 파일 리스트
 	 * @return {@link List<File> )
 	 */
-	List<File> saveAll(List<File> fileList);
+	List<File> saveAll(final List<File> fileList);
+
+	/**
+	 * 파일 ID로 조회 메서드
+	 *
+	 * @param idList 조회할 파일 ID 리스트
+	 * @return {@link List<File> )
+	 */
+	List<File> findAllById(final List<Long> idList);
 }

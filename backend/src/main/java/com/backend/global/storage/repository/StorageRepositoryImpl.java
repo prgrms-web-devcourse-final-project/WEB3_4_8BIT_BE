@@ -20,7 +20,12 @@ public class StorageRepositoryImpl implements StorageRepository {
 	}
 
 	@Override
-	public List<File> saveAll(List<File> fileList) {
+	public List<File> saveAll(final List<File> fileList) {
 		return storageJpaRepository.saveAll(fileList);
+	}
+
+	@Override
+	public List<File> findAllById(final List<Long> idList) {
+		return storageJpaRepository.findAllById(idList);
 	}
 }
