@@ -48,6 +48,7 @@ public class CaptainServiceImpl implements CaptainService {
 	}
 
 	@Override
+	@Transactional
 	public Long updateCaptainShipList(final Long captainId, final CaptainRequest.Update requestDto) {
 
 		Captain captain = getCaptainById(captainId);
