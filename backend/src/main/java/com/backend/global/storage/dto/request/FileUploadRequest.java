@@ -9,13 +9,14 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 public class FileUploadRequest {
 
-	public record File (
+	public record UploadFile(
 		@NotBlank(message = "파일명은 필수 항목입니다.")
 		@Schema(description = "파일명", example = "IMG_3687.jpeg")
-		String fileName,
+		String originalFileName,
 
 		@NotNull(message = "파일 크기는 필수 항목입니다.")
 		@Min(value = 1, message = "파일 크기는 1바이트 이상이어야 합니다.")
@@ -34,7 +35,8 @@ public class FileUploadRequest {
 		String domain,
 
 		@NotEmpty
+		@Size(max = 10, message = "파일은 최대 10개까지 업로드할 수 있습니다.")
 		@Valid
-		List<File> fileList
+		List<UploadFile> uploadFileList
 	) {}
 }

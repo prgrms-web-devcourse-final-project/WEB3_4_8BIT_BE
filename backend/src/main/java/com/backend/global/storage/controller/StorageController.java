@@ -3,11 +3,13 @@ package com.backend.global.storage.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.response.GenericResponse;
 import com.backend.global.storage.dto.request.FileUploadRequest;
 import com.backend.global.storage.dto.response.FileUploadResponse;
@@ -29,9 +31,15 @@ public class StorageController {
 	@PostMapping("/presigned-urls")
 	@Operation(summary = "Presigned URL 생성", description = "파일 업로드를 위한 presigned URL 리스트를 생성하는 API")
 	public ResponseEntity<GenericResponse<List<FileUploadResponse>>> getPresignedUrls(
-		@RequestBody @Valid final FileUploadRequest.Request requestDto
+		@RequestBody @Valid final FileUploadRequest.Request requestDto,
+		@AuthenticationPrincipal CustomOAuth2User user
 	) {
-		List<FileUploadResponse> response = storageService.generateUploadUrls(requestDto.domain(), requestDto.fileList());
+		List<FileUploadResponse> response = storageService.generateUploadUrls(
+			user.getId(),
+			requestDto.domain(),
+			requestDto.uploadFileList()
+		);
+
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
 }
