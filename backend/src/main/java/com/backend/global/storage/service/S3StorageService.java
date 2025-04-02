@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.global.storage.StorageProperties;
 import com.backend.global.storage.converter.StorageConverter;
 import com.backend.global.storage.dto.request.FileUploadRequest;
 import com.backend.global.storage.dto.response.FileUploadResponse;
@@ -19,6 +19,7 @@ import com.backend.global.storage.exception.StorageException;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.dto.FileToUpload;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -29,6 +30,7 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 @Slf4j
 @Service
 @Primary
+@RequiredArgsConstructor
 public class S3StorageService implements StorageService {
 
 	private static final List<String> ALLOWED_CONTENT_TYPES = List.of(
@@ -39,20 +41,8 @@ public class S3StorageService implements StorageService {
 
 	private final S3Presigner s3Presigner;
 	private final S3Client s3Client;
-	private final String bucketName;
+	private final StorageProperties storageProperties;
 	private final StorageRepository storageRepository;
-
-	public S3StorageService(
-		S3Presigner s3Presigner,
-		S3Client s3Client,
-		@Value("${aws.s3.bucket-name}") String bucketName,
-		StorageRepository storageRepository
-	) {
-		this.s3Presigner = s3Presigner;
-		this.s3Client = s3Client;
-		this.storageRepository = storageRepository;
-		this.bucketName = bucketName;
-	}
 
 	@Override
 	@Transactional
@@ -74,7 +64,7 @@ public class S3StorageService implements StorageService {
 
 			// 2-3. S3 presigned URL 생성을 위한 요청 객체 구성
 			PutObjectRequest objectRequest = PutObjectRequest.builder()
-				.bucket(bucketName)
+				.bucket(storageProperties.getBucketName())
 				.key(uploadFileName)
 				.contentLength(uploadFile.fileSize())
 				.contentType(uploadFile.contentType())
@@ -87,7 +77,13 @@ public class S3StorageService implements StorageService {
 			);
 
 			// 2-5. DB에 저장할 File 엔티티 생성
-			File file = StorageConverter.from(memberId, domain, uploadFile, uploadFileName);
+			File file = StorageConverter.from(
+				memberId,
+				domain,
+				uploadFile,
+				uploadFileName,
+				storageProperties.buildAccessUrl(uploadFileName)
+			);
 
 			// 2-6. presigned URL, 파일 이름, File 엔티티를 함께 묶어서 리스트에 저장
 			filesToUpload.add(new FileToUpload(file, uploadFileName, presignedRequest.url().toString()));
@@ -227,7 +223,7 @@ public class S3StorageService implements StorageService {
 	 */
 	private boolean isFileUploadedToS3(String key) {
 		try {
-			s3Client.headObject(b -> b.bucket(bucketName).key(key));
+			s3Client.headObject(b -> b.bucket(storageProperties.getBucketName()).key(key));
 			return true;
 		} catch (S3Exception e) {
 			return false;
