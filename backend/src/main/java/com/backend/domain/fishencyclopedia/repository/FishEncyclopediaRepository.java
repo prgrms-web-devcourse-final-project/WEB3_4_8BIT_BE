@@ -1,10 +1,9 @@
 package com.backend.domain.fishencyclopedia.repository;
 
-import org.springframework.data.domain.Slice;
-
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 public interface FishEncyclopediaRepository {
 
@@ -23,13 +22,13 @@ public interface FishEncyclopediaRepository {
 	 *
 	 * @param pageRequestDto {@link GlobalRequest.PageRequest}
 	 * @param fishId {@link Long}
-	 * @return {@link FishEncyclopedia}
+	 * @return {@link ScrollResponse}
 	 * @implSpec FishId가 일치하는 데이터 동적 조회 후 결과 반환
 	 * Sort - length, sort, createdAt(default)
 	 * Order - ASC, DESC(default)
 	 * @author Kim Dong O
 	 */
-	Slice<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
+	ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
 		final GlobalRequest.PageRequest pageRequestDto,
 		final Long fishId,
 		final Long memberId

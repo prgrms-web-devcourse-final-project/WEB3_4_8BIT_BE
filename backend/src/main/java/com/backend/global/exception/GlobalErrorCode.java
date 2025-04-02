@@ -13,7 +13,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public enum GlobalErrorCode {
+public enum GlobalErrorCode implements ErrorCode {
 
 	//공통 서버 에러 코드 500
 	NOT_VALID(HttpStatus.BAD_REQUEST, 5001, "요청하신 유효성 검증에 실패하였습니다."),
@@ -21,6 +21,6 @@ public enum GlobalErrorCode {
 	WRONG_SORT_CONDITION(HttpStatus.BAD_REQUEST, 5003, "지원하지 않는 정렬 항목입니다.");
 
 	private final HttpStatus httpStatus;
-	private final int code;
+	private final Integer code;
 	private final String message;
 }

@@ -84,8 +84,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
 			throw new OAuth2AuthenticationException(
 				new OAuth2Error(
-					String.valueOf(ex.getMemberErrorCode().getCode()),
-					ex.getMemberErrorCode().getMessage(),
+					String.valueOf(ex.getErrorCode().getCode()),
+					ex.getErrorCode().getMessage(),
 					null
 				),
 				ex

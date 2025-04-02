@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Slice;
 
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
@@ -27,6 +26,7 @@ import com.backend.domain.member.entity.Member;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -134,16 +134,16 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCreatedAt).reversed())
 			.toList();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).createdAt().truncatedTo(ChronoUnit.SECONDS))
 			.isEqualTo(sortedFishEncyclopediaList.get(0).getCreatedAt().truncatedTo(ChronoUnit.SECONDS));
 	}
@@ -157,16 +157,16 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCreatedAt))
 			.toList();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).createdAt().truncatedTo(ChronoUnit.SECONDS))
 			.isEqualTo(sortedFishEncyclopediaList.get(0).getCreatedAt().truncatedTo(ChronoUnit.SECONDS));
 	}
@@ -180,16 +180,16 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getLength).reversed())
 			.toList();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).length()).isEqualTo(sortedFishEncyclopediaList.get(0).getLength());
 	}
 
@@ -202,16 +202,16 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getLength))
 			.toList();
 
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).length()).isEqualTo(sortedFishEncyclopediaList.get(0).getLength());
 	}
 
@@ -224,16 +224,16 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCount).reversed())
 			.toList();
 
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).count()).isEqualTo(sortedFishEncyclopediaList.get(0).getCount());
 	}
 
@@ -246,21 +246,21 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCount))
 			.toList();
 
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).count()).isEqualTo(sortedFishEncyclopediaList.get(0).getCount());
 	}
 
 	// 유틸리티 메서드
-	private Slice<FishEncyclopediaResponse.Detail> executeQuery(GlobalRequest.PageRequest pageRequestDto) {
+	private ScrollResponse<FishEncyclopediaResponse.Detail> executeQuery(GlobalRequest.PageRequest pageRequestDto) {
 		return fishEncyclopediaQueryRepository.findDetailByAllByFishPointIdAndFishId(
 			pageRequestDto,
 			savedFishList.get(0).getFishId(),

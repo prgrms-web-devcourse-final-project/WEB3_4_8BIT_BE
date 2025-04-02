@@ -28,6 +28,7 @@ import com.backend.domain.fishencyclopedia.service.FishEncyclopediaService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -199,8 +200,10 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			givenHasNext
 		);
 
+		ScrollResponse<FishEncyclopediaResponse.Detail> givenScrollResponse = ScrollResponse.from(givenSlice);
+
 		when(fishEncyclopediaService.getDetailList(givenPageRequest, givenFish.getFishId(), 1L))
-			.thenReturn(givenSlice);
+			.thenReturn(givenScrollResponse);
 
 		// When
 		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
@@ -215,8 +218,8 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.content.size()").value(7))
 			.andExpect(jsonPath("$.data.numberOfElements").value(7))
-			.andExpect(jsonPath("$.data.pageable.pageSize").value(givenPageRequest.size()))
-			.andExpect(jsonPath("$.data.pageable.pageNumber").value(givenPageRequest.page()));
+			.andExpect(jsonPath("$.data.isFirst").value(true))
+			.andExpect(jsonPath("$.data.isLast").value(true));
 	}
 
 	@Test

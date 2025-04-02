@@ -2,12 +2,14 @@ package com.backend.domain.ship.exception;
 
 import org.springframework.http.HttpStatus;
 
+import com.backend.global.exception.ErrorCode;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum ShipErrorCode {
+public enum ShipErrorCode implements ErrorCode {
 
 	SHIP_NOT_FOUND(HttpStatus.NOT_FOUND, 8001, "선박 정보가 존재하지 않음"),
 	SHIP_MISMATCH_MEMBER_ID(HttpStatus.BAD_REQUEST, 8002, "선박 소유자 정보가 일치하지 않음");

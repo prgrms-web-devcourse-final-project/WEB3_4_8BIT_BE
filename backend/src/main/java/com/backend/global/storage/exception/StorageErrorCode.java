@@ -2,6 +2,8 @@ package com.backend.global.storage.exception;
 
 import org.springframework.http.HttpStatus;
 
+import com.backend.global.exception.ErrorCode;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +15,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public enum StorageErrorCode {
+public enum StorageErrorCode implements ErrorCode {
 
 	//스토리지 에러 코드 500
 	UNSUPPORTED_FILE_TYPE(HttpStatus.BAD_REQUEST, 5001, "지원하지 않는 파일 형식입니다. (허용된 형식: PNG, JPEG, JPG)");

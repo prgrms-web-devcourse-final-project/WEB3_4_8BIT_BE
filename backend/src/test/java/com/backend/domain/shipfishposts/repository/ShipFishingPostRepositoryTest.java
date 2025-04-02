@@ -653,7 +653,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		// Then
 		assertThatThrownBy(() -> shipFishingPostRepository.findAllBySearchAndCondition(givenRequestDto, pageable))
 			.isInstanceOf(GlobalException.class)
-			.hasFieldOrPropertyWithValue("globalErrorCode", GlobalErrorCode.WRONG_SORT_CONDITION)
+			.hasFieldOrPropertyWithValue("errorCode", GlobalErrorCode.WRONG_SORT_CONDITION)
 			.hasMessageContaining(GlobalErrorCode.WRONG_SORT_CONDITION.getMessage());
 	}
 }

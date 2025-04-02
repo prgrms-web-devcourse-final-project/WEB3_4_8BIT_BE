@@ -1,6 +1,7 @@
 package com.backend.domain.review.exception;
 
-import org.springframework.http.HttpStatus;
+import com.backend.global.exception.ErrorCode;
+import com.backend.global.exception.GlobalException;
 
 import lombok.Getter;
 
@@ -14,24 +15,21 @@ import lombok.Getter;
  * @author vdvhk12
  */
 @Getter
-public class ReviewException extends RuntimeException {
+public class ReviewException extends GlobalException {
 
-	private final ReviewErrorCode reviewErrorCode;
+	private final ErrorCode errorCode;
 
 	/**
 	 * ReviewException 생성자 입니다.
-	 * @param reviewErrorCode ReviewErrorCode 값
+	 * @param errorCode ReviewErrorCode 값
 	 */
-	public ReviewException(ReviewErrorCode reviewErrorCode) {
-		super(reviewErrorCode.getMessage());
-		this.reviewErrorCode = reviewErrorCode;
+	public ReviewException(ErrorCode errorCode) {
+		super(errorCode);
+		this.errorCode = errorCode;
 	}
 
-	/**
-	 * 응답 HttpStatus를 반환하는 메서드 입니다.
-	 * @return {@link HttpStatus}
-	 */
-	public HttpStatus getStatus() {
-		return reviewErrorCode.getHttpStatus();
+	public ReviewException(Throwable cause, ErrorCode errorCode) {
+		super(cause, errorCode);
+		this.errorCode = errorCode;
 	}
 }

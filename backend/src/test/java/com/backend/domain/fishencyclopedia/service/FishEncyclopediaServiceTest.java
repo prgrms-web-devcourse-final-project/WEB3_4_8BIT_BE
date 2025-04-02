@@ -14,9 +14,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
 
+import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
+import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.fishencyclopedia.converter.FishEncyclopediaConverter;
@@ -26,11 +27,10 @@ import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
-import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
-import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.member.entity.Member;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -228,18 +228,20 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			givenHasNext
 		);
 
+		ScrollResponse<FishEncyclopediaResponse.Detail> givenScrollResponse = ScrollResponse.from(givenSlice);
+
 		when(fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
 			givenPageRequest,
 			givenFish.getFishId(),
-			givenMember.getMemberId())).thenReturn(givenSlice);
+			givenMember.getMemberId())).thenReturn(givenScrollResponse);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> getDetailList = fishEncyclopediasService.getDetailList(givenPageRequest,
+		ScrollResponse<FishEncyclopediaResponse.Detail> getDetailList = fishEncyclopediasService.getDetailList(givenPageRequest,
 			givenFish.getFishId(), givenMember.getMemberId());
 
 		// Then
-		assertThat(getDetailList.getContent()).hasSize(givenDetailList.size());
-		assertThat(getDetailList.getContent()).isEqualTo(givenDetailList);
-		assertThat(getDetailList.hasNext()).isFalse();
+		assertThat(getDetailList.content()).hasSize(givenDetailList.size());
+		assertThat(getDetailList.content()).isEqualTo(givenDetailList);
+		assertThat(getDetailList.isLast()).isTrue();
 	}
 }

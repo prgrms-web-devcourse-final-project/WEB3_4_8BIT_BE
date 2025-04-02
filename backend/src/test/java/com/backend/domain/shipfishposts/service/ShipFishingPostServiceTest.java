@@ -99,7 +99,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// Then
 		assertThatThrownBy(() -> shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L))
 			.isInstanceOf(ShipException.class)
-			.hasFieldOrPropertyWithValue("shipErrorCode", ShipErrorCode.SHIP_NOT_FOUND)
+			.hasFieldOrPropertyWithValue("errorCode", ShipErrorCode.SHIP_NOT_FOUND)
 			.hasMessageContaining(ShipErrorCode.SHIP_NOT_FOUND.getMessage());
 
 	}
@@ -127,7 +127,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// Then
 		assertThatThrownBy(() -> shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L))
 			.isInstanceOf(ShipException.class)
-			.hasFieldOrPropertyWithValue("shipErrorCode", ShipErrorCode.SHIP_MISMATCH_MEMBER_ID)
+			.hasFieldOrPropertyWithValue("errorCode", ShipErrorCode.SHIP_MISMATCH_MEMBER_ID)
 			.hasMessageContaining(ShipErrorCode.SHIP_MISMATCH_MEMBER_ID.getMessage());
 	}
 
@@ -159,7 +159,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// Then
 		assertThatThrownBy(() -> shipFishingPostServiceImpl.getShipFishingPost(1L))
 			.isInstanceOf(ShipFishingPostException.class)
-			.hasFieldOrPropertyWithValue("shipFishingPostErrorCode", ShipFishingPostErrorCode.POSTS_NOT_FOUND)
+			.hasFieldOrPropertyWithValue("errorCode", ShipFishingPostErrorCode.POSTS_NOT_FOUND)
 			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_NOT_FOUND.getMessage());
 	}
 
@@ -190,7 +190,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// Then
 		assertThatThrownBy(() -> shipFishingPostServiceImpl.getShipFishingPostAll(1L))
 			.isInstanceOf(ShipFishingPostException.class)
-			.hasFieldOrPropertyWithValue("shipFishingPostErrorCode", ShipFishingPostErrorCode.POSTS_NOT_FOUND)
+			.hasFieldOrPropertyWithValue("errorCode", ShipFishingPostErrorCode.POSTS_NOT_FOUND)
 			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_NOT_FOUND.getMessage());
 	}
 
