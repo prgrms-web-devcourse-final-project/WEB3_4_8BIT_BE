@@ -200,7 +200,13 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			givenHasNext
 		);
 
-		ScrollResponse<FishEncyclopediaResponse.Detail> givenScrollResponse = ScrollResponse.from(givenSlice);
+		ScrollResponse<FishEncyclopediaResponse.Detail> givenScrollResponse = ScrollResponse.from(
+			givenSlice.getContent(),
+			givenSlice.getSize(),
+			givenSlice.getNumberOfElements(),
+			givenSlice.isFirst(),
+			givenSlice.isLast()
+		);
 
 		when(fishEncyclopediaService.getDetailList(givenPageRequest, givenFish.getFishId(), 1L))
 			.thenReturn(givenScrollResponse);

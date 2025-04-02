@@ -63,7 +63,13 @@ public class FishEncyclopediaQueryRepository {
 
 		SliceImpl<FishEncyclopediaResponse.Detail> detailSlice = new SliceImpl<>(detailList, pageable, hasNext);
 
-		return ScrollResponse.from(detailSlice);
+		return ScrollResponse.from(
+			detailSlice.getContent(),
+			detailSlice.getSize(),
+			detailSlice.getNumberOfElements(),
+			detailSlice.isFirst(),
+			detailSlice.isLast()
+		);
 	}
 
 	/**

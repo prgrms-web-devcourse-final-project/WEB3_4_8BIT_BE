@@ -219,7 +219,13 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			givenHasNext
 		);
 
-		ScrollResponse<FishEncyclopediaResponse.Detail> givenScrollResponse = ScrollResponse.from(givenSlice);
+		ScrollResponse<FishEncyclopediaResponse.Detail> givenScrollResponse = ScrollResponse.from(
+			givenSlice.getContent(),
+			givenSlice.getSize(),
+			givenSlice.getNumberOfElements(),
+			givenSlice.isFirst(),
+			givenSlice.isLast()
+		);
 
 		when(fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
 			givenPageRequest,
