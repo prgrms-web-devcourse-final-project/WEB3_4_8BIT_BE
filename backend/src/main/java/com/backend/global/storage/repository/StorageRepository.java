@@ -1,6 +1,6 @@
 package com.backend.global.storage.repository;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.backend.global.storage.entity.File;
@@ -37,7 +37,7 @@ public interface StorageRepository {
 	 * @param expirationTime 삭제 기준 시각 (이 시각보다 이전에 생성된 파일이 삭제 대상)
 	 * @return {@link Integer} 삭제된 파일 개수
 	 */
-	int deletePendingFilesBefore(final LocalDateTime expirationTime);
+	int deletePendingFilesBefore(final ZonedDateTime expirationTime);
 
 	/**
 	 * 주어진 파일 리스트 삭제
