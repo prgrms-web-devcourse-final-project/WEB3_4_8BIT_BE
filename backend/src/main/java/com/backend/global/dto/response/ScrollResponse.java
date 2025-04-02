@@ -2,27 +2,29 @@ package com.backend.global.dto.response;
 
 import java.util.List;
 
-import org.springframework.data.domain.Slice;
-
 public record ScrollResponse<T>(
 
 
 	List<T> content,
-	int pageNumber,
 	int pageSize,
 	int numberOfElements,
 	boolean isFirst,
 	boolean isLast
 ) {
 
-	public static <T> ScrollResponse<T> from(Slice<T> slice) {
+	public static <T> ScrollResponse<T> from(
+		List<T> content,
+		int pageSize,
+		int numberOfElements,
+		boolean isFirst,
+		boolean isLast
+	) {
 		return new ScrollResponse<>(
-			slice.getContent(),
-			slice.getNumber(),
-			slice.getSize(),
-			slice.getNumberOfElements(),
-			slice.isFirst(),
-			slice.isLast()
+			content,
+			pageSize,
+			numberOfElements,
+			isFirst,
+			isLast
 		);
 	}
 }
