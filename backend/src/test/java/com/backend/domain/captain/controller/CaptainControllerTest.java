@@ -27,6 +27,7 @@ import com.backend.domain.captain.exception.CaptainException;
 import com.backend.domain.captain.service.CaptainService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
+import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -91,7 +92,7 @@ class CaptainControllerTest extends BaseTest {
 
 		result
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("nickname"))
 			.andExpect(jsonPath("$.data[0].reason").value("닉네임은 필수 항목입니다."))
 			.andExpect(jsonPath("$.success").value(false));
@@ -109,7 +110,7 @@ class CaptainControllerTest extends BaseTest {
 
 		result
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("shipLicenseNumber"))
 			.andExpect(jsonPath("$.data[0].reason").value("선박 운전 면허 번호는 필수 항목입니다."))
 			.andExpect(jsonPath("$.success").value(false));
@@ -145,7 +146,7 @@ class CaptainControllerTest extends BaseTest {
 
 		result
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("nickname"))
 			.andExpect(jsonPath("$.data[0].reason").value("닉네임은 최대 30자까지 가능합니다."))
 			.andExpect(jsonPath("$.success").value(false));
@@ -271,7 +272,7 @@ class CaptainControllerTest extends BaseTest {
 		// Then
 		result
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("shipList"))
 			.andExpect(jsonPath("$.data[0].reason").value("배는 최소 1개 등록해야합니다."))
 			.andExpect(jsonPath("$.success").value(false));

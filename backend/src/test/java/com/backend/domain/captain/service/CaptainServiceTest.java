@@ -174,7 +174,9 @@ class CaptainServiceTest extends BaseTest {
 	void t06() {
 		// Given
 		Long captainId = 1L;
-		CaptainRequest.Update updateRequest = new CaptainRequest.Update(List.of(2L, 3L, 4L));
+		CaptainRequest.Update givenRequest = fixtureMonkeyValidation.giveMeBuilder(CaptainRequest.Update.class)
+			.set("shipList", List.of(2L, 3L, 4L))
+			.sample();
 
 		Captain existingCaptain = fixtureMonkeyBuilder.giveMeBuilder(Captain.class)
 			.set("memberId", captainId)
@@ -184,11 +186,11 @@ class CaptainServiceTest extends BaseTest {
 		when(captainRepository.findById(captainId)).thenReturn(Optional.of(existingCaptain));
 
 		// When
-		Long updatedId = captainService.updateCaptainShipList(captainId, updateRequest);
+		Long updatedId = captainService.updateCaptainShipList(captainId, givenRequest);
 
 		// Then
 		assertThat(updatedId).isEqualTo(captainId);
-		assertThat(existingCaptain.getShipList()).isEqualTo(updateRequest.shipList());
+		assertThat(existingCaptain.getShipList()).isEqualTo(givenRequest.shipList());
 
 		verify(captainRepository, times(1)).findById(captainId);
 	}
@@ -198,12 +200,14 @@ class CaptainServiceTest extends BaseTest {
 	void t07() {
 		// Given
 		Long invalidCaptainId = 999L;
-		CaptainRequest.Update updateRequest = new CaptainRequest.Update(List.of(10L, 20L, 30L));
+		CaptainRequest.Update givenRequest = fixtureMonkeyValidation.giveMeBuilder(CaptainRequest.Update.class)
+			.set("shipList", List.of(2L, 3L, 4L))
+			.sample();
 
 		when(captainRepository.findById(invalidCaptainId)).thenReturn(Optional.empty());
 
 		// When & Then
-		assertThatThrownBy(() -> captainService.updateCaptainShipList(invalidCaptainId, updateRequest))
+		assertThatThrownBy(() -> captainService.updateCaptainShipList(invalidCaptainId, givenRequest))
 			.isInstanceOf(CaptainException.class)
 			.hasFieldOrPropertyWithValue("errorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
 			.hasMessageContaining(CaptainErrorCode.CAPTAIN_NOT_FOUND.getMessage());

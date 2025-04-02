@@ -12,7 +12,7 @@ public class CaptainRequest {
 	/**
 	 * {@code
 	 * {
-	 *   "profileImg": ["http://example.com/image1.jpg"],
+	 *   "profileImg": "http://example.com/image1.jpg",
 	 *   "nickname": "해적왕",
 	 *   "descrption": "자기 소개글 내용",
 	 *   "shipLicenseNumber": "1-2019123456",
@@ -52,6 +52,7 @@ public class CaptainRequest {
 	}
 
 	//TODO 추후 선장 번호 수정 필요시 추가 예정
+
 	/**
 	 * {@code
 	 * {

@@ -30,29 +30,28 @@ public class CaptainServiceImpl implements CaptainService {
 	@Override
 	@Transactional
 	public Long createCaptain(final Long memberId, final CaptainRequest.Create requestDto) {
-		// 1. 멤버 조회
-		Member member = getMember(memberId);
+		// 멤버 조회
+		Member member = getMemberById(memberId);
 
-		if (member.getIsAddInfo()) {
-			throw new MemberException(MemberErrorCode.ALREADY_ADDED_INFO);
-		}
+		// 추가정보 이미 작성했는지 검증
+		validAddInfo(member);
 
-		// 2. 멤버 추가 정보 및 role 업데이트
+		// 멤버 추가 정보 및 role 업데이트
 		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.descrption());
 		member.updateRole(MemberRole.CAPTAIN);
 
-		// 3. 선장 정보 생성 및 저장
+		// 선장 정보 생성 및 저장
 		Captain captain = CaptainConverter.fromMemberAndCaptainRequestCreate(requestDto, member);
-
 		log.debug("[선장 등록 완료] : {}", captain);
 
 		return captainRepository.save(captain).getMemberId();
 	}
 
 	@Override
+	@Transactional
 	public Long updateCaptainShipList(final Long captainId, final CaptainRequest.Update requestDto) {
 
-		Captain captain = getCaptain(captainId);
+		Captain captain = getCaptainById(captainId);
 
 		captain.updateShipList(requestDto.shipList());
 		log.debug("선장 배 리스트를 수정하였습니다. 업데이트된 배 리스트 : {}", captain.getShipList());
@@ -64,14 +63,11 @@ public class CaptainServiceImpl implements CaptainService {
 	@Transactional(readOnly = true)
 	public CaptainResponse.Detail getCaptainDetail(final Long captainId) {
 
-		CaptainResponse.Detail detail = captainRepository.findDetailById(captainId)
-			.orElseThrow(() -> new CaptainException(CaptainErrorCode.CAPTAIN_NOT_FOUND));
+		// 선장 상세 조회
+		CaptainResponse.Detail detail = getCaptainDetailById(captainId);
 
-		if (detail.role() != MemberRole.CAPTAIN) {
-			throw new CaptainException(CaptainErrorCode.NOT_CAPTAIN);
-		}
-
-		log.debug("[선장 상세 조회] : {}", detail);
+		// 역할이 선장인지 검증
+		validCaptainRole(detail);
 
 		return detail;
 	}
@@ -84,12 +80,12 @@ public class CaptainServiceImpl implements CaptainService {
 	 * @throws MemberException 회원이 존재하지 않는 경우 예외 발생
 	 */
 
-	private Member getMember(final Long memberId) {
+	private Member getMemberById(final Long memberId) {
 
 		Member member = memberRepository.findById(memberId)
 			.orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
-
 		log.debug("[멤버 조회] : {}", member);
+
 		return member;
 	}
 
@@ -101,12 +97,55 @@ public class CaptainServiceImpl implements CaptainService {
 	 * @throws CaptainException 선장이 존재하지 않는 경우 예외 발생
 	 */
 
-	private Captain getCaptain(final Long captainId) {
+	private Captain getCaptainById(final Long captainId) {
 
 		Captain captain = captainRepository.findById(captainId)
 			.orElseThrow(() -> new CaptainException(CaptainErrorCode.CAPTAIN_NOT_FOUND));
-
 		log.debug("[선장 조회] : {}", captain);
+
 		return captain;
+	}
+
+	/**
+	 * 선장 ID로 선장 상세 조회하는 메소드
+	 *
+	 * @param captainId 조회할 선장의 ID
+	 * @return {@link CaptainResponse.Detail} 조회된 선장 상세 내역
+	 * @throws CaptainException 선장이 존재하지 않는 경우 예외 발생
+	 */
+
+	private CaptainResponse.Detail getCaptainDetailById(final Long captainId) {
+
+		CaptainResponse.Detail detail = captainRepository.findDetailById(captainId)
+			.orElseThrow(() -> new CaptainException(CaptainErrorCode.CAPTAIN_NOT_FOUND));
+		log.debug("[선장 상세 조회] : {}", detail);
+
+		return detail;
+	}
+
+	/**
+	 * 회원의 추가 정보 등록 여부를 검증하는 메소드
+	 *
+	 * @param member 검증할 회원 엔티티
+	 * @throws MemberException 이미 추가 정보가 등록된 경우 예외 발생
+	 */
+
+	private static void validAddInfo(final Member member) {
+		if (member.getIsAddInfo()) {
+			throw new MemberException(MemberErrorCode.ALREADY_ADDED_INFO);
+		}
+	}
+
+	/**
+	 * 선장 상세 정보에서 역할이 선장인지 검증하는 메소드
+	 *
+	 * @param detail 검증할 선장 상세 정보
+	 * @throws CaptainException 역할이 선장이 아닌 경우 예외 발생
+	 */
+
+	private static void validCaptainRole(final CaptainResponse.Detail detail) {
+		if (detail.role() != MemberRole.CAPTAIN) {
+			throw new CaptainException(CaptainErrorCode.NOT_CAPTAIN);
+		}
 	}
 }
