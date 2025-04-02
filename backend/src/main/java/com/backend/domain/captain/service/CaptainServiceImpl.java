@@ -114,7 +114,7 @@ public class CaptainServiceImpl implements CaptainService {
 	 * @throws CaptainException 선장이 존재하지 않는 경우 예외 발생
 	 */
 
-	private CaptainResponse.Detail getCaptainDetailById(Long captainId) {
+	private CaptainResponse.Detail getCaptainDetailById(final Long captainId) {
 
 		CaptainResponse.Detail detail = captainRepository.findDetailById(captainId)
 			.orElseThrow(() -> new CaptainException(CaptainErrorCode.CAPTAIN_NOT_FOUND));
@@ -130,7 +130,7 @@ public class CaptainServiceImpl implements CaptainService {
 	 * @throws MemberException 이미 추가 정보가 등록된 경우 예외 발생
 	 */
 
-	private static void validAddInfo(Member member) {
+	private static void validAddInfo(final Member member) {
 		if (member.getIsAddInfo()) {
 			throw new MemberException(MemberErrorCode.ALREADY_ADDED_INFO);
 		}
@@ -143,7 +143,7 @@ public class CaptainServiceImpl implements CaptainService {
 	 * @throws CaptainException 역할이 선장이 아닌 경우 예외 발생
 	 */
 
-	private static void validCaptainRole(CaptainResponse.Detail detail) {
+	private static void validCaptainRole(final CaptainResponse.Detail detail) {
 		if (detail.role() != MemberRole.CAPTAIN) {
 			throw new CaptainException(CaptainErrorCode.NOT_CAPTAIN);
 		}
