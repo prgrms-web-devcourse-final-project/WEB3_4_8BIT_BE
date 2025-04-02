@@ -43,7 +43,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional
-	public Long updateMember(Long memberId, final MemberRequest.Form requestDto) {
+	public Long updateMember(final Long memberId, final MemberRequest.Form requestDto) {
 
 		Member member = getMemberById(memberId);
 
@@ -77,7 +77,7 @@ public class MemberServiceImpl implements MemberService {
 	 * @throws MemberException 이미 추가 정보가 등록된 경우 예외 발생
 	 */
 
-	private static void validAddInfo(Member member) {
+	private static void validAddInfo(final Member member) {
 		if (member.getIsAddInfo()) {
 			throw new MemberException(MemberErrorCode.ALREADY_ADDED_INFO);
 		}
@@ -92,7 +92,7 @@ public class MemberServiceImpl implements MemberService {
 	 * @implSpec QueryDSL을 통해 필요한 필드만 조회하여 DTO로 변환된 결과를 반환한다.
 	 */
 
-	private MemberResponse.Detail getMemberDetailById(Long memberId) {
+	private MemberResponse.Detail getMemberDetailById(final Long memberId) {
 		MemberResponse.Detail responseDto = memberRepository.findDetailById(memberId)
 			.orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 		log.debug("responseDto를 만들었습니다. 이름 : {}, 이메일 : {}, 닉네임 : {}", responseDto.name(), responseDto.email(),
