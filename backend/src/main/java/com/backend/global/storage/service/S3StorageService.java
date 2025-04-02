@@ -20,7 +20,9 @@ import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.dto.FileToUpload;
 
 import lombok.extern.slf4j.Slf4j;
+import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 
@@ -36,15 +38,18 @@ public class S3StorageService implements StorageService {
 	);
 
 	private final S3Presigner s3Presigner;
+	private final S3Client s3Client;
 	private final String bucketName;
 	private final StorageRepository storageRepository;
 
 	public S3StorageService(
 		S3Presigner s3Presigner,
+		S3Client s3Client,
 		@Value("${aws.s3.bucket-name}") String bucketName,
 		StorageRepository storageRepository
 	) {
 		this.s3Presigner = s3Presigner;
+		this.s3Client = s3Client;
 		this.storageRepository = storageRepository;
 		this.bucketName = bucketName;
 	}
@@ -109,11 +114,38 @@ public class S3StorageService implements StorageService {
 		return response;
 	}
 
+	@Override
+	@Transactional
+	public List<Long> confirmFileUpload(Long memberId, List<Long> fileIdList) {
+
+		// 1. 조회 후 파일 존재 검증
+		List<File> fileList = storageRepository.findAllById(fileIdList);
+		validateFileIdsExist(fileList, fileIdList);
+
+		// 2. 업로드 상태 중복 처리 방지
+		validateNotAlreadyUploaded(fileList);
+
+		// 3. 작성자 일치 검증
+		validateOwner(fileList, memberId);
+
+		// 4. 실제 업로드 검증 (필요시 추가)
+		// validateUploadedToS3(fileList);
+
+		// 5. uploaded 상태 변경
+		for (File file : fileList) {
+			file.completeUpload();
+		}
+
+		log.debug("업로드 완료 처리된 파일 수: {}", fileList.size());
+
+		return fileList.stream().map(File::getFileId).toList();
+	}
+
 	/**
-	 * 파일 검증(MIME 타입)
+	 * 파일 타입(MIME type) 검증
 	 *
-	 * @param contentType 파일 타입
-	 * @author vdvhk12
+	 * @param contentType 업로드할 파일의 MIME 타입
+	 * @throws StorageException 허용되지 않은 파일 형식인 경우 예외 발생
 	 */
 	private void validateFile(final String contentType) {
 		if (!ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
@@ -122,14 +154,83 @@ public class S3StorageService implements StorageService {
 	}
 
 	/**
-	 * 파일명 중복 방지를 위한 파일명 생성
+	 * 파일명 중복 방지를 위한 고유 파일명 생성
 	 *
-	 * @param domain 파일이 사용되는 도메인
-	 * @param originalFileName 파일 이름
-	 * @return String
-	 * @author vdvhk12
+	 * @param domain 파일이 사용되는 도메인 (예: profile, post 등)
+	 * @param originalFileName 클라이언트가 업로드한 원본 파일명
+	 * @return S3에 저장할 고유 파일 경로 (도메인/UUID-파일명 형태)
 	 */
 	private String generateFileName(final String domain, final String originalFileName) {
 		return domain + "/" + UUID.randomUUID().toString().replace("-", "") + "-" + originalFileName;
+	}
+
+	/**
+	 * 파일 ID 유효성 검증
+	 *
+	 * @param fileList   DB에서 조회된 파일 리스트
+	 * @param fileIdList 요청받은 파일 ID 리스트
+	 * @throws StorageException 파일 개수가 일치하지 않으면 예외 발생
+	 */
+	private void validateFileIdsExist(List<File> fileList, List<Long> fileIdList) {
+		if (fileList.size() != fileIdList.size()) {
+			throw new StorageException(StorageErrorCode.FILE_NOT_FOUND);
+		}
+	}
+
+	/**
+	 * 이미 업로드 처리된 파일이 있는지 검증
+	 *
+	 * @param fileList DB에서 조회된 파일 리스트
+	 * @throws StorageException uploaded = true 인 파일이 하나라도 있으면 예외 발생
+	 */
+	private void validateNotAlreadyUploaded(List<File> fileList) {
+		boolean anyUploaded = fileList.stream().anyMatch(File::getUploaded);
+		if (anyUploaded) {
+			throw new StorageException(StorageErrorCode.ALREADY_UPLOADED_FILE);
+		}
+	}
+
+	/**
+	 * 파일 작성자(memberId)와 요청자가 일치하는지 검증
+	 *
+	 * @param fileList DB에서 조회된 파일 리스트
+	 * @param memberId 현재 요청한 사용자 ID
+	 * @throws StorageException 소유자가 아닌 파일이 하나라도 있으면 예외 발생
+	 */
+	private void validateOwner(List<File> fileList, Long memberId) {
+		for (File file : fileList) {
+			if (!file.getCreatedById().equals(memberId)) {
+				throw new StorageException(StorageErrorCode.NO_FILE_ACCESS);
+			}
+		}
+	}
+
+	/**
+	 * S3에 실제로 파일이 존재하는지 검증
+	 *
+	 * @param fileList DB에서 조회된 파일 리스트
+	 * @throws StorageException S3에 파일이 존재하지 않으면 예외 발생
+	 */
+	private void validateUploadedToS3(List<File> fileList) {
+		for (File file : fileList) {
+			if (!isFileUploadedToS3(file.getFileName())) {
+				throw new StorageException(StorageErrorCode.S3_FILE_NOT_FOUND);
+			}
+		}
+	}
+
+	/**
+	 * S3에 해당 파일이 실제 존재하는지 확인
+	 *
+	 * @param key S3 버킷 내의 파일 키 (파일 경로)
+	 * @return 존재하면 true, 존재하지 않으면 false
+	 */
+	private boolean isFileUploadedToS3(String key) {
+		try {
+			s3Client.headObject(b -> b.bucket(bucketName).key(key));
+			return true;
+		} catch (S3Exception e) {
+			return false;
+		}
 	}
 }

@@ -50,4 +50,8 @@ public class File extends BaseEntity {
 
 	@Column(nullable = false)
 	private Boolean uploaded = false;
+
+	public void completeUpload() {
+		this.uploaded = true;
+	}
 }
