@@ -137,6 +137,34 @@ public class S3StorageService implements StorageService {
 		return fileList.stream().map(File::getFileId).toList();
 	}
 
+	@Override
+	@Transactional
+	public void deleteFilesByIdList(Long memberId, List<Long> fileIdList) {
+		// 1. 파일 엔티티 조회
+		List<File> fileList = storageRepository.findAllById(fileIdList);
+
+		// 2. 검증 로직 적용
+		validateFileIdsExist(fileList, fileIdList);
+		validateOwner(fileList, memberId);
+
+		// 3. S3에서 삭제
+		for (File file : fileList) {
+			try {
+				s3Client.deleteObject(b -> b
+					.bucket(storageProperties.getBucketName())
+					.key(file.getFileName()));
+			} catch (S3Exception e) {
+				log.error("S3 삭제 실패: {}", file.getFileName(), e);
+				throw new StorageException(StorageErrorCode.S3_DELETE_FAILED);
+			}
+		}
+
+		// 4. DB에서 삭제
+		storageRepository.deleteAll(fileList);
+
+		log.debug("파일 {}개 삭제 완료", fileList.size());
+	}
+
 	/**
 	 * 파일 타입(MIME type) 검증
 	 *

@@ -38,4 +38,11 @@ public interface StorageRepository {
 	 * @return {@link Integer} 삭제된 파일 개수
 	 */
 	int deletePendingFilesBefore(final LocalDateTime expirationTime);
+
+	/**
+	 * 주어진 파일 리스트 삭제
+	 *
+	 * @param fileList 삭제할 {@link File} 엔티티 리스트
+	 */
+	void deleteAll(List<File> fileList);
 }

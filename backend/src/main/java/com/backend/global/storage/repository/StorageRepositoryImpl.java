@@ -34,4 +34,9 @@ public class StorageRepositoryImpl implements StorageRepository {
 	public int deletePendingFilesBefore(LocalDateTime expirationTime) {
 		return storageJpaRepository.deletePendingFilesBefore(expirationTime);
 	}
+
+	@Override
+	public void deleteAll(List<File> fileList) {
+		storageJpaRepository.deleteAll(fileList);
+	}
 }

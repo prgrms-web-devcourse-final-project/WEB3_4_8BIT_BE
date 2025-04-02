@@ -32,4 +32,12 @@ public interface StorageService {
 	 * @author vdvhk12
 	 */
 	List<Long> confirmFileUpload(final Long memberId, final List<Long> fileIdList);
+
+	/**
+	 * 주어진 파일 ID 리스트에 해당하는 파일을 삭제
+	 * S3 저장소와 DB 모두 삭제
+	 *
+	 * @param fileIdList 삭제할 파일 ID 목록
+	 */
+	void deleteFilesByIdList(Long memberId, List<Long> fileIdList);
 }
