@@ -66,9 +66,9 @@ public class GlobalRequest {
 	 * @param size       페이지 사이즈
 	 */
 	public record CursorRequest(
-		@Schema(description = "정렬 필드 (default createdAt)", example = "createdAt")
-		String order,
 		@Schema(description = "정렬 기준 [asc, desc] (default desc)", example = "desc")
+		String order,
+		@Schema(description = "정렬 필드 (default createdAt)", example = "createdAt")
 		String sort,
 		@Schema(description = "이전, 이후 [prev, next] (default next)", example = "next")
 		String type,
