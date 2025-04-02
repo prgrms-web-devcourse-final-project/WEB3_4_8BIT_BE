@@ -39,6 +39,6 @@ public class CatchMaxLength extends BaseEntity {
 
 	//TODO 추후 테스트 코드 작성해야함
 	public void setBestLength(final Integer bestLength) {
-		this.bestLength = this.bestLength > bestLength ? this.bestLength : bestLength;
+		this.bestLength = Math.max(this.bestLength, bestLength);
 	}
 }

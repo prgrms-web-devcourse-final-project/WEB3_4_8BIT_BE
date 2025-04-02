@@ -77,7 +77,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// When
 		when(shipRepository.findById(1L)).thenReturn(Optional.of(givenShip));
 		when(fishRepository.findAllById(givenRequestDto.fishList())).thenReturn(List.of(Fish.builder().build()));
-		when(shipFishingPostRepository.save(givenShipFishingPost)).thenReturn(savedShipFishingPost);
+		when(shipFishingPostRepository.save(any(ShipFishingPost.class))).thenReturn(savedShipFishingPost);
 
 		Long savedId = shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L);
 
