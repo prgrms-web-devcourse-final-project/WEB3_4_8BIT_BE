@@ -44,5 +44,5 @@ public interface StorageRepository {
 	 *
 	 * @param fileList 삭제할 {@link File} 엔티티 리스트
 	 */
-	void deleteAll(List<File> fileList);
+	void deleteAll(final List<File> fileList);
 }

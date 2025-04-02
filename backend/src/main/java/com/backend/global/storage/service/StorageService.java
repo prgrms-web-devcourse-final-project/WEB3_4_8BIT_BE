@@ -39,5 +39,5 @@ public interface StorageService {
 	 *
 	 * @param fileIdList 삭제할 파일 ID 목록
 	 */
-	void deleteFilesByIdList(Long memberId, List<Long> fileIdList);
+	void deleteFilesByIdList(final Long memberId, final List<Long> fileIdList);
 }

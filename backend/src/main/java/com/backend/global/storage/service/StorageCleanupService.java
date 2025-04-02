@@ -9,5 +9,5 @@ public interface StorageCleanupService {
 	 *
 	 * @param olderThan 삭제 기준 시간 (예: 10분 이상)
 	 */
-	void deletePendingFiles(Duration olderThan);
+	void deletePendingFiles(final Duration olderThan);
 }

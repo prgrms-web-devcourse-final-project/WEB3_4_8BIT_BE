@@ -15,5 +15,5 @@ public interface StorageJpaRepository extends JpaRepository<File, Long> {
 	@Modifying
 	@Transactional
 	@Query("DELETE FROM File f WHERE f.uploaded = false AND f.createdAt < :expirationTime")
-	int deletePendingFilesBefore(@Param("expirationTime") ZonedDateTime expirationTime);
+	int deletePendingFilesBefore(@Param("expirationTime") final ZonedDateTime expirationTime);
 }

@@ -20,7 +20,7 @@ public class StorageCleanupServiceImpl implements StorageCleanupService {
 
 	@Override
 	@Transactional
-	public void deletePendingFiles(Duration olderThan) {
+	public void deletePendingFiles(final Duration olderThan) {
 
 		ZonedDateTime expirationTime = ZonedDateTime.now().minus(olderThan);
 

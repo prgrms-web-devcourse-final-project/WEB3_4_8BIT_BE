@@ -31,12 +31,12 @@ public class StorageRepositoryImpl implements StorageRepository {
 	}
 
 	@Override
-	public int deletePendingFilesBefore(ZonedDateTime expirationTime) {
+	public int deletePendingFilesBefore(final ZonedDateTime expirationTime) {
 		return storageJpaRepository.deletePendingFilesBefore(expirationTime);
 	}
 
 	@Override
-	public void deleteAll(List<File> fileList) {
+	public void deleteAll(final List<File> fileList) {
 		storageJpaRepository.deleteAll(fileList);
 	}
 }
