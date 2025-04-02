@@ -139,7 +139,7 @@ class CaptainServiceTest extends BaseTest {
 		// When & Then
 		assertThatThrownBy(() -> captainService.getCaptainDetail(invalidCaptainId))
 			.isInstanceOf(CaptainException.class)
-			.hasFieldOrPropertyWithValue("captainErrorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
+			.hasFieldOrPropertyWithValue("errorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
 			.hasMessageContaining(CaptainErrorCode.CAPTAIN_NOT_FOUND.getMessage());
 
 		verify(captainRepository, times(1)).findDetailById(invalidCaptainId);
@@ -152,13 +152,9 @@ class CaptainServiceTest extends BaseTest {
 		Long memberId = 1L;
 
 		// 일반 멤버 (선장이 아님)
-		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
-			.set("memberId", memberId)
-			.set("role", MemberRole.USER)
-			.sample();
-
 		CaptainResponse.Detail givenResponseDto = fixtureMonkeyValidation.giveMeBuilder(CaptainResponse.Detail.class)
 			.set("memberId", memberId)
+			.set("role", MemberRole.USER)
 			.sample();
 
 		when(captainRepository.findDetailById(memberId)).thenReturn(Optional.of(givenResponseDto));
@@ -166,7 +162,7 @@ class CaptainServiceTest extends BaseTest {
 		// When & Then
 		assertThatThrownBy(() -> captainService.getCaptainDetail(memberId))
 			.isInstanceOf(CaptainException.class)
-			.hasFieldOrPropertyWithValue("captainErrorCode", CaptainErrorCode.NOT_CAPTAIN)
+			.hasFieldOrPropertyWithValue("errorCode", CaptainErrorCode.NOT_CAPTAIN)
 			.hasMessageContaining(CaptainErrorCode.NOT_CAPTAIN.getMessage());
 
 		verify(captainRepository, times(1)).findDetailById(memberId);
@@ -209,7 +205,7 @@ class CaptainServiceTest extends BaseTest {
 		// When & Then
 		assertThatThrownBy(() -> captainService.updateCaptainShipList(invalidCaptainId, updateRequest))
 			.isInstanceOf(CaptainException.class)
-			.hasFieldOrPropertyWithValue("captainErrorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
+			.hasFieldOrPropertyWithValue("errorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
 			.hasMessageContaining(CaptainErrorCode.CAPTAIN_NOT_FOUND.getMessage());
 
 		verify(captainRepository, times(1)).findById(invalidCaptainId);
