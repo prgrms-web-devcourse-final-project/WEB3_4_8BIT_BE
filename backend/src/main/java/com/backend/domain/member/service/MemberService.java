@@ -23,7 +23,7 @@ public interface MemberService {
 	 * @param memberId 조회할 회원의 고유 ID
 	 * @return {@link MemberResponse.Detail} 조회된 회원의 상세 응답 DTO
 	 * @throws MemberException 회원이 존재하지 않는 경우 예외 발생
-	 * @implSpec 회원 ID로 회원 엔티티를 조회한 후, {@link MemberConverter}를 통해 응답 DTO로 변환한다.
+	 * @implSpec QueryDSL을 사용해 필요한 필드만 조회하여 {@link MemberResponse.Detail} DTO로 직접 반환한다.
 	 */
 	MemberResponse.Detail getMemberDetail(final Long memberId);
 
