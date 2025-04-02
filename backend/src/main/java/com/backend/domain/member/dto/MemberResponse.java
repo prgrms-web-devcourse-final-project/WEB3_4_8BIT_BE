@@ -1,5 +1,7 @@
 package com.backend.domain.member.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
+
 import lombok.Builder;
 
 public class MemberResponse {
@@ -32,6 +34,9 @@ public class MemberResponse {
 		String phone,
 		String profileImg,
 		String description
-	){
+	) {
+		@QueryProjection
+		public Detail {
+		}
 	}
 }

@@ -121,21 +121,31 @@ class MemberServiceTest extends BaseTest {
 			.set("nickname", "닉네임")
 			.sample();
 
-		when(memberRepository.findById(memberId)).thenReturn(Optional.of(givenMember));
+		MemberResponse.Detail responseDto = MemberResponse.Detail.builder()
+			.memberId(givenMember.getMemberId())
+			.email(givenMember.getEmail())
+			.name(givenMember.getName())
+			.nickname(givenMember.getNickname())
+			.phone(givenMember.getPhone())
+			.profileImg(givenMember.getProfileImg())
+			.description(givenMember.getDescription())
+			.build();
+
+		when(memberRepository.findDetailById(memberId)).thenReturn(Optional.of(responseDto));
 
 		// When
 		MemberResponse.Detail result = memberService.getMemberDetail(memberId);
 
 		// Then
 		assertThat(result).isNotNull();
-		assertThat(result.memberId()).isEqualTo(givenMember.getMemberId());
-		assertThat(result.name()).isEqualTo(givenMember.getName());
-		assertThat(result.email()).isEqualTo(givenMember.getEmail());
-		assertThat(result.nickname()).isEqualTo(givenMember.getNickname());
-		assertThat(result.phone()).isEqualTo(givenMember.getPhone());
-		assertThat(result.profileImg()).isEqualTo(givenMember.getProfileImg());
-		assertThat(result.description()).isEqualTo(givenMember.getDescription());
-		verify(memberRepository, times(1)).findById(memberId);
+		assertThat(result.memberId()).isEqualTo(responseDto.memberId());
+		assertThat(result.email()).isEqualTo(responseDto.email());
+		assertThat(result.name()).isEqualTo(responseDto.name());
+		assertThat(result.nickname()).isEqualTo(responseDto.nickname());
+		assertThat(result.phone()).isEqualTo(responseDto.phone());
+		assertThat(result.profileImg()).isEqualTo(responseDto.profileImg());
+		assertThat(result.description()).isEqualTo(responseDto.description());
+		verify(memberRepository, times(1)).findDetailById(memberId);
 	}
 
 	@Test

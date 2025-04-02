@@ -2,6 +2,7 @@ package com.backend.domain.member.repository;
 
 import java.util.Optional;
 
+import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.entity.Member;
 
 public interface MemberRepository {
@@ -32,4 +33,13 @@ public interface MemberRepository {
 	 * @implSpec 인증된 사용자 ID 기반으로 회원 정보를 조회할 때 사용한다.
 	 */
 	Optional<Member> findById(Long id);
+
+	/**
+	 * 회원 상세 조회 메서드
+	 *
+	 * @param memberId {@link Long}
+	 * @return {@link Optional<MemberResponse.Detail>}
+	 * @implSpec memberId 기준으로 회원 상세 정보를 조회한다.
+	 */
+	Optional<MemberResponse.Detail> findDetailById(Long memberId);
 }
