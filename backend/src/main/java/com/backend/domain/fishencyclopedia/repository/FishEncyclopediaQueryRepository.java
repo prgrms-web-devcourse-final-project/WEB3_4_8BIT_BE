@@ -34,10 +34,10 @@ public class FishEncyclopediaQueryRepository {
 
 	// 정렬 필드를 매핑
 	private static final Map<String, ComparableExpressionBase<?>> FIELD_MAP = Map.of(
-			"count", fishEncyclopedia.count,
-			"length", fishEncyclopedia.length,
-			"createdAt", fishEncyclopedia.createdAt
-		);
+		"count", fishEncyclopedia.count,
+		"length", fishEncyclopedia.length,
+		"createdAt", fishEncyclopedia.createdAt
+	);
 
 	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
 		final GlobalRequest.CursorRequest pageRequestDto,
@@ -92,20 +92,36 @@ public class FishEncyclopediaQueryRepository {
 			return null;
 		}
 
-		// 기본키 ID 필드
+		// 기본키 ID 값
 		Long idValue = cursorRequestDto.id();
-		// Sort 필드 타입 소문자로 변환
-		String sortFieldType = cursorRequestDto.sort().toLowerCase();
+		// Sort 필드 소문자로 변환
+		String sortField = cursorRequestDto.sort().toLowerCase();
 		// Sort 필드 값
 		String sortFieldValueStr = cursorRequestDto.fieldValue();
 		// 정렬 순서 Order 객체로 변환
 		Order order = QuerydslUtil.getOrder(cursorRequestDto);
 
+		//fishId와 memberId가 일치하는 데이터를 가져오는 조건식
 		BooleanExpression baseBooleanExpression = fishEncyclopedia.fishId.eq(fishId)
-						.and(fishEncyclopedia.memberId.eq(memberId));
+			.and(fishEncyclopedia.memberId.eq(memberId));
 
-		// 각 필드 타입별 처리를 추상화
-		switch (sortFieldType) {
+		return getWhereBooleanExpression(sortField, sortFieldValueStr, idValue, order, baseBooleanExpression);
+	}
+
+	/**
+	 * Where절에 들어가야하는 조건식을 만들어 반환하는 메소드 입니다.
+	 *
+	 * @param sortField 정렬 필드
+	 * @param sortFieldValueStr 정렬 필드 값
+	 * @param idValue 기본키 ID 값
+	 * @param order {@link Order}
+	 * @param baseBooleanExpression 항상 고정인 조건식
+	 *
+	 * @return
+	 */
+	private BooleanExpression getWhereBooleanExpression(String sortField, String sortFieldValueStr, Long idValue,
+		Order order, BooleanExpression baseBooleanExpression) {
+		switch (sortField) {
 			case "count":
 				try {
 					Integer fieldValue = Integer.valueOf(sortFieldValueStr);
@@ -161,18 +177,19 @@ public class FishEncyclopediaQueryRepository {
 	 * @return {@link OrderSpecifier}
 	 */
 	private OrderSpecifier<?>[] getOrderBy(GlobalRequest.CursorRequest pageRequestDto) {
-    // 기본 정렬 방식 설정
-    Order queryOrder = QuerydslUtil.getOrder(pageRequestDto);
+		// 기본 정렬 방식 설정
+		Order queryOrder = QuerydslUtil.getOrder(pageRequestDto);
 
-    // 정렬 필드 결정
-    ComparableExpressionBase<?> sortField = StringUtils.hasText(pageRequestDto.sort()) && FIELD_MAP.containsKey(pageRequestDto.sort()) ?
-            FIELD_MAP.get(pageRequestDto.sort()) : fishEncyclopedia.createdAt;
+		// 정렬 필드 결정
+		ComparableExpressionBase<?> sortField =
+			StringUtils.hasText(pageRequestDto.sort()) && FIELD_MAP.containsKey(pageRequestDto.sort()) ?
+				FIELD_MAP.get(pageRequestDto.sort()) : fishEncyclopedia.createdAt;
 
-    // 두 개의 OrderSpecifier를 배열로 반환
-    return new OrderSpecifier<?>[] {
-        new OrderSpecifier<>(queryOrder, sortField),
-        new OrderSpecifier<>(Order.ASC, fishEncyclopedia.fishEncyclopediaId)
-    };
-}
+		// 두 개의 OrderSpecifier를 배열로 반환
+		return new OrderSpecifier<?>[] {
+			new OrderSpecifier<>(queryOrder, sortField),
+			new OrderSpecifier<>(Order.ASC, fishEncyclopedia.fishEncyclopediaId)
+		};
+	}
 }
 
