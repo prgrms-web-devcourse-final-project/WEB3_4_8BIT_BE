@@ -1,6 +1,5 @@
 package com.backend.domain.auth.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +29,7 @@ public class AuthController {
 	public ResponseEntity<GenericResponse<Void>> refreshToken(HttpServletRequest request,
 		HttpServletResponse response) {
 		authService.refreshAccessToken(request, response);
-		return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.of(true));
+		return ResponseEntity.ok(GenericResponse.of(true));
 	}
 
 	@PostMapping("/logout")
@@ -38,6 +37,6 @@ public class AuthController {
 	public ResponseEntity<GenericResponse<Void>> logout(HttpServletRequest request,
 		HttpServletResponse response) {
 		authService.logout(request, response);
-		return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.of(true));
+		return ResponseEntity.ok(GenericResponse.of(true));
 	}
 }
