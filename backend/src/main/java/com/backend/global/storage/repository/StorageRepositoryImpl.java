@@ -1,5 +1,6 @@
 package com.backend.global.storage.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -27,5 +28,10 @@ public class StorageRepositoryImpl implements StorageRepository {
 	@Override
 	public List<File> findAllById(final List<Long> idList) {
 		return storageJpaRepository.findAllById(idList);
+	}
+
+	@Override
+	public int deletePendingFilesBefore(LocalDateTime expirationTime) {
+		return storageJpaRepository.deletePendingFilesBefore(expirationTime);
 	}
 }

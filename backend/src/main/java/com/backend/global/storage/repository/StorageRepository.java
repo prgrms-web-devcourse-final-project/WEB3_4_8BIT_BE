@@ -1,5 +1,6 @@
 package com.backend.global.storage.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.backend.global.storage.entity.File;
@@ -29,4 +30,12 @@ public interface StorageRepository {
 	 * @return {@link List<File> )
 	 */
 	List<File> findAllById(final List<Long> idList);
+
+	/**
+	 * 업로드되지 않은 파일 중, 지정된 시각 이전에 생성된 파일들을 삭제
+	 *
+	 * @param expirationTime 삭제 기준 시각 (이 시각보다 이전에 생성된 파일이 삭제 대상)
+	 * @return {@link Integer} 삭제된 파일 개수
+	 */
+	int deletePendingFilesBefore(final LocalDateTime expirationTime);
 }
