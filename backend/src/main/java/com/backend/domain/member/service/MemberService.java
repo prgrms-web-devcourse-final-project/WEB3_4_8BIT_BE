@@ -1,6 +1,5 @@
 package com.backend.domain.member.service;
 
-import com.backend.domain.member.converter.MemberConverter;
 import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.exception.MemberException;

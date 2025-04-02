@@ -3,7 +3,6 @@ package com.backend.domain.member.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.backend.domain.member.converter.MemberConverter;
 import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.entity.Member;
