@@ -93,8 +93,7 @@ public class JwtTokenProvider {
 		} catch (ExpiredJwtException e) {
 			log.debug("Token is expired, skipping blacklist");
 		} catch (Exception e) {
-			log.error("Failed to add token to blacklist", e);
-			throw new JwtAuthenticationException((JwtAuthenticationErrorCode.BLACK_LIST_FAIL));
+			throw new JwtAuthenticationException(e, JwtAuthenticationErrorCode.BLACK_LIST_FAIL);
 		}
 	}
 
@@ -163,17 +162,13 @@ public class JwtTokenProvider {
 				.parseSignedClaims(token);
 			return true;
 		} catch (SecurityException | MalformedJwtException e) {
-			log.error("Invalid JWT signature: {}", e.getMessage());
-			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.INVALID_SIGNATURE);
+			throw new JwtAuthenticationException(e, JwtAuthenticationErrorCode.INVALID_SIGNATURE);
 		} catch (ExpiredJwtException e) {
-			log.error("Expired JWT token: {}", e.getMessage());
-			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.EXPIRED_TOKEN);
+			throw new JwtAuthenticationException(e, JwtAuthenticationErrorCode.EXPIRED_TOKEN);
 		} catch (UnsupportedJwtException e) {
-			log.error("Unsupported JWT token: {}", e.getMessage());
-			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.UNSUPPORTED_TOKEN);
+			throw new JwtAuthenticationException(e, JwtAuthenticationErrorCode.UNSUPPORTED_TOKEN);
 		} catch (IllegalArgumentException e) {
-			log.error("JWT claims string is empty: {}", e.getMessage());
-			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.EMPTY_CLAIMS);
+			throw new JwtAuthenticationException(e, JwtAuthenticationErrorCode.EMPTY_CLAIMS);
 		}
 
 	}
@@ -189,7 +184,7 @@ public class JwtTokenProvider {
 			// 만료된 토큰이어도 Claims 반환
 			return e.getClaims();
 		} catch (Exception e) {
-			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.INVALID_TOKEN);
+			throw new JwtAuthenticationException(e, JwtAuthenticationErrorCode.INVALID_TOKEN);
 		}
 	}
 
@@ -200,7 +195,7 @@ public class JwtTokenProvider {
 			// 만료된 토큰이어도 서명이 유효하면 ID 반환
 			return Long.valueOf(e.getClaims().getSubject());
 		} catch (Exception e) {
-			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.INVALID_TOKEN);
+			throw new JwtAuthenticationException(e, JwtAuthenticationErrorCode.INVALID_TOKEN);
 		}
 	}
 
