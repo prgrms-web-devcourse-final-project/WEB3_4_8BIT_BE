@@ -1,19 +1,21 @@
 package com.backend.domain.captain.exception;
 
-import org.springframework.http.HttpStatus;
+import com.backend.global.exception.ErrorCode;
+import com.backend.global.exception.GlobalException;
 
 import lombok.Getter;
 
 @Getter
-public class CaptainException extends RuntimeException {
-	private final CaptainErrorCode captainErrorCode;
+public class CaptainException extends GlobalException {
+	private final ErrorCode errorCode;
 
-	public CaptainException(CaptainErrorCode captainErrorCode) {
-		super(captainErrorCode.getMessage());
-		this.captainErrorCode = captainErrorCode;
+	public CaptainException(ErrorCode errorCode) {
+		super(errorCode);
+		this.errorCode = errorCode;
 	}
 
-	public HttpStatus getStatus() {
-		return captainErrorCode.getHttpStatus();
+	public CaptainException(Throwable cause, ErrorCode errorCode) {
+		super(cause, errorCode);
+		this.errorCode = errorCode;
 	}
 }

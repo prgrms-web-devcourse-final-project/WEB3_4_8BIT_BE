@@ -1,21 +1,22 @@
 package com.backend.domain.ship.exception;
 
-import org.springframework.http.HttpStatus;
+import com.backend.global.exception.ErrorCode;
+import com.backend.global.exception.GlobalException;
 
 import lombok.Getter;
 
 @Getter
-public class ShipException extends RuntimeException {
+public class ShipException extends GlobalException {
 
-	private final ShipErrorCode shipErrorCode;
+	private final ErrorCode errorCode;
 
-	public ShipException(final ShipErrorCode shipErrorCode) {
-		super(shipErrorCode.getMessage());
-		this.shipErrorCode = shipErrorCode;
+	public ShipException(final ErrorCode errorCode) {
+		super(errorCode);
+		this.errorCode = errorCode;
 	}
 
-	public HttpStatus getStatus() {
-
-		return shipErrorCode.getHttpStatus();
+	public ShipException(Throwable cause, ErrorCode errorCode) {
+		super(cause, errorCode);
+		this.errorCode = errorCode;
 	}
 }
