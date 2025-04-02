@@ -64,7 +64,7 @@ public class CaptainServiceImpl implements CaptainService {
 	public CaptainResponse.Detail getCaptainDetail(final Long captainId) {
 
 		// 선장 상세 조회
-		CaptainResponse.Detail detail = getDetailById(captainId);
+		CaptainResponse.Detail detail = getCaptainDetailById(captainId);
 
 		// 역할이 선장인지 검증
 		validCaptainRole(detail);
@@ -114,7 +114,7 @@ public class CaptainServiceImpl implements CaptainService {
 	 * @throws CaptainException 선장이 존재하지 않는 경우 예외 발생
 	 */
 
-	private CaptainResponse.Detail getDetailById(Long captainId) {
+	private CaptainResponse.Detail getCaptainDetailById(Long captainId) {
 
 		CaptainResponse.Detail detail = captainRepository.findDetailById(captainId)
 			.orElseThrow(() -> new CaptainException(CaptainErrorCode.CAPTAIN_NOT_FOUND));
