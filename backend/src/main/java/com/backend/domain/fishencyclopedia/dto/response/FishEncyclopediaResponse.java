@@ -20,6 +20,7 @@ public class FishEncyclopediaResponse {
 	 * @param createdAt 잡은 날짜
 	 */
 	public record Detail(
+		Long fishEncyclopediaId,
 		Integer length,
 		Integer count,
 		String fishPointName,

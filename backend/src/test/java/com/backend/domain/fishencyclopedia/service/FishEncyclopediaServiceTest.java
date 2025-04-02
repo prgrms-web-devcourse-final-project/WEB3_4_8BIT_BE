@@ -12,9 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.SliceImpl;
 
 import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
 import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
@@ -195,10 +192,9 @@ class FishEncyclopediaServiceTest extends BaseTest {
 	@DisplayName("물고기 도감 상세 조회 [Service] - Success")
 	void t05() {
 		// Given
-		GlobalRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
-			.giveMeBuilder(GlobalRequest.PageRequest.class)
+		GlobalRequest.CursorRequest givenCursorRequestDto = fixtureMonkeyRecord
+			.giveMeBuilder(GlobalRequest.CursorRequest.class)
 			.set("size", 10)
-			.set("page", 0)
 			.sample();
 
 		Fish givenFish = fixtureMonkeyBuilder.giveMeOne(Fish.class);
@@ -209,36 +205,28 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			.giveMeBuilder(FishEncyclopediaResponse.Detail.class)
 			.sampleList(7);
 
-		Pageable givenPageable = PageRequest.of(givenPageRequest.page(), givenPageRequest.size());
-
 		boolean givenHasNext = false;
 
-		SliceImpl<FishEncyclopediaResponse.Detail> givenSlice = new SliceImpl<>(
+		ScrollResponse<FishEncyclopediaResponse.Detail> givenScrollResponse = ScrollResponse.from(
 			givenDetailList,
-			givenPageable,
+			givenCursorRequestDto.size(),
+			givenDetailList.size(),
+			true,
 			givenHasNext
 		);
 
-		ScrollResponse<FishEncyclopediaResponse.Detail> givenScrollResponse = ScrollResponse.from(
-			givenSlice.getContent(),
-			givenSlice.getSize(),
-			givenSlice.getNumberOfElements(),
-			givenSlice.isFirst(),
-			givenSlice.isLast()
-		);
-
 		when(fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
-			givenPageRequest,
+			givenCursorRequestDto,
 			givenFish.getFishId(),
 			givenMember.getMemberId())).thenReturn(givenScrollResponse);
 
 		// When
-		ScrollResponse<FishEncyclopediaResponse.Detail> getDetailList = fishEncyclopediasService.getDetailList(givenPageRequest,
+		ScrollResponse<FishEncyclopediaResponse.Detail> getDetailList = fishEncyclopediasService.getDetailList(givenCursorRequestDto,
 			givenFish.getFishId(), givenMember.getMemberId());
 
 		// Then
 		assertThat(getDetailList.content()).hasSize(givenDetailList.size());
 		assertThat(getDetailList.content()).isEqualTo(givenDetailList);
-		assertThat(getDetailList.isLast()).isTrue();
+		assertThat(getDetailList.isLast()).isFalse();
 	}
 }

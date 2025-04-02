@@ -52,12 +52,15 @@ public class FishEncyclopediaController {
 	public ResponseEntity<GenericResponse<ScrollResponse<FishEncyclopediaResponse.Detail>>> getDetailList(
 		@Parameter(description = "조회할 물고기의 ID", example = "1")
 		@PathVariable final Long fishId,
-		@Valid final GlobalRequest.PageRequest pageRequestDto,
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		ScrollResponse<FishEncyclopediaResponse.Detail> detailList = fishEncyclopediaService.getDetailList(pageRequestDto, fishId,
-			user.getId());
+		ScrollResponse<FishEncyclopediaResponse.Detail> detailList = fishEncyclopediaService.getDetailList(
+			cursorRequestDto,
+			fishId,
+			user.getId()
+		);
 
 		return ResponseEntity.ok(GenericResponse.of(true, detailList));
 	}

@@ -73,12 +73,12 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 	@Override
 	@Transactional(readOnly = true)
 	public ScrollResponse<FishEncyclopediaResponse.Detail> getDetailList(
-		final GlobalRequest.PageRequest pageRequestDto,
+		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long fishId,
 		final Long memberId
 	) {
 		ScrollResponse<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
-			pageRequestDto, fishId, memberId);
+			cursorRequestDto, fishId, memberId);
 
 		log.debug("물고기 도감 상세 조회: {}", findDetailList);
 
