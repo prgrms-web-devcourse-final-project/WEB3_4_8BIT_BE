@@ -26,6 +26,12 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 	}
 
 	@Override
+	public Optional<ShipFishingPost> findById(Long shipFishingPostId) {
+
+		return shipFishingPostJpaRepository.findById(shipFishingPostId);
+	}
+
+	@Override
 	public Optional<ShipFishingPostResponse.Detail> findDetailById(final Long fishingPostId) {
 
 		return shipFishingPostQueryRepository.findDetailById(fishingPostId);

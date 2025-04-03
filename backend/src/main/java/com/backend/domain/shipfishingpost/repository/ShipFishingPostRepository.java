@@ -21,6 +21,15 @@ public interface ShipFishingPostRepository {
 	ShipFishingPost save(final ShipFishingPost shipFishingPost);
 
 	/**
+	 * 선상 낚시 게시글 조회 메서드
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @return {@link Optional<ShipFishingPost>}
+	 * @implSpec 선상 낚시 게시글 Entity 를 반환한다.
+	 */
+	Optional<ShipFishingPost> findById(final Long shipFishingPostId);
+
+	/**
 	 * 선상 낚시 게시글 상세 조회 메서드
 	 *
 	 * @param shipFishingPostId {@link Long}
