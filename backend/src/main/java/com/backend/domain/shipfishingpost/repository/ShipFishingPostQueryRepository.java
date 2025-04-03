@@ -1,5 +1,6 @@
 package com.backend.domain.shipfishingpost.repository;
 
+import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.domain.ship.entity.QShip.*;
 import static com.backend.domain.shipfishingpost.entity.QShipFishingPost.*;
 import static com.backend.domain.shipfishingpostfish.entity.QShipFishingPostFish.*;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
@@ -93,10 +95,18 @@ public class ShipFishingPostQueryRepository {
 					ship.fishingGearRental,
 					ship.mealProvided,
 					ship.parkingAvailable
+				),
+				Projections.constructor(
+					MemberResponse.ContactInfo.class,
+					member.memberId,
+					member.email,
+					member.name,
+					member.phone
 				)
 			))
 			.from(shipFishingPost)
 			.join(ship).on(shipFishingPost.shipId.eq(ship.shipId))
+			.join(member).on(shipFishingPost.memberId.eq(member.memberId))
 			.where(shipFishingPost.shipFishingPostId.eq(shipFishingPostId))
 			.fetchOne();
 
