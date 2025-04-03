@@ -130,7 +130,8 @@ public class FishEncyclopediaQueryRepository {
 						fishEncyclopedia.fishEncyclopediaId,
 						idValue,
 						fishEncyclopedia.count,
-						fieldValue, order
+						fieldValue,
+						order
 					);
 
 					return baseBooleanExpression.and(createFieldPredicate);
