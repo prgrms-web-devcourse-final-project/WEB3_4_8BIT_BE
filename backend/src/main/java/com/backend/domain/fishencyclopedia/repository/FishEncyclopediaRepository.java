@@ -44,7 +44,7 @@ public interface FishEncyclopediaRepository {
 	 * 관리자가 직접 추가하는 데이터이기 때문에 일단은 findAll 형태로 구현
 	 * @author Kim Dong O
 	 */
-	List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberIdAndFishId(
+	List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberId(
 		final Long memberId
 	);
 }

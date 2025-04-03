@@ -285,7 +285,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	void t08() {
 		// When
 		List<FishEncyclopediaResponse.DetailPage> detailPageList = fishEncyclopediaRepository
-			.findDetailPageByAllByMemberIdAndFishId(givenMember.getMemberId());
+			.findDetailPageByAllByMemberId(givenMember.getMemberId());
 
 		// Then
 		assertThat(detailPageList).hasSize(savedCatchMaxLengthList.size());

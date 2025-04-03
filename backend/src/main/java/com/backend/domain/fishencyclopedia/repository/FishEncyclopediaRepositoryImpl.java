@@ -37,11 +37,11 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 	}
 
 	@Override
-	public List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberIdAndFishId(
+	public List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberId(
 		final Long memberId
 	) {
 
-		return fishEncyclopediaQueryRepository.findDetailPageByAllByMemberIdAndFishId(
+		return fishEncyclopediaQueryRepository.findDetailPageByAllByMemberId(
 			memberId
 		);
 	}

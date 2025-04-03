@@ -98,7 +98,7 @@ public class FishEncyclopediaQueryRepository {
 		);
 	}
 
-	public List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberIdAndFishId(
+	public List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberId(
 		final Long memberId
 	) {
 
