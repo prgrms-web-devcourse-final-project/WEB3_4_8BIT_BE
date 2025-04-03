@@ -31,8 +31,7 @@ public class ShipFishingPostFishRepositoryTest extends BaseTest {
 	@DisplayName("선상 낚시 게시글, 어류 중간 테이블 entity save [Repository] - Success")
 	void t01() {
 		// Given
-		ShipFishingPostFish givenShipFishingPostFish = fixtureMonkeyBuilder
-			.giveMeBuilder(ShipFishingPostFish.class)
+		ShipFishingPostFish givenShipFishingPostFish = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPostFish.class)
 			.sample();
 
 		// When
@@ -47,17 +46,41 @@ public class ShipFishingPostFishRepositoryTest extends BaseTest {
 	@DisplayName("선상 낚시 게시글, 어류 중간 테이블 entity saveAll & findAll [Repository] - Success")
 	void t02() {
 		// Given
-		List<ShipFishingPostFish> givenShipFishingPostFishList = fixtureMonkeyBuilder.
-			giveMeBuilder(ShipFishingPostFish.class)
-			.sampleList(5);
+		List<ShipFishingPostFish> givenShipFishingPostFishList = fixtureMonkeyBuilder.giveMeBuilder(
+			ShipFishingPostFish.class).sampleList(100);
 
 		// When
+		long startTime = System.currentTimeMillis();
 		shipFishingPostFishRepository.saveAll(givenShipFishingPostFishList);
+		long elapsedTime = System.currentTimeMillis() - startTime;
 
 		// Then
 		List<ShipFishingPostFish> savedShipFishingPostFish = shipFishingPostFishRepository.findAll();
 
 		assertThat(savedShipFishingPostFish.size()).isEqualTo(givenShipFishingPostFishList.size());
+
+		System.out.println("save All insert 소요 시간: " + elapsedTime + " ms");
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글, 어류 중간 테이블 entity saveAllByBulkQuery & findAll [Repository] - Success")
+	void t03() {
+		// Given
+		List<ShipFishingPostFish> givenShipFishingPostFishList = fixtureMonkeyBuilder.giveMeBuilder(
+			ShipFishingPostFish.class).sampleList(100);
+
+		// When
+		long startTime = System.currentTimeMillis();
+		shipFishingPostFishRepository.saveAllByBulkQuery(givenShipFishingPostFishList,
+			givenShipFishingPostFishList.size());
+		long elapsedTime = System.currentTimeMillis() - startTime;
+
+		// Then
+		List<ShipFishingPostFish> savedShipFishingPostFishList = shipFishingPostFishRepository.findAll();
+
+		assertThat(savedShipFishingPostFishList).hasSize(givenShipFishingPostFishList.size());
+
+		System.out.println("Bulk insert 소요 시간: " + elapsedTime + " ms");
 	}
 
 }
