@@ -131,7 +131,7 @@ public class FishEncyclopediaQueryRepository {
 	) {
 		try {
 			switch (sortField) {
-				case "count": {
+				case "count" -> {
 					Integer fieldValue = Integer.valueOf(sortFieldValueStr);
 
 					BooleanExpression createFieldPredicate = QuerydslUtil.createFieldPredicate(
@@ -144,7 +144,7 @@ public class FishEncyclopediaQueryRepository {
 
 					return baseBooleanExpression.and(createFieldPredicate);
 				}
-				case "length": {
+				case "length" -> {
 					Integer fieldValue = Integer.valueOf(sortFieldValueStr);
 
 					BooleanExpression createFieldPredicate = QuerydslUtil.createFieldPredicate(
@@ -156,7 +156,7 @@ public class FishEncyclopediaQueryRepository {
 					);
 					return baseBooleanExpression.and(createFieldPredicate);
 				}
-				default: {//createdAT
+				default -> {//createdAT
 					ZonedDateTime parseFieldValue = ZonedDateTime.parse(sortFieldValueStr);
 					BooleanExpression createFieldPredicate = QuerydslUtil.createFieldPredicate(
 						fishEncyclopedia.fishEncyclopediaId,
