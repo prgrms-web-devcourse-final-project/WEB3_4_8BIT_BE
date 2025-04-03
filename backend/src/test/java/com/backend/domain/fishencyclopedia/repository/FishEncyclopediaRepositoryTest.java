@@ -16,6 +16,8 @@ import org.springframework.context.annotation.Import;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 
+import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
+import com.backend.domain.catchmaxlength.repository.CatchMaxLengthJpaRepository;
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishJpaRepository;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
@@ -56,11 +58,15 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	private FishPointJpaRepository fishPointJpaRepository;
 
 	@Autowired
+	private CatchMaxLengthJpaRepository catchMaxLengthJpaRepository;
+
+	@Autowired
 	private FishJpaRepository fishJpaRepository;
 
 	private List<FishPoint> savedFishPointList;
 	private List<Fish> savedFishList;
 	private List<FishEncyclopedia> savedFishEncyclopediasList;
+	private List<CatchMaxLength> savedCatchMaxLengthList;
 
 	private final Arbitrary<String> englishStringLength = Arbitraries.strings()
 		.withCharRange('a', 'z')
@@ -108,7 +114,14 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 			.set("memberId", 2L)
 			.sampleList(10);
 
+		List<CatchMaxLength> catchMaxLengthList = fixtureMonkeyBuilder.giveMeBuilder(CatchMaxLength.class)
+			.set("catchMaxLengthId", null)
+			.set("fishId", savedFishList.get(0).getFishId())
+			.sampleList(12);
+
 		savedFishEncyclopediasList = fishEncyclopediaJpaRepository.saveAll(fishEncyclopediasList1);
+		fishEncyclopediaJpaRepository.saveAll(fishEncyclopediasList2);
+		savedCatchMaxLengthList = catchMaxLengthJpaRepository.saveAll(catchMaxLengthList);
 	}
 
 	@Test
