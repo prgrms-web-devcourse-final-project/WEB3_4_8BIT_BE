@@ -42,4 +42,13 @@ public interface MemberRepository {
 	 * @implSpec memberId 기준으로 회원 상세 정보를 조회한다.
 	 */
 	Optional<MemberResponse.Detail> findDetailById(Long memberId);
+
+	/**
+	 * 멤버 존재 여부 조회 메소드
+	 *
+	 * @param memberId {@link Long}
+	 * @return {@link Boolean} 데이터가 있다면 true, 없으면 false
+	 * @implSpec memberId 데이터가 있는지 확인 후 결과 반한
+	 */
+	boolean existsById(final Long memberId);
 }
