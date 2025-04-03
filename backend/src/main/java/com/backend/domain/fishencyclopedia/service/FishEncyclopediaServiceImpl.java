@@ -1,5 +1,6 @@
 package com.backend.domain.fishencyclopedia.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -87,6 +88,12 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		log.debug("물고기 도감 상세 조회: {}", findDetailList);
 
 		return findDetailList;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<FishEncyclopediaResponse.DetailPage> getDetailPageList(final Long memberId) {
+		return fishEncyclopediaRepository.findDetailPageByAllByMemberId(memberId);
 	}
 
 	/**
