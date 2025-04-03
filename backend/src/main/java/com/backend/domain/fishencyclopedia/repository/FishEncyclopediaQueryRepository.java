@@ -4,6 +4,7 @@ import static com.backend.domain.catchmaxlength.entity.QCatchMaxLength.*;
 import static com.backend.domain.fish.entity.QFish.*;
 import static com.backend.domain.fishencyclopedia.entity.QFishEncyclopedia.*;
 import static com.backend.domain.fishpoint.entity.QFishPoint.*;
+import static com.backend.global.storage.entity.QFile.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
@@ -55,7 +56,7 @@ public class FishEncyclopediaQueryRepository {
 	) {
 
 		List<FishEncyclopediaResponse.Detail> detailList = queryFactory
-			.select(
+			.selectDistinct(
 				new QFishEncyclopediaResponse_Detail(
 					fishEncyclopedia.fishEncyclopediaId,
 					fishEncyclopedia.length,
@@ -98,28 +99,25 @@ public class FishEncyclopediaQueryRepository {
 	}
 
 	public List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberIdAndFishId(
-		final GlobalRequest.CursorRequest cursorRequestDto,
-		final Long fishId,
 		final Long memberId
 	) {
 
 		return queryFactory
 			.select(
 				new QFishEncyclopediaResponse_DetailPage(
-					fishEncyclopedia.fishEncyclopediaId,
-					fish.imageId,
+					fish.fishId,
+					file.url,
 					fish.name,
 					catchMaxLength.bestLength,
 					catchMaxLength.catchCount
 				)
 			)
-			.from(fishEncyclopedia)
-			.leftJoin(fish)
-			.on(fishEncyclopedia.fishId.eq(fish.fishId))
+			.from(fish)
 			.leftJoin(catchMaxLength)
-			.on(fishEncyclopedia.fishId.eq(catchMaxLength.fishId))
-			.where(BOOLEAN_EXPRESSION_BI_FUNCTION.apply(fishId, memberId))
-			.orderBy(getOrderBy(cursorRequestDto))
+			.on(fish.fishId.eq(catchMaxLength.fishId))
+			.leftJoin(file)
+			.on(file.fileId.eq(fish.fileId))
+			.where(catchMaxLength.memberId.eq(memberId))
 			.fetch();
 	}
 

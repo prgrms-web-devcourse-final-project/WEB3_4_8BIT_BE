@@ -35,7 +35,7 @@ public class FishEncyclopediaResponse {
 
 	public record DetailPage(
 		Long fishEncyclopediaId,
-		Long imageId,
+		String imageUrl,
 		String fishName,
 		Integer bestLength,
 		Integer totalCount

@@ -38,14 +38,10 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 
 	@Override
 	public List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberIdAndFishId(
-		final GlobalRequest.CursorRequest cursorRequestDto,
-		final Long fishId,
 		final Long memberId
 	) {
 
 		return fishEncyclopediaQueryRepository.findDetailPageByAllByMemberIdAndFishId(
-			cursorRequestDto,
-			fishId,
 			memberId
 		);
 	}

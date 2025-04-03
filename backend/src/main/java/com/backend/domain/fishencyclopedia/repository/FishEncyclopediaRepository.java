@@ -49,8 +49,6 @@ public interface FishEncyclopediaRepository {
 	 * @author Kim Dong O
 	 */
 	List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberIdAndFishId(
-		final GlobalRequest.CursorRequest cursorRequestDto,
-		final Long fishId,
 		final Long memberId
 	);
 }

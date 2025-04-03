@@ -39,7 +39,7 @@ public class Fish extends BaseEntity {
 	private String description;
 
 	@Column(nullable = false)
-	private Long imageId;
+	private Long fileId;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<Long> spawnSeason = new ArrayList<>();
