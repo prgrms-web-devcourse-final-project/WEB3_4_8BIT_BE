@@ -26,7 +26,7 @@ public class GlobalRequest {
 		@Schema(description = "페이지 번호", example = "0")
 		Integer page,
 
-		@Min(value = 1, message = "페이지 사이즈는 0 이상이어야 합니다.")
+		@Min(value = 1, message = "페이지 사이즈는 1 이상이어야 합니다.")
 		@Schema(description = "페이지 사이즈", example = "10")
 		Integer size,
 
@@ -76,7 +76,7 @@ public class GlobalRequest {
 		String fieldValue,
 		@Schema(description = "정렬 필드 ID값 [이전이면 처음 값, 이후면 마지막 값]", example = "next")
 		Long id,
-		@Min(value = 1, message = "페이지 사이즈는 0 이상이어야 합니다.")
+		@Min(value = 1, message = "페이지 사이즈는 1 이상이어야 합니다.")
 		@Schema(description = "페이지 사이즈", example = "10")
 		Integer size
 	) {
