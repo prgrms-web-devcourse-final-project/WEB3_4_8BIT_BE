@@ -1,5 +1,7 @@
 package com.backend.domain.fishencyclopedia.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
@@ -35,7 +37,7 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 	}
 
 	@Override
-	public ScrollResponse<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberIdAndFishId(
+	public List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberIdAndFishId(
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long fishId,
 		final Long memberId

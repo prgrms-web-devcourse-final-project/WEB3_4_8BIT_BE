@@ -38,8 +38,8 @@ public class Fish extends BaseEntity {
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String description;
 
-	@Column(nullable = false, length = 50)
-	private String icon;
+	@Column(nullable = false)
+	private Long imageId;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<Long> spawnSeason = new ArrayList<>();

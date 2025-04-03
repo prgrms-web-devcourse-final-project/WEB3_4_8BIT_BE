@@ -35,9 +35,10 @@ public class FishEncyclopediaResponse {
 
 	public record DetailPage(
 		Long fishEncyclopediaId,
+		Long imageId,
 		String fishName,
 		Integer bestLength,
-		String totalCount
+		Integer totalCount
 	) {
 		@QueryProjection
 		public DetailPage {

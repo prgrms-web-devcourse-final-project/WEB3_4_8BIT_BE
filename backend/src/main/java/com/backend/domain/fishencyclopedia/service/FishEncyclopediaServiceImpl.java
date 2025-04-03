@@ -56,10 +56,14 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		CatchMaxLength encyclopediaMaxLength = findEncyclopediaMaxLength
 			.orElse(CatchMaxLengthConvert.fromCatchMaxLength(requestDto.fishId(), memberId));
 
- 		// 최대 값 갱신
+ 		// 최대 값 갱신 & 잡은 마리 수 설정
 		encyclopediaMaxLength.setBestLength(requestDto.length());
+		encyclopediaMaxLength.setCatchCount(requestDto.count());
 
-		if (encyclopediaMaxLength.getBestLength().equals(requestDto.length())) {
+		if (
+			encyclopediaMaxLength.getBestLength().equals(requestDto.length()) ||
+			encyclopediaMaxLength.getCatchCount().equals(requestDto.count())
+		) {
 			catchMaxLengthRepository.save(encyclopediaMaxLength);
 		}
 

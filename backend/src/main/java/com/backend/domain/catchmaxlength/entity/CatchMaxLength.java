@@ -37,8 +37,15 @@ public class CatchMaxLength extends BaseEntity {
 	@Builder.Default
 	private Integer bestLength = 0;
 
-	//TODO 추후 테스트 코드 작성해야함
+	@Column(nullable = false)
+	@Builder.Default
+	private Integer catchCount = 0;
+
 	public void setBestLength(final Integer bestLength) {
 		this.bestLength = Math.max(this.bestLength, bestLength);
+	}
+
+	public void setCatchCount(final Integer catchCount) {
+		this.catchCount +=  catchCount;
 	}
 }
