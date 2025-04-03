@@ -1,5 +1,11 @@
 package com.backend.global.auth.jwt;
 
+import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -19,6 +25,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtTokenProvider jwtTokenProvider;
 	private final CookieUtil cookieUtil;
+	private final RedisTemplate<String, String> redisTemplate;
+
+	@Value("${jwt.refresh-token-expire-time-seconds}")
+	private long refreshTokenValidityInSeconds;
 
 	@Override
 	protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -42,24 +52,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				// Access Token 블랙리스트 확인
 				if (jwtTokenProvider.isBlacklisted(accessToken)) {
 					log.warn("JwtAuthenticationFilter - 블랙리스트에 등록된 accessToken");
-					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					refreshAndContinue(request, response, filterChain, accessToken);
 					return;
 				}
 
 				try {
-					// /auth/refresh 요청이 아닌 경우에만 토큰 유효성 검증
-					if (!request.getRequestURI().equals("/auth/refresh")) {
-						if (jwtTokenProvider.validateToken(accessToken)) {
-							Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
-							SecurityContextHolder.getContext().setAuthentication(authentication);
-							log.debug("사용자 '{}'의 인증 정보를 security context에 설정함", authentication.getName());
-						}
+					if (jwtTokenProvider.validateToken(accessToken)) {
+						Authentication authentication = jwtTokenProvider.getAuthentication(accessToken);
+						SecurityContextHolder.getContext().setAuthentication(authentication);
+						log.debug("사용자 '{}'의 인증 정보를 security context에 설정함", authentication.getName());
 					}
 				} catch (JwtAuthenticationException e) {
-					// /auth/refresh 요청이 아닌 경우에만 예외 처리
-					if (!request.getRequestURI().equals("/auth/refresh")) {
-						throw e;
-					}
+					refreshAndContinue(request, response, filterChain, accessToken);
+					return;
 				}
 			}
 
@@ -71,6 +76,46 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		} catch (Exception e) {
 			log.warn("사용자 인증 정보를 설정할 수 없음: {}", e.getMessage());
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+		}
+	}
+
+	private void refreshAndContinue(HttpServletRequest request, HttpServletResponse response,
+		FilterChain filterChain, String expiredAccessToken) {
+		try {
+			Long userId = jwtTokenProvider.getUserIdFromExpiredToken(expiredAccessToken);
+			String refreshTokenKey = "RT:" + userId;
+			String refreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
+
+			if (refreshToken == null || jwtTokenProvider.isRefreshTokenExpired(refreshToken)) {
+				log.warn("RefreshToken 만료 또는 없음");
+
+				ResponseCookie logoutCookie = cookieUtil.createLogoutCookie();
+				response.addHeader(HttpHeaders.SET_COOKIE, logoutCookie.toString());
+
+				response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+				return;
+			}
+
+			// refresh token ttl갱신
+			redisTemplate.expire(refreshTokenKey, refreshTokenValidityInSeconds, TimeUnit.SECONDS);
+			log.debug("기존 RefreshToken TTL만 갱신");
+
+			// access token 재발급
+			String newAccessToken = jwtTokenProvider.refreshAccessToken(expiredAccessToken);
+			ResponseCookie accessTokenCookie = cookieUtil.createAccessTokenCookie(newAccessToken);
+			response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+
+			// SecurityContext 설정
+			Authentication authentication = jwtTokenProvider.getAuthentication(newAccessToken);
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			log.debug("재발급 및 인증 완료: {}", authentication.getName());
+
+			// 다음 필터로 이동
+			filterChain.doFilter(request, response);
+
+		} catch (Exception e) {
+			log.error("refreshAndContinue 중 예외 발생: {}", e.getMessage());
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 	}
