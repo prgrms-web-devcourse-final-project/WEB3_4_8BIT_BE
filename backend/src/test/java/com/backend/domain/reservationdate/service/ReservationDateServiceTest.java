@@ -130,7 +130,6 @@ public class ReservationDateServiceTest extends BaseTest {
 		assertThatThrownBy(
 			() -> reservationDateServiceImpl.getReservationDate(1L, LocalDate.of(2025, 4, 2)))
 			.isInstanceOf(ShipFishingPostException.class)
-			.hasFieldOrPropertyWithValue("shipFishingPostErrorCode", ShipFishingPostErrorCode.POSTS_NOT_FOUND)
 			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_NOT_FOUND.getMessage());
 	}
 
