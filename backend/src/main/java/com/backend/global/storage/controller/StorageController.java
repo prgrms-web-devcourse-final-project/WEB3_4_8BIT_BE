@@ -32,7 +32,7 @@ public class StorageController {
 	@Operation(summary = "Presigned URL 생성", description = "파일 업로드를 위한 presigned URL 리스트를 생성하는 API")
 	public ResponseEntity<GenericResponse<List<FileUploadResponse>>> getPresignedUrls(
 		@RequestBody @Valid final FileUploadRequest.Request requestDto,
-		@AuthenticationPrincipal CustomOAuth2User user
+		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 		List<FileUploadResponse> response = storageService.generateUploadUrls(
 			user.getId(),
