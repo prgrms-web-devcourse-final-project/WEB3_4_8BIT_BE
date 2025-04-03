@@ -91,9 +91,13 @@ public class FishEncyclopediaQueryRepository {
 		final Long fishId,
 		final Long memberId
 	) {
+		//fishId와 memberId가 일치하는 데이터를 가져오는 조건식
+		BooleanExpression baseBooleanExpression = fishEncyclopedia.fishId.eq(fishId)
+			.and(fishEncyclopedia.memberId.eq(memberId));
+
 		// 입력값 유효성 검사
 		if (!StringUtils.hasText(cursorRequestDto.fieldValue()) || cursorRequestDto.id() == null) {
-			return null;
+			return baseBooleanExpression;
 		}
 
 		// 기본키 ID 값
@@ -104,10 +108,6 @@ public class FishEncyclopediaQueryRepository {
 		String sortFieldValueStr = cursorRequestDto.fieldValue();
 		// 정렬 순서 Order 객체로 변환
 		Order order = QuerydslUtil.getOrder(cursorRequestDto);
-
-		//fishId와 memberId가 일치하는 데이터를 가져오는 조건식
-		BooleanExpression baseBooleanExpression = fishEncyclopedia.fishId.eq(fishId)
-			.and(fishEncyclopedia.memberId.eq(memberId));
 
 		return getWhereBooleanExpression(sortField, sortFieldValueStr, idValue, order, baseBooleanExpression);
 	}
