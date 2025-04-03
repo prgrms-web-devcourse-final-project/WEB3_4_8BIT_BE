@@ -34,6 +34,7 @@ public class FishEncyclopediaController {
 
 	private final FishEncyclopediaService fishEncyclopediaService;
 
+	//TODO 프론트랑 얘기해서 request 객체를 어떻게 받을 것인지 정해야함
 	@Operation(summary = "물고기 도감 추가하기", description = "물고기 도감 추가시 사용하는 API")
 	@PostMapping("/encyclopedias")
 	public ResponseEntity<GenericResponse<Void>> createFishEncyclopedia(
