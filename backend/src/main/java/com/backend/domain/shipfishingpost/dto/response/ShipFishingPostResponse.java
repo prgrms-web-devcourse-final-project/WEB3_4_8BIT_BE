@@ -3,6 +3,7 @@ package com.backend.domain.shipfishingpost.dto.response;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.ship.dto.response.ShipResponse;
 import com.querydsl.core.annotations.QueryProjection;
 
@@ -40,7 +41,7 @@ public class ShipFishingPostResponse {
 		List<String> imageList,
 		LocalTime startTime,
 		LocalTime durationTime,
-		Long maxGuestCount,
+		Integer maxGuestCount,
 		Double reviewEverRate) {
 		@QueryProjection
 		public Detail {
@@ -51,15 +52,17 @@ public class ShipFishingPostResponse {
 	 * {
 	 *     detailShipFishingPost
 	 *     detailShip
+	 *     detailMember
 	 * }
 	 *
 	 * @param detailShipFishingPost
 	 * @param detailShip
+	 * @param detailMember
 	 */
 	public record DetailAll(
 		ShipFishingPostResponse.Detail detailShipFishingPost,
-		ShipResponse.Detail detailShip
-		// Todo : user 정보 추후 작성 예정
+		ShipResponse.Detail detailShip,
+		MemberResponse.ContactInfo detailMember
 	) {
 	}
 
