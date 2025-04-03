@@ -54,7 +54,7 @@ class CaptainControllerTest extends BaseTest {
 		.giveMeBuilder(CaptainRequest.Create.class)
 		.set("nickname", "해적왕")
 		.set("profileImg", "http://example.com/image.jpg")
-		.set("descrption", "해적왕이 되고싶은 루피 입니다.")
+		.set("description", "해적왕이 되고싶은 루피 입니다.")
 		.set("shipLicenseNumber", "1-2019123456")
 		.set("shipList", List.of(1L, 2L, 3L));
 
@@ -117,10 +117,10 @@ class CaptainControllerTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("선장 저장 [descrption null] [Controller] - Fail")
+	@DisplayName("선장 저장 [description null] [Controller] - Fail")
 	@WithMockCustomUser
 	void t04() throws Exception {
-		CaptainRequest.Create requestDto = arbitraryBuilder.set("descrption", null).sample();
+		CaptainRequest.Create requestDto = arbitraryBuilder.set("description", null).sample();
 
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/members/captains")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -128,7 +128,7 @@ class CaptainControllerTest extends BaseTest {
 
 		result
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.data[0].field").value("descrption"))
+			.andExpect(jsonPath("$.data[0].field").value("description"))
 			.andExpect(jsonPath("$.data[0].reason").value("자기 소개글은 필수 항목입니다."))
 			.andExpect(jsonPath("$.success").value(false));
 	}
