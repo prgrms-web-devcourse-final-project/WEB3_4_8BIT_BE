@@ -24,7 +24,7 @@ public class StorageCleanupServiceImpl implements StorageCleanupService {
 
 		ZonedDateTime expirationTime = ZonedDateTime.now().minus(olderThan);
 
-		int deletedCount = storageRepository.deletePendingFilesBefore(expirationTime);
+		Long deletedCount = storageRepository.deletePendingFilesBefore(expirationTime);
 
 		if(deletedCount > 0) {
 			log.debug("업로드 되지 않은 파일 삭제 완료 - 기준 시각: {}, 삭제된 개수: {}", expirationTime, deletedCount);

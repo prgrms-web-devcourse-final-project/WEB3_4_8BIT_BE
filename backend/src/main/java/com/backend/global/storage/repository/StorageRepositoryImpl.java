@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 public class StorageRepositoryImpl implements StorageRepository {
 
 	private final StorageJpaRepository storageJpaRepository;
+	private final StorageQueryRepository storageQueryRepository;
 
 	@Override
 	public File save(final File file) {
@@ -31,8 +32,8 @@ public class StorageRepositoryImpl implements StorageRepository {
 	}
 
 	@Override
-	public int deletePendingFilesBefore(final ZonedDateTime expirationTime) {
-		return storageJpaRepository.deletePendingFilesBefore(expirationTime);
+	public Long deletePendingFilesBefore(final ZonedDateTime expirationTime) {
+		return storageQueryRepository.deletePendingFilesBefore(expirationTime);
 	}
 
 	@Override

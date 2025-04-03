@@ -35,9 +35,9 @@ public interface StorageRepository {
 	 * 업로드되지 않은 파일 중, 지정된 시각 이전에 생성된 파일들을 삭제
 	 *
 	 * @param expirationTime 삭제 기준 시각 (이 시각보다 이전에 생성된 파일이 삭제 대상)
-	 * @return {@link Integer} 삭제된 파일 개수
+	 * @return {@link Long} 삭제된 파일 개수
 	 */
-	int deletePendingFilesBefore(final ZonedDateTime expirationTime);
+	Long deletePendingFilesBefore(final ZonedDateTime expirationTime);
 
 	/**
 	 * 주어진 파일 리스트 삭제
