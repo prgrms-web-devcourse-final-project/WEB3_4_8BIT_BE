@@ -2,6 +2,7 @@ package com.backend.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -35,10 +36,11 @@ public class SecurityConfig {
 	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 	private final CustomOAuth2UserService customOAuth2UserService;
 	private final CookieUtil cookieUtil;
+	private final RedisTemplate<String, String> redisTemplate;
 
 	@Bean
 	public JwtAuthenticationFilter jwtAuthenticationFilter() {
-		return new JwtAuthenticationFilter(jwtTokenProvider, cookieUtil);
+		return new JwtAuthenticationFilter(jwtTokenProvider, cookieUtil, redisTemplate);
 	}
 
 	@Bean
