@@ -1,6 +1,7 @@
 package com.backend.domain.fishencyclopedia.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -63,5 +64,18 @@ public class FishEncyclopediaController {
 		);
 
 		return ResponseEntity.ok(GenericResponse.of(true, detailList));
+	}
+
+	@Operation(summary = "물고기 도감 상세 조회", description = "물고기 도감 상세 조회시 사용하는 API")
+	@GetMapping("/encyclopedias")
+	public ResponseEntity<GenericResponse<List<FishEncyclopediaResponse.DetailPage>>> getDetailPageList(
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		List<FishEncyclopediaResponse.DetailPage> detailPageList = fishEncyclopediaService.getDetailPageList(
+			user.getId()
+		);
+
+		return ResponseEntity.ok(GenericResponse.of(true, detailPageList));
 	}
 }
