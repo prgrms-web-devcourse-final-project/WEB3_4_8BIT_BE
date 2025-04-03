@@ -25,29 +25,7 @@ public class AuthServiceImpl implements AuthService {
 	private final CookieUtil cookieUtil;
 
 	@Override
-	public void refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
-		String accessToken = cookieUtil.extractTokenFromCookie(request);
-
-		if (accessToken == null) {
-			log.error("토큰이 요청에 없습니다(auth/refresh)");
-			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.TOKEN_NOT_FOUND);
-		}
-
-		validateAccessToken(accessToken);
-		Long userId = jwtTokenProvider.getUserIdFromExpiredToken(accessToken);
-		validateRefreshToken(userId);
-
-		String newAccessToken = jwtTokenProvider.refreshAccessToken(accessToken);
-		log.debug("New access token created for userId: {}", userId);
-
-		ResponseCookie cookie = cookieUtil.createAccessTokenCookie(newAccessToken);
-		response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
-		log.debug("AccessToken 재발급 및 쿠키 설정 완료 - userId={}", userId);
-	}
-
-	@Override
-	public void logout(HttpServletRequest request, HttpServletResponse response) {
+	public void logout(final HttpServletRequest request, final HttpServletResponse response) {
 		String accessToken = cookieUtil.extractTokenFromCookie(request);
 
 		if (accessToken == null) {
@@ -72,24 +50,10 @@ public class AuthServiceImpl implements AuthService {
 	 * @param accessToken 검증 토큰
 	 * @throws JwtAuthenticationException 블랙리스트에 존재할 경우 예외 발생
 	 */
-	private void validateAccessToken(String accessToken) {
+	private void validateAccessToken(final String accessToken) {
 		if (jwtTokenProvider.isBlacklisted(accessToken)) {
 			log.warn("블랙리스트된 토큰 사용");
 			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.INVALID_TOKEN);
-		}
-	}
-
-	/**
-	 * Redis에 저장된 Refresh Token의 존재 여부를 확인하는 메서드
-	 *
-	 * @param userId 사용자 ID
-	 * @throws JwtAuthenticationException Refresh Token이 없을 경우 예외 발생
-	 */
-	private void validateRefreshToken(Long userId) {
-		String refreshToken = redisTemplate.opsForValue().get("RT:" + userId);
-		if (refreshToken == null) {
-			log.warn("RefreshToken 없음: userId={}", userId);
-			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.TOKEN_NOT_FOUND);
 		}
 	}
 }
