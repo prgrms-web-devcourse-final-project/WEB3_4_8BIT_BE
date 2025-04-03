@@ -3,6 +3,8 @@ package com.backend.global.advice;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -13,8 +15,20 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.backend.global.dto.response.ErrorDetail;
 import com.backend.global.dto.response.GenericResponse;
+import com.backend.domain.captain.exception.CaptainException;
+import com.backend.domain.fish.exception.FishException;
+import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
+import com.backend.domain.member.exception.MemberException;
+import com.backend.domain.reservation.exception.ReservationException;
+import com.backend.domain.review.exception.ReviewException;
+import com.backend.domain.ship.exception.ShipException;
+import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
+import com.backend.global.auth.exception.JwtAuthenticationException;
+import com.backend.global.dto.response.ErrorDetail;
+import com.backend.global.dto.response.GenericResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
+import com.backend.global.storage.exception.StorageException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +60,19 @@ public class GlobalControllerAdvice {
 
 		return ResponseEntity.status(globalException.getStatus().value())
 			.body(genericResponse);
+	}
+
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<GenericResponse<Void>> handleDataIntegrityViolationException(
+		DataIntegrityViolationException ex) {
+		log.error("DataIntegrityViolationException caught: ", ex);
+
+		GenericResponse<Void> response = GenericResponse.fail(
+			GlobalErrorCode.DATA_INTEGRITY_VIOLATION.getCode(),
+			GlobalErrorCode.DATA_INTEGRITY_VIOLATION.getMessage()
+		);
+
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
 	}
 
 	/**
