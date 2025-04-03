@@ -45,7 +45,7 @@ class CaptainRepositoryTest extends BaseTest {
 	@Autowired
 	TestEntityManager em;
 
-	private final ArbitraryBuilder<Member> memberArbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+	final ArbitraryBuilder<Member> memberArbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 		.set("memberId", null)
 		.set("phone", "010-1234-5678")
 		.set("email", "test@naver.com")
@@ -99,5 +99,4 @@ class CaptainRepositoryTest extends BaseTest {
 		assertThat(result.get().shipLicenseNumber()).isEqualTo("1-2019123456");
 		assertThat(result.get().shipList()).isEqualTo(List.of(101L, 102L));
 	}
-
 }
