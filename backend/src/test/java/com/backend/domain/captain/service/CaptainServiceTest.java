@@ -48,7 +48,7 @@ class CaptainServiceTest extends BaseTest {
 		CaptainRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(CaptainRequest.Create.class)
 			.set("nickname", "해적왕")
 			.set("profileImg", "http://example.com/image.jpg")
-			.set("descrption", "해적왕이 되고싶은 루피 입니다.")
+			.set("description", "해적왕이 되고싶은 루피 입니다.")
 			.set("shipLicenseNumber", "1-2019123456")
 			.set("shipList", List.of(1L, 2L, 3L))
 			.sample();
@@ -73,7 +73,7 @@ class CaptainServiceTest extends BaseTest {
 		// member가 업데이트 되었는지 확인
 		assertThat(givenMember.getNickname()).isEqualTo(givenRequestDto.nickname());
 		assertThat(givenMember.getProfileImg()).isEqualTo(givenRequestDto.profileImg());
-		assertThat(givenMember.getDescription()).isEqualTo(givenRequestDto.descrption());
+		assertThat(givenMember.getDescription()).isEqualTo(givenRequestDto.description());
 		assertThat(givenMember.getRole().name()).isEqualTo("CAPTAIN");
 		assertThat(givenMember.getIsAddInfo()).isTrue();
 

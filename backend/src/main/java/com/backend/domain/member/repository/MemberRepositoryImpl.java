@@ -34,4 +34,9 @@ public class MemberRepositoryImpl implements MemberRepository {
 	public Optional<MemberResponse.Detail> findDetailById(Long memberId) {
 		return memberQueryRepository.findDetailById(memberId);
 	}
+
+	@Override
+	public boolean existsById(Long memberId) {
+		return memberJpaRepository.existsById(memberId);
+	}
 }

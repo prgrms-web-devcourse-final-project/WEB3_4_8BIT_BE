@@ -8,11 +8,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.backend.domain.captain.dto.Response.CaptainResponse;
 import com.backend.domain.captain.entity.Captain;
@@ -28,21 +26,13 @@ import com.backend.global.util.BaseTest;
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
 @DataJpaTest
-@EnableJpaRepositories(basePackages = {
-	"com.backend.domain.captain.repository",
-	"com.backend.domain.member.repository"
-})
-@EntityScan(basePackages = {
-	"com.backend.domain.captain.entity",
-	"com.backend.domain.member.entity"
-})
 @Import({
 	JpaAuditingConfig.class,
-	QuerydslConfig.class,
 	CaptainRepositoryImpl.class,
 	CaptainQueryRepository.class,
 	MemberRepositoryImpl.class,
-	MemberQueryRepository.class
+	MemberQueryRepository.class,
+	QuerydslConfig.class,
 })
 class CaptainRepositoryTest extends BaseTest {
 
@@ -55,7 +45,7 @@ class CaptainRepositoryTest extends BaseTest {
 	@Autowired
 	TestEntityManager em;
 
-	private final ArbitraryBuilder<Member> memberArbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+	final ArbitraryBuilder<Member> memberArbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 		.set("memberId", null)
 		.set("phone", "010-1234-5678")
 		.set("email", "test@naver.com")
@@ -109,5 +99,4 @@ class CaptainRepositoryTest extends BaseTest {
 		assertThat(result.get().shipLicenseNumber()).isEqualTo("1-2019123456");
 		assertThat(result.get().shipList()).isEqualTo(List.of(101L, 102L));
 	}
-
 }

@@ -55,7 +55,7 @@ public class Member extends BaseEntity {
 
 	private String profileImg;
 
-	@Column(columnDefinition = "TEXT")
+	@Column(columnDefinition = "TEXT", length = 500)
 	private String description;
 
 	@Column(nullable = false)
