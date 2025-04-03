@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishRepository;
+import com.backend.domain.reservationdate.repository.ReservationDateRepository;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
@@ -33,6 +34,7 @@ import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.domain.shipfishingpost.service.ShipFishingPostServiceImpl;
+import com.backend.domain.shipfishingpostfish.repository.ShipFishingPostFishRepository;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.util.BaseTest;
 
@@ -47,6 +49,12 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Mock
 	private ShipFishingPostRepository shipFishingPostRepository;
+
+	@Mock
+	private ReservationDateRepository reservationDateRepository;
+
+	@Mock
+	private ShipFishingPostFishRepository shipFishingPostFishRepository;
 
 	@InjectMocks
 	private ShipFishingPostServiceImpl shipFishingPostServiceImpl;
@@ -65,7 +73,8 @@ public class ShipFishingPostServiceTest extends BaseTest {
 			.set("shipId", 1L)
 			.set("memberId", 1L).sample();
 
-		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishPostsRequestCreate(givenRequestDto,
+		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishingPostRequestCreate(
+			givenRequestDto,
 			1L);
 
 		ShipFishingPost savedShipFishingPost = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
@@ -92,7 +101,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		ShipFishingPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeOne(
 			ShipFishingPostRequest.Create.class);
 
-		ShipFishingPostConverter.fromShipFishPostsRequestCreate(givenRequestDto, 1L);
+		ShipFishingPostConverter.fromShipFishingPostRequestCreate(givenRequestDto, 1L);
 
 		// When
 
@@ -118,7 +127,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 			.set("memberId", 2L)
 			.sample();
 
-		ShipFishingPostConverter.fromShipFishPostsRequestCreate(givenRequestDto,
+		ShipFishingPostConverter.fromShipFishingPostRequestCreate(givenRequestDto,
 			1L);
 
 		// When
