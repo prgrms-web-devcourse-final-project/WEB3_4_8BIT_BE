@@ -15,20 +15,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.backend.global.dto.response.ErrorDetail;
 import com.backend.global.dto.response.GenericResponse;
-import com.backend.domain.captain.exception.CaptainException;
-import com.backend.domain.fish.exception.FishException;
-import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
-import com.backend.domain.member.exception.MemberException;
-import com.backend.domain.reservation.exception.ReservationException;
-import com.backend.domain.review.exception.ReviewException;
-import com.backend.domain.ship.exception.ShipException;
-import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
-import com.backend.global.auth.exception.JwtAuthenticationException;
-import com.backend.global.dto.response.ErrorDetail;
-import com.backend.global.dto.response.GenericResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
-import com.backend.global.storage.exception.StorageException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -62,6 +50,12 @@ public class GlobalControllerAdvice {
 			.body(genericResponse);
 	}
 
+	/**
+	 * DataIntegrityViolationException 처리 핸들러 입니다.
+	 *
+	 * @param ex {@link DataIntegrityViolationException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
 	@ExceptionHandler(DataIntegrityViolationException.class)
 	public ResponseEntity<GenericResponse<Void>> handleDataIntegrityViolationException(
 		DataIntegrityViolationException ex) {
