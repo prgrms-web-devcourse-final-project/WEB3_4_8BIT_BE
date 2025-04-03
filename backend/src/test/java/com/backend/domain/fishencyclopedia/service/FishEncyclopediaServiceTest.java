@@ -215,7 +215,7 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			givenHasNext
 		);
 
-		when(fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
+		when(fishEncyclopediaRepository.findDetailByAllByMemberIdAndFishId(
 			givenCursorRequestDto,
 			givenFish.getFishId(),
 			givenMember.getMemberId())).thenReturn(givenScrollResponse);

@@ -77,7 +77,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		final Long fishId,
 		final Long memberId
 	) {
-		ScrollResponse<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
+		ScrollResponse<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByMemberIdAndFishId(
 			cursorRequestDto, fishId, memberId);
 
 		log.debug("물고기 도감 상세 조회: {}", findDetailList);

@@ -39,31 +39,33 @@ public class FishEncyclopediaQueryRepository {
 		"createdAt", fishEncyclopedia.createdAt
 	);
 
-	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
-		final GlobalRequest.CursorRequest pageRequestDto,
+	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByMemberIdAndFishId(
+		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long fishId,
 		final Long memberId
 	) {
 
-		List<FishEncyclopediaResponse.Detail> detailList = queryFactory.select(
+		List<FishEncyclopediaResponse.Detail> detailList = queryFactory
+			.select(
 				new QFishEncyclopediaResponse_Detail(
 					fishEncyclopedia.fishEncyclopediaId,
 					fishEncyclopedia.length,
 					fishEncyclopedia.count,
 					fishPoint.fishPointName,
 					fishPoint.fishPointDetailName,
-					fishEncyclopedia.createdAt)
+					fishEncyclopedia.createdAt
+				)
 			)
 			.from(fishEncyclopedia)
 			.leftJoin(fishPoint)
 			.on(fishEncyclopedia.fishPointId.eq(fishPoint.fishPointId))
-			.where(whereCondition(pageRequestDto, fishId, memberId))
-			.orderBy(getOrderBy(pageRequestDto))
-			.limit(pageRequestDto.size() + 1)
+			.where(whereCondition(cursorRequestDto, fishId, memberId))
+			.orderBy(getOrderBy(cursorRequestDto))
+			.limit(cursorRequestDto.size() + 1)
 			.fetch();
 
 		// 다음 페이지가 있는지 확인
-		boolean hasNext = detailList.size() > pageRequestDto.size();
+		boolean hasNext = detailList.size() > cursorRequestDto.size();
 
 		if (hasNext) {
 			detailList.remove(detailList.size() - 1);
@@ -79,11 +81,19 @@ public class FishEncyclopediaQueryRepository {
 		 */
 		return ScrollResponse.from(
 			detailList,
-			pageRequestDto.size(),
+			cursorRequestDto.size(),
 			detailList.size(),
-			pageRequestDto.fieldValue() == null,
+			cursorRequestDto.fieldValue() == null,
 			hasNext
 		);
+	}
+
+	public ScrollResponse<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberIdAndFishId(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long fishId,
+		final Long memberId
+	) {
+		return null;
 	}
 
 	private BooleanExpression whereCondition(

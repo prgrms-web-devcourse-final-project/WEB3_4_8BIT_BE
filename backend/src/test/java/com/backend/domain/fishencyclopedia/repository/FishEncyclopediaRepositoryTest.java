@@ -265,7 +265,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 
 	// 유틸리티 메서드
 	private ScrollResponse<FishEncyclopediaResponse.Detail> executeQuery(GlobalRequest.CursorRequest cursorRequestDto) {
-		return fishEncyclopediaQueryRepository.findDetailByAllByFishPointIdAndFishId(
+		return fishEncyclopediaQueryRepository.findDetailByAllByMemberIdAndFishId(
 			cursorRequestDto,
 			savedFishList.get(0).getFishId(),
 			givenMember.getMemberId()
