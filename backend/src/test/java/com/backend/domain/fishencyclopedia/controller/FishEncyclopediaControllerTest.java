@@ -245,7 +245,7 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.timestamp").exists())
 			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("size"))
-			.andExpect(jsonPath("$.data[0].reason").value("페이지 사이즈는 0 이상이어야 합니다."))
+			.andExpect(jsonPath("$.data[0].reason").value("페이지 사이즈는 1 이상이어야 합니다."))
 			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
 	}
