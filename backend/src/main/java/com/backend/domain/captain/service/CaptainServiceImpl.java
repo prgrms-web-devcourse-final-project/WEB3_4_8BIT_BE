@@ -37,11 +37,11 @@ public class CaptainServiceImpl implements CaptainService {
 		validAddInfo(member);
 
 		// 멤버 추가 정보 및 role 업데이트
-		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.descrption());
+		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.description());
 		member.updateRole(MemberRole.CAPTAIN);
 
 		// 선장 정보 생성 및 저장
-		Captain captain = CaptainConverter.fromMemberAndCaptainRequestCreate(requestDto, member);
+		Captain captain = CaptainConverter.fromMemberAndCaptainRequestCreate(requestDto, memberId);
 		log.debug("[선장 등록 완료] : {}", captain);
 
 		return captainRepository.save(captain).getMemberId();
