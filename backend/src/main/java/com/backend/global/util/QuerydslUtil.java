@@ -17,7 +17,7 @@ public class QuerydslUtil {
 	 * @param pageRequestDto
 	 * @return {@link Order} 기본 값 DESC
 	 */
-	public static Order getOrder(GlobalRequest.CursorRequest pageRequestDto) {
+	public static Order getOrder(final GlobalRequest.CursorRequest pageRequestDto) {
 		// 기본 정렬은 DESC로 동작
 		return Order.ASC.toString().equalsIgnoreCase(pageRequestDto.order()) ?
 			Order.ASC :
@@ -37,11 +37,11 @@ public class QuerydslUtil {
 	 * @return {@link BooleanExpression}
 	 */
 	public static BooleanExpression createFieldPredicate(
-		NumberPath<Long> idField,
-		Long idFieldValue,
-		NumberPath<Integer> sortField,
-		Integer sortFieldValue,
-		Order order
+		final NumberPath<Long> idField,
+		final Long idFieldValue,
+		final NumberPath<Integer> sortField,
+		final Integer sortFieldValue,
+		final Order order
 	) {
 		return sortField.eq(sortFieldValue)
 			.and(idField.gt(idFieldValue))
@@ -61,11 +61,11 @@ public class QuerydslUtil {
 	 * @return {@link BooleanExpression}
 	 */
 	public static BooleanExpression createFieldPredicate(
-		NumberPath<Long> idField,
-		Long idFieldValue,
-		DateTimePath<ZonedDateTime> sortField,
-		ZonedDateTime sortFieldValue,
-		Order order
+		final NumberPath<Long> idField,
+		final Long idFieldValue,
+		final DateTimePath<ZonedDateTime> sortField,
+		final ZonedDateTime sortFieldValue,
+		final Order order
 	) {
 
 		return sortField.eq(sortFieldValue)
