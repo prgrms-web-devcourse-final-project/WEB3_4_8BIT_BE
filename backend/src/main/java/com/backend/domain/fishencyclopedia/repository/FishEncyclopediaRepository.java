@@ -38,13 +38,9 @@ public interface FishEncyclopediaRepository {
 	);
 
 	/**
-	 * @param cursorRequestDto {@link GlobalRequest.CursorRequest}
-	 * @param fishId           {@link Long}
 	 * @param memberId         {@link Long}
 	 * @return {@link ScrollResponse}
 	 * @implSpec FishId가 일치하는 데이터 동적 조회 후 결과 반환
-	 * Sort - length, sort, createdAt(default)
-	 * Order - ASC, DESC(default)
 	 * 관리자가 직접 추가하는 데이터이기 때문에 일단은 findAll 형태로 구현
 	 * @author Kim Dong O
 	 */
