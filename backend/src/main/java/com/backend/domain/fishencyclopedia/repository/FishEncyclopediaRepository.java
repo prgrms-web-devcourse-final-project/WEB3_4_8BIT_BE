@@ -29,7 +29,7 @@ public interface FishEncyclopediaRepository {
 	 * @author Kim Dong O
 	 */
 	ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
-		final GlobalRequest.PageRequest pageRequestDto,
+		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long fishId,
 		final Long memberId
 	);

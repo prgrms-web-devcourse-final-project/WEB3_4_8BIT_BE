@@ -69,6 +69,12 @@ public class ShipFishingPostController {
 		Slice<ShipFishingPostResponse.DetailPage> response = shipFishingPostService
 			.getShipFishingPostPage(requestDto, pageRequestDto);
 
-		return ResponseEntity.ok(GenericResponse.of(true, ScrollResponse.from(response)));
+		return ResponseEntity.ok(GenericResponse.of(true,  ScrollResponse.from(
+			response.getContent(),
+			response.getSize(),
+			response.getNumberOfElements(),
+			response.isFirst(),
+			response.isLast()
+		)));
 	}
 }

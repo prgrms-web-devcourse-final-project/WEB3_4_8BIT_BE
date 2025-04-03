@@ -22,7 +22,7 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 
 	@Override
 	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
-		GlobalRequest.PageRequest pageRequestDto,
+		GlobalRequest.CursorRequest pageRequestDto,
 		Long fishId,
 		Long memberId
 	) {
