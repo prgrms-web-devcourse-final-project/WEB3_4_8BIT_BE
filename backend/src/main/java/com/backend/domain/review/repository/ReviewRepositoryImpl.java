@@ -16,6 +16,8 @@ import lombok.RequiredArgsConstructor;
 public class ReviewRepositoryImpl implements ReviewRepository {
 
 	private final ReviewJpaRepository reviewJpaRepository;
+	private final ReviewQueryRepository reviewQueryRepository;
+
 
 	@Override
 	public Review save(final Review review) {
@@ -29,12 +31,12 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 
 	@Override
 	public Slice<ReviewWithMemberResponse> findReviewsWithMemberByPostId(final Long postId, final Pageable pageable) {
-		return reviewJpaRepository.findReviewsWithMemberByPostId(postId, pageable);
+		return reviewQueryRepository.findReviewsWithMemberByPostId(postId, pageable);
 	}
 
 	@Override
 	public Slice<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(final Long memberId, final Pageable pageable) {
-		return reviewJpaRepository.findReviewsWithMemberByMemberId(memberId, pageable);
+		return reviewQueryRepository.findReviewsWithMemberByMemberId(memberId, pageable);
 	}
 
 	@Override

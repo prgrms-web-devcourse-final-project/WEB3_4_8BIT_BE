@@ -36,6 +36,7 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 @Import({
 	JpaAuditingConfig.class,
 	ReviewRepositoryImpl.class,
+	ReviewQueryRepository.class,
 	MemberRepositoryImpl.class,
 	MemberQueryRepository.class,
 	ShipFishingPostRepositoryImpl.class,
@@ -101,8 +102,6 @@ class ReviewRepositoryTest extends BaseTest {
 	}
 
 	private void saveTestReviews(Member member, ShipFishingPost post) {
-		File file = storageRepository.save(getFileBuilder());
-
 		reviewRepository.save(createReview(1L, member.getMemberId(), post.getShipFishingPostId()));
 		reviewRepository.save(createReview(2L, member.getMemberId(), post.getShipFishingPostId()));
 	}
@@ -152,7 +151,6 @@ class ReviewRepositoryTest extends BaseTest {
 	@DisplayName("게시글 ID로 리뷰 조회 [Repository] - Success")
 	void t04() {
 		// given
-		File givenFile = getFileBuilder();
 		Member givenMember = saveTestMember();
 		ShipFishingPost givenPost = saveTestPost();
 		saveTestReviews(givenMember, givenPost);
