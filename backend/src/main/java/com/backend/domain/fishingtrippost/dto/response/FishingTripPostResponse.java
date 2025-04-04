@@ -1,5 +1,6 @@
 package com.backend.domain.fishingtrippost.dto.response;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import lombok.Builder;
@@ -16,14 +17,18 @@ public class FishingTripPostResponse {
 	 *   "name": "루피",
 	 *   "subject": "해적왕과 함께하는 낚시",
 	 *   "content": "고무고무 낚시왕!",
-	 *   "headCount": "2/4명",
-	 *   "createDate": "2024.04.03",
-	 *   "fishingDate": "2024.04.10",
-	 *   "fishingTime": "06:00",
+	 *   "currentCount": 2,
+	 *   "recruitmentCount": 4,
+	 *   "createDate": "2025-04-03T12:30:00+09:00",
+	 *   "fishingDate": "2025-04-10T06:00:00+09:00",
 	 *   "fishPointDetailName": "동해 낚시 명소",
 	 *   "fishPointName": "동해 포인트",
 	 *   "longitude": 128.12345,
-	 *   "latitude": 37.12345
+	 *   "latitude": 37.12345,
+	 *   "fileUrlList": [
+	 *     "https://cdn.example.com/image1.jpg",
+	 *     "https://cdn.example.com/image2.jpg"
+	 *   ]
 	 * }
 	 * }</pre>
 	 *
@@ -31,30 +36,32 @@ public class FishingTripPostResponse {
 	 * @param name 작성자 이름
 	 * @param subject 게시글 제목
 	 * @param content 게시글 내용
-	 * @param headCount "현재인원/모집인원명" 형식의 참가 인원 정보
-	 * @param createDate 게시글 생성일 (yyyy.MM.dd)
-	 * @param fishingDate 출조일 (yyyy.MM.dd)
-	 * @param fishingTime 출조 시간 (HH:mm)
-	 * @param fishPointDetailName 상세 낚시 포인트 이름
+	 * @param currentCount 현재 참여 인원
+	 * @param recruitmentCount 모집 정원
+	 * @param createDate 게시글 생성일시 (ISO-8601 ZonedDateTime)
+	 * @param fishingDate 출조 예정일시 (ISO-8601 ZonedDateTime)
+	 * @param fishPointDetailName 낚시 포인트 상세명
 	 * @param fishPointName 낚시 포인트 이름
-	 * @param longitude 경도
-	 * @param latitude 위도
+	 * @param longitude 낚시 포인트 경도
+	 * @param latitude 낚시 포인트 위도
+	 * @param fileUrlList 첨부 이미지 URL 리스트
 	 */
+
 	@Builder
 	public record Detail(
 		Long fishingTripPostId,
 		String name,
 		String subject,
 		String content,
-		String headCount,
-		String createDate,
-		String fishingDate,
-		String fishingTime,
+		Integer currentCount,
+		Integer recruitmentCount,
+		ZonedDateTime createDate,
+		ZonedDateTime fishingDate,
 		String fishPointDetailName,
 		String fishPointName,
 		Double longitude,
 		Double latitude,
-		List<Long> images
+		List<String> fileUrlList
 	) {
 	}
 }
