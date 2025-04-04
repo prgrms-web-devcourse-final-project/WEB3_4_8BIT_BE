@@ -130,6 +130,7 @@ public class ShipFishingPostRequest {
 		String keyword,
 		@Schema(description = "게스트 수", example = "2")
 		Long guestCount,
+		@DateTimeFormat(pattern = "HH:mm")
 		@Schema(description = "이용 시간", example = "01:30")
 		LocalTime duration
 	) {
