@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.backend.domain.fishingtrippost.converter.FishingTripPostConvert;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
+import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
@@ -35,7 +36,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 	@Override
 	@Transactional
-	public Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.Form requestDto) {
+	public Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.Create requestDto) {
 		// 멤버, 낚시 포인트 존재 검증
 		validMemberAndFishPoint(memberId, requestDto);
 
@@ -105,6 +106,44 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		return fishingTripPost;
 	}
 
+	@Override
+	public FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId) {
+		return getDetailById(fishingTripPostId);
+	}
+
+	/**
+	 * 주어진 게시글 ID를 기반으로 동출 모집 게시글 상세 정보를 조회합니다.
+	 *
+	 * <p>존재하지 않는 게시글일 경우 {@link FishingTripPostException} 예외를 발생시킵니다.</p>
+	 *
+	 * @param fishingTripPostId 조회할 게시글의 고유 ID
+	 * @return 해당 게시글의 상세 정보 {@link FishingTripPostResponse.Detail}
+	 * @throws FishingTripPostException 게시글이 존재하지 않을 경우 발생
+	 */
+	private FishingTripPostResponse.Detail getDetailById(final Long fishingTripPostId) {
+		FishingTripPostResponse.Detail detail = fishingTripPostRepository.findDetailById(fishingTripPostId)
+			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
+		log.debug("동출게시글을 찾았습니다. id :{}", detail.fishingTripPostId());
+		return detail;
+	}
+
+	/**
+	 * 동출 모집 게시글 ID로 동출 게시글 엔티티를 조회하는 메소드
+	 *
+	 * @param fishingTripPostId 동출 모집 게시글의 ID
+	 * @return {@link FishingTripPost} 조회된 동출 모집 게시글 엔티티
+	 * @throws FishingTripPostException 동출 모집 게시글이 존재하지 않는 경우 예외 발생
+	 */
+
+	private FishingTripPost getFishingTripPostById(final Long fishingTripPostId) {
+
+		FishingTripPost fishingTripPost = fishingTripPostRepository.findById(fishingTripPostId)
+			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
+		log.debug("[동출 모집 게시글 조회] : {}", fishingTripPost);
+
+		return fishingTripPost;
+	}
+
 	/**
 	 * 로그인한 멤버와 낚시포인트 존재 검증 메서드
 	 *
@@ -113,7 +152,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @throws FishPointException 존재하지 않는 낚시 포인트면 예외 발생
 	 */
 
-	private void validMemberAndFishPoint(final Long memberId, final FishingTripPostRequest.Form requestDto)
+	private void validMemberAndFishPoint(final Long memberId, final FishingTripPostRequest.Create requestDto)
 		throws GlobalException {
 
 		if (!memberRepository.existsById(memberId)) {

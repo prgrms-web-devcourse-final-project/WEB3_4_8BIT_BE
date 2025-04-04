@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.Import;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 
+import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishpoint.entity.FishPoint;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
@@ -37,6 +39,7 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 	MemberQueryRepository.class,
 	FishPointRepositoryImpl.class,
 	FishingTripPostRepositoryImpl.class,
+	FishingTripPostQueryRepository.class,
 	QuerydslConfig.class,
 })
 class FishingTripPostRepositoryTest extends BaseTest {
@@ -129,4 +132,42 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		assertThat(result.getContent()).isEqualTo("테스트 내용");
 	}
 
+
+	@Test
+	@DisplayName("동출 게시글 상세 조회 [Repository] - Success")
+	void t03() {
+		// given
+		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
+		FishPoint savedFishPoint = fishPointRepository.save(fishPointArbitraryBuilder.sample());
+
+		FishingTripPost givenPost = fishingTripPostArbitraryBuilder
+			.set("fishingTripPostId", null)
+			.set("memberId", savedMember.getMemberId())
+			.set("fishingPointId", savedFishPoint.getFishPointId())
+			.sample();
+
+		FishingTripPost savedPost = fishingTripPostRepository.save(givenPost);
+
+		// when
+		Optional<FishingTripPostResponse.Detail> result = fishingTripPostRepository.findDetailById(
+			savedPost.getFishingTripPostId());
+
+		// then
+		assertThat(result).isPresent();
+		FishingTripPostResponse.Detail detail = result.get();
+
+		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());
+		assertThat(detail.name()).isEqualTo(savedMember.getName());
+		assertThat(detail.subject()).isEqualTo(savedPost.getSubject());
+		assertThat(detail.content()).isEqualTo(savedPost.getContent());
+		assertThat(detail.headCount()).isEqualTo("0/5명");
+		assertThat(detail.createDate()).isNotBlank();
+		assertThat(detail.fishingDate()).isEqualTo("2025.06.10");
+		assertThat(detail.fishingTime()).isEqualTo("08:00");
+		assertThat(detail.fishPointName()).isEqualTo(savedFishPoint.getFishPointName());
+		assertThat(detail.fishPointDetailName()).isEqualTo(savedFishPoint.getFishPointDetailName());
+		assertThat(detail.longitude()).isEqualTo(savedFishPoint.getLongitude());
+		assertThat(detail.latitude()).isEqualTo(savedFishPoint.getLatitude());
+		assertThat(detail.images()).containsExactlyElementsOf(savedPost.getFileIdList());
+	}
 }

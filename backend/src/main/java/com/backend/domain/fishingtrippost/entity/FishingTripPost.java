@@ -28,6 +28,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @ToString
+
 public class FishingTripPost extends BaseEntity {
 
 	@Id

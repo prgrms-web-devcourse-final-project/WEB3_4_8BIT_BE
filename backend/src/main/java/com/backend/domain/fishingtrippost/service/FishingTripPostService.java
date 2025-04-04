@@ -1,6 +1,9 @@
 package com.backend.domain.fishingtrippost.service;
 
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
+import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
+import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
+import com.backend.domain.member.exception.MemberException;
 
 public interface FishingTripPostService {
 
@@ -30,4 +33,14 @@ public interface FishingTripPostService {
 		final Long fishingTripPostId,
 		final FishingTripPostRequest.Form requestDto
 	);
+	Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.Create requestDto);
+
+	/**
+	 * 게시글 ID를 기반으로 동출 모집 게시글의 상세 정보를 조회합니다.
+	 *
+	 * @param fishingTripPostId 조회할 게시글의 고유 ID
+	 * @return 게시글 상세 정보 {@link FishingTripPostResponse.Detail}
+	 * @throws FishingTripPostException 게시글이 존재하지 않을 경우 발생
+	 */
+	FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId);
 }
