@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "선상 낚시 게시글 API")
@@ -51,7 +52,7 @@ public class ShipFishingPostController {
 	@Operation(summary = "선상 낚시 게시글 상세 조회", description = "유저가 선상 낚시 게시글을 상세 조회할 때 사용하는 API")
 	@Parameter(name = "id", required = true, description = "조회할 선상 낚시 게시글 ID", example = "1")
 	public ResponseEntity<GenericResponse<ShipFishingPostResponse.DetailAll>> getShipFishPost(
-		@PathVariable("id") final Long shipFishPostsId
+		@PathVariable("id") @Min(1) final Long shipFishPostsId
 	) {
 
 		ShipFishingPostResponse.DetailAll response = shipFishingPostService.getShipFishingPostAll(shipFishPostsId);
