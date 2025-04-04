@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
+import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
@@ -194,7 +195,6 @@ class FishingTripPostServiceTest extends BaseTest {
 		);
 	}
 
-
 	@Test
 	@DisplayName("동출 게시글 수정 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
 	void t05() {
@@ -238,4 +238,50 @@ class FishingTripPostServiceTest extends BaseTest {
 		verify(fishingTripPostRepository).findById(postId);
 	}
 
+	@Test
+	@DisplayName("동출 게시글 상세 조회 [Service] - Success")
+	void t07() {
+		// Given
+		Long postId = 1L;
+
+		FishingTripPostResponse.Detail expectedDetail = FishingTripPostResponse.Detail.builder()
+			.fishingTripPostId(postId)
+			.name("루피")
+			.subject("같이 갑시다")
+			.content("초보 환영")
+			.headCount("1/5명")
+			.createDate("2025.04.01")
+			.fishingDate("2025.04.10")
+			.fishingTime("06:00")
+			.fishPointDetailName("남해 앞바다")
+			.fishPointName("남해")
+			.longitude(128.12345)
+			.latitude(37.12345)
+			.images(List.of(1L, 2L, 3L))
+			.build();
+
+		when(fishingTripPostRepository.findDetailById(postId)).thenReturn(Optional.of(expectedDetail));
+
+		// When
+		FishingTripPostResponse.Detail actualDetail = fishingTripPostService.getFishingTripPostDetail(postId);
+
+		// Then
+		assertThat(actualDetail).isEqualTo(expectedDetail);
+		verify(fishingTripPostRepository).findDetailById(postId);
+	}
+
+	@Test
+	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
+	void t08() {
+		// Given
+		Long postId = 999L;
+		when(fishingTripPostRepository.findDetailById(postId)).thenReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> fishingTripPostService.getFishingTripPostDetail(postId))
+			.isInstanceOf(FishingTripPostException.class)
+			.hasMessage(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getMessage());
+
+		verify(fishingTripPostRepository).findDetailById(postId);
+	}
 }
