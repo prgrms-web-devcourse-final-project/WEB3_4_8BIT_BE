@@ -12,14 +12,14 @@ public class CaptainRequest {
 	/**
 	 * {@code
 	 * {
-	 *   "profileImg": "http://example.com/image1.jpg",
+	 *   "fileId": 101,
 	 *   "nickname": "해적왕",
 	 *   "description": "자기 소개글 내용",
 	 *   "shipLicenseNumber": "1-2019123456",
 	 *   "shipList": [1, 2, 3]
 	 * }
 	 *}
-	 * @param profileImg 프로필 이미지 URL 리스트 (선택값)
+	 * @param fileId 프로필 이미지 ID (필수)
 	 * @param nickname 사용자 닉네임 (필수, 최대 15자)
 	 * @param description 자기 소개글 (필수,최대 500자)
 	 * @param shipLicenseNumber 선장 면허 번호 (필수)
@@ -34,7 +34,7 @@ public class CaptainRequest {
 		String nickname,
 
 		@Schema(description = "프로필 이미지 URL", example = "http://example.com/image1.jpg")
-		String profileImg,
+		Long fileId,
 
 		@NotBlank(message = "자기 소개글은 필수 항목입니다.")
 		@Size(max = 500, message = "자개소개글은 최대 500자까지 가능합니다.")

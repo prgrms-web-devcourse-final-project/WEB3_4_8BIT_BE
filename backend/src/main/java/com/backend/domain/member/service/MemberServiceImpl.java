@@ -28,7 +28,7 @@ public class MemberServiceImpl implements MemberService {
 
 		validAddInfo(member);
 
-		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.description());
+		member.updateMember(requestDto.nickname(), requestDto.fileId(), requestDto.description());
 		log.debug("추가 정보저장에 성공하였습니다. 닉네임 :{} ", member.getNickname());
 
 		return member.getMemberId();
@@ -47,7 +47,7 @@ public class MemberServiceImpl implements MemberService {
 
 		Member member = getMemberById(memberId);
 
-		member.updateMember(requestDto.nickname(), requestDto.profileImg(), requestDto.profileImg());
+		member.updateMember(requestDto.nickname(), requestDto.fileId(), requestDto.description());
 		log.debug("회원 정보를 수정하였습니다. 닉네임 :{}", member.getNickname());
 
 		return member.getMemberId();

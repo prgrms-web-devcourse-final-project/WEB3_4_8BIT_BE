@@ -64,7 +64,7 @@ class MemberServiceTest extends BaseTest {
 		// Then
 		assertThat(saveAddInfo).isEqualTo(givenMember.getMemberId());
 		assertThat(givenMember.getNickname()).isEqualTo(givenRequest.nickname());
-		assertThat(givenMember.getProfileImg()).isEqualTo(givenRequest.profileImg());
+		assertThat(givenMember.getFileId()).isEqualTo(givenRequest.fileId());
 		assertThat(givenMember.getDescription()).isEqualTo(givenRequest.description());
 		assertThat(givenMember.getIsAddInfo()).isTrue();
 		verify(memberRepository, times(1)).findById(givenMember.getMemberId());
@@ -116,7 +116,7 @@ class MemberServiceTest extends BaseTest {
 
 		Member givenMember = arbitraryBuilder
 			.set("memberId", memberId)
-			.set("profileImg", "http://example.com/profile.jpg")
+			.set("fileId", 101L)
 			.set("description", "자기소개입니다.")
 			.set("nickname", "닉네임")
 			.sample();
@@ -127,7 +127,7 @@ class MemberServiceTest extends BaseTest {
 			.name(givenMember.getName())
 			.nickname(givenMember.getNickname())
 			.phone(givenMember.getPhone())
-			.profileImg(givenMember.getProfileImg())
+			.fileUrl("http://example.com/profile.jpg")
 			.description(givenMember.getDescription())
 			.build();
 
@@ -143,7 +143,7 @@ class MemberServiceTest extends BaseTest {
 		assertThat(result.name()).isEqualTo(responseDto.name());
 		assertThat(result.nickname()).isEqualTo(responseDto.nickname());
 		assertThat(result.phone()).isEqualTo(responseDto.phone());
-		assertThat(result.profileImg()).isEqualTo(responseDto.profileImg());
+		assertThat(result.fileUrl()).isEqualTo(responseDto.fileUrl());
 		assertThat(result.description()).isEqualTo(responseDto.description());
 		verify(memberRepository, times(1)).findDetailById(memberId);
 	}
@@ -153,12 +153,12 @@ class MemberServiceTest extends BaseTest {
 	void t05() {
 		// Given
 		Long memberId = 1L;
-		MemberRequest.Form givenRequest = new MemberRequest.Form("수정된닉네임", "http://new.url/profile.jpg", "수정된 자기소개");
+		MemberRequest.Form givenRequest = new MemberRequest.Form("수정된닉네임", 105L, "수정된 자기소개");
 
 		Member givenMember = arbitraryBuilder
 			.set("memberId", memberId)
 			.set("nickname", "이전닉네임")
-			.set("profileImg", "http://old.url/profile.jpg")
+			.set("fileId", 101L)
 			.set("description", "이전 자기소개")
 			.sample();
 
@@ -170,8 +170,8 @@ class MemberServiceTest extends BaseTest {
 		// Then
 		assertThat(updatedId).isEqualTo(memberId);
 		assertThat(givenMember.getNickname()).isEqualTo(givenRequest.nickname());
-		assertThat(givenMember.getProfileImg()).isEqualTo(givenRequest.profileImg());
-		assertThat(givenMember.getDescription()).isEqualTo(givenRequest.profileImg());
+		assertThat(givenMember.getFileId()).isEqualTo(givenRequest.fileId());
+		assertThat(givenMember.getDescription()).isEqualTo(givenRequest.description());
 		verify(memberRepository, times(1)).findById(memberId);
 	}
 }

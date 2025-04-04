@@ -23,11 +23,12 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 			r.shipFishingPostId,
 			r.memberId,
 			m.nickname,
-			m.profileImg,
+			f.url,
 			r.createdAt
 		)
 		FROM Review r
 		JOIN Member m ON r.memberId = m.memberId
+		LEFT JOIN File f ON m.fileId = f.fileId
 		WHERE r.shipFishingPostId = :postId
 		""")
 	Slice<ReviewWithMemberResponse> findReviewsWithMemberByPostId(@Param("postId") final Long postId, final Pageable pageable);
@@ -42,11 +43,12 @@ public interface ReviewJpaRepository extends JpaRepository<Review, Long> {
 			r.shipFishingPostId,
 			r.memberId,
 			m.nickname,
-			m.profileImg,
+			f.url,
 			r.createdAt
 		)
 		FROM Review r
 		JOIN Member m ON r.memberId = m.memberId
+		LEFT JOIN File f ON m.fileId = f.fileId
 		WHERE r.memberId = :memberId
 		"""
 	)

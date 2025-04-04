@@ -24,6 +24,10 @@ import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepositoryImpl;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
+import com.backend.global.storage.entity.File;
+import com.backend.global.storage.repository.StorageQueryRepository;
+import com.backend.global.storage.repository.StorageRepository;
+import com.backend.global.storage.repository.StorageRepositoryImpl;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -36,6 +40,8 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 	MemberQueryRepository.class,
 	ShipFishingPostRepositoryImpl.class,
 	ShipFishingPostQueryRepository.class,
+	StorageRepositoryImpl.class,
+	StorageQueryRepository.class,
 	QuerydslConfig.class})
 class ReviewRepositoryTest extends BaseTest {
 
@@ -47,6 +53,16 @@ class ReviewRepositoryTest extends BaseTest {
 
 	@Autowired
 	private ShipFishingPostRepository shipFishingPostRepository;
+
+	@Autowired
+	private StorageRepository storageRepository;
+
+	private File getFileBuilder() {
+		return fixtureMonkeyBuilder
+			.giveMeBuilder(File.class)
+			.set("fileId", null)
+			.sample();
+	}
 
 	private ArbitraryBuilder<Review> getReviewBuilder() {
 		return fixtureMonkeyBuilder
@@ -85,6 +101,8 @@ class ReviewRepositoryTest extends BaseTest {
 	}
 
 	private void saveTestReviews(Member member, ShipFishingPost post) {
+		File file = storageRepository.save(getFileBuilder());
+
 		reviewRepository.save(createReview(1L, member.getMemberId(), post.getShipFishingPostId()));
 		reviewRepository.save(createReview(2L, member.getMemberId(), post.getShipFishingPostId()));
 	}
@@ -134,6 +152,7 @@ class ReviewRepositoryTest extends BaseTest {
 	@DisplayName("게시글 ID로 리뷰 조회 [Repository] - Success")
 	void t04() {
 		// given
+		File givenFile = getFileBuilder();
 		Member givenMember = saveTestMember();
 		ShipFishingPost givenPost = saveTestPost();
 		saveTestReviews(givenMember, givenPost);
