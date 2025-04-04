@@ -1,18 +1,33 @@
 package com.backend.domain.fishingtrippost.service;
 
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
-import com.backend.domain.member.exception.MemberException;
 
 public interface FishingTripPostService {
 
 	/**
-	 * 선장 저장 메소드
+	 * 동출 게시글 저장 메소드
 	 *
-	 * @param memberId 동출 게시글 작성하는 멤버
-	 * @param requestDto {@link FishingTripPostRequest.Create}
-	 * @return {@link Long memberId} Long: 선장 memberId
-	 * @throws MemberException 이미 추가 정보를 받았으면 예외 발생
-	 * @implSpec 회원가입한 멤버와 선장 추가 정보를 파라미터로 받고 저장한다.
+	 * @param memberId   동출 게시글 작성하는 멤버
+	 * @param requestDto {@link FishingTripPostRequest.Form}
+	 * @return {@link Long fishingTripPostId} Long: 동출 게시글 Id fishingTripPostId
+	 * @implSpec 로그인한 멤버 Id와 동출 게시글 작성에 필요한 정보를 받아 게시글 작성
 	 */
-	Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.Create requestDto);
+	Long createFishingTripPost(
+		final Long memberId,
+		final FishingTripPostRequest.Form requestDto
+	);
+
+	/**
+	 * 동출 게시글 수정 메소드
+	 *
+	 * @param memberId   동출 게시글 작성하는 멤버
+	 * @param requestDto {@link FishingTripPostRequest.Form}
+	 * @return {@link Long fishingTripPostId} Long: 동출 게시글 Id fishingTripPostId
+	 * @implSpec 로그인한 멤버 Id와 동출 게시글 수정에 필요한 정보를 받아 게시글 수정
+	 */
+	Long updateFishingTripPost(
+		final Long memberId,
+		final Long fishingTripPostId,
+		final FishingTripPostRequest.Form requestDto
+	);
 }
