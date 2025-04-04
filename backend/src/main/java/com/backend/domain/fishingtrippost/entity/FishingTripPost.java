@@ -15,12 +15,14 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+@Table(name = "fishing_trip_posts")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -65,5 +67,24 @@ public class FishingTripPost extends BaseEntity {
 			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_OVER_RECRUITMENT);
 		}
 		this.currentCount += count;
+	}
+
+	// 동출 게시글 수정 메서드
+	public void updateFishingTripPost(
+		final String subject,
+		final String content,
+		final Integer recruitmentCount,
+		final Boolean isShipFish,
+		final ZonedDateTime fishingDate,
+		final Long fishingPointId,
+		final List<Long> fileIdList
+	) {
+		this.subject = subject;
+		this.content = content;
+		this.recruitmentCount = recruitmentCount;
+		this.isShipFish = isShipFish;
+		this.fishingDate = fishingDate;
+		this.fishingPointId = fishingPointId;
+		this.fileIdList = fileIdList;
 	}
 }

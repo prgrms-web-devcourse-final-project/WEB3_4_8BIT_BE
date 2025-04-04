@@ -36,7 +36,7 @@ public class FishingTripPostRequest {
 	 */
 
 	@Builder
-	public record Create(
+	public record Form(
 		@NotBlank(message = "게시글 제목은 필수 항목입니다.")
 		@Size(max = 50, message = "게시글 제목은 최대 50자까지 가능합니다.")
 		@Schema(description = "게시글 제목", example = "게시글 제목")

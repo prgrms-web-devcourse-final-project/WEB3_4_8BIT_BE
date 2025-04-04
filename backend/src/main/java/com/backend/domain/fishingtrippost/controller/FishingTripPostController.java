@@ -4,6 +4,8 @@ import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,7 +33,7 @@ public class FishingTripPostController {
 	@Operation(summary = "동출 모집 게시글 생성", description = "로그인한 사용자가 동출 모집 게시글 작성시 사용하는 API")
 	public ResponseEntity<GenericResponse<Long>> createFishingTripPost(
 		@AuthenticationPrincipal final CustomOAuth2User user,
-		@RequestBody @Valid final FishingTripPostRequest.Create requestDto
+		@RequestBody @Valid final FishingTripPostRequest.Form requestDto
 	) {
 
 		Long saveFishingTripPostId = fishingTripPostService.createFishingTripPost(user.getId(), requestDto);
@@ -40,4 +42,20 @@ public class FishingTripPostController {
 			.body(GenericResponse.of(true));
 	}
 
+	@PatchMapping("/{fishingTripPostId}")
+	@Operation(summary = "동출 모집 게시글 수정", description = "로그인한 사용자가 동출 모집 게시글 수정시 사용하는 API")
+	public ResponseEntity<GenericResponse<Long>> updateFishingTripPost(
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@PathVariable final Long fishingTripPostId,
+		@RequestBody @Valid final FishingTripPostRequest.Form requestDto
+	) {
+
+		Long updateFishingTripPostId = fishingTripPostService.updateFishingTripPost(
+			user.getId(),
+			fishingTripPostId,
+			requestDto
+		);
+
+		return ResponseEntity.ok(GenericResponse.of(true, updateFishingTripPostId));
+	}
 }

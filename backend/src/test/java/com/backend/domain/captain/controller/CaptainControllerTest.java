@@ -247,10 +247,9 @@ class CaptainControllerTest extends BaseTest {
 
 		// Then
 		result
-			.andExpect(status().isCreated())
-			.andExpect(header().exists("Location"))
-			.andExpect(header().string("Location", captainId.toString()))
-			.andExpect(jsonPath("$.success").value(true));
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data").value(captainId));
 	}
 
 	@Test
