@@ -2,6 +2,7 @@ package com.backend.domain.shipfishingpost.controller;
 
 import java.net.URI;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -62,7 +63,7 @@ public class ShipFishingPostController {
 	@GetMapping
 	@Operation(summary = "선상 낚시 게시글 조회", description = "유저가 선상 낚시 게시글을 조회할 때 사용하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ShipFishingPostResponse.DetailPage>>> getShipFishPostList(
-		@ModelAttribute final ShipFishingPostRequest.Search requestDto,
+		@ParameterObject @ModelAttribute final ShipFishingPostRequest.Search requestDto,
 		@Valid final GlobalRequest.PageRequest pageRequestDto
 	) {
 

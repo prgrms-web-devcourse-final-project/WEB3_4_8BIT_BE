@@ -16,6 +16,7 @@ import com.backend.global.dto.response.GenericResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "예약 일자 정보 API")
@@ -31,7 +32,7 @@ public class ReservationDateController {
 	@Parameter(name = "id", required = true, description = "선상 낚시 게시글 ID", example = "1")
 	@Parameter(name = "reservationDate", required = true, description = "조회할 예약 일자", example = "2025-04-02")
 	public ResponseEntity<GenericResponse<ReservationDateResponse.Detail>> getReservationDate(
-		@PathVariable("id") final Long shipFishingPostId,
+		@PathVariable("id") @Min(1) final Long shipFishingPostId,
 		@RequestParam final LocalDate reservationDate
 	) {
 
@@ -46,7 +47,7 @@ public class ReservationDateController {
 	@Parameter(name = "id", required = true, description = "선상 낚시 게시글 ID", example = "1")
 	@Parameter(name = "reservationDate", required = true, description = "조회할 예약 일자", example = "2025-04-02")
 	public ResponseEntity<GenericResponse<ReservationDateResponse.UnAvailableDateList>> getAvailableReservationDateList(
-		@PathVariable("id") final Long shipFishingPostId,
+		@PathVariable("id") @Min(1) final Long shipFishingPostId,
 		@RequestParam final LocalDate reservationDate
 	) {
 
