@@ -15,6 +15,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
+import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
+import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 import com.backend.domain.fishpoint.exception.FishPointErrorCode;
 import com.backend.domain.fishpoint.exception.FishPointException;
@@ -24,6 +26,7 @@ import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.util.BaseTest;
+
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,8 +44,8 @@ class FishingTripPostServiceTest extends BaseTest {
 	@Mock
 	private FishingTripPostRepository fishingTripPostRepository;
 
-	private final ArbitraryBuilder<FishingTripPostRequest.Create> createRequestBuilder =
-		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Create.class);
+	private final ArbitraryBuilder<FishingTripPostRequest.Form> createRequestBuilder =
+		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Form.class);
 
 	private final ArbitraryBuilder<FishingTripPost> postBuilder =
 		fixtureMonkeyBuilder.giveMeBuilder(FishingTripPost.class);
@@ -56,7 +59,8 @@ class FishingTripPostServiceTest extends BaseTest {
 			.set("memberId", 1L)
 			.sample();
 
-		FishingTripPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Create.class)
+		FishingTripPostRequest.Form givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
+				FishingTripPostRequest.Form.class)
 			.set("subject", "같이 낚시 가실 분~")
 			.set("content", "초보 환영합니다!")
 			.set("recruitmentCount", 5)
@@ -91,7 +95,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		// Given
 		Long memberId = 999L;
 
-		FishingTripPostRequest.Create requestDto = createRequestBuilder
+		FishingTripPostRequest.Form requestDto = createRequestBuilder
 			.set("fishingTripPointId", 1L)
 			.sample();
 
@@ -113,7 +117,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		// Given
 		Long memberId = 1L;
 
-		FishingTripPostRequest.Create requestDto = createRequestBuilder
+		FishingTripPostRequest.Form requestDto = createRequestBuilder
 			.set("subject", "같이 낚시 가실 분~")
 			.set("content", "초보 환영합니다!")
 			.set("recruitmentCount", 5)
@@ -135,4 +139,80 @@ class FishingTripPostServiceTest extends BaseTest {
 		verify(fishPointRepository).existsById(requestDto.fishingPointId());
 		verify(fishingTripPostRepository, never()).save(any());
 	}
+
+	@Test
+	@DisplayName("동출 게시글 수정 [Service] - Success")
+	void t04() {
+		// Given
+		Long memberId = 1L;
+		Long postId = 100L;
+
+		FishingTripPostRequest.Form requestDto = createRequestBuilder
+			.set("subject", "수정된 제목")
+			.set("content", "수정된 내용")
+			.set("recruitmentCount", 3)
+			.set("isShipFish", true)
+			.set("fishingDate", ZonedDateTime.now().plusDays(2))
+			.set("fishingPointId", 2L)
+			.set("fileIdList", List.of(10L, 20L))
+			.sample();
+
+		FishingTripPost existingPost = postBuilder
+			.set("fishingTripPostId", postId)
+			.set("memberId", memberId) // 작성자 본인
+			.sample();
+
+		when(fishingTripPostRepository.findById(postId)).thenReturn(java.util.Optional.of(existingPost));
+
+		// When
+		Long updatedPointId = fishingTripPostService.updateFishingTripPost(memberId, postId, requestDto);
+
+		// Then
+		assertThat(updatedPointId).isEqualTo(requestDto.fishingPointId());
+		verify(fishingTripPostRepository).findById(postId);
+	}
+
+	@Test
+	@DisplayName("동출 게시글 수정 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
+	void t05() {
+		// Given
+		Long memberId = 1L;
+		Long postId = 999L;
+
+		FishingTripPostRequest.Form requestDto = createRequestBuilder.sample();
+
+		when(fishingTripPostRepository.findById(postId)).thenReturn(java.util.Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> fishingTripPostService.updateFishingTripPost(memberId, postId, requestDto))
+			.isInstanceOf(FishingTripPostException.class)
+			.hasMessage(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getMessage());
+
+		verify(fishingTripPostRepository).findById(postId);
+	}
+
+	@Test
+	@DisplayName("동출 게시글 수정 [UNAUTHORIZED_AUTHOR] [Service] - Fail")
+	void t06() {
+		// Given
+		Long memberId = 1L;
+		Long postId = 100L;
+
+		FishingTripPostRequest.Form requestDto = createRequestBuilder.sample();
+
+		FishingTripPost existingPost = postBuilder
+			.set("fishingTripPostId", postId)
+			.set("memberId", 2L) // 다른 작성자
+			.sample();
+
+		when(fishingTripPostRepository.findById(postId)).thenReturn(java.util.Optional.of(existingPost));
+
+		// When & Then
+		assertThatThrownBy(() -> fishingTripPostService.updateFishingTripPost(memberId, postId, requestDto))
+			.isInstanceOf(FishingTripPostException.class)
+			.hasMessage(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage());
+
+		verify(fishingTripPostRepository).findById(postId);
+	}
+
 }

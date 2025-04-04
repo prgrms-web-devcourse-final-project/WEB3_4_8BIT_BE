@@ -21,6 +21,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
+import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
+import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.service.FishingTripPostService;
 import com.backend.domain.fishpoint.exception.FishPointErrorCode;
 import com.backend.domain.fishpoint.exception.FishPointException;
@@ -51,8 +53,8 @@ class FishingTripPostControllerTest extends BaseTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	final ArbitraryBuilder<FishingTripPostRequest.Create> arbitraryBuilder = fixtureMonkeyBuilder
-		.giveMeBuilder(FishingTripPostRequest.Create.class)
+	final ArbitraryBuilder<FishingTripPostRequest.Form> arbitraryBuilder = fixtureMonkeyBuilder
+		.giveMeBuilder(FishingTripPostRequest.Form.class)
 		.set("subject", "동출 구합니다!")
 		.set("content", "다같이 낚시가요~")
 		.set("recruitmentCount", 5)
@@ -66,7 +68,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	@DisplayName("동출 게시글 저장 [Controller] - Success")
 	@WithMockCustomUser
 	void t01() throws Exception {
-		FishingTripPostRequest.Create requestDto = arbitraryBuilder.sample();
+		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
 		Long savedId = 0L;
 
 		when(fishingTripPostService.createFishingTripPost(1L, requestDto)).thenReturn(savedId);
@@ -85,7 +87,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	@DisplayName("동출 게시글 저장 [존재하지 않는 Member] [Controller] - Fail")
 	@WithMockCustomUser
 	void t02() throws Exception {
-		FishingTripPostRequest.Create requestDto = arbitraryBuilder.sample();
+		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
 
 		doThrow(new MemberException(MemberErrorCode.MEMBER_NOT_FOUND))
 			.when(fishingTripPostService).createFishingTripPost(anyLong(), any());
@@ -104,7 +106,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	@DisplayName("동출 게시글 저장 [존재하지 않는 FishPoint] [Controller] - Fail")
 	@WithMockCustomUser
 	void t03() throws Exception {
-		FishingTripPostRequest.Create requestDto = arbitraryBuilder.sample();
+		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
 
 		doThrow(new FishPointException(FishPointErrorCode.FISH_POINT_NOT_FOUND))
 			.when(fishingTripPostService).createFishingTripPost(anyLong(), any());
@@ -123,7 +125,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	@DisplayName("동출 게시글 저장 [subject null] [Controller] - Fail")
 	@WithMockCustomUser
 	void t04() throws Exception {
-		FishingTripPostRequest.Create requestDto = arbitraryBuilder.set("subject", null).sample();
+		FishingTripPostRequest.Form requestDto = arbitraryBuilder.set("subject", null).sample();
 
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fishing-trip-post")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -139,7 +141,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	@DisplayName("동출 게시글 저장 [fishingPointId null] [Controller] - Fail")
 	@WithMockCustomUser
 	void t05() throws Exception {
-		FishingTripPostRequest.Create requestDto = arbitraryBuilder.set("fishingPointId", null).sample();
+		FishingTripPostRequest.Form requestDto = arbitraryBuilder.set("fishingPointId", null).sample();
 
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fishing-trip-post")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -150,4 +152,101 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data[0].field").value("fishingPointId"))
 			.andExpect(jsonPath("$.success").value(false));
 	}
+
+	@Test
+	@DisplayName("동출 게시글 수정 [Controller] - Success")
+	@WithMockCustomUser
+	void t06() throws Exception {
+		// Given
+		Long postId = 123L;
+		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
+
+		when(fishingTripPostService.updateFishingTripPost(anyLong(), eq(postId), any()))
+			.thenReturn(postId);
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.patch("/api/v1/fishing-trip-post/{fishingTripPostId}", postId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(requestDto)));
+
+		// Then
+		result
+			.andExpect(status().isCreated())
+			.andExpect(header().string("Location", postId.toString()))
+			.andExpect(jsonPath("$.success").value(true));
+	}
+
+	@Test
+	@DisplayName("동출 게시글 수정 [FISHING_TRIP_POST_NOT_FOUND] [Controller] - Fail")
+	@WithMockCustomUser
+	void t07() throws Exception {
+		// Given
+		Long postId = 999L;
+		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
+
+		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND))
+			.when(fishingTripPostService).updateFishingTripPost(anyLong(), eq(postId), any());
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.patch("/api/v1/fishing-trip-post/{fishingTripPostId}", postId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(requestDto)));
+
+		// Then
+		result
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getCode()))
+			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("동출 게시글 수정 [UNAUTHORIZED_AUTHOR] [Controller] - Fail")
+	@WithMockCustomUser
+	void t08() throws Exception {
+		// Given
+		Long postId = 999L;
+		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
+
+		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR))
+			.when(fishingTripPostService).updateFishingTripPost(anyLong(), eq(postId), any());
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.patch("/api/v1/fishing-trip-post/{fishingTripPostId}", postId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(requestDto)));
+
+		// Then
+		result
+			.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getCode()))
+			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("동출 게시글 수정 [subject null] [Controller] - Fail")
+	@WithMockCustomUser
+	void t09() throws Exception {
+		// Given
+		Long postId = 1L;
+		FishingTripPostRequest.Form requestDto = arbitraryBuilder.set("subject", null).sample();
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.patch("/api/v1/fishing-trip-post/{fishingTripPostId}", postId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(requestDto)));
+
+		// Then
+		result
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
+			.andExpect(jsonPath("$.data[0].field").value("subject"))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
 }

@@ -103,4 +103,30 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		assertThat(saved).isNotNull();
 		assertThat(saved.getFishingTripPostId()).isNotNull();
 	}
+
+	@Test
+	@DisplayName("동출 게시글 Id로 조회 [Repository] - Success")
+	void t02() {
+		// given
+		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
+		FishPoint savedFishPoint = fishPointRepository.save(fishPointArbitraryBuilder.sample());
+
+		FishingTripPost givenPost = fishingTripPostArbitraryBuilder
+			.set("fishingTripPostId", null)
+			.set("memberId", savedMember.getMemberId())
+			.set("fishPointId", savedFishPoint.getFishPointId())
+			.sample();
+
+		FishingTripPost saved = fishingTripPostRepository.save(givenPost);
+
+		// when
+		FishingTripPost result = fishingTripPostRepository.findById(saved.getFishingTripPostId()).orElse(null);
+
+		// then
+		assertThat(result).isNotNull();
+		assertThat(result.getFishingTripPostId()).isEqualTo(saved.getFishingTripPostId());
+		assertThat(result.getSubject()).isEqualTo("테스트 제목");
+		assertThat(result.getContent()).isEqualTo("테스트 내용");
+	}
+
 }
