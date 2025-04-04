@@ -33,17 +33,4 @@ public interface ReservationDateService {
 		final Long shipFishingPostId,
 		final LocalDate reservationDate
 	);
-
-	/**
-	 * 예약 가능 여부를 검증하고 잔여 인원을 차감하는 메서드입니다.
-	 *
-	 * @param shipFishingPostId {@link Long}
-	 * @param reservationDate {@link LocalDate}
-	 * @param guestCount {@link Long}
-	 */
-	void updateReservationDateWithRemainCount(
-		final Long shipFishingPostId,
-		final LocalDate reservationDate,
-		final Integer guestCount
-	);
 }

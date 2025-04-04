@@ -5,11 +5,8 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.backend.domain.reservation.exception.ReservationErrorCode;
-import com.backend.domain.reservation.exception.ReservationException;
 import com.backend.domain.reservationdate.converter.ReservationDateConverter;
 import com.backend.domain.reservationdate.dto.response.ReservationDateResponse;
 import com.backend.domain.reservationdate.entity.ReservationDate;
@@ -51,38 +48,12 @@ public class ReservationDateServiceImpl implements ReservationDateService {
 		final Long shipFishingPostId,
 		final LocalDate reservationDate) {
 
-		LocalDate now = LocalDate.now();
-		LocalDate firstDayOfMonth = reservationDate.with(TemporalAdjusters.firstDayOfMonth());
-
-		LocalDate startDate = now.isAfter(firstDayOfMonth) ? now : firstDayOfMonth;
-		LocalDate endDate = reservationDate.with(TemporalAdjusters.lastDayOfMonth());
+		List<LocalDate> date = getStartDateAndEndDate(reservationDate);
 
 		List<LocalDate> unAvailableDateList = reservationDateRepository
-			.findUnAvailableDatesByStartDateBetweenEndDate(shipFishingPostId, startDate, endDate);
+			.findUnAvailableDatesByStartDateBetweenEndDate(shipFishingPostId, date.get(0), date.get(1));
 
 		return ReservationDateConverter.fromUnAvailableDateList(unAvailableDateList);
-	}
-
-	@Override
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
-	public void updateReservationDateWithRemainCount(
-		final Long shipFishingPostId,
-		final LocalDate reservationDate,
-		final Integer guestCount) {
-
-		log.debug("updateReservationDateWithRemainCount transaction start");
-
-		ReservationDate findReservationDate = reservationDateRepository
-			.findByIdWithPessimistic(shipFishingPostId, reservationDate)
-			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-
-		verifyReservationDate(findReservationDate, guestCount);
-
-		findReservationDate.remainMinus(guestCount);
-
-		reservationDateRepository.save(findReservationDate);
-
-		log.debug("updateReservationDateWithRemainCount transaction end");
 	}
 
 	/**
@@ -124,23 +95,6 @@ public class ReservationDateServiceImpl implements ReservationDateService {
 
 				return reservationDateRepository.save(reservationDate);
 			});
-	}
-
-	/**
-	 * 선택한 예약 일자의 예약 가능 여부를 검증하는 메서드입니다.
-	 *
-	 * @param reservationDate {@link ReservationDate}
-	 * @param guestCount {@link Integer}
-	 */
-	private void verifyReservationDate(final ReservationDate reservationDate, final int guestCount) {
-
-		if (reservationDate.getIsBan()) {
-			throw new ReservationException(ReservationErrorCode.NOT_AVAILABLE_DATE_RESERVATION);
-		}
-
-		if (reservationDate.getRemainCount() < guestCount) {
-			throw new ReservationException(ReservationErrorCode.NOT_AVAILABLE_END_RESERVATION);
-		}
 	}
 
 	/**
