@@ -14,7 +14,6 @@ import com.backend.domain.reservation.exception.ReservationException;
 import com.backend.domain.reservation.repository.ReservationRepository;
 import com.backend.domain.reservationdate.entity.ReservationDate;
 import com.backend.domain.reservationdate.repository.ReservationDateRepository;
-import com.backend.domain.reservationdate.service.ReservationDateService;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
@@ -29,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ReservationServiceImpl implements ReservationService {
 
 	private final ReservationRepository reservationRepository;
-	private final ReservationDateService reservationDateService;
 	private final ReservationDateRepository reservationDateRepository;
 	private final ShipFishingPostRepository shipFishingPostRepository;
 
@@ -59,22 +57,15 @@ public class ReservationServiceImpl implements ReservationService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ReservationResponse.DetailWithMemberName getReservation(final Long reservationId) {
+	public ReservationResponse.DetailWithMember getReservation(final Long reservationId, final Long memberId) {
 
-		return reservationRepository.findDetailWithMemberNameById(reservationId)
+		ReservationResponse.DetailWithMember responseDto = reservationRepository
+			.findDetailWithMemberById(reservationId)
 			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-	}
 
-	/**
-	 * 선상 낚시 게시글 Entity 를 반환합니다.
-	 *
-	 * @param shipFishingPostId {@link Long}
-	 * @return {@link ShipFishingPost}
-	 */
-	private ShipFishingPost getShipFishingPostEntity(final Long shipFishingPostId) {
+		verifyAuthorization(responseDto, memberId);
 
-		return shipFishingPostRepository.findById(shipFishingPostId)
-			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
+		return responseDto;
 	}
 
 	/**
@@ -104,9 +95,7 @@ public class ReservationServiceImpl implements ReservationService {
 	 * @param reservationDate {@link LocalDate}
 	 * @param guestCount {@link Long}
 	 */
-	private void updateReservationDateWithRemainCount(
-		final Long shipFishingPostId,
-		final LocalDate reservationDate,
+	private void updateReservationDateWithRemainCount(final Long shipFishingPostId, final LocalDate reservationDate,
 		final Integer guestCount) {
 
 		log.debug("예약 일자 검증 및 업데이트 method start");
@@ -140,4 +129,32 @@ public class ReservationServiceImpl implements ReservationService {
 			throw new ReservationException(ReservationErrorCode.NOT_AVAILABLE_END_RESERVATION);
 		}
 	}
+
+	/**
+	 * 예약 소유자 인지 예약을 한 게시글의 선상인지 검증하는 메서드입니다.
+	 *
+	 * @param responseDto {@link ReservationResponse.DetailWithMember}
+	 * @param memberId {@link Long}
+	 */
+	private void verifyAuthorization(final ReservationResponse.DetailWithMember responseDto, final Long memberId) {
+
+		ShipFishingPost shipFishingPost = getShipFishingPostEntity(responseDto.shipFishingPostId());
+
+		if (!shipFishingPost.getMemberId().equals(memberId) && !responseDto.memberId().equals(memberId)) {
+			throw new ReservationException(ReservationErrorCode.NOT_AUTHORITY_RESERVATION);
+		}
+	}
+
+	/**
+	 * 선상 낚시 게시글 Entity 를 반환합니다.
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @return {@link ShipFishingPost}
+	 */
+	private ShipFishingPost getShipFishingPostEntity(final Long shipFishingPostId) {
+
+		return shipFishingPostRepository.findById(shipFishingPostId)
+			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
+	}
+
 }
