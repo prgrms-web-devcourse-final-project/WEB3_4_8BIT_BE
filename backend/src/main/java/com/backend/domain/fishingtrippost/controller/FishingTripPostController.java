@@ -37,7 +37,7 @@ public class FishingTripPostController {
 	@Operation(summary = "동출 모집 게시글 생성", description = "로그인한 사용자가 동출 모집 게시글 작성시 사용하는 API")
 	public ResponseEntity<GenericResponse<Long>> createFishingTripPost(
 		@AuthenticationPrincipal final CustomOAuth2User user,
-		@RequestBody @Valid final FishingTripPostRequest.Create requestDto
+		@RequestBody @Valid final FishingTripPostRequest.Form requestDto
 	) {
 
 		Long saveFishingTripPostId = fishingTripPostService.createFishingTripPost(user.getId(), requestDto);
@@ -62,6 +62,7 @@ public class FishingTripPostController {
 
 		return ResponseEntity.ok(GenericResponse.of(true, updateFishingTripPostId));
 	}
+
 	@GetMapping
 	@Operation(summary = "동출 모집 게시글 상세조회", description = "동출 모집 게시글을 상세 조회하는 API")
 	@Parameter(name = "id", required = true, description = "조회할 동출 모집 게시글 ID", example = "1")
