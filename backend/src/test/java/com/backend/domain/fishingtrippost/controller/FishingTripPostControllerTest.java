@@ -159,22 +159,34 @@ class FishingTripPostControllerTest extends BaseTest {
 	void t06() throws Exception {
 		// Given
 		Long postId = 123L;
-		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
+		Long memberId = 1L;
 
-		when(fishingTripPostService.updateFishingTripPost(anyLong(), eq(postId), any()))
-			.thenReturn(postId);
+		List<Long> updatedFileIds = List.of(10L, 20L);
+		FishingTripPostRequest.Form requestDto = FishingTripPostRequest.Form.builder()
+			.subject("수정된 제목")
+			.content("수정된 내용")
+			.recruitmentCount(3)
+			.isShipFish(true)
+			.fishingDate(ZonedDateTime.now().plusDays(3))
+			.fishingPointId(99L)
+			.fileIdList(updatedFileIds)
+			.build();
+
+		when(fishingTripPostService.updateFishingTripPost(eq(memberId), eq(postId), any()))
+			.thenReturn(requestDto.fishingPointId());
 
 		// When
 		ResultActions result = mockMvc.perform(
 			MockMvcRequestBuilders.patch("/api/v1/fishing-trip-post/{fishingTripPostId}", postId)
 				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(requestDto)));
+				.content(objectMapper.writeValueAsString(requestDto))
+		);
 
 		// Then
 		result
-			.andExpect(status().isCreated())
-			.andExpect(header().string("Location", postId.toString()))
-			.andExpect(jsonPath("$.success").value(true));
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data").value(requestDto.fishingPointId()));
 	}
 
 	@Test
@@ -222,8 +234,10 @@ class FishingTripPostControllerTest extends BaseTest {
 		// Then
 		result
 			.andExpect(status().isForbidden())
-			.andExpect(jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getCode()))
-			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage()))
+			.andExpect(
+				jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getCode()))
+			.andExpect(jsonPath("$.message").value(
+				FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
 	}
 

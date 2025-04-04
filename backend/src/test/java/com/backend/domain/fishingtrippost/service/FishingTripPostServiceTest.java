@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +26,7 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
+import com.backend.global.storage.service.StorageService;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -34,6 +36,9 @@ class FishingTripPostServiceTest extends BaseTest {
 
 	@InjectMocks
 	private FishingTripPostServiceImpl fishingTripPostService;
+
+	@Mock
+	private StorageService storageService;
 
 	@Mock
 	private FishPointRepository fishPointRepository;
@@ -147,30 +152,48 @@ class FishingTripPostServiceTest extends BaseTest {
 		Long memberId = 1L;
 		Long postId = 100L;
 
-		FishingTripPostRequest.Form requestDto = createRequestBuilder
-			.set("subject", "수정된 제목")
-			.set("content", "수정된 내용")
-			.set("recruitmentCount", 3)
-			.set("isShipFish", true)
-			.set("fishingDate", ZonedDateTime.now().plusDays(2))
-			.set("fishingPointId", 2L)
-			.set("fileIdList", List.of(10L, 20L))
-			.sample();
+		// 기존에 저장되어 있던 이미지 ID
+		List<Long> originalFileIds = List.of(10L, 30L); // 기존 이미지 10, 30
+		List<Long> updatedFileIds = List.of(10L, 20L);  // 새로 들어온 이미지 10, 20 → 30은 삭제 대상
 
-		FishingTripPost existingPost = postBuilder
-			.set("fishingTripPostId", postId)
-			.set("memberId", memberId) // 작성자 본인
-			.sample();
+		FishingTripPostRequest.Form requestDto = FishingTripPostRequest.Form.builder()
+			.subject("수정된 제목")
+			.content("수정된 내용")
+			.recruitmentCount(2)
+			.isShipFish(false)
+			.fishingDate(ZonedDateTime.now().plusDays(5))
+			.fishingPointId(42L)
+			.fileIdList(updatedFileIds)
+			.build();
 
-		when(fishingTripPostRepository.findById(postId)).thenReturn(java.util.Optional.of(existingPost));
+		FishingTripPost existingPost = mock(FishingTripPost.class);
+		when(existingPost.getMemberId()).thenReturn(memberId);
+		when(existingPost.getFileIdList()).thenReturn(originalFileIds);
+		when(existingPost.getFishingPointId()).thenReturn(42L);
+
+		when(fishingTripPostRepository.findById(postId)).thenReturn(Optional.of(existingPost));
+
+		// storageService 삭제 로직 모킹
+		doNothing().when(storageService).deleteFilesByIdList(eq(memberId), eq(List.of(30L)));
 
 		// When
-		Long updatedPointId = fishingTripPostService.updateFishingTripPost(memberId, postId, requestDto);
+		Long result = fishingTripPostService.updateFishingTripPost(memberId, postId, requestDto);
 
 		// Then
-		assertThat(updatedPointId).isEqualTo(requestDto.fishingPointId());
+		assertThat(result).isEqualTo(requestDto.fishingPointId());
 		verify(fishingTripPostRepository).findById(postId);
+		verify(storageService).deleteFilesByIdList(memberId, List.of(30L));
+		verify(existingPost).updateFishingTripPost(
+			eq("수정된 제목"),
+			eq("수정된 내용"),
+			eq(2),
+			eq(false),
+			any(),
+			eq(42L),
+			eq(updatedFileIds)
+		);
 	}
+
 
 	@Test
 	@DisplayName("동출 게시글 수정 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
