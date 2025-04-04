@@ -56,7 +56,6 @@ public class FishingTripPostController {
 			requestDto
 		);
 
-		return ResponseEntity.created(URI.create(updateFishingTripPostId.toString()))
-			.body(GenericResponse.of(true));
+		return ResponseEntity.ok(GenericResponse.of(true, updateFishingTripPostId));
 	}
 }
