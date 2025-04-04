@@ -16,7 +16,7 @@ public class FishServiceImpl implements FishService {
 	private final FishRepository fishRepository;
 
 	@Override
-	public FishResponse.Detail getFishDetail(Long fishId) {
+	public FishResponse.Detail getFishDetail(final Long fishId) {
 
 		return fishRepository.findById(fishId)
 			.orElseThrow(() -> new FishPointException(FishPointErrorCode.FISH_POINT_NOT_FOUND));
