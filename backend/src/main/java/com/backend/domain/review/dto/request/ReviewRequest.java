@@ -14,7 +14,7 @@ public class ReviewRequest {
 	 * {
 	 *     "rating": 5,
 	 *     "content": "진짜 손맛 제대로! 선상낚시 최고였어요 🎣",
-	 *     "imageList": "[\"https://example.com/image1.jpg\", \"s3에 이미지 업로드 후 리턴 받은 URL\"]",
+	 *     "imageList": "[101, 102, 103]",
 	 *     "shipFishingPostId": 1
 	 * }
 	 *
@@ -35,8 +35,8 @@ public class ReviewRequest {
 		@Schema(description = "리뷰 내용", example = "진짜 손맛 제대로! 선상낚시 최고였어요 🎣")
 		String content,
 
-		@Schema(description = "이미지", example = "[\"https://example.com/image1.jpg\", \"s3에 이미지 업로드 후 리턴 받은 URL\"]")
-		List<String> imageList,
+		@Schema(description = "이미지 ID 리스트", example = "[101, 102, 102]")
+		List<Long> imageList,
 
 		@NotNull(message = "선상 낚시 게시글 ID는 필수 항목입니다.")
 		@Schema(description = "선상 낚시 게시글 ID", example = "1")

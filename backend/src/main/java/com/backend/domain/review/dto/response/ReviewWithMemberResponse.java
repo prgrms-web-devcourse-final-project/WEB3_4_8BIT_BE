@@ -29,7 +29,7 @@ public record ReviewWithMemberResponse(
 	Long reviewId,
 	Integer rating,
 	String content,
-	List<String> imageList,
+	List<Long> imageList,
 	Long shipFishingPostId,
 	Long memberId,
 	String nickname,
