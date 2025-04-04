@@ -3,6 +3,7 @@ package com.backend.domain.fish.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.fish.entity.Fish;
 
 public interface FishRepository {
@@ -30,11 +31,11 @@ public interface FishRepository {
 	 * 물고기 조회 메소드
 	 *
 	 * @param fishId {@link Long}
-	 * @return {@link Optional<Fish>}
+	 * @return {@link Optional<FishResponse.Detail>}
 	 * @implSpec fishId 받아서 조회 후 Optional로 감싸서 반환
 	 * @author Kim Dong O
 	 */
-	Optional<Fish> findById(final Long fishId);
+	Optional<FishResponse.Detail> findById(final Long fishId);
 
 	/**
 	 * Id 리스트와 일치하는 물고기 정보 조회 메소드

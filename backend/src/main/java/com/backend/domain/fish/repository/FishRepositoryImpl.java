@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.fish.entity.Fish;
 
 import lombok.RequiredArgsConstructor;
@@ -12,7 +13,9 @@ import lombok.RequiredArgsConstructor;
 @Repository
 @RequiredArgsConstructor
 public class FishRepositoryImpl implements FishRepository {
+
 	private final FishJpaRepository fishJpaRepository;
+	private final FishQueryRepository fishQueryRepository;
 
 	@Override
 	public boolean existsById(final Long fishId) {
@@ -25,8 +28,8 @@ public class FishRepositoryImpl implements FishRepository {
 	}
 
 	@Override
-	public Optional<Fish> findById(Long fishId) {
-		return fishJpaRepository.findById(fishId);
+	public Optional<FishResponse.Detail> findById(final Long fishId) {
+		return fishQueryRepository.findById(fishId);
 	}
 
 	@Override
