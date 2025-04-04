@@ -1,6 +1,6 @@
 package com.backend.domain.fishingtrippost.repository;
 
-import java.util.Objects;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -11,7 +11,8 @@ import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
 import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.domain.fishpoint.entity.QFishPoint.*;
 
-import com.backend.global.util.StringUtil;
+import com.backend.global.storage.entity.File;
+import com.backend.global.storage.repository.StorageRepository;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class FishingTripPostQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
+	private final StorageRepository storageRepository;
 
 	public Optional<FishingTripPostResponse.Detail> findDetailById(final Long fishingTripPostId) {
 
@@ -47,26 +49,25 @@ public class FishingTripPostQueryRepository {
 			.where(fishingTripPost.fishingTripPostId.eq(fishingTripPostId))
 			.fetchOne();
 
-		if (tuple == null)
-			return Optional.empty();
-		return
-			Optional.of(new FishingTripPostResponse.Detail(
-				tuple.get(fishingTripPost.fishingTripPostId),
-				tuple.get(member.name),
-				tuple.get(fishingTripPost.subject),
-				tuple.get(fishingTripPost.content),
-				StringUtil.formatParticipantCount(
-					tuple.get(fishingTripPost.currentCount),
-					tuple.get(fishingTripPost.recruitmentCount)
-				),
-				StringUtil.formatDate(Objects.requireNonNull(tuple.get(fishingTripPost.createdAt))),
-				StringUtil.formatDate(Objects.requireNonNull(tuple.get(fishingTripPost.fishingDate))),
-				StringUtil.formatTime(Objects.requireNonNull(tuple.get(fishingTripPost.fishingDate))),
-				tuple.get(fishPoint.fishPointDetailName),
-				tuple.get(fishPoint.fishPointName),
-				tuple.get(fishPoint.longitude),
-				tuple.get(fishPoint.latitude),
-				tuple.get(fishingTripPost.fileIdList)
-			));
+		List<Long> fileIdList = tuple.get(fishingTripPost.fileIdList);
+		List<String> fileUrlList = storageRepository.findAllById(fileIdList).stream()
+			.map(File::getUrl)
+			.toList();
+
+		return Optional.of(FishingTripPostResponse.Detail.builder()
+			.fishingTripPostId(tuple.get(fishingTripPost.fishingTripPostId))
+			.name(tuple.get(member.name))
+			.subject(tuple.get(fishingTripPost.subject))
+			.content(tuple.get(fishingTripPost.content))
+			.currentCount(tuple.get(fishingTripPost.currentCount))
+			.recruitmentCount(tuple.get(fishingTripPost.recruitmentCount))
+			.createDate(tuple.get(fishingTripPost.createdAt))
+			.fishingDate(tuple.get(fishingTripPost.fishingDate))
+			.fishPointDetailName(tuple.get(fishPoint.fishPointDetailName))
+			.fishPointName(tuple.get(fishPoint.fishPointName))
+			.longitude(tuple.get(fishPoint.longitude))
+			.latitude(tuple.get(fishPoint.latitude))
+			.fileUrlList(fileUrlList)
+			.build());
 	}
 }
