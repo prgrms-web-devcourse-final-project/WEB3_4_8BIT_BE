@@ -135,7 +135,6 @@ public class JwtTokenProvider {
 		Member member = memberRepository.findById(userId)
 			.orElseThrow(() -> new MemberException(MemberErrorCode.MEMBER_NOT_FOUND));
 
-
 		Collection<? extends GrantedAuthority> authorities =
 			Arrays.stream(claims.get("auth").toString().split(","))
 				.map(SimpleGrantedAuthority::new)
@@ -181,8 +180,7 @@ public class JwtTokenProvider {
 				.parseSignedClaims(token)
 				.getPayload();
 		} catch (ExpiredJwtException e) {
-			// 만료된 토큰이어도 Claims 반환
-			return e.getClaims();
+			throw new JwtAuthenticationException(JwtAuthenticationErrorCode.EXPIRED_TOKEN);
 		} catch (Exception e) {
 			throw new JwtAuthenticationException(e, JwtAuthenticationErrorCode.INVALID_TOKEN);
 		}

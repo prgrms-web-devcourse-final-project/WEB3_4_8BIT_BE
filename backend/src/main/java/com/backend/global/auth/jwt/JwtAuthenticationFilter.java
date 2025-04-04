@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import com.backend.global.auth.exception.JwtAuthenticationErrorCode;
 import com.backend.global.auth.exception.JwtAuthenticationException;
 import com.backend.global.util.CookieUtil;
 
@@ -63,8 +64,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 						log.debug("사용자 '{}'의 인증 정보를 security context에 설정함", authentication.getName());
 					}
 				} catch (JwtAuthenticationException e) {
-					refreshAndContinue(request, response, filterChain, accessToken);
-					return;
+					if (e.getErrorCode() == JwtAuthenticationErrorCode.EXPIRED_TOKEN) {
+						refreshAndContinue(request, response, filterChain, accessToken);
+					} else {
+						response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					}
 				}
 			}
 
