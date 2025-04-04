@@ -66,4 +66,23 @@ public class FishingTripPost extends BaseEntity {
 		}
 		this.currentCount += count;
 	}
+
+	// 동출 게시글 수정 메서드
+	public void updateFishingTripPost(
+		final String subject,
+		final String content,
+		final Integer recruitmentCount,
+		final Boolean isShipFish,
+		final ZonedDateTime fishingDate,
+		final Long fishingPointId,
+		final List<Long> fileIdList
+	) {
+		this.subject = subject;
+		this.content = content;
+		this.recruitmentCount = recruitmentCount;
+		this.isShipFish = isShipFish;
+		this.fishingDate = fishingDate;
+		this.fishingPointId = fishingPointId;
+		this.fileIdList = fileIdList;
+	}
 }
