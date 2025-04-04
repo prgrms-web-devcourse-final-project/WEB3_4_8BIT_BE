@@ -57,6 +57,14 @@ public class ReservationServiceImpl implements ReservationService {
 		return ReservationConverter.fromReservationResponseDetail(reservation);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public ReservationResponse.DetailWithMemberName getReservation(final Long reservationId) {
+
+		return reservationRepository.findDetailWithMemberNameById(reservationId)
+			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+	}
+
 	/**
 	 * 선상 낚시 게시글 Entity 를 반환합니다.
 	 *
