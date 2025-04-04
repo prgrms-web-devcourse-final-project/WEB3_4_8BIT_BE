@@ -249,15 +249,15 @@ class FishingTripPostServiceTest extends BaseTest {
 			.name("루피")
 			.subject("같이 갑시다")
 			.content("초보 환영")
-			.headCount("1/5명")
-			.createDate("2025.04.01")
-			.fishingDate("2025.04.10")
-			.fishingTime("06:00")
+			.currentCount(1)
+			.recruitmentCount(5)
+			.createDate(ZonedDateTime.parse("2025-04-01T12:00:00+09:00"))
+			.fishingDate(ZonedDateTime.parse("2025-04-10T06:00:00+09:00"))
 			.fishPointDetailName("남해 앞바다")
 			.fishPointName("남해")
 			.longitude(128.12345)
 			.latitude(37.12345)
-			.images(List.of(1L, 2L, 3L))
+			.images(List.of("https://cdn.example.com/1.jpg", "https://cdn.example.com/2.jpg", "https://cdn.example.com/3.jpg"))
 			.build();
 
 		when(fishingTripPostRepository.findDetailById(postId)).thenReturn(Optional.of(expectedDetail));

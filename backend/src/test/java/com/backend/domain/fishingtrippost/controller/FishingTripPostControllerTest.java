@@ -276,15 +276,15 @@ class FishingTripPostControllerTest extends BaseTest {
 			.name("루피")
 			.subject("같이 갑시다")
 			.content("초보 환영")
-			.headCount("1/5명")
-			.createDate("2025.04.01")
-			.fishingDate("2025.04.10")
-			.fishingTime("06:00")
+			.currentCount(1)
+			.recruitmentCount(5)
+			.createDate(ZonedDateTime.parse("2025-04-01T12:00:00+09:00"))
+			.fishingDate(ZonedDateTime.parse("2025-04-10T06:00:00+09:00"))
 			.fishPointDetailName("남해 앞바다")
 			.fishPointName("남해")
 			.longitude(128.12345)
 			.latitude(37.12345)
-			.images(List.of(1L, 2L, 3L))
+			.images(List.of("https://cdn.example.com/1.jpg", "https://cdn.example.com/2.jpg", "https://cdn.example.com/3.jpg"))
 			.build();
 
 		when(fishingTripPostService.getFishingTripPostDetail(postId)).thenReturn(responseDto);
@@ -304,16 +304,17 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.name").value("루피"))
 			.andExpect(jsonPath("$.data.subject").value("같이 갑시다"))
 			.andExpect(jsonPath("$.data.content").value("초보 환영"))
-			.andExpect(jsonPath("$.data.headCount").value("1/5명"))
-			.andExpect(jsonPath("$.data.createDate").value("2025.04.01"))
-			.andExpect(jsonPath("$.data.fishingDate").value("2025.04.10"))
-			.andExpect(jsonPath("$.data.fishingTime").value("06:00"))
+			.andExpect(jsonPath("$.data.currentCount").value(1))
+			.andExpect(jsonPath("$.data.recruitmentCount").value(5))
+			.andExpect(jsonPath("$.data.createDate").value("2025-04-01T12:00:00+09:00"))
+			.andExpect(jsonPath("$.data.fishingDate").value("2025-04-10T06:00:00+09:00"))
 			.andExpect(jsonPath("$.data.fishPointDetailName").value("남해 앞바다"))
 			.andExpect(jsonPath("$.data.fishPointName").value("남해"))
 			.andExpect(jsonPath("$.data.longitude").value(128.12345))
 			.andExpect(jsonPath("$.data.latitude").value(37.12345))
 			.andExpect(jsonPath("$.data.images").isArray());
 	}
+
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Controller] - Fail")

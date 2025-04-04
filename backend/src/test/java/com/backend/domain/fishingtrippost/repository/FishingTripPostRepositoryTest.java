@@ -28,6 +28,10 @@ import com.backend.domain.member.repository.MemberRepository;
 import com.backend.domain.member.repository.MemberRepositoryImpl;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
+import com.backend.global.storage.entity.File;
+import com.backend.global.storage.repository.StorageQueryRepository;
+import com.backend.global.storage.repository.StorageRepository;
+import com.backend.global.storage.repository.StorageRepositoryImpl;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -40,6 +44,8 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 	FishPointRepositoryImpl.class,
 	FishingTripPostRepositoryImpl.class,
 	FishingTripPostQueryRepository.class,
+	StorageRepositoryImpl.class,
+	StorageQueryRepository.class,
 	QuerydslConfig.class,
 })
 class FishingTripPostRepositoryTest extends BaseTest {
@@ -52,6 +58,9 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 	@Autowired
 	private FishPointRepository fishPointRepository;
+
+	@Autowired
+	private StorageRepository storageRepository;
 
 	final ArbitraryBuilder<FishingTripPost> fishingTripPostArbitraryBuilder = fixtureMonkeyBuilder
 		.giveMeBuilder(FishingTripPost.class)
@@ -140,10 +149,29 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
 		FishPoint savedFishPoint = fishPointRepository.save(fishPointArbitraryBuilder.sample());
 
+		List<File> savedFiles = List.of(1, 2, 3).stream()
+			.map(i -> File.builder()
+				.fileName("file_" + i + ".jpg")
+				.originalFileName("original_" + i + ".jpg")
+				.contentType("image/jpeg")
+				.fileSize(12345L)
+				.url("http://test.com/file_" + i + ".jpg")
+				.domain("test")
+				.createdById(savedMember.getMemberId())
+				.uploaded(true)
+				.build())
+			.map(storageRepository::save)
+			.toList();
+
+		List<Long> fileIds = savedFiles.stream()
+			.map(File::getFileId)
+			.toList();
+
 		FishingTripPost givenPost = fishingTripPostArbitraryBuilder
 			.set("fishingTripPostId", null)
 			.set("memberId", savedMember.getMemberId())
 			.set("fishingPointId", savedFishPoint.getFishPointId())
+			.set("fileIdList", fileIds)
 			.sample();
 
 		FishingTripPost savedPost = fishingTripPostRepository.save(givenPost);
@@ -160,14 +188,15 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		assertThat(detail.name()).isEqualTo(savedMember.getName());
 		assertThat(detail.subject()).isEqualTo(savedPost.getSubject());
 		assertThat(detail.content()).isEqualTo(savedPost.getContent());
-		assertThat(detail.headCount()).isEqualTo("0/5명");
-		assertThat(detail.createDate()).isNotBlank();
-		assertThat(detail.fishingDate()).isEqualTo("2025.06.10");
-		assertThat(detail.fishingTime()).isEqualTo("08:00");
+		assertThat(detail.currentCount()).isEqualTo(savedPost.getCurrentCount());
+		assertThat(detail.recruitmentCount()).isEqualTo(savedPost.getRecruitmentCount());
+		assertThat(detail.fishingDate()).isEqualTo(savedPost.getFishingDate());
 		assertThat(detail.fishPointName()).isEqualTo(savedFishPoint.getFishPointName());
 		assertThat(detail.fishPointDetailName()).isEqualTo(savedFishPoint.getFishPointDetailName());
 		assertThat(detail.longitude()).isEqualTo(savedFishPoint.getLongitude());
 		assertThat(detail.latitude()).isEqualTo(savedFishPoint.getLatitude());
-		assertThat(detail.images()).containsExactlyElementsOf(savedPost.getFileIdList());
+
+		List<String> expectedUrls = savedFiles.stream().map(File::getUrl).toList();
+		assertThat(detail.images()).containsExactlyElementsOf(expectedUrls);
 	}
 }
