@@ -39,13 +39,4 @@ public interface FishingTripPostRepository {
 	 */
 
 	Optional<FishingTripPostResponse.Detail> findDetailById(final Long fishingTripPostId);
-
-	/**
-	 * 동출 모집 게시글 조회 메서드
-	 *
-	 * @param fishingTripPostId {@link Long}
-	 * @return {@link FishingTripPost}
-	 * @implSpec FishingTripPostId 받아서 조회된 동출 모집 게시글 엔티티 반환
-	 */
-	Optional<FishingTripPost> findById(final Long fishingTripPostId);
 }
