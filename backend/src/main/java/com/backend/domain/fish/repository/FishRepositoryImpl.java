@@ -1,6 +1,7 @@
 package com.backend.domain.fish.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +22,11 @@ public class FishRepositoryImpl implements FishRepository {
 	@Override
 	public Fish save(final Fish fish) {
 		return fishJpaRepository.save(fish);
+	}
+
+	@Override
+	public Optional<Fish> findById(Long fishId) {
+		return fishJpaRepository.findById(fishId);
 	}
 
 	@Override

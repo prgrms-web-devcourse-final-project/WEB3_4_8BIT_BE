@@ -35,6 +35,7 @@ public class Fish extends BaseEntity {
 	@Column(nullable = false, length = 30)
 	private String name;
 
+	// Length 기본 값인 255로 제한
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String description;
 

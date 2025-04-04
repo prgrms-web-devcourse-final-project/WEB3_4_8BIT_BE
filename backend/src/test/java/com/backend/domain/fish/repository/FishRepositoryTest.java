@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -78,6 +79,20 @@ class FishRepositoryTest extends BaseTest {
 		List<Fish> fishList = fishRepository.findAllById(fishIdList);
 
 		// Then
-		assertThat(fishList.size()).isEqualTo(5);
+		assertThat(fishList).hasSize(5);
+	}
+
+	@Test
+	@DisplayName("물고기 상세 조회 [Repository] - Success")
+	void t04() {
+		// Given
+		Fish givenFish = arbitraryBuilder.set("fishId", null).sample();
+		Fish savedFish = fishRepository.save(givenFish);
+
+		// When
+		Optional<Fish> findFish = fishRepository.findById(savedFish.getFishId());
+
+		// Then
+		assertThat(findFish).contains(savedFish);
 	}
 }
