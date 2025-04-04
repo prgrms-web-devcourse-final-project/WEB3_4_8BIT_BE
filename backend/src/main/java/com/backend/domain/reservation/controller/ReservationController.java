@@ -4,6 +4,8 @@ import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,8 +18,10 @@ import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "예약 정보 API")
@@ -40,4 +44,14 @@ public class ReservationController {
 			.body(GenericResponse.of(true, response));
 	}
 
+	@GetMapping("/{id}")
+	@Operation(summary = "예약 내역 상세 조회", description = "유저가 선상 낚시를 예약 정보를 상세 조회 할 때 사용하는 API")
+	@Parameter(name = "id", required = true, description = "예약 Id", example = "1")
+	public ResponseEntity<GenericResponse<ReservationResponse.DetailWithMemberName>> getReservation(
+		@PathVariable("id") @Min(1) final Long reservationId) {
+
+		ReservationResponse.DetailWithMemberName response = reservationService.getReservation(reservationId);
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
 }
