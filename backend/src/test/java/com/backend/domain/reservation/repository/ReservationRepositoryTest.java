@@ -69,15 +69,17 @@ public class ReservationRepositoryTest extends BaseTest {
 		Reservation savedReservation = reservationRepository.save(givenReservation);
 
 		// When
-		Optional<ReservationResponse.DetailWithMemberName> optionalResponseDto = reservationRepository
-			.findDetailWithMemberNameById(savedReservation.getReservationId());
+		Optional<ReservationResponse.DetailWithMember> optionalResponseDto = reservationRepository
+			.findDetailWithMemberById(savedReservation.getReservationId());
 
 		// Then
 		assertThat(optionalResponseDto.isPresent()).isTrue();
 
-		ReservationResponse.DetailWithMemberName responseDto = optionalResponseDto.get();
+		ReservationResponse.DetailWithMember responseDto = optionalResponseDto.get();
 
 		assertThat(responseDto.reservationId()).isEqualTo(savedReservation.getReservationId());
+		assertThat(responseDto.shipFishingPostId()).isEqualTo(savedReservation.getShipFishingPostId());
+		assertThat(responseDto.memberId()).isEqualTo(savedMember.getMemberId());
 		assertThat(responseDto.name()).isEqualTo(savedMember.getName());
 		assertThat(responseDto.reservationNumber()).isEqualTo(savedReservation.getReservationNumber());
 		assertThat(responseDto.guestCount()).isEqualTo(savedReservation.getGuestCount());

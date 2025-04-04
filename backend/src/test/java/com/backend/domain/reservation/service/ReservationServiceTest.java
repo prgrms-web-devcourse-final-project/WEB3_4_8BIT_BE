@@ -16,6 +16,8 @@ import com.backend.domain.reservation.dto.response.ReservationResponse;
 import com.backend.domain.reservation.exception.ReservationErrorCode;
 import com.backend.domain.reservation.exception.ReservationException;
 import com.backend.domain.reservation.repository.ReservationRepository;
+import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
+import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,41 +26,113 @@ public class ReservationServiceTest extends BaseTest {
 	@Mock
 	private ReservationRepository reservationRepository;
 
+	@Mock
+	private ShipFishingPostRepository shipFishingPostRepository;
+
 	@InjectMocks
 	private ReservationServiceImpl reservationServiceImpl;
 
 	@Test
-	@DisplayName("예약 정보 조회 [Service] - Success")
+	@DisplayName("예약 정보 조회 [예약자 본인] [Service] - Success")
 	void t01() {
 		// Given
-		ReservationResponse.DetailWithMemberName givenResponseDto = fixtureMonkeyValidation.giveMeBuilder(
-			ReservationResponse.DetailWithMemberName.class).set("reservationId", 1L).sample();
+		ReservationResponse.DetailWithMember givenResponseDto = fixtureMonkeyValidation
+			.giveMeBuilder(ReservationResponse.DetailWithMember.class)
+			.set("reservationId", 1L)
+			.set("memberId", 1L)
+			.sample();
+
+		ShipFishingPost givenShipFishingPost = fixtureMonkeyBuilder
+			.giveMeBuilder(ShipFishingPost.class)
+			.set("memberId", 2L)
+			.sample();
 
 		// When
-		when(reservationRepository.findDetailWithMemberNameById(any(Long.class))).thenReturn(
-			Optional.ofNullable(givenResponseDto));
+		when(reservationRepository.findDetailWithMemberById(any(Long.class)))
+			.thenReturn(Optional.ofNullable(givenResponseDto));
+
+		when(shipFishingPostRepository.findById(any(Long.class)))
+			.thenReturn(Optional.ofNullable(givenShipFishingPost));
 
 		// Then
-		ReservationResponse.DetailWithMemberName savedResponseDto = reservationServiceImpl.getReservation(
-			givenResponseDto.reservationId());
+		ReservationResponse.DetailWithMember savedResponseDto = reservationServiceImpl.getReservation(
+			givenResponseDto.reservationId(), 1L);
 
 		assertThat(savedResponseDto.reservationId()).isEqualTo(givenResponseDto.reservationId());
 	}
 
 	@Test
-	@DisplayName("예약 정보 조회 [Service] - Fail")
+	@DisplayName("예약 정보 조회 [해당 예약 선장] [Service] - Success")
 	void t02() {
 		// Given
-		ReservationResponse.DetailWithMemberName givenResponseDto = fixtureMonkeyValidation.giveMeBuilder(
-			ReservationResponse.DetailWithMemberName.class).set("reservationId", 1L).sample();
+		ReservationResponse.DetailWithMember givenResponseDto = fixtureMonkeyValidation
+			.giveMeBuilder(ReservationResponse.DetailWithMember.class)
+			.set("reservationId", 1L)
+			.set("memberId", 1L)
+			.sample();
+
+		ShipFishingPost givenShipFishingPost = fixtureMonkeyBuilder
+			.giveMeBuilder(ShipFishingPost.class)
+			.set("memberId", 2L)
+			.sample();
 
 		// When
-		when(reservationRepository.findDetailWithMemberNameById(any(Long.class))).thenReturn(Optional.empty());
+		when(reservationRepository.findDetailWithMemberById(any(Long.class)))
+			.thenReturn(Optional.ofNullable(givenResponseDto));
+
+		when(shipFishingPostRepository.findById(any(Long.class)))
+			.thenReturn(Optional.ofNullable(givenShipFishingPost));
+
+		// Then
+		ReservationResponse.DetailWithMember savedResponseDto = reservationServiceImpl.getReservation(
+			givenResponseDto.reservationId(), 2L);
+
+		assertThat(savedResponseDto.reservationId()).isEqualTo(givenResponseDto.reservationId());
+	}
+
+	@Test
+	@DisplayName("예약 정보 조회 [게시글 존재 x] [Service] - Fail")
+	void t03() {
+		// Given
+		ReservationResponse.DetailWithMember givenResponseDto = fixtureMonkeyValidation.giveMeBuilder(
+			ReservationResponse.DetailWithMember.class).set("reservationId", 1L).sample();
+
+		// When
+		when(reservationRepository.findDetailWithMemberById(any(Long.class))).thenReturn(Optional.empty());
 
 		// Then
 
-		assertThatThrownBy(() -> reservationServiceImpl.getReservation(givenResponseDto.reservationId())).isInstanceOf(
+		assertThatThrownBy(
+			() -> reservationServiceImpl.getReservation(givenResponseDto.reservationId(), 1L)).isInstanceOf(
 			ReservationException.class).hasMessageContaining(ReservationErrorCode.RESERVATION_NOT_FOUND.getMessage());
+	}
+
+	@Test
+	@DisplayName("예약 정보 조회 [예약자 or 선장이 아님] [Service] - Fail")
+	void t04() {
+		// Given
+		ReservationResponse.DetailWithMember givenResponseDto = fixtureMonkeyValidation
+			.giveMeBuilder(ReservationResponse.DetailWithMember.class)
+			.set("reservationId", 1L)
+			.set("memberId", 1L)
+			.sample();
+
+		ShipFishingPost givenShipFishingPost = fixtureMonkeyBuilder
+			.giveMeBuilder(ShipFishingPost.class)
+			.set("memberId", 2L)
+			.sample();
+
+		// When
+		when(reservationRepository.findDetailWithMemberById(any(Long.class)))
+			.thenReturn(Optional.ofNullable(givenResponseDto));
+
+		when(shipFishingPostRepository.findById(any(Long.class)))
+			.thenReturn(Optional.ofNullable(givenShipFishingPost));
+
+		assertThatThrownBy(
+			() -> reservationServiceImpl.getReservation(givenResponseDto.reservationId(), 3L)).isInstanceOf(
+				ReservationException.class)
+			.hasMessageContaining(ReservationErrorCode.NOT_AUTHORITY_RESERVATION.getMessage());
 	}
 
 }
