@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum FishErrorCode implements ErrorCode {
 
-	FISH_NOT_FOUND(HttpStatus.NOT_FOUND, 10001, "물고기 정보가 존재하지 않음");
+	FISH_NOT_FOUND(HttpStatus.NOT_FOUND, 10001, "물고기가 존재하지 않습니다.");
 
 	private final HttpStatus httpStatus;
 	private final Integer code;

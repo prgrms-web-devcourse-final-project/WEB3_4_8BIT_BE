@@ -9,14 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.domain.catchmaxlength.converter.CatchMaxLengthConvert;
 import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
 import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
+import com.backend.domain.fish.exception.FishErrorCode;
+import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.fishencyclopedia.converter.FishEncyclopediaConverter;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
-import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
+import com.backend.domain.fishpoint.exception.FishPointErrorCode;
+import com.backend.domain.fishpoint.exception.FishPointException;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
@@ -111,7 +114,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		log.debug("물고기 존재 여부: {}", result);
 
 		if (!result) {
-			throw new FishEncyclopediaException(FishEncyclopediaErrorCode.NOT_EXISTS_FISH);
+			throw new FishException(FishErrorCode.FISH_NOT_FOUND);
 		}
 	}
 
@@ -128,7 +131,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		log.debug("낚시 포인트 존재 여부: {}", result);
 
 		if (!result) {
-			throw new FishEncyclopediaException(FishEncyclopediaErrorCode.NOT_EXISTS_FISH_POINT);
+			throw new FishPointException(FishPointErrorCode.FISH_POINT_NOT_FOUND);
 		}
 	}
 }

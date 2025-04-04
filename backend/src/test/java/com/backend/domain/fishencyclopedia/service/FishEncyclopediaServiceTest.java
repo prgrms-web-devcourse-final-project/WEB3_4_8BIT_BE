@@ -16,13 +16,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
 import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
 import com.backend.domain.fish.entity.Fish;
+import com.backend.domain.fish.exception.FishErrorCode;
+import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
-import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
-import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
+import com.backend.domain.fishpoint.exception.FishPointErrorCode;
+import com.backend.domain.fishpoint.exception.FishPointException;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.member.entity.Member;
 import com.backend.global.dto.request.GlobalRequest;
@@ -155,8 +157,8 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		// When & Then
 		assertThatThrownBy(
 			() -> fishEncyclopediasService.createFishEncyclopedia(givenCreate, GIVEN_MEMBER.getMemberId()))
-			.isExactlyInstanceOf(FishEncyclopediaException.class)
-			.hasMessage(FishEncyclopediaErrorCode.NOT_EXISTS_FISH_POINT.getMessage());
+			.isExactlyInstanceOf(FishPointException.class)
+			.hasMessage(FishPointErrorCode.FISH_POINT_NOT_FOUND.getMessage());
 	}
 
 	@Test
@@ -178,8 +180,8 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		// When & Then
 		assertThatThrownBy(
 			() -> fishEncyclopediasService.createFishEncyclopedia(givenCreate, GIVEN_MEMBER.getMemberId()))
-			.isExactlyInstanceOf(FishEncyclopediaException.class)
-			.hasMessage(FishEncyclopediaErrorCode.NOT_EXISTS_FISH.getMessage());
+			.isExactlyInstanceOf(FishException.class)
+			.hasMessage(FishErrorCode.FISH_NOT_FOUND.getMessage());
 	}
 
 	@Test
