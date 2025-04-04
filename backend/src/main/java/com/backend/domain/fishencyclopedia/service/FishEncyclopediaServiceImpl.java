@@ -1,5 +1,6 @@
 package com.backend.domain.fishencyclopedia.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -53,14 +54,20 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 			);
 
 		// 비어있다면 객체 생성
-		CatchMaxLength encyclopediaMaxLength = findEncyclopediaMaxLength
+		CatchMaxLength catchMaxLength = findEncyclopediaMaxLength
 			.orElse(CatchMaxLengthConvert.fromCatchMaxLength(requestDto.fishId(), memberId));
 
- 		// 최대 값 갱신
-		encyclopediaMaxLength.setBestLength(requestDto.length());
+ 		// 최대 값 갱신 & 잡은 마리 수 설정
+		catchMaxLength.setBestLength(requestDto.length());
+		catchMaxLength.setCatchCount(requestDto.count());
 
-		if (encyclopediaMaxLength.getBestLength().equals(requestDto.length())) {
-			catchMaxLengthRepository.save(encyclopediaMaxLength);
+		log.debug("잡은 물고기 데이터 갱신: {}", catchMaxLength);
+
+		if (
+			catchMaxLength.getBestLength().equals(requestDto.length()) ||
+			catchMaxLength.getCatchCount().equals(requestDto.count())
+		) {
+			catchMaxLengthRepository.save(catchMaxLength);
 		}
 
 		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.createFishEncyclopedia(fishEncyclopedia);
@@ -77,12 +84,18 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		final Long fishId,
 		final Long memberId
 	) {
-		ScrollResponse<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
+		ScrollResponse<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByMemberIdAndFishId(
 			cursorRequestDto, fishId, memberId);
 
 		log.debug("물고기 도감 상세 조회: {}", findDetailList);
 
 		return findDetailList;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<FishEncyclopediaResponse.DetailPage> getDetailPageList(final Long memberId) {
+		return fishEncyclopediaRepository.findDetailPageByAllByMemberId(memberId);
 	}
 
 	/**

@@ -1,18 +1,23 @@
 package com.backend.domain.fishencyclopedia.repository;
 
+import static com.backend.domain.catchmaxlength.entity.QCatchMaxLength.*;
+import static com.backend.domain.fish.entity.QFish.*;
 import static com.backend.domain.fishencyclopedia.entity.QFishEncyclopedia.*;
 import static com.backend.domain.fishpoint.entity.QFishPoint.*;
+import static com.backend.global.storage.entity.QFile.*;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.dto.response.QFishEncyclopediaResponse_Detail;
+import com.backend.domain.fishencyclopedia.dto.response.QFishEncyclopediaResponse_DetailPage;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalErrorCode;
@@ -39,31 +44,38 @@ public class FishEncyclopediaQueryRepository {
 		"createdAt", fishEncyclopedia.createdAt
 	);
 
-	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
-		final GlobalRequest.CursorRequest pageRequestDto,
+	//fishId와 memberId가 일치하는 데이터를 가져오는 조건식 생성 함수
+    private static final BiFunction<Long, Long, BooleanExpression> BOOLEAN_EXPRESSION_BI_FUNCTION =
+        (fishId, memberId) -> fishEncyclopedia.fishId.eq(fishId)
+            .and(fishEncyclopedia.memberId.eq(memberId));
+
+	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByMemberIdAndFishId(
+		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long fishId,
 		final Long memberId
 	) {
 
-		List<FishEncyclopediaResponse.Detail> detailList = queryFactory.select(
+		List<FishEncyclopediaResponse.Detail> detailList = queryFactory
+			.selectDistinct(
 				new QFishEncyclopediaResponse_Detail(
 					fishEncyclopedia.fishEncyclopediaId,
 					fishEncyclopedia.length,
 					fishEncyclopedia.count,
 					fishPoint.fishPointName,
 					fishPoint.fishPointDetailName,
-					fishEncyclopedia.createdAt)
+					fishEncyclopedia.createdAt
+				)
 			)
 			.from(fishEncyclopedia)
 			.leftJoin(fishPoint)
 			.on(fishEncyclopedia.fishPointId.eq(fishPoint.fishPointId))
-			.where(whereCondition(pageRequestDto, fishId, memberId))
-			.orderBy(getOrderBy(pageRequestDto))
-			.limit(pageRequestDto.size() + 1)
+			.where(whereCondition(cursorRequestDto, fishId, memberId))
+			.orderBy(getOrderBy(cursorRequestDto))
+			.limit(cursorRequestDto.size() + 1)
 			.fetch();
 
 		// 다음 페이지가 있는지 확인
-		boolean hasNext = detailList.size() > pageRequestDto.size();
+		boolean hasNext = detailList.size() > cursorRequestDto.size();
 
 		if (hasNext) {
 			detailList.remove(detailList.size() - 1);
@@ -79,11 +91,34 @@ public class FishEncyclopediaQueryRepository {
 		 */
 		return ScrollResponse.from(
 			detailList,
-			pageRequestDto.size(),
+			cursorRequestDto.size(),
 			detailList.size(),
-			pageRequestDto.fieldValue() == null,
+			cursorRequestDto.fieldValue() == null,
 			hasNext
 		);
+	}
+
+	public List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberId(
+		final Long memberId
+	) {
+
+		return queryFactory
+			.select(
+				new QFishEncyclopediaResponse_DetailPage(
+					fish.fishId,
+					file.url,
+					fish.name,
+					catchMaxLength.bestLength,
+					catchMaxLength.catchCount
+				)
+			)
+			.from(fish)
+			.leftJoin(catchMaxLength)
+			.on(fish.fishId.eq(catchMaxLength.fishId))
+			.leftJoin(file)
+			.on(file.fileId.eq(fish.fileId))
+			.where(catchMaxLength.memberId.eq(memberId))
+			.fetch();
 	}
 
 	private BooleanExpression whereCondition(
@@ -91,9 +126,8 @@ public class FishEncyclopediaQueryRepository {
 		final Long fishId,
 		final Long memberId
 	) {
-		//fishId와 memberId가 일치하는 데이터를 가져오는 조건식
-		BooleanExpression baseBooleanExpression = fishEncyclopedia.fishId.eq(fishId)
-			.and(fishEncyclopedia.memberId.eq(memberId));
+
+		BooleanExpression baseBooleanExpression = BOOLEAN_EXPRESSION_BI_FUNCTION.apply(fishId, memberId);
 
 		// 입력값 유효성 검사
 		if (!StringUtils.hasText(cursorRequestDto.fieldValue()) || cursorRequestDto.id() == null) {
@@ -173,26 +207,26 @@ public class FishEncyclopediaQueryRepository {
 		}
 	}
 
-		/**
-		 * 정렬할 필드와 정렬 방식을 OrderSpecifier로 반환합니다.
-		 *
-		 * @param pageRequestDto
-		 * @return {@link OrderSpecifier}
-		 */
-		private OrderSpecifier<?>[] getOrderBy ( final GlobalRequest.CursorRequest pageRequestDto){
-			// 기본 정렬 방식 설정
-			Order queryOrder = QuerydslUtil.getOrder(pageRequestDto);
+	/**
+	 * 정렬할 필드와 정렬 방식을 OrderSpecifier로 반환합니다.
+	 *
+	 * @param pageRequestDto
+	 * @return {@link OrderSpecifier}
+	 */
+	private OrderSpecifier<?>[] getOrderBy(final GlobalRequest.CursorRequest pageRequestDto) {
+		// 기본 정렬 방식 설정
+		Order queryOrder = QuerydslUtil.getOrder(pageRequestDto);
 
-			// 정렬 필드 결정
-			ComparableExpressionBase<?> sortField =
-				StringUtils.hasText(pageRequestDto.sort()) && FIELD_MAP.containsKey(pageRequestDto.sort()) ?
-					FIELD_MAP.get(pageRequestDto.sort()) : fishEncyclopedia.createdAt;
+		// 정렬 필드 결정
+		ComparableExpressionBase<?> sortField =
+			StringUtils.hasText(pageRequestDto.sort()) && FIELD_MAP.containsKey(pageRequestDto.sort()) ?
+				FIELD_MAP.get(pageRequestDto.sort()) : fishEncyclopedia.createdAt;
 
-			// 두 개의 OrderSpecifier를 배열로 반환
-			return new OrderSpecifier<?>[] {
-				new OrderSpecifier<>(queryOrder, sortField),
-				new OrderSpecifier<>(Order.ASC, fishEncyclopedia.fishEncyclopediaId)
-			};
-		}
+		// 두 개의 OrderSpecifier를 배열로 반환
+		return new OrderSpecifier<?>[] {
+			new OrderSpecifier<>(queryOrder, sortField),
+			new OrderSpecifier<>(Order.ASC, fishEncyclopedia.fishEncyclopediaId)
+		};
 	}
+}
 

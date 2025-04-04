@@ -1,5 +1,7 @@
 package com.backend.domain.fishencyclopedia.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
@@ -21,11 +23,26 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 	}
 
 	@Override
-	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
-		GlobalRequest.CursorRequest pageRequestDto,
-		Long fishId,
-		Long memberId
+	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByMemberIdAndFishId(
+		final GlobalRequest.CursorRequest pageRequestDto,
+		final Long fishId,
+		final Long memberId
 	) {
-		return fishEncyclopediaQueryRepository.findDetailByAllByFishPointIdAndFishId(pageRequestDto, fishId, memberId);
+
+		return fishEncyclopediaQueryRepository.findDetailByAllByMemberIdAndFishId(
+			pageRequestDto,
+			fishId,
+			memberId
+		);
+	}
+
+	@Override
+	public List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberId(
+		final Long memberId
+	) {
+
+		return fishEncyclopediaQueryRepository.findDetailPageByAllByMemberId(
+			memberId
+		);
 	}
 }

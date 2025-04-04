@@ -1,6 +1,7 @@
 package com.backend.domain.fishencyclopedia.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -33,6 +34,7 @@ public class FishEncyclopediaController {
 
 	private final FishEncyclopediaService fishEncyclopediaService;
 
+	//TODO 프론트랑 얘기해서 request 객체를 어떻게 받을 것인지 정해야함
 	@Operation(summary = "물고기 도감 추가하기", description = "물고기 도감 추가시 사용하는 API")
 	@PostMapping("/encyclopedias")
 	public ResponseEntity<GenericResponse<Void>> createFishEncyclopedia(
@@ -63,5 +65,18 @@ public class FishEncyclopediaController {
 		);
 
 		return ResponseEntity.ok(GenericResponse.of(true, detailList));
+	}
+
+	@Operation(summary = "물고기 도감 상세 조회", description = "물고기 도감 상세 조회시 사용하는 API")
+	@GetMapping("/encyclopedias")
+	public ResponseEntity<GenericResponse<List<FishEncyclopediaResponse.DetailPage>>> getDetailPageList(
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		List<FishEncyclopediaResponse.DetailPage> detailPageList = fishEncyclopediaService.getDetailPageList(
+			user.getId()
+		);
+
+		return ResponseEntity.ok(GenericResponse.of(true, detailPageList));
 	}
 }

@@ -34,6 +34,8 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 @ExtendWith(MockitoExtension.class)
 class FishEncyclopediaServiceTest extends BaseTest {
 
+	private static final Member GIVEN_MEMBER = fixtureMonkeyBuilder.giveMeOne(Member.class);
+
 	@Mock
 	private FishEncyclopediaRepository fishEncyclopediaRepository;
 
@@ -58,34 +60,32 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			.set("length", 5)
 			.sample();
 
-		Member givenMember = fixtureMonkeyBuilder.giveMeOne(Member.class);
-
 		FishEncyclopedia givenFishEncyclopedia = fixtureMonkeyBuilder.giveMeBuilder(FishEncyclopedia.class)
 			.set("fishEncyclopediaId", 1L)
 			.set("fishId", givenCreate.fishId())
 			.set("length", givenCreate.length())
 			.set("fishPointId", givenCreate.fishPointId())
-			.set("memberId", givenMember.getMemberId())
+			.set("memberId", GIVEN_MEMBER.getMemberId())
 			.sample();
 
 		ArbitraryBuilder<CatchMaxLength> arbitraryBuilder = fixtureMonkeyBuilder
 			.giveMeBuilder(CatchMaxLength.class)
 			.set("catchMaxLengthId", 1L)
 			.set("fishId", givenCreate.fishId())
-			.set("memberId", givenMember.getMemberId())
+			.set("memberId", GIVEN_MEMBER.getMemberId())
 			.set("bestLength", 10);
 
 		when(fishPointRepository.existsById(givenFishEncyclopedia.getFishPointId())).thenReturn(true);
 		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(true);
 		when(catchMaxLengthRepository
-			.findByFishIdAndMemberId(givenCreate.fishId(), givenMember.getMemberId()))
+			.findByFishIdAndMemberId(givenCreate.fishId(), GIVEN_MEMBER.getMemberId()))
 			.thenReturn(Optional.of(arbitraryBuilder.sample()));
 
 		when(fishEncyclopediaRepository.createFishEncyclopedia(any(FishEncyclopedia.class)))
 			.thenReturn(givenFishEncyclopedia);
 
 		// When
-		Long savedId = fishEncyclopediasService.createFishEncyclopedia(givenCreate, givenMember.getMemberId());
+		Long savedId = fishEncyclopediasService.createFishEncyclopedia(givenCreate, GIVEN_MEMBER.getMemberId());
 
 		// Then
 		assertThat(savedId).isEqualTo(givenFishEncyclopedia.getFishEncyclopediaId());
@@ -99,21 +99,19 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		FishEncyclopediaRequest.Create givenCreate = fixtureMonkeyValidation.giveMeOne(
 			FishEncyclopediaRequest.Create.class);
 
-		Member givenMember = fixtureMonkeyBuilder.giveMeOne(Member.class);
-
 		FishEncyclopedia givenFishEncyclopedia = fixtureMonkeyBuilder.giveMeBuilder(FishEncyclopedia.class)
 			.set("fishEncyclopediaId", 1L)
 			.set("fishId", givenCreate.fishId())
 			.set("length", givenCreate.length())
 			.set("fishPointId", givenCreate.fishPointId())
-			.set("memberId", givenMember.getMemberId())
+			.set("memberId", GIVEN_MEMBER.getMemberId())
 			.sample();
 
 		ArbitraryBuilder<CatchMaxLength> arbitraryBuilder = fixtureMonkeyBuilder
 			.giveMeBuilder(CatchMaxLength.class)
 			.set("catchMaxLengthId", null)
 			.set("fishId", givenCreate.fishId())
-			.set("memberId", givenMember.getMemberId())
+			.set("memberId", GIVEN_MEMBER.getMemberId())
 			.set("bestLength", givenCreate.length());
 
 		when(fishEncyclopediaRepository.createFishEncyclopedia(any(FishEncyclopedia.class)))
@@ -121,13 +119,13 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		when(fishPointRepository.existsById(givenFishEncyclopedia.getFishPointId())).thenReturn(true);
 		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(true);
 		when(catchMaxLengthRepository
-			.findByFishIdAndMemberId(givenCreate.fishId(), givenMember.getMemberId()))
+			.findByFishIdAndMemberId(givenCreate.fishId(), GIVEN_MEMBER.getMemberId()))
 			.thenReturn(Optional.empty());
 		when(catchMaxLengthRepository.save(any(CatchMaxLength.class)))
 			.thenReturn(arbitraryBuilder.set("fishEncyclopediaMaxLengthId", 1L).sample());
 
 		// When
-		Long savedId = fishEncyclopediasService.createFishEncyclopedia(givenCreate, givenMember.getMemberId());
+		Long savedId = fishEncyclopediasService.createFishEncyclopedia(givenCreate, GIVEN_MEMBER.getMemberId());
 
 		// Then
 		assertThat(savedId).isEqualTo(givenFishEncyclopedia.getFishEncyclopediaId());
@@ -144,13 +142,11 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		FishEncyclopediaRequest.Create givenCreate = fixtureMonkeyValidation.giveMeOne(
 			FishEncyclopediaRequest.Create.class);
 
-		Member givenMember = fixtureMonkeyBuilder.giveMeOne(Member.class);
-
 		FishEncyclopedia givenFishEncyclopedia = fixtureMonkeyBuilder.giveMeBuilder(FishEncyclopedia.class)
 			.set("fishId", givenCreate.fishId())
 			.set("length", givenCreate.length())
 			.set("fishPointId", givenCreate.fishPointId())
-			.set("memberId", givenMember.getMemberId())
+			.set("memberId", GIVEN_MEMBER.getMemberId())
 			.sample();
 
 		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(true);
@@ -158,7 +154,7 @@ class FishEncyclopediaServiceTest extends BaseTest {
 
 		// When & Then
 		assertThatThrownBy(
-			() -> fishEncyclopediasService.createFishEncyclopedia(givenCreate, givenMember.getMemberId()))
+			() -> fishEncyclopediasService.createFishEncyclopedia(givenCreate, GIVEN_MEMBER.getMemberId()))
 			.isExactlyInstanceOf(FishEncyclopediaException.class)
 			.hasMessage(FishEncyclopediaErrorCode.NOT_EXISTS_FISH_POINT.getMessage());
 	}
@@ -170,20 +166,18 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		FishEncyclopediaRequest.Create givenCreate = fixtureMonkeyValidation.giveMeOne(
 			FishEncyclopediaRequest.Create.class);
 
-		Member givenMember = fixtureMonkeyBuilder.giveMeOne(Member.class);
-
 		FishEncyclopedia givenFishEncyclopedia = fixtureMonkeyBuilder.giveMeBuilder(FishEncyclopedia.class)
 			.set("fishId", givenCreate.fishId())
 			.set("length", givenCreate.length())
 			.set("fishPointId", givenCreate.fishPointId())
-			.set("memberId", givenMember.getMemberId())
+			.set("memberId", GIVEN_MEMBER.getMemberId())
 			.sample();
 
 		when(fishRepository.existsById(givenFishEncyclopedia.getFishId())).thenReturn(false);
 
 		// When & Then
 		assertThatThrownBy(
-			() -> fishEncyclopediasService.createFishEncyclopedia(givenCreate, givenMember.getMemberId()))
+			() -> fishEncyclopediasService.createFishEncyclopedia(givenCreate, GIVEN_MEMBER.getMemberId()))
 			.isExactlyInstanceOf(FishEncyclopediaException.class)
 			.hasMessage(FishEncyclopediaErrorCode.NOT_EXISTS_FISH.getMessage());
 	}
@@ -215,7 +209,7 @@ class FishEncyclopediaServiceTest extends BaseTest {
 			givenHasNext
 		);
 
-		when(fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
+		when(fishEncyclopediaRepository.findDetailByAllByMemberIdAndFishId(
 			givenCursorRequestDto,
 			givenFish.getFishId(),
 			givenMember.getMemberId())).thenReturn(givenScrollResponse);
@@ -229,4 +223,25 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		assertThat(getDetailList.content()).isEqualTo(givenDetailList);
 		assertThat(getDetailList.isLast()).isFalse();
 	}
+
+	@Test
+	@DisplayName("물고기 도감 전체 조회 [Service] - Success")
+	void t06() {
+		// Given
+		List<FishEncyclopediaResponse.DetailPage> givenDetailPageList = fixtureMonkeyRecord.giveMeBuilder(
+				FishEncyclopediaResponse.DetailPage.class)
+			.set("memberId", GIVEN_MEMBER.getMemberId())
+			.sampleList(15);
+
+		when(fishEncyclopediaRepository.findDetailPageByAllByMemberId(GIVEN_MEMBER.getMemberId()))
+			.thenReturn(givenDetailPageList);
+
+		// When
+		List<FishEncyclopediaResponse.DetailPage> detailPageList = fishEncyclopediasService.getDetailPageList(
+			GIVEN_MEMBER.getMemberId());
+
+		// Then
+		assertThat(detailPageList).isEqualTo(givenDetailPageList);
+	}
+
 }

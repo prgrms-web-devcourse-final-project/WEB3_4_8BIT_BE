@@ -200,13 +200,14 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			.thenReturn(givenScrollResponse);
 
 		// When
-		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
-			.param("size", givenCursorRequest.size().toString())
-			.param("sort", givenCursorRequest.sort())
-			.param("fieldValue", givenCursorRequest.fieldValue())
-			.param("id", givenCursorRequest.id().toString())
-			.param("order", givenCursorRequest.order())
-			.param("type", givenCursorRequest.type()));
+		ResultActions resultActions = mockMvc.perform(
+			get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
+				.param("size", givenCursorRequest.size().toString())
+				.param("sort", givenCursorRequest.sort())
+				.param("fieldValue", givenCursorRequest.fieldValue())
+				.param("id", givenCursorRequest.id().toString())
+				.param("order", givenCursorRequest.order())
+				.param("type", givenCursorRequest.type()));
 
 		// Then
 		resultActions
@@ -231,13 +232,14 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 		Fish givenFish = fixtureMonkeyBuilder.giveMeOne(Fish.class);
 
 		// When
-		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
-			.param("size", givenCursorRequest.size().toString())
-			.param("sort", givenCursorRequest.sort())
-			.param("fieldValue", givenCursorRequest.fieldValue())
-			.param("id", givenCursorRequest.id().toString())
-			.param("order", givenCursorRequest.order())
-			.param("type", givenCursorRequest.type()));
+		ResultActions resultActions = mockMvc.perform(
+			get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
+				.param("size", givenCursorRequest.size().toString())
+				.param("sort", givenCursorRequest.sort())
+				.param("fieldValue", givenCursorRequest.fieldValue())
+				.param("id", givenCursorRequest.id().toString())
+				.param("order", givenCursorRequest.order())
+				.param("type", givenCursorRequest.type()));
 
 		// Then
 		resultActions
@@ -248,5 +250,28 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data[0].reason").value("페이지 사이즈는 1 이상이어야 합니다."))
 			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("물고기 도감 전체 조회 [Controller] - Success")
+	@WithMockCustomUser
+	void t08() throws Exception {
+		// Given
+		List<FishEncyclopediaResponse.DetailPage> givenDetailPageList = fixtureMonkeyRecord
+			.giveMeBuilder(FishEncyclopediaResponse.DetailPage.class)
+			.set("memberId", 1L)
+			.sampleList(15);
+
+		when(fishEncyclopediaService.getDetailPageList(1L)).thenReturn(givenDetailPageList);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/encyclopedias")
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.size()").value(givenDetailPageList.size()));
 	}
 }
