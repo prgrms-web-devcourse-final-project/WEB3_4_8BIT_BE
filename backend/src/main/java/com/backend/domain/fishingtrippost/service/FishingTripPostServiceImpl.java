@@ -1,5 +1,7 @@
 package com.backend.domain.fishingtrippost.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.backend.domain.fishingtrippost.converter.FishingTripPostConvert;
@@ -15,6 +17,7 @@ import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.exception.GlobalException;
+import com.backend.global.storage.service.StorageService;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final FishingTripPostRepository fishingTripPostRepository;
 	private final MemberRepository memberRepository;
 	private final FishPointRepository fishPointRepository;
+	private final StorageService storageService;
 
 	@Override
 	@Transactional
@@ -53,6 +57,22 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		// 동출 모집 게시글 작성자인지 검증
 		validAuthor(fishingTripPost, memberId);
 
+		// 기존 동출 게시글 이미지 ID 리스트
+		List<Long> originalFileIdList = fishingTripPost.getFileIdList();
+
+		// 새로 요청된 이미지 ID 리스트
+		List<Long> newFileIdList = requestDto.fileIdList();
+
+		// 삭제 대상 이미지 ID 추출
+		List<Long> unusedFileIdList = originalFileIdList.stream()
+			.filter(id -> !newFileIdList.contains(id))
+			.toList();
+
+		// 사용하지 않는 이미지 삭제
+		if (!unusedFileIdList.isEmpty()) {
+			storageService.deleteFilesByIdList(memberId, unusedFileIdList);
+		}
+
 		fishingTripPost.updateFishingTripPost(
 			requestDto.subject(),
 			requestDto.content(),
@@ -62,6 +82,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 			requestDto.fishingPointId(),
 			requestDto.fileIdList()
 		);
+
 		log.debug("[동출 모집 게시글 정보 수정] : {}", fishingTripPost);
 
 		return fishingTripPost.getFishingPointId();
