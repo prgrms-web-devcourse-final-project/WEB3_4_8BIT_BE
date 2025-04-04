@@ -18,6 +18,7 @@ import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.exception.GlobalException;
+import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.StorageService;
 
 import jakarta.transaction.Transactional;
@@ -33,6 +34,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final MemberRepository memberRepository;
 	private final FishPointRepository fishPointRepository;
 	private final StorageService storageService;
+	private final StorageRepository storageRepository;
 
 	@Override
 	@Transactional
@@ -89,7 +91,6 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		return fishingTripPost.getFishingPointId();
 	}
 
-
 	@Override
 	public FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId) {
 		return getDetailById(fishingTripPostId);
@@ -128,7 +129,6 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		return detail;
 	}
 
-
 	/**
 	 * 로그인한 멤버와 낚시포인트 존재 검증 메서드
 	 *
@@ -161,5 +161,4 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR);
 		}
 	}
-
 }
