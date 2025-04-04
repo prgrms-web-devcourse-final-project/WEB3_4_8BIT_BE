@@ -284,7 +284,7 @@ class FishingTripPostControllerTest extends BaseTest {
 			.fishPointName("남해")
 			.longitude(128.12345)
 			.latitude(37.12345)
-			.images(List.of("https://cdn.example.com/1.jpg", "https://cdn.example.com/2.jpg", "https://cdn.example.com/3.jpg"))
+			.fileUrlList(List.of("https://cdn.example.com/1.jpg", "https://cdn.example.com/2.jpg", "https://cdn.example.com/3.jpg"))
 			.build();
 
 		when(fishingTripPostService.getFishingTripPostDetail(postId)).thenReturn(responseDto);
@@ -312,7 +312,7 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.fishPointName").value("남해"))
 			.andExpect(jsonPath("$.data.longitude").value(128.12345))
 			.andExpect(jsonPath("$.data.latitude").value(37.12345))
-			.andExpect(jsonPath("$.data.images").isArray());
+			.andExpect(jsonPath("$.data.fileUrlList").isArray());
 	}
 
 

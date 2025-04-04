@@ -197,6 +197,6 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		assertThat(detail.latitude()).isEqualTo(savedFishPoint.getLatitude());
 
 		List<String> expectedUrls = savedFiles.stream().map(File::getUrl).toList();
-		assertThat(detail.images()).containsExactlyElementsOf(expectedUrls);
+		assertThat(detail.fileUrlList()).containsExactlyElementsOf(expectedUrls);
 	}
 }
