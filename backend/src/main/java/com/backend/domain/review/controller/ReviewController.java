@@ -50,8 +50,10 @@ public class ReviewController {
 		@PathVariable final Long postId,
 		@Valid final GlobalRequest.PageRequest pageRequest
 	) {
-		Slice<ReviewWithMemberResponse> reviewWithMemberResponseSlice = reviewService.getReviewListByPostId(postId,
-			pageRequest.toPageable());
+		Slice<ReviewWithMemberResponse> reviewWithMemberResponseSlice = reviewService.getReviewListByPostId(
+			postId,
+			pageRequest.toPageable()
+		);
 
 		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
 			reviewWithMemberResponseSlice.getContent(),
@@ -71,8 +73,10 @@ public class ReviewController {
 		@AuthenticationPrincipal final CustomOAuth2User user,
 		@Valid final GlobalRequest.PageRequest pageRequest
 	) {
-		Slice<ReviewWithMemberResponse> reviewWithMemberResponseSlice = reviewService.getReviewListByMemberId(user.getId(),
-			pageRequest.toPageable());
+		Slice<ReviewWithMemberResponse> reviewWithMemberResponseSlice = reviewService.getReviewListByMemberId(
+			user.getId(),
+			pageRequest.toPageable()
+		);
 
 		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
 			reviewWithMemberResponseSlice.getContent(),
