@@ -8,6 +8,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
@@ -17,7 +18,9 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "reservation_dates")
+@Table(name = "reservation_dates", indexes = {
+	@Index(name = "idx_reservation_dates_01_02", columnList = "shipFishingPostId, reservationDate")
+})
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
