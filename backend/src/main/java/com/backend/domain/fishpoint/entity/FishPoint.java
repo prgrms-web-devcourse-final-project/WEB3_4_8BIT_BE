@@ -1,6 +1,7 @@
 package com.backend.domain.fishpoint.entity;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.locationtech.jts.geom.Point;
 
 import com.backend.global.baseentity.BaseEntity;
 
@@ -45,4 +46,7 @@ public class FishPoint extends BaseEntity {
 	@ColumnDefault("false")
 	@Builder.Default
 	private Boolean isBan = false;
+
+	@Column(nullable = false, columnDefinition = "POINT SRID 4326")
+	private Point location;
 }
