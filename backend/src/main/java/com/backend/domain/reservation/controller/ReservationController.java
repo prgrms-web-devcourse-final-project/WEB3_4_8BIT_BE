@@ -21,7 +21,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "예약 정보 API")
@@ -47,10 +46,11 @@ public class ReservationController {
 	@GetMapping("/{id}")
 	@Operation(summary = "예약 내역 상세 조회", description = "유저가 선상 낚시를 예약 정보를 상세 조회 할 때 사용하는 API")
 	@Parameter(name = "id", required = true, description = "예약 Id", example = "1")
-	public ResponseEntity<GenericResponse<ReservationResponse.DetailWithMemberName>> getReservation(
-		@PathVariable("id") @Min(1) final Long reservationId) {
+	public ResponseEntity<GenericResponse<ReservationResponse.DetailWithMember>> getReservation(
+		@PathVariable("id") final Long reservationId,
+		@AuthenticationPrincipal final CustomOAuth2User user) {
 
-		ReservationResponse.DetailWithMemberName response = reservationService.getReservation(reservationId);
+		ReservationResponse.DetailWithMember response = reservationService.getReservation(reservationId, user.getId());
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
