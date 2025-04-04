@@ -2,7 +2,6 @@ package com.backend.domain.fishingtrippost.service;
 
 import org.springframework.stereotype.Service;
 
-import com.backend.domain.captain.entity.Captain;
 import com.backend.domain.fishingtrippost.converter.FishingTripPostConvert;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
@@ -72,7 +71,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * 동출 모집 게시글 ID로 동출 게시글 엔티티를 조회하는 메소드
 	 *
 	 * @param fishingTripPostId 동출 모집 게시글의 ID
-	 * @return {@link Captain} 조회된 동출 모집 게시글 엔티티
+	 * @return {@link FishingTripPost} 조회된 동출 모집 게시글 엔티티
 	 * @throws FishingTripPostException 동출 모집 게시글이 존재하지 않는 경우 예외 발생
 	 */
 
