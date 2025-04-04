@@ -44,7 +44,7 @@ public class ReservationController {
 	}
 
 	@GetMapping("/{id}")
-	@Operation(summary = "예약 내역 상세 조회", description = "유저가 선상 낚시를 예약 정보를 상세 조회 할 때 사용하는 API")
+	@Operation(summary = "예약 내역 상세 조회", description = "유저가 선상 낚시 예약 정보를 상세 조회 할 때 사용하는 API")
 	@Parameter(name = "id", required = true, description = "예약 Id", example = "1")
 	public ResponseEntity<GenericResponse<ReservationResponse.DetailWithMember>> getReservation(
 		@PathVariable("id") final Long reservationId,
