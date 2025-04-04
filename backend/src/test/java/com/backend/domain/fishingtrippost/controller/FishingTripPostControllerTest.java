@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
+import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.service.FishingTripPostService;
@@ -260,6 +261,82 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("subject"))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("동출 게시글 상세 조회 [Controller] - Success")
+	@WithMockCustomUser
+	void t10() throws Exception {
+		// Given
+		Long postId = 1L;
+
+		FishingTripPostResponse.Detail responseDto = FishingTripPostResponse.Detail.builder()
+			.fishingTripPostId(postId)
+			.name("루피")
+			.subject("같이 갑시다")
+			.content("초보 환영")
+			.headCount("1/5명")
+			.createDate("2025.04.01")
+			.fishingDate("2025.04.10")
+			.fishingTime("06:00")
+			.fishPointDetailName("남해 앞바다")
+			.fishPointName("남해")
+			.longitude(128.12345)
+			.latitude(37.12345)
+			.images(List.of(1L, 2L, 3L))
+			.build();
+
+		when(fishingTripPostService.getFishingTripPostDetail(postId)).thenReturn(responseDto);
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/v1/fishing-trip-post")
+				.param("id", postId.toString())
+				.accept(MediaType.APPLICATION_JSON)
+		);
+
+		// Then
+		result
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.fishingTripPostId").value(postId))
+			.andExpect(jsonPath("$.data.name").value("루피"))
+			.andExpect(jsonPath("$.data.subject").value("같이 갑시다"))
+			.andExpect(jsonPath("$.data.content").value("초보 환영"))
+			.andExpect(jsonPath("$.data.headCount").value("1/5명"))
+			.andExpect(jsonPath("$.data.createDate").value("2025.04.01"))
+			.andExpect(jsonPath("$.data.fishingDate").value("2025.04.10"))
+			.andExpect(jsonPath("$.data.fishingTime").value("06:00"))
+			.andExpect(jsonPath("$.data.fishPointDetailName").value("남해 앞바다"))
+			.andExpect(jsonPath("$.data.fishPointName").value("남해"))
+			.andExpect(jsonPath("$.data.longitude").value(128.12345))
+			.andExpect(jsonPath("$.data.latitude").value(37.12345))
+			.andExpect(jsonPath("$.data.images").isArray());
+	}
+
+	@Test
+	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Controller] - Fail")
+	@WithMockCustomUser
+	void t11() throws Exception {
+		// Given
+		Long postId = 999L;
+
+		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND))
+			.when(fishingTripPostService).getFishingTripPostDetail(postId);
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/v1/fishing-trip-post")
+				.param("id", postId.toString())
+				.accept(MediaType.APPLICATION_JSON)
+		);
+
+		// Then
+		result
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getCode()))
+			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
 	}
 
