@@ -19,12 +19,15 @@ public class ReservationQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public Optional<ReservationResponse.DetailWithMemberName> findDetailWithMemberNameById(Long reservationId) {
+	public Optional<ReservationResponse.DetailWithMember> findDetailWithMemberNameById(final Long reservationId) {
 
-		ReservationResponse.DetailWithMemberName detailWithMemberName = jpaQueryFactory.select(Projections.constructor(
-				ReservationResponse.DetailWithMemberName.class,
+		ReservationResponse.DetailWithMember detailWithMember = jpaQueryFactory.select(Projections.constructor(
+				ReservationResponse.DetailWithMember.class,
 				reservation.reservationId,
+				reservation.shipFishingPostId,
+				member.memberId,
 				member.name,
+				member.phone,
 				reservation.reservationNumber,
 				reservation.guestCount,
 				reservation.price,
@@ -40,6 +43,6 @@ public class ReservationQueryRepository {
 			.where(reservation.reservationId.eq(reservationId))
 			.fetchOne();
 
-		return Optional.ofNullable(detailWithMemberName);
+		return Optional.ofNullable(detailWithMember);
 	}
 }

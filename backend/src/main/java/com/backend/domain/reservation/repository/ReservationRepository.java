@@ -20,9 +20,9 @@ public interface ReservationRepository {
 	 * 예약 상세정보를 조회하는 메서드입니다.
 	 *
 	 * @param reservationId {@link Long}
-	 * @return {@link Optional<ReservationResponse.DetailWithMemberName>}
+	 * @return {@link Optional<ReservationResponse.DetailWithMember>}
 	 * @implSpec 예약 상세정보를 조회하고 예약자 이름을 함께 반환합니다.
 	 */
-	Optional<ReservationResponse.DetailWithMemberName> findDetailWithMemberNameById(final Long reservationId);
+	Optional<ReservationResponse.DetailWithMember> findDetailWithMemberById(final Long reservationId);
 
 }
