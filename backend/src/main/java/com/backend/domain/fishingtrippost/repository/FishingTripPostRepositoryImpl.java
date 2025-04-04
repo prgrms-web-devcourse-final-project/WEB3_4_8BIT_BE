@@ -20,7 +20,7 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	}
 
 	@Override
-	public Optional<FishingTripPost> findById(Long fishingTripPostId) {
+	public Optional<FishingTripPost> findById(final Long fishingTripPostId) {
 		return fishingTripPostJpaRepository.findById(fishingTripPostId);
 	}
 }
