@@ -72,12 +72,16 @@ public class SecurityConfig {
 			// 요청에 대한 권한 설정
 			.authorizeHttpRequests((authorizeHttpRequests) ->
 				authorizeHttpRequests
-					.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+					.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**", "/api/v1/auth/test").permitAll()
 
 					.requestMatchers(HttpMethod.POST, "/api/v1/fishes/encyclopedias")
 					.hasAnyRole("USER", "CAPTAIN", "ADMIN")
 
-					.requestMatchers(HttpMethod.GET, "/api/v1/fishes/{fishId}/encyclopedias")
+					.requestMatchers(
+						HttpMethod.GET,
+						"/api/v1/fishes/{fishId}/encyclopedias",
+						"/api/v1/fishes/{fishId}"
+					)
 					.hasAnyRole("USER", "CAPTAIN", "ADMIN")
 
 					.anyRequest().authenticated()
