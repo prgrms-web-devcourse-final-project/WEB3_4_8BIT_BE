@@ -41,7 +41,7 @@ public class ReservationDateRepositoryImpl implements ReservationDateRepository 
 		final Long shipFishingPostId,
 		final LocalDate reservationDate) {
 
-		return reservationDateJpaRepository
+		return reservationDateQueryRepository
 			.findByShipFishingPostIdAndReservationDate(shipFishingPostId, reservationDate);
 	}
 

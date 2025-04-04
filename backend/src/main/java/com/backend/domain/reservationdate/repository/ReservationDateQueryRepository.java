@@ -4,6 +4,7 @@ import static com.backend.domain.reservationdate.entity.QReservationDate.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import com.backend.domain.reservationdate.entity.ReservationDate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 
 @Repository
@@ -51,5 +53,19 @@ public class ReservationDateQueryRepository {
 			)
 			.orderBy(reservationDate1.reservationDate.asc())
 			.fetch();
+	}
+
+	public Optional<ReservationDate> findByShipFishingPostIdAndReservationDate(
+		final Long shipFishingPostId,
+		final LocalDate reservationDate) {
+
+		ReservationDate reservation = jpaQueryFactory
+			.selectFrom(reservationDate1)
+			.where(reservationDate1.shipFishingPostId.eq(shipFishingPostId)
+				.and(reservationDate1.reservationDate.eq(reservationDate)))
+			.setLockMode(LockModeType.PESSIMISTIC_WRITE)
+			.fetchOne();
+
+		return Optional.ofNullable(reservation);
 	}
 }
