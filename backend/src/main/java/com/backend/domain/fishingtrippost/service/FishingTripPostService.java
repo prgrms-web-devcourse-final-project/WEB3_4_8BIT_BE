@@ -33,7 +33,6 @@ public interface FishingTripPostService {
 		final Long fishingTripPostId,
 		final FishingTripPostRequest.Form requestDto
 	);
-	Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.Create requestDto);
 
 	/**
 	 * 게시글 ID를 기반으로 동출 모집 게시글의 상세 정보를 조회합니다.

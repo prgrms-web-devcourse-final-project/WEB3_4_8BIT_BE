@@ -36,7 +36,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 	@Override
 	@Transactional
-	public Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.Create requestDto) {
+	public Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.Form requestDto) {
 		// 멤버, 낚시 포인트 존재 검증
 		validMemberAndFishPoint(memberId, requestDto);
 
@@ -89,6 +89,12 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		return fishingTripPost.getFishingPointId();
 	}
 
+
+	@Override
+	public FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId) {
+		return getDetailById(fishingTripPostId);
+	}
+
 	/**
 	 * 동출 모집 게시글 ID로 동출 게시글 엔티티를 조회하는 메소드
 	 *
@@ -104,11 +110,6 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		log.debug("[동출 모집 게시글 조회] : {}", fishingTripPost);
 
 		return fishingTripPost;
-	}
-
-	@Override
-	public FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId) {
-		return getDetailById(fishingTripPostId);
 	}
 
 	/**
@@ -127,22 +128,6 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		return detail;
 	}
 
-	/**
-	 * 동출 모집 게시글 ID로 동출 게시글 엔티티를 조회하는 메소드
-	 *
-	 * @param fishingTripPostId 동출 모집 게시글의 ID
-	 * @return {@link FishingTripPost} 조회된 동출 모집 게시글 엔티티
-	 * @throws FishingTripPostException 동출 모집 게시글이 존재하지 않는 경우 예외 발생
-	 */
-
-	private FishingTripPost getFishingTripPostById(final Long fishingTripPostId) {
-
-		FishingTripPost fishingTripPost = fishingTripPostRepository.findById(fishingTripPostId)
-			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
-		log.debug("[동출 모집 게시글 조회] : {}", fishingTripPost);
-
-		return fishingTripPost;
-	}
 
 	/**
 	 * 로그인한 멤버와 낚시포인트 존재 검증 메서드
@@ -152,7 +137,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @throws FishPointException 존재하지 않는 낚시 포인트면 예외 발생
 	 */
 
-	private void validMemberAndFishPoint(final Long memberId, final FishingTripPostRequest.Create requestDto)
+	private void validMemberAndFishPoint(final Long memberId, final FishingTripPostRequest.Form requestDto)
 		throws GlobalException {
 
 		if (!memberRepository.existsById(memberId)) {
