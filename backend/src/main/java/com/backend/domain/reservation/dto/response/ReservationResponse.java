@@ -46,7 +46,10 @@ public class ReservationResponse {
 	/**
 	 * {
 	 * 	 	"reservationId": 12345,
+	 * 	 	"shipFishingPostId": 1,
 	 * 	 	"memberId": 67890,
+	 * 	 	"name": "이름"
+	 * 	 	"phone": "01012345678",
 	 * 	 	"reservationNumber": "20250402-202345",
 	 * 	 	"guestCount": 4,
 	 * 	 	"price": 50000,
@@ -58,26 +61,32 @@ public class ReservationResponse {
 	 * }
 	 *
 	 * @param reservationId - 예약 id
+	 * @param shipFishingPostId - 게시글 id
+	 * @param memberId - 예약자 id
 	 * @param name - 예약자 이름
+	 * @param phone - 예약자 핸드폰 번호
 	 * @param reservationNumber - 예약 번호
 	 * @param guestCount - 예약 인원
 	 * @param price - 인당 가격
 	 * @param totalPrice - 총 가격
 	 * @param reservationDate - 예약 일자
 	 * @param reservationStatus - 예약 상태
-	 * @param createAt - 예약 생성 일자
+	 * @param createdAt - 예약 생성 일자
 	 * @param modifiedAt - 예약 수정 일자
 	 */
-	public record DetailWithMemberName(
+	public record DetailWithMember(
 		Long reservationId,
+		Long shipFishingPostId,
+		Long memberId,
 		String name,
+		String phone,
 		String reservationNumber,
 		Integer guestCount,
 		Long price,
 		Long totalPrice,
 		LocalDate reservationDate,
 		ReservationStatus reservationStatus,
-		ZonedDateTime createAt,
+		ZonedDateTime createdAt,
 		ZonedDateTime modifiedAt
 	) {
 	}
