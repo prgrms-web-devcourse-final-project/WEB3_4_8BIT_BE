@@ -32,9 +32,9 @@ public class ReservationController {
 	@Operation(summary = "예약 신청 및 생성", description = "유저가 선상 낚시를 예약 할 때 사용하는 API")
 	public ResponseEntity<GenericResponse<ReservationResponse.Detail>> saveReservation(
 		@RequestBody @Valid final ReservationRequest.Reserve requestDto,
-		@AuthenticationPrincipal final CustomOAuth2User userDetails) {
+		@AuthenticationPrincipal final CustomOAuth2User user) {
 
-		ReservationResponse.Detail response = reservationService.createReservation(requestDto, userDetails.getId());
+		ReservationResponse.Detail response = reservationService.createReservation(requestDto, user.getId());
 
 		return ResponseEntity.created(URI.create(response.reservationId().toString()))
 			.body(GenericResponse.of(true, response));
