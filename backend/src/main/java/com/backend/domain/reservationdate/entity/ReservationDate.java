@@ -19,7 +19,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Table(name = "reservation_dates", indexes = {
-	@Index(name = "idx_reservation_dates_01_02", columnList = "shipFishingPostId, reservationDate")
+	@Index(name = "idx_reservation_dates_01", columnList = "shipFishingPostId, reservationDate")
 })
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
