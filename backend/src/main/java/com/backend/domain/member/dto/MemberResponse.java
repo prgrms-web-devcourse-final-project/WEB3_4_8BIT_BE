@@ -39,4 +39,26 @@ public class MemberResponse {
 		public Detail {
 		}
 	}
+
+	/**
+	 * {
+	 *   "memberId": 1,
+	 *   "email": "test@naver.com",
+	 *   "name": "홍길동",
+	 *   "phone": "010-1234-5678",
+	 * }
+	 *
+	 * @param memberId
+	 * @param email
+	 * @param name
+	 * @param phone
+	 */
+	@Builder
+	public record ContactInfo(
+		Long memberId,
+		String email,
+		String name,
+		String phone
+	) {
+	}
 }

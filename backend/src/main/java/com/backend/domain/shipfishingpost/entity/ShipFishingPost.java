@@ -63,7 +63,7 @@ public class ShipFishingPost extends BaseEntity {
 	private LocalTime durationTime;
 
 	@Column(nullable = false)
-	private Long maxGuestCount;
+	private Integer maxGuestCount;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(nullable = false)

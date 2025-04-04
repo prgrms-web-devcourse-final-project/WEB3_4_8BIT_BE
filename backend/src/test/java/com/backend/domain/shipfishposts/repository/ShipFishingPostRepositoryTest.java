@@ -24,6 +24,9 @@ import org.springframework.stereotype.Repository;
 
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishRepository;
+import com.backend.domain.member.dto.MemberResponse;
+import com.backend.domain.member.entity.Member;
+import com.backend.domain.member.repository.MemberRepository;
 import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.repository.ShipRepository;
@@ -53,6 +56,9 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 	@Autowired
 	private FishRepository fishRepository;
+
+	@Autowired
+	private MemberRepository memberRepository;
 
 	@Autowired
 	private ShipFishingPostRepository shipFishingPostRepository;
@@ -106,10 +112,14 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenShipFishingPost);
 
 		// When
-		ShipFishingPostResponse.Detail findDetail = shipFishingPostRepository
-			.findDetailById(savedShipFishingPost.getShipFishingPostId()).get();
+		Optional<ShipFishingPostResponse.Detail> findDetailOptional = shipFishingPostRepository
+			.findDetailById(savedShipFishingPost.getShipFishingPostId());
 
 		// Then
+		assertThat(findDetailOptional).isPresent();
+
+		ShipFishingPostResponse.Detail findDetail = findDetailOptional.get();
+
 		assertThat(findDetail.shipFishingPostId()).isEqualTo(savedShipFishingPost.getShipFishingPostId());
 		assertThat(findDetail.subject()).isEqualTo(savedShipFishingPost.getSubject());
 		assertThat(findDetail.content()).isEqualTo(savedShipFishingPost.getContent());
@@ -124,6 +134,16 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 	@DisplayName("선상 낚시 게시글 상세 조회 [ShipFishingPostResponse.DetailAll] [Repository] - Success")
 	void t03() {
 		// Given
+		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", null)
+			.set("email", "test@test.com")
+			.set("name", "member")
+			.set("nickname", "nickname")
+			.set("phone", "telephone")
+			.sample();
+
+		Member savedMember = memberRepository.save(givenMember);
+
 		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class)
 			.set("shipId", null)
 			.set("shipName", "나로호")
@@ -136,6 +156,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		ShipFishingPost givenShipFishingPost = arbitraryBuilder
 			.set("shipFishingPostId", null)
 			.set("shipId", savedShip.getShipId())
+			.set("memberId", savedMember.getMemberId())
 			.sample();
 
 		ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenShipFishingPost);
@@ -176,7 +197,12 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		assertThat(shipDetail.mealProvided()).isEqualTo(savedShip.getMealProvided());
 		assertThat(shipDetail.parkingAvailable()).isEqualTo(savedShip.getParkingAvailable());
 
-		// Todo : 멤버 정보 검증
+		// 게시글 작성자 정보 검증
+		MemberResponse.ContactInfo memberDetail = findDetailAll.detailMember();
+		assertThat(memberDetail.memberId()).isEqualTo(savedMember.getMemberId());
+		assertThat(memberDetail.email()).isEqualTo(savedMember.getEmail());
+		assertThat(memberDetail.name()).isEqualTo(savedMember.getName());
+		assertThat(memberDetail.phone()).isEqualTo(savedMember.getPhone());
 	}
 
 	@Test

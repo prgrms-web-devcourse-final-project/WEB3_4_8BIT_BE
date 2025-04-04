@@ -12,7 +12,7 @@ public class ShipFishingPostConverter {
 	 * @param memberId {@link Long}
 	 * @return {@link ShipFishingPost}
 	 */
-	public static ShipFishingPost fromShipFishPostsRequestCreate(
+	public static ShipFishingPost fromShipFishingPostRequestCreate(
 		final ShipFishingPostRequest.Create requestDto,
 		final Long memberId) {
 

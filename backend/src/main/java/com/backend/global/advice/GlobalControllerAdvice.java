@@ -3,6 +3,8 @@ package com.backend.global.advice;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -46,6 +48,25 @@ public class GlobalControllerAdvice {
 
 		return ResponseEntity.status(globalException.getStatus().value())
 			.body(genericResponse);
+	}
+
+	/**
+	 * DataIntegrityViolationException 처리 핸들러 입니다.
+	 *
+	 * @param ex {@link DataIntegrityViolationException}
+	 * @return {@link ResponseEntity<GenericResponse>}
+	 */
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<GenericResponse<Void>> handleDataIntegrityViolationException(
+		DataIntegrityViolationException ex) {
+		log.error("DataIntegrityViolationException caught: ", ex);
+
+		GenericResponse<Void> response = GenericResponse.fail(
+			GlobalErrorCode.DATA_INTEGRITY_VIOLATION.getCode(),
+			GlobalErrorCode.DATA_INTEGRITY_VIOLATION.getMessage()
+		);
+
+		return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
 	}
 
 	/**
