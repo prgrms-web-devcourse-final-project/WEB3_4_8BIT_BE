@@ -37,7 +37,7 @@ public class FishingTripRecruitment extends BaseEntity {
 	@Column(nullable = false, length = 50)
 	private String introduction;
 
-	@Column(nullable = false)
+	@Column(nullable = false, length = 10)
 	@Enumerated(EnumType.STRING)
 	private RecruitmentStatus recruitmentStatus;
 
