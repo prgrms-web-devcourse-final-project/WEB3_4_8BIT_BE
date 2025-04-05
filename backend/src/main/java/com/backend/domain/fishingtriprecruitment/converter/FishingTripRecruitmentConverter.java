@@ -1,5 +1,6 @@
 package com.backend.domain.fishingtriprecruitment.converter;
 
+import com.backend.domain.fishingtriprecruitment.domain.FishingLevel;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.domain.fishingtriprecruitment.dto.request.FishingTripRecruitmentRequest;
 import com.backend.domain.fishingtriprecruitment.entity.FishingTripRecruitment;
@@ -19,7 +20,7 @@ public class FishingTripRecruitmentConverter {
 		final FishingTripRecruitmentRequest.Create requestDto
 	) {
 		return FishingTripRecruitment.builder()
-			.fishingLevel(requestDto.fishingLevel())
+			.fishingLevel(FishingLevel.from(requestDto.fishingLevel()))
 			.introduction(requestDto.introduction())
 			.recruitmentStatus(RecruitmentStatus.PENDING) // 신청시 "대기"로 기본값
 			.fishingTripPostId(requestDto.fishingTripPostId())

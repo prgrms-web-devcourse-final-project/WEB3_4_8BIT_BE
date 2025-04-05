@@ -1,6 +1,7 @@
 package com.backend.domain.fishingtriprecruitment.dto.request;
 
 import com.backend.domain.fishingtriprecruitment.domain.FishingLevel;
+import com.backend.global.validator.ValidEnum;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -39,7 +40,8 @@ public class FishingTripRecruitmentRequest {
 
 		@NotNull(message = "낚시 실력은 필수입니다.")
 		@Schema(description = "낚시 실력 (BEGINNER / INTERMEDIATE / ADVANCED)", example = "BEGINNER")
-		FishingLevel fishingLevel
+		@ValidEnum(enumClass = FishingLevel.class, message = "올바른 낚시 실력을 입력해주세요.")
+		String fishingLevel
 
 	) {
 	}
