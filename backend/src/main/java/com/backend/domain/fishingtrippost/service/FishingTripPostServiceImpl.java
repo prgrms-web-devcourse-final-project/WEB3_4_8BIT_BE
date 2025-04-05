@@ -18,6 +18,7 @@ import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.exception.GlobalException;
+import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.StorageService;
 
@@ -93,7 +94,41 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 	@Override
 	public FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId) {
-		return getDetailById(fishingTripPostId);
+		FishingTripPostResponse.DetailQueryDto detailQueryDto = getDetailDtoById(fishingTripPostId);
+		List<String> fileUrlList = getFileUrlList(detailQueryDto);
+		return FishingTripPostResponse.Detail.fromDetailQueryDtoAndFileUrlList(detailQueryDto, fileUrlList);
+	}
+
+	/**
+	 * 상세 조회용 DTO에서 이미지 파일 ID 리스트를 기반으로 실제 이미지 URL 목록을 조회합니다.
+	 *
+	 * <p>저장소에서 파일 엔티티를 조회하고, 각 파일의 URL만 추출하여 리스트로 반환합니다.</p>
+	 *
+	 * @param detailQueryDto 동출 게시글 상세 정보가 담긴 DTO
+	 * @return 이미지 URL 문자열 리스트
+	 */
+	private List<String> getFileUrlList(FishingTripPostResponse.DetailQueryDto detailQueryDto) {
+		return storageRepository.findAllById(detailQueryDto.fileIdList()).stream()
+			.map(File::getUrl)
+			.toList();
+	}
+
+	/**
+	 * 주어진 게시글 ID를 기반으로 동출 게시글 상세 정보를 조회합니다.
+	 *
+	 * <p>해당 ID의 게시글이 존재하지 않을 경우 {@link FishingTripPostException} 예외를 발생시키며,
+	 * 조회된 결과는 중간 응답 DTO {@link FishingTripPostResponse.DetailQueryDto} 형태로 반환됩니다.</p>
+	 *
+	 * @param fishingTripPostId 조회할 게시글의 고유 ID
+	 * @return 조회된 상세 정보 DTO
+	 * @throws FishingTripPostException 게시글이 존재하지 않는 경우
+	 */
+	private FishingTripPostResponse.DetailQueryDto getDetailDtoById(Long fishingTripPostId) {
+		FishingTripPostResponse.DetailQueryDto detailQueryDto = fishingTripPostRepository.findDetailQueryDtoById(
+				fishingTripPostId)
+			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
+		log.debug("[동출 모집 상세 조회 Dto 조회] : {}", detailQueryDto);
+		return detailQueryDto;
 	}
 
 	/**
@@ -111,22 +146,6 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		log.debug("[동출 모집 게시글 조회] : {}", fishingTripPost);
 
 		return fishingTripPost;
-	}
-
-	/**
-	 * 주어진 게시글 ID를 기반으로 동출 모집 게시글 상세 정보를 조회합니다.
-	 *
-	 * <p>존재하지 않는 게시글일 경우 {@link FishingTripPostException} 예외를 발생시킵니다.</p>
-	 *
-	 * @param fishingTripPostId 조회할 게시글의 고유 ID
-	 * @return 해당 게시글의 상세 정보 {@link FishingTripPostResponse.Detail}
-	 * @throws FishingTripPostException 게시글이 존재하지 않을 경우 발생
-	 */
-	private FishingTripPostResponse.Detail getDetailById(final Long fishingTripPostId) {
-		FishingTripPostResponse.Detail detail = fishingTripPostRepository.findDetailById(fishingTripPostId)
-			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
-		log.debug("동출게시글을 찾았습니다. id :{}", detail.fishingTripPostId());
-		return detail;
 	}
 
 	/**
