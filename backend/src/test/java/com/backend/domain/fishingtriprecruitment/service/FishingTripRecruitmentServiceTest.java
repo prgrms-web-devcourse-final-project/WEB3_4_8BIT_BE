@@ -39,7 +39,8 @@ class FishingTripRecruitmentServiceTest extends BaseTest {
 	private FishingTripPostRepository fishingTripPostRepository;
 
 	private final ArbitraryBuilder<FishingTripRecruitmentRequest.Create> createRequestBuilder =
-		fixtureMonkeyValidation.giveMeBuilder(FishingTripRecruitmentRequest.Create.class);
+		fixtureMonkeyValidation.giveMeBuilder(FishingTripRecruitmentRequest.Create.class)
+			.set("fishingLevel", "BEGINNER");
 
 	private final ArbitraryBuilder<FishingTripRecruitment> recruitmentBuilder =
 		fixtureMonkeyBuilder.giveMeBuilder(FishingTripRecruitment.class);

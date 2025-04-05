@@ -48,7 +48,7 @@ class FishingTripRecruitmentControllerTest extends BaseTest {
 		fixtureMonkeyBuilder.giveMeBuilder(FishingTripRecruitmentRequest.Create.class)
 			.set("fishingTripPostId", 1L)
 			.set("introduction", "열심히 하겠습니다!")
-			.set("fishingLevel", com.backend.domain.fishingtriprecruitment.domain.FishingLevel.BEGINNER);
+			.set("fishingLevel", "BEGINNER");
 
 	@Test
 	@DisplayName("동출 모집 신청 [Controller] - Success")
@@ -145,12 +145,12 @@ class FishingTripRecruitmentControllerTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("동출 모집 신청 실패 [fishingLevel null] [Controller] - Fail")
+	@DisplayName("동출 모집 신청 실패 [INVALID_FISHING_LEVEL] [Controller] - Fail")
 	@WithMockCustomUser
 	void t05() throws Exception {
 		// Given
 		FishingTripRecruitmentRequest.Create requestDto = createBuilder
-			.set("fishingLevel", null)
+			.set("fishingLevel", "UNKNOWN")
 			.sample();
 
 		// When
@@ -162,9 +162,10 @@ class FishingTripRecruitmentControllerTest extends BaseTest {
 		result
 			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
+			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
+			.andExpect(jsonPath("$.success").value(false))
 			.andExpect(jsonPath("$.data[0].field").value("fishingLevel"))
-			.andExpect(jsonPath("$.data[0].reason").value("낚시 실력은 필수입니다."))
-			.andExpect(jsonPath("$.success").value(false));
+			.andExpect(jsonPath("$.data[0].reason").value("올바른 낚시 실력을 입력해주세요."));
 	}
 
 }
