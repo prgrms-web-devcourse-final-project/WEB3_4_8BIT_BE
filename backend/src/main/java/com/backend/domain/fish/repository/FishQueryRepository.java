@@ -19,7 +19,7 @@ public class FishQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public Optional<FishResponse.Detail> findById(final Long fishId) {
+	public Optional<FishResponse.Detail> findDetailById(final Long fishId) {
 		FishResponse.Detail findDetail = jpaQueryFactory
 			.select(new QFishResponse_Detail(fish.fishId, fish.name, fish.description, file.url, fish.spawnSeasonList,
 				fish.spawnLocation))

@@ -107,7 +107,7 @@ class FishRepositoryTest extends BaseTest {
 		Fish savedFish = fishRepository.save(givenFish);
 
 		// When
-		FishResponse.Detail findDetail = fishRepository.findById(savedFish.getFishId()).orElse(null);
+		FishResponse.Detail findDetail = fishRepository.findDetailById(savedFish.getFishId()).orElse(null);
 
 		// Then
 		assertThat(findDetail).isNotNull();

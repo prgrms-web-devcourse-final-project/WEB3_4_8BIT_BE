@@ -3,9 +3,9 @@ package com.backend.domain.fish.service;
 import org.springframework.stereotype.Service;
 
 import com.backend.domain.fish.dto.FishResponse;
+import com.backend.domain.fish.exception.FishErrorCode;
+import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fish.repository.FishRepository;
-import com.backend.domain.fishpoint.exception.FishPointErrorCode;
-import com.backend.domain.fishpoint.exception.FishPointException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ public class FishServiceImpl implements FishService {
 	@Override
 	public FishResponse.Detail getFishDetail(final Long fishId) {
 
-		return fishRepository.findById(fishId)
-			.orElseThrow(() -> new FishPointException(FishPointErrorCode.FISH_POINT_NOT_FOUND));
+		return fishRepository.findDetailById(fishId)
+			.orElseThrow(() -> new FishException(FishErrorCode.FISH_NOT_FOUND));
 	}
 }

@@ -35,7 +35,7 @@ public interface FishRepository {
 	 * @implSpec fishId 받아서 조회 후 Optional로 감싸서 반환
 	 * @author Kim Dong O
 	 */
-	Optional<FishResponse.Detail> findById(final Long fishId);
+	Optional<FishResponse.Detail> findDetailById(final Long fishId);
 
 	/**
 	 * Id 리스트와 일치하는 물고기 정보 조회 메소드

@@ -13,6 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.backend.domain.fish.dto.FishResponse;
+import com.backend.domain.fish.exception.FishErrorCode;
+import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fish.repository.FishRepository;
 import com.backend.global.util.BaseTest;
 
@@ -33,7 +35,7 @@ class FishServiceTest extends BaseTest {
 
 		FishResponse.Detail givenDetail = fixtureMonkeyRecord.giveMeOne(FishResponse.Detail.class);
 
-		when(fishRepository.findById(fishId)).thenReturn(Optional.ofNullable(givenDetail));
+		when(fishRepository.findDetailById(fishId)).thenReturn(Optional.ofNullable(givenDetail));
 
 		// When
 		FishResponse.Detail getDetail = fishServiceImpl.getFishDetail(fishId);
@@ -43,19 +45,15 @@ class FishServiceTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("물고기 상세 조회 [NotFound] [Service] - Success")
+	@DisplayName("물고기 상세 조회 [NotFound] [Service] - Fail")
 	void t02() {
 		// Given
-		Long fishId = 1L;
+		Long givenFishId = 1L;
 
-		FishResponse.Detail givenDetail = fixtureMonkeyRecord.giveMeOne(FishResponse.Detail.class);
-
-		when(fishRepository.findById(fishId)).thenReturn(Optional.empty());
-
-		// When
-		FishResponse.Detail getDetail = fishServiceImpl.getFishDetail(fishId);
-
-		// Then
-		assertThat(getDetail).isEqualTo(givenDetail);
+		// When & Then
+		assertThatThrownBy(
+			() -> fishServiceImpl.getFishDetail(givenFishId))
+			.isExactlyInstanceOf(FishException.class)
+			.hasMessage(FishErrorCode.FISH_NOT_FOUND.getMessage());
 	}
 }

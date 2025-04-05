@@ -24,7 +24,7 @@ public class FishController {
 
 	@Operation(summary = "물고기 조회", description = "물고기 조회시 사용하는 API")
 	@GetMapping("/{fishId}")
-	public ResponseEntity<GenericResponse<FishResponse.Detail>> getDetail(@PathVariable Long fishId) {
+	public ResponseEntity<GenericResponse<FishResponse.Detail>> getDetail(@PathVariable final Long fishId) {
 
 		FishResponse.Detail getDetail = fishService.getFishDetail(fishId);
 

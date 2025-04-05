@@ -28,8 +28,8 @@ public class FishRepositoryImpl implements FishRepository {
 	}
 
 	@Override
-	public Optional<FishResponse.Detail> findById(final Long fishId) {
-		return fishQueryRepository.findById(fishId);
+	public Optional<FishResponse.Detail> findDetailById(final Long fishId) {
+		return fishQueryRepository.findDetailById(fishId);
 	}
 
 	@Override
