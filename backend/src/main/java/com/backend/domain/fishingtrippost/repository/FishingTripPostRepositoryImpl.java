@@ -30,4 +30,9 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	public Optional<FishingTripPostResponse.DetailQueryDto> findDetailQueryDtoById(final Long fishingTripPostId) {
 		return fishingTripPostQueryRepository.findDetailDtoById(fishingTripPostId);
 	}
+
+	@Override
+	public boolean existsById(final Long fishingTripPostId) {
+		return fishingTripPostJpaRepository.existsById(fishingTripPostId);
+	}
 }
