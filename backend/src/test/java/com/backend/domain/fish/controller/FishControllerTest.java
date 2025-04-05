@@ -23,6 +23,7 @@ import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fish.service.FishService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
+import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.util.BaseTest;
 
 @WebMvcTest(FishController.class)
@@ -104,4 +105,62 @@ class FishControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.size()").value(givenSize));
 	}
 
+	@Test
+	@DisplayName("물고기 인기순 조회 [Min] [Controller] - Fail")
+	@WithMockCustomUser
+	void t04() throws Exception {
+		// Given
+		Integer givenSize = 0;
+
+		// When
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/popular")
+			.param("size", givenSize.toString()));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
+			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
+			.andExpect(jsonPath("$.data[0].field").value("size"))
+			.andExpect(jsonPath("$.data[0].reason").value("사이즈는 1개 이상이어야 합니다."));
+	}
+
+	@Test
+	@DisplayName("물고기 인기순 조회 [Max] [Controller] - Fail")
+	@WithMockCustomUser
+	void t05() throws Exception {
+		// Given
+		Integer givenSize = 11;
+
+		// When
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/popular")
+			.param("size", givenSize.toString()));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
+			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
+			.andExpect(jsonPath("$.data[0].field").value("size"))
+			.andExpect(jsonPath("$.data[0].reason").value("사이즈는 10개 이하여야 합니다."));
+	}
+
+	@Test
+	@DisplayName("물고기 인기순 조회 [NotNull] [Controller] - Fail")
+	@WithMockCustomUser
+	void t06() throws Exception {
+		// When
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/popular"));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
+			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
+			.andExpect(jsonPath("$.data[0].field").value("size"))
+			.andExpect(jsonPath("$.data[0].reason").value("사이즈는 필수 항목입니다."));
+	}
 }
