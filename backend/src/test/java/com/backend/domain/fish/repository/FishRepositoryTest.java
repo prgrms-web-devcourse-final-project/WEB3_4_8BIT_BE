@@ -155,7 +155,7 @@ class FishRepositoryTest extends BaseTest {
 		// When
 		fishEncyclopediaJpaRepository.saveAll(givenFishEncyclopediaList);
 
-		fishQueryRepository.updateFishPopularityScores();
+		fishRepository.updateFishPopularityScores();
 
 		entityManager.flush();
 		entityManager.clear();
