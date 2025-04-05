@@ -3,6 +3,8 @@ package com.backend.domain.fishingtrippost.dto.response;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import com.querydsl.core.annotations.QueryProjection;
+
 import lombok.Builder;
 
 public class FishingTripPostResponse {
@@ -63,5 +65,44 @@ public class FishingTripPostResponse {
 		Double latitude,
 		List<String> fileUrlList
 	) {
+		public static Detail fromDetailQueryDtoAndFileUrlList(DetailQueryDto detailQueryDto,
+			List<String> fileUrlList) {
+			return Detail.builder()
+				.fishingTripPostId(detailQueryDto.fishingTripPostId())
+				.name(detailQueryDto.name())
+				.subject(detailQueryDto.subject())
+				.content(detailQueryDto.content())
+				.currentCount(detailQueryDto.currentCount())
+				.recruitmentCount(detailQueryDto.recruitmentCount())
+				.createDate(detailQueryDto.createDate())
+				.fishingDate(detailQueryDto.fishingDate())
+				.fishPointDetailName(detailQueryDto.fishPointDetailName())
+				.fishPointName(detailQueryDto.fishPointName())
+				.longitude(detailQueryDto.longitude())
+				.latitude(detailQueryDto.latitude())
+				.fileUrlList(fileUrlList)
+				.build();
+		}
+	}
+
+	public record DetailQueryDto(
+		Long fishingTripPostId,
+		String name,
+		String subject,
+		String content,
+		Integer currentCount,
+		Integer recruitmentCount,
+		ZonedDateTime createDate,
+		ZonedDateTime fishingDate,
+		String fishPointDetailName,
+		String fishPointName,
+		Double longitude,
+		Double latitude,
+		List<Long> fileIdList
+	) {
+		@QueryProjection
+		public DetailQueryDto {
+
+		}
 	}
 }
