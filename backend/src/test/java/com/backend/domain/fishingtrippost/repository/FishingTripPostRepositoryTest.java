@@ -177,13 +177,19 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		FishingTripPost savedPost = fishingTripPostRepository.save(givenPost);
 
 		// when
-		Optional<FishingTripPostResponse.Detail> result = fishingTripPostRepository.findDetailById(
-			savedPost.getFishingTripPostId());
+		Optional<FishingTripPostResponse.DetailQueryDto> optionalDto =
+			fishingTripPostRepository.findDetailQueryDtoById(savedPost.getFishingTripPostId());
+
+		assertThat(optionalDto).isPresent();
+		FishingTripPostResponse.DetailQueryDto detailDto = optionalDto.get();
+
+		List<String> fileUrlList = storageRepository.findAllById(detailDto.fileIdList()).stream()
+			.map(File::getUrl)
+			.toList();
+
+		FishingTripPostResponse.Detail detail = FishingTripPostResponse.Detail.fromDetailQueryDtoAndFileUrlList(detailDto, fileUrlList);
 
 		// then
-		assertThat(result).isPresent();
-		FishingTripPostResponse.Detail detail = result.get();
-
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());
 		assertThat(detail.name()).isEqualTo(savedMember.getName());
 		assertThat(detail.subject()).isEqualTo(savedPost.getSubject());

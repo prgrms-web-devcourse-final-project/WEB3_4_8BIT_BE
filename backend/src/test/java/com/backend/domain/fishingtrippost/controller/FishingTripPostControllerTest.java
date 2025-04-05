@@ -284,7 +284,11 @@ class FishingTripPostControllerTest extends BaseTest {
 			.fishPointName("남해")
 			.longitude(128.12345)
 			.latitude(37.12345)
-			.fileUrlList(List.of("https://cdn.example.com/1.jpg", "https://cdn.example.com/2.jpg", "https://cdn.example.com/3.jpg"))
+			.fileUrlList(List.of(
+				"https://cdn.example.com/1.jpg",
+				"https://cdn.example.com/2.jpg",
+				"https://cdn.example.com/3.jpg"
+			))
 			.build();
 
 		when(fishingTripPostService.getFishingTripPostDetail(postId)).thenReturn(responseDto);
@@ -312,9 +316,10 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.fishPointName").value("남해"))
 			.andExpect(jsonPath("$.data.longitude").value(128.12345))
 			.andExpect(jsonPath("$.data.latitude").value(37.12345))
-			.andExpect(jsonPath("$.data.fileUrlList").isArray());
+			.andExpect(jsonPath("$.data.fileUrlList[0]").value("https://cdn.example.com/1.jpg"))
+			.andExpect(jsonPath("$.data.fileUrlList[1]").value("https://cdn.example.com/2.jpg"))
+			.andExpect(jsonPath("$.data.fileUrlList[2]").value("https://cdn.example.com/3.jpg"));
 	}
-
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Controller] - Fail")
@@ -340,5 +345,4 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
 	}
-
 }
