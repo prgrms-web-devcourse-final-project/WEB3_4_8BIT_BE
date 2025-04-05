@@ -6,17 +6,21 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
+import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.service.FishingTripPostService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -58,4 +62,16 @@ public class FishingTripPostController {
 
 		return ResponseEntity.ok(GenericResponse.of(true, updateFishingTripPostId));
 	}
+
+	@GetMapping
+	@Operation(summary = "동출 모집 게시글 상세조회", description = "동출 모집 게시글을 상세 조회하는 API")
+	@Parameter(name = "id", required = true, description = "조회할 동출 모집 게시글 ID", example = "1")
+	public ResponseEntity<GenericResponse<FishingTripPostResponse.Detail>> getFishingTripPostDetail(
+		@RequestParam("id") final Long fishingTripPostId
+	) {
+		FishingTripPostResponse.Detail responseDto = fishingTripPostService.getFishingTripPostDetail(
+			fishingTripPostId);
+		return ResponseEntity.ok().body(GenericResponse.of(true, responseDto));
+	}
+
 }

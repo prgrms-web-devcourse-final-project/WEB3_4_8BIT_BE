@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
+import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
@@ -26,6 +27,8 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
+import com.backend.global.storage.entity.File;
+import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.StorageService;
 import com.backend.global.util.BaseTest;
 
@@ -48,6 +51,9 @@ class FishingTripPostServiceTest extends BaseTest {
 
 	@Mock
 	private FishingTripPostRepository fishingTripPostRepository;
+
+	@Mock
+	private StorageRepository storageRepository;
 
 	private final ArbitraryBuilder<FishingTripPostRequest.Form> createRequestBuilder =
 		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Form.class);
@@ -194,7 +200,6 @@ class FishingTripPostServiceTest extends BaseTest {
 		);
 	}
 
-
 	@Test
 	@DisplayName("동출 게시글 수정 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
 	void t05() {
@@ -238,4 +243,82 @@ class FishingTripPostServiceTest extends BaseTest {
 		verify(fishingTripPostRepository).findById(postId);
 	}
 
+	@Test
+	@DisplayName("동출 게시글 상세 조회 [Service] - Success")
+	void t07() {
+		// Given
+		Long postId = 1L;
+		List<Long> fileIds = List.of(101L, 102L, 103L);
+		List<String> fileUrls = List.of(
+			"https://cdn.example.com/1.jpg",
+			"https://cdn.example.com/2.jpg",
+			"https://cdn.example.com/3.jpg"
+		);
+
+		FishingTripPostResponse.DetailQueryDto queryDto = new FishingTripPostResponse.DetailQueryDto(
+			postId,
+			"루피",
+			"같이 갑시다",
+			"초보 환영",
+			1,
+			5,
+			ZonedDateTime.parse("2025-04-01T12:00:00+09:00"),
+			ZonedDateTime.parse("2025-04-10T06:00:00+09:00"),
+			"남해 앞바다",
+			"남해",
+			128.12345,
+			37.12345,
+			fileIds
+		);
+
+		List<File> mockFiles = List.of(
+			File.builder().fileId(101L).fileName("f1.jpg").originalFileName("o1.jpg")
+				.contentType("image/jpeg").fileSize(12345L).url(fileUrls.get(0)).domain("test").createdById(1L).uploaded(true).build(),
+			File.builder().fileId(102L).fileName("f2.jpg").originalFileName("o2.jpg")
+				.contentType("image/jpeg").fileSize(12345L).url(fileUrls.get(1)).domain("test").createdById(1L).uploaded(true).build(),
+			File.builder().fileId(103L).fileName("f3.jpg").originalFileName("o3.jpg")
+				.contentType("image/jpeg").fileSize(12345L).url(fileUrls.get(2)).domain("test").createdById(1L).uploaded(true).build()
+		);
+
+		when(fishingTripPostRepository.findDetailQueryDtoById(postId)).thenReturn(Optional.of(queryDto));
+		when(storageRepository.findAllById(fileIds)).thenReturn(mockFiles);
+
+		// When
+		FishingTripPostResponse.Detail actual = fishingTripPostService.getFishingTripPostDetail(postId);
+
+		// Then
+		assertThat(actual.fishingTripPostId()).isEqualTo(postId);
+		assertThat(actual.name()).isEqualTo("루피");
+		assertThat(actual.subject()).isEqualTo("같이 갑시다");
+		assertThat(actual.content()).isEqualTo("초보 환영");
+		assertThat(actual.currentCount()).isEqualTo(1);
+		assertThat(actual.recruitmentCount()).isEqualTo(5);
+		assertThat(actual.createDate()).isEqualTo(ZonedDateTime.parse("2025-04-01T12:00:00+09:00"));
+		assertThat(actual.fishingDate()).isEqualTo(ZonedDateTime.parse("2025-04-10T06:00:00+09:00"));
+		assertThat(actual.fishPointDetailName()).isEqualTo("남해 앞바다");
+		assertThat(actual.fishPointName()).isEqualTo("남해");
+		assertThat(actual.longitude()).isEqualTo(128.12345);
+		assertThat(actual.latitude()).isEqualTo(37.12345);
+		assertThat(actual.fileUrlList()).containsExactlyElementsOf(fileUrls);
+
+		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
+		verify(storageRepository).findAllById(fileIds);
+	}
+
+
+	@Test
+	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
+	void t08() {
+		// Given
+		Long postId = 999L;
+		when(fishingTripPostRepository.findDetailQueryDtoById(postId)).thenReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(() -> fishingTripPostService.getFishingTripPostDetail(postId))
+			.isInstanceOf(FishingTripPostException.class)
+			.hasMessage(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getMessage());
+
+		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
+		verifyNoInteractions(storageRepository); // 파일 조회는 호출되지 않아야 함
+	}
 }
