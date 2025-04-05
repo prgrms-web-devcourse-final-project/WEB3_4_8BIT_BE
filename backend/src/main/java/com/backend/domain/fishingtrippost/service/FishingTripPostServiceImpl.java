@@ -107,7 +107,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @param detailQueryDto 동출 게시글 상세 정보가 담긴 DTO
 	 * @return 이미지 URL 문자열 리스트
 	 */
-	private List<String> getFileUrlList(FishingTripPostResponse.DetailQueryDto detailQueryDto) {
+	private List<String> getFileUrlList(final FishingTripPostResponse.DetailQueryDto detailQueryDto) {
 		return storageRepository.findAllById(detailQueryDto.fileIdList()).stream()
 			.map(File::getUrl)
 			.toList();
@@ -123,7 +123,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @return 조회된 상세 정보 DTO
 	 * @throws FishingTripPostException 게시글이 존재하지 않는 경우
 	 */
-	private FishingTripPostResponse.DetailQueryDto getDetailDtoById(Long fishingTripPostId) {
+	private FishingTripPostResponse.DetailQueryDto getDetailDtoById(final Long fishingTripPostId) {
 		FishingTripPostResponse.DetailQueryDto detailQueryDto = fishingTripPostRepository.findDetailQueryDtoById(
 				fishingTripPostId)
 			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
