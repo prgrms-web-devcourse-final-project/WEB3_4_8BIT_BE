@@ -15,7 +15,7 @@ public class MemberRequest {
 	 *
 	 * @param nickname 유저 닉네임 (최대 30자, 필수)
 	 * @param profileImg 유저 프로필 이미지 URL (선택)
-	 * @param description 유저 자기소개 (선택)
+	 * @param description 유저 자기소개 (최대 500자)
 	 */
 	public record Form(
 		@NotBlank(message = "닉네임은 필수 항목입니다.")
@@ -27,6 +27,7 @@ public class MemberRequest {
 		String profileImg,
 
 		@NotBlank(message = "자기소개는 필수 항목입니다.")
+		@Size(max = 500, message = "자개소개는 최대 500자까지 가능합니다.")
 		@Schema(description = "유저 자기소개", example = "낚시를 좋아합니다.")
 		String description
 	) {

@@ -40,7 +40,10 @@ public class TestSecurityConfig {
 				authorizeHttpRequests
 					.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
 					.requestMatchers(HttpMethod.POST, "/api/v1/fishes/encyclopedias").hasRole("USER")
-					.requestMatchers(HttpMethod.GET, "/api/v1/fishes/{fishId}/encyclopedias").hasRole("USER")
+					.requestMatchers(HttpMethod.GET,
+						"/api/v1/fishes/{fishId}/encyclopedias",
+						"/api/v1/fishes/{fishId}")
+					.hasRole("USER")
 					.anyRequest().authenticated()
 			);
 

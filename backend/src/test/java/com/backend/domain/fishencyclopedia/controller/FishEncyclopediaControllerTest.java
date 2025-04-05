@@ -13,9 +13,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.SliceImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -28,6 +25,7 @@ import com.backend.domain.fishencyclopedia.service.FishEncyclopediaService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -177,10 +175,9 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t06() throws Exception {
 		// Given
-		GlobalRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
-			.giveMeBuilder(GlobalRequest.PageRequest.class)
+		GlobalRequest.CursorRequest givenCursorRequest = fixtureMonkeyRecord
+			.giveMeBuilder(GlobalRequest.CursorRequest.class)
 			.set("size", 10)
-			.set("page", 0)
 			.sample();
 
 		Fish givenFish = fixtureMonkeyBuilder.giveMeOne(Fish.class);
@@ -189,25 +186,28 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			.giveMeBuilder(FishEncyclopediaResponse.Detail.class)
 			.sampleList(7);
 
-		Pageable givenPageable = PageRequest.of(givenPageRequest.page(), givenPageRequest.size());
+		boolean givenHasNext = true;
 
-		boolean givenHasNext = false;
-
-		SliceImpl<FishEncyclopediaResponse.Detail> givenSlice = new SliceImpl<>(
+		ScrollResponse<FishEncyclopediaResponse.Detail> givenScrollResponse = ScrollResponse.from(
 			givenDetailList,
-			givenPageable,
+			givenCursorRequest.size(),
+			givenDetailList.size(),
+			true,
 			givenHasNext
 		);
 
-		when(fishEncyclopediaService.getDetailList(givenPageRequest, givenFish.getFishId(), 1L))
-			.thenReturn(givenSlice);
+		when(fishEncyclopediaService.getDetailList(givenCursorRequest, givenFish.getFishId(), 1L))
+			.thenReturn(givenScrollResponse);
 
 		// When
-		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
-			.param("page", givenPageRequest.page().toString())
-			.param("size", givenPageRequest.size().toString())
-			.param("sort", givenPageRequest.sort())
-			.param("order", givenPageRequest.order()));
+		ResultActions resultActions = mockMvc.perform(
+			get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
+				.param("size", givenCursorRequest.size().toString())
+				.param("sort", givenCursorRequest.sort())
+				.param("fieldValue", givenCursorRequest.fieldValue())
+				.param("id", givenCursorRequest.id().toString())
+				.param("order", givenCursorRequest.order())
+				.param("type", givenCursorRequest.type()));
 
 		// Then
 		resultActions
@@ -215,8 +215,8 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.content.size()").value(7))
 			.andExpect(jsonPath("$.data.numberOfElements").value(7))
-			.andExpect(jsonPath("$.data.pageable.pageSize").value(givenPageRequest.size()))
-			.andExpect(jsonPath("$.data.pageable.pageNumber").value(givenPageRequest.page()));
+			.andExpect(jsonPath("$.data.isFirst").value(true))
+			.andExpect(jsonPath("$.data.isLast").value(true));
 	}
 
 	@Test
@@ -224,20 +224,22 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t07() throws Exception {
 		// Given
-		GlobalRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
-			.giveMeBuilder(GlobalRequest.PageRequest.class)
+		GlobalRequest.CursorRequest givenCursorRequest = fixtureMonkeyRecord
+			.giveMeBuilder(GlobalRequest.CursorRequest.class)
 			.set("size", -1)
-			.set("page", 0)
 			.sample();
 
 		Fish givenFish = fixtureMonkeyBuilder.giveMeOne(Fish.class);
 
 		// When
-		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
-			.param("page", givenPageRequest.page().toString())
-			.param("size", givenPageRequest.size().toString())
-			.param("sort", givenPageRequest.sort())
-			.param("order", givenPageRequest.order()));
+		ResultActions resultActions = mockMvc.perform(
+			get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
+				.param("size", givenCursorRequest.size().toString())
+				.param("sort", givenCursorRequest.sort())
+				.param("fieldValue", givenCursorRequest.fieldValue())
+				.param("id", givenCursorRequest.id().toString())
+				.param("order", givenCursorRequest.order())
+				.param("type", givenCursorRequest.type()));
 
 		// Then
 		resultActions
@@ -245,39 +247,31 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.timestamp").exists())
 			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("size"))
-			.andExpect(jsonPath("$.data[0].reason").value("페이지 사이즈는 0 이상이어야 합니다."))
+			.andExpect(jsonPath("$.data[0].reason").value("페이지 사이즈는 1 이상이어야 합니다."))
 			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
 	}
 
 	@Test
-	@DisplayName("물고기 도감 상세 조회 [Page Min] [Controller] - Fail")
+	@DisplayName("물고기 도감 전체 조회 [Controller] - Success")
 	@WithMockCustomUser
 	void t08() throws Exception {
 		// Given
-		GlobalRequest.PageRequest givenPageRequest = fixtureMonkeyRecord
-			.giveMeBuilder(GlobalRequest.PageRequest.class)
-			.set("size", 1)
-			.set("page", -1)
-			.sample();
+		List<FishEncyclopediaResponse.DetailPage> givenDetailPageList = fixtureMonkeyRecord
+			.giveMeBuilder(FishEncyclopediaResponse.DetailPage.class)
+			.set("memberId", 1L)
+			.sampleList(15);
 
-		Fish givenFish = fixtureMonkeyBuilder.giveMeOne(Fish.class);
+		when(fishEncyclopediaService.getDetailPageList(1L)).thenReturn(givenDetailPageList);
 
 		// When
-		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/{fishId}/encyclopedias", givenFish.getFishId())
-			.param("page", givenPageRequest.page().toString())
-			.param("size", givenPageRequest.size().toString())
-			.param("sort", givenPageRequest.sort())
-			.param("order", givenPageRequest.order()));
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/encyclopedias")
+			.contentType(MediaType.APPLICATION_JSON));
 
 		// Then
 		resultActions
-			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.timestamp").exists())
-			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
-			.andExpect(jsonPath("$.data[0].field").value("page"))
-			.andExpect(jsonPath("$.data[0].reason").value("페이지 번호는 0 이상이어야 합니다."))
-			.andExpect(jsonPath("$.message").value(GlobalErrorCode.NOT_VALID.getMessage()))
-			.andExpect(jsonPath("$.success").value(false));
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.size()").value(givenDetailPageList.size()));
 	}
 }

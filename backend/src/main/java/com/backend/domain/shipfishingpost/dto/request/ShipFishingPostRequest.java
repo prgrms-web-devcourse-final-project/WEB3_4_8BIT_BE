@@ -77,7 +77,7 @@ public class ShipFishingPostRequest {
 
 		@Positive(message = "최대 인원은 0 명 이상이어야 합니다.")
 		@Schema(description = "최대 인원", example = "10")
-		Long maxGuestCount,
+		Integer maxGuestCount,
 
 		@NotNull(message = "배 등록 번호는 필수 항목입니다.")
 		@Schema(description = "배 Id 값 (entity)", example = "10")
@@ -124,13 +124,14 @@ public class ShipFishingPostRequest {
 		String location,
 		@Schema(description = "물고기 ID", example = "1")
 		Long fishId,
-		@Schema(description = "검색 날짜 (ISO 날짜 형식, 예: 2025-04-01)", example = "2025-04-01")
+		@Schema(description = "검색 날짜", example = "2025-04-01")
 		LocalDate searchDate,
 		@Schema(description = "검색 키워드", example = "낚시")
 		String keyword,
 		@Schema(description = "게스트 수", example = "2")
 		Long guestCount,
-		@Schema(description = "이용 시간 (ISO 시간 형식, 예: 01:30)", example = "01:30")
+		@DateTimeFormat(pattern = "HH:mm")
+		@Schema(description = "이용 시간", example = "01:30")
 		LocalTime duration
 	) {
 	}

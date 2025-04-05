@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class ShipFishingPostFishRepositoryImpl implements ShipFishingPostFishRepository {
 
 	private final ShipFishingPostFishJpaRepository shipFishingPostFishJpaRepository;
+	private final ShipFishingPostFishQueryRepository shipFishingPostFishQueryRepository;
 
 	@Override
 	public ShipFishingPostFish save(final ShipFishingPostFish shipFishingPostFish) {
@@ -30,5 +31,10 @@ public class ShipFishingPostFishRepositoryImpl implements ShipFishingPostFishRep
 	public List<ShipFishingPostFish> findAll() {
 
 		return shipFishingPostFishJpaRepository.findAll();
+	}
+
+	@Override
+	public void saveAllByBulkQuery(final List<ShipFishingPostFish> shipFishingPostFishList, final int batchSize) {
+		shipFishingPostFishQueryRepository.batchInsert(shipFishingPostFishList, batchSize);
 	}
 }

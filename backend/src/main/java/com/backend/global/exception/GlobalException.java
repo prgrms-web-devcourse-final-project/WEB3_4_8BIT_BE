@@ -1,7 +1,8 @@
 package com.backend.global.exception;
 
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
+
+import lombok.Getter;
 
 /**
  * GlobalException
@@ -14,15 +15,25 @@ import org.springframework.http.HttpStatus;
  */
 @Getter
 public class GlobalException extends RuntimeException {
-	private final GlobalErrorCode globalErrorCode;
+	private final ErrorCode errorCode;
 
 	/**
 	 * GlobalException 생성자 입니다.
-	 * @param globalErrorCode GlobalErrorCode 값
+	 * @param errorCode GlobalErrorCode 값
 	 */
-	public GlobalException(GlobalErrorCode globalErrorCode) {
-		super(globalErrorCode.getMessage());
-		this.globalErrorCode = globalErrorCode;
+	public GlobalException(ErrorCode errorCode) {
+		super(errorCode.getMessage());
+		this.errorCode = errorCode;
+	}
+
+	/**
+	 * GlobalException 생성자 입니다.
+	 * @param errorCode GlobalErrorCode 값
+	 * @param cause 상위 Exception
+	 */
+	public GlobalException(Throwable cause, ErrorCode errorCode) {
+		super(errorCode.getMessage(), cause);
+		this.errorCode = errorCode;
 	}
 
 	/**
@@ -30,6 +41,6 @@ public class GlobalException extends RuntimeException {
 	 * @return {@link HttpStatus}
 	 */
 	public HttpStatus getStatus() {
-		return globalErrorCode.getHttpStatus();
+		return errorCode.getHttpStatus();
 	}
 }

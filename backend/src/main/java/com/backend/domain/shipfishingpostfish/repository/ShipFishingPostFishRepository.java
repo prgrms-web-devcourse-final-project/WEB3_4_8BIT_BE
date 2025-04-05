@@ -29,4 +29,14 @@ public interface ShipFishingPostFishRepository {
 	 * @implSpec 선상낚시 게시글과 매칭된 전체 물고기 정보를 한번에 조회한다.
 	 */
 	List<ShipFishingPostFish> findAll();
+
+	/**
+	 * 여러건의 예약 일자를 쿼리 한번에 저장하는 메서드입니다.
+	 *
+	 * @param shipFishingPostFishList {@link List<ShipFishingPostFish>}
+	 * @param batchSize {@link Integer}
+	 * @implSpec 배치 사이즈를 정해서 여러건의 데이터를 한번에 저장합니다.
+	 * @author swjoon
+	 */
+	void saveAllByBulkQuery(final List<ShipFishingPostFish> shipFishingPostFishList, final int batchSize);
 }

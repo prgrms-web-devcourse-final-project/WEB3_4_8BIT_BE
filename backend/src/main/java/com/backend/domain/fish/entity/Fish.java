@@ -15,7 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -27,7 +27,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @ToString
-@EqualsAndHashCode(callSuper = false)
 public class Fish extends BaseEntity {
 
 	@Id
@@ -37,15 +36,21 @@ public class Fish extends BaseEntity {
 	@Column(nullable = false, length = 30)
 	private String name;
 
+	// Length 기본 값인 255로 제한
 	@Column(nullable = false, columnDefinition = "TEXT")
 	private String description;
 
-	@Column(nullable = false, length = 50)
-	private String icon;
+	@Column(nullable = false)
+	private Long fileId;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	private List<Long> spawnSeason = new ArrayList<>();
+	private List<Long> spawnSeasonList = new ArrayList<>();
 
 	@Column(nullable = false, length = 50)
 	private String spawnLocation;
+
+	@Column(nullable = false)
+	@Builder.Default
+	private Long popularityScore = 0L; //인기 점수
+	// TODO 스케줄링 하나 만들어서 일정 간격마다 잡은 횟수 초기화
 }

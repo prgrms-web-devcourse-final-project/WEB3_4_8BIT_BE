@@ -15,24 +15,22 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-@SuperBuilder
-@ToString
-@EqualsAndHashCode(callSuper = false)
 @Table(
 	name = "reviews",
 	uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"reservation_id"})
 	}
 )
+@Entity
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Getter
+@SuperBuilder
+@ToString
 public class Review extends BaseEntity {
 
 	@Id

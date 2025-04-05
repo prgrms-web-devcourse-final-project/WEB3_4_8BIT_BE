@@ -2,6 +2,7 @@ package com.backend.domain.shipfishingpost.controller;
 
 import java.net.URI;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -39,10 +40,10 @@ public class ShipFishingPostController {
 	@Operation(summary = "선상 낚시 게시글 생성", description = "유저가 새로운 선상 낚시 게시글을 생성할 때 사용하는 API")
 	public ResponseEntity<GenericResponse<Void>> createShipFishPost(
 		@RequestBody @Valid final ShipFishingPostRequest.Create requestDto,
-		@AuthenticationPrincipal final CustomOAuth2User userDetails
+		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		Long shipFishingPostId = shipFishingPostService.saveShipFishingPost(requestDto, userDetails.getId());
+		Long shipFishingPostId = shipFishingPostService.saveShipFishingPost(requestDto, user.getId());
 
 		return ResponseEntity.created(URI.create(shipFishingPostId.toString())).body(GenericResponse.of(true));
 	}
@@ -62,13 +63,19 @@ public class ShipFishingPostController {
 	@GetMapping
 	@Operation(summary = "선상 낚시 게시글 조회", description = "유저가 선상 낚시 게시글을 조회할 때 사용하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ShipFishingPostResponse.DetailPage>>> getShipFishPostList(
-		@ModelAttribute final ShipFishingPostRequest.Search requestDto,
+		@ParameterObject @ModelAttribute final ShipFishingPostRequest.Search requestDto,
 		@Valid final GlobalRequest.PageRequest pageRequestDto
 	) {
 
 		Slice<ShipFishingPostResponse.DetailPage> response = shipFishingPostService
 			.getShipFishingPostPage(requestDto, pageRequestDto);
 
-		return ResponseEntity.ok(GenericResponse.of(true, ScrollResponse.from(response)));
+		return ResponseEntity.ok(GenericResponse.of(true, ScrollResponse.from(
+			response.getContent(),
+			response.getSize(),
+			response.getNumberOfElements(),
+			response.isFirst(),
+			response.isLast()
+		)));
 	}
 }

@@ -1,11 +1,13 @@
 package com.backend.domain.fishencyclopedia.repository;
 
-import org.springframework.data.domain.Slice;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,11 +23,26 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 	}
 
 	@Override
-	public Slice<FishEncyclopediaResponse.Detail> findDetailByAllByFishPointIdAndFishId(
-		GlobalRequest.PageRequest pageRequestDto,
-		Long fishId,
-		Long memberId
+	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByMemberIdAndFishId(
+		final GlobalRequest.CursorRequest pageRequestDto,
+		final Long fishId,
+		final Long memberId
 	) {
-		return fishEncyclopediaQueryRepository.findDetailByAllByFishPointIdAndFishId(pageRequestDto, fishId, memberId);
+
+		return fishEncyclopediaQueryRepository.findDetailByAllByMemberIdAndFishId(
+			pageRequestDto,
+			fishId,
+			memberId
+		);
+	}
+
+	@Override
+	public List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberId(
+		final Long memberId
+	) {
+
+		return fishEncyclopediaQueryRepository.findDetailPageByAllByMemberId(
+			memberId
+		);
 	}
 }

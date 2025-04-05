@@ -1,23 +1,28 @@
 package com.backend.domain.fishencyclopedia.service;
 
+import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.catchmaxlength.converter.CatchMaxLengthConvert;
+import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
+import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
+import com.backend.domain.fish.exception.FishErrorCode;
+import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.fishencyclopedia.converter.FishEncyclopediaConverter;
 import com.backend.domain.fishencyclopedia.dto.request.FishEncyclopediaRequest;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
-import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaErrorCode;
 import com.backend.domain.fishencyclopedia.exception.FishEncyclopediaException;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaRepository;
-import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
-import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
+import com.backend.domain.fishpoint.exception.FishPointErrorCode;
+import com.backend.domain.fishpoint.exception.FishPointException;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,16 +57,21 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 			);
 
 		// 비어있다면 객체 생성
-		CatchMaxLength encyclopediaMaxLength = findEncyclopediaMaxLength
-			.orElse(CatchMaxLength.builder()
-				.fishId(requestDto.fishId())
-				.memberId(memberId)
-				.build());
- 		// 최대 값 갱신
-		encyclopediaMaxLength.setBestLength(requestDto.length());
+		CatchMaxLength catchMaxLength = findEncyclopediaMaxLength
+			.orElse(CatchMaxLengthConvert.fromCatchMaxLength(requestDto.fishId(), memberId));
 
-		// 새로 생성된 객체일 가능성이 있어 명시
-		catchMaxLengthRepository.save(encyclopediaMaxLength);
+ 		// 최대 값 갱신 & 잡은 마리 수 설정
+		catchMaxLength.setBestLength(requestDto.length());
+		catchMaxLength.setCatchCount(requestDto.count());
+
+		log.debug("잡은 물고기 데이터 갱신: {}", catchMaxLength);
+
+		if (
+			catchMaxLength.getBestLength().equals(requestDto.length()) ||
+			catchMaxLength.getCatchCount().equals(requestDto.count())
+		) {
+			catchMaxLengthRepository.save(catchMaxLength);
+		}
 
 		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.createFishEncyclopedia(fishEncyclopedia);
 
@@ -72,17 +82,23 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Slice<FishEncyclopediaResponse.Detail> getDetailList(
-		final GlobalRequest.PageRequest pageRequestDto,
+	public ScrollResponse<FishEncyclopediaResponse.Detail> getDetailList(
+		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long fishId,
 		final Long memberId
 	) {
-		Slice<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByFishPointIdAndFishId(
-			pageRequestDto, fishId, memberId);
+		ScrollResponse<FishEncyclopediaResponse.Detail> findDetailList = fishEncyclopediaRepository.findDetailByAllByMemberIdAndFishId(
+			cursorRequestDto, fishId, memberId);
 
 		log.debug("물고기 도감 상세 조회: {}", findDetailList);
 
 		return findDetailList;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<FishEncyclopediaResponse.DetailPage> getDetailPageList(final Long memberId) {
+		return fishEncyclopediaRepository.findDetailPageByAllByMemberId(memberId);
 	}
 
 	/**
@@ -98,7 +114,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		log.debug("물고기 존재 여부: {}", result);
 
 		if (!result) {
-			throw new FishEncyclopediaException(FishEncyclopediaErrorCode.NOT_EXISTS_FISH);
+			throw new FishException(FishErrorCode.FISH_NOT_FOUND);
 		}
 	}
 
@@ -115,7 +131,7 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		log.debug("낚시 포인트 존재 여부: {}", result);
 
 		if (!result) {
-			throw new FishEncyclopediaException(FishEncyclopediaErrorCode.NOT_EXISTS_FISH_POINT);
+			throw new FishPointException(FishPointErrorCode.FISH_POINT_NOT_FOUND);
 		}
 	}
 }

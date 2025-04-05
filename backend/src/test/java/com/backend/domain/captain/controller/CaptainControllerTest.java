@@ -27,6 +27,7 @@ import com.backend.domain.captain.exception.CaptainException;
 import com.backend.domain.captain.service.CaptainService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
+import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -53,7 +54,7 @@ class CaptainControllerTest extends BaseTest {
 		.giveMeBuilder(CaptainRequest.Create.class)
 		.set("nickname", "해적왕")
 		.set("profileImg", "http://example.com/image.jpg")
-		.set("descrption", "해적왕이 되고싶은 루피 입니다.")
+		.set("description", "해적왕이 되고싶은 루피 입니다.")
 		.set("shipLicenseNumber", "1-2019123456")
 		.set("shipList", List.of(1L, 2L, 3L));
 
@@ -91,7 +92,7 @@ class CaptainControllerTest extends BaseTest {
 
 		result
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("nickname"))
 			.andExpect(jsonPath("$.data[0].reason").value("닉네임은 필수 항목입니다."))
 			.andExpect(jsonPath("$.success").value(false));
@@ -109,17 +110,17 @@ class CaptainControllerTest extends BaseTest {
 
 		result
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("shipLicenseNumber"))
 			.andExpect(jsonPath("$.data[0].reason").value("선박 운전 면허 번호는 필수 항목입니다."))
 			.andExpect(jsonPath("$.success").value(false));
 	}
 
 	@Test
-	@DisplayName("선장 저장 [descrption null] [Controller] - Fail")
+	@DisplayName("선장 저장 [description null] [Controller] - Fail")
 	@WithMockCustomUser
 	void t04() throws Exception {
-		CaptainRequest.Create requestDto = arbitraryBuilder.set("descrption", null).sample();
+		CaptainRequest.Create requestDto = arbitraryBuilder.set("description", null).sample();
 
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/members/captains")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -127,7 +128,7 @@ class CaptainControllerTest extends BaseTest {
 
 		result
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.data[0].field").value("descrption"))
+			.andExpect(jsonPath("$.data[0].field").value("description"))
 			.andExpect(jsonPath("$.data[0].reason").value("자기 소개글은 필수 항목입니다."))
 			.andExpect(jsonPath("$.success").value(false));
 	}
@@ -145,7 +146,7 @@ class CaptainControllerTest extends BaseTest {
 
 		result
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("nickname"))
 			.andExpect(jsonPath("$.data[0].reason").value("닉네임은 최대 30자까지 가능합니다."))
 			.andExpect(jsonPath("$.success").value(false));
@@ -246,10 +247,9 @@ class CaptainControllerTest extends BaseTest {
 
 		// Then
 		result
-			.andExpect(status().isCreated())
-			.andExpect(header().exists("Location"))
-			.andExpect(header().string("Location", captainId.toString()))
-			.andExpect(jsonPath("$.success").value(true));
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data").value(captainId));
 	}
 
 	@Test
@@ -271,7 +271,7 @@ class CaptainControllerTest extends BaseTest {
 		// Then
 		result
 			.andExpect(status().isBadRequest())
-			.andExpect(jsonPath("$.code").value(5001))
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("shipList"))
 			.andExpect(jsonPath("$.data[0].reason").value("배는 최소 1개 등록해야합니다."))
 			.andExpect(jsonPath("$.success").value(false));

@@ -1,5 +1,6 @@
 package com.backend.domain.review.controller;
 
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -49,8 +50,17 @@ public class ReviewController {
 		@PathVariable final Long postId,
 		@Valid final GlobalRequest.PageRequest pageRequest
 	) {
+		Slice<ReviewWithMemberResponse> reviewWithMemberResponseSlice = reviewService.getReviewListByPostId(postId,
+			pageRequest.toPageable());
+
 		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
-			reviewService.getReviewListByPostId(postId, pageRequest.toPageable()));
+			reviewWithMemberResponseSlice.getContent(),
+			reviewWithMemberResponseSlice.getSize(),
+			reviewWithMemberResponseSlice.getNumberOfElements(),
+			reviewWithMemberResponseSlice.isFirst(),
+			reviewWithMemberResponseSlice.isLast()
+		);
+
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(GenericResponse.of(true, scrollResponse));
 	}
@@ -61,8 +71,16 @@ public class ReviewController {
 		@AuthenticationPrincipal final CustomOAuth2User user,
 		@Valid final GlobalRequest.PageRequest pageRequest
 	) {
+		Slice<ReviewWithMemberResponse> reviewWithMemberResponseSlice = reviewService.getReviewListByMemberId(user.getId(),
+			pageRequest.toPageable());
+
 		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
-			reviewService.getReviewListByMemberId(user.getId(), pageRequest.toPageable()));
+			reviewWithMemberResponseSlice.getContent(),
+			reviewWithMemberResponseSlice.getSize(),
+			reviewWithMemberResponseSlice.getNumberOfElements(),
+			reviewWithMemberResponseSlice.isFirst(),
+			reviewWithMemberResponseSlice.isLast()
+		);
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(GenericResponse.of(true, scrollResponse));
 	}
@@ -73,6 +91,7 @@ public class ReviewController {
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 		reviewService.delete(user.getId(), reviewId);
+
 		return ResponseEntity.status(HttpStatus.OK).body(GenericResponse.of(true));
 	}
 }

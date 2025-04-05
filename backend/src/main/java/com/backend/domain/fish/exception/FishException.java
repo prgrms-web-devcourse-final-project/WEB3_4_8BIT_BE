@@ -1,21 +1,22 @@
 package com.backend.domain.fish.exception;
 
-import org.springframework.http.HttpStatus;
+import com.backend.global.exception.ErrorCode;
+import com.backend.global.exception.GlobalException;
 
 import lombok.Getter;
 
 @Getter
-public class FishException extends RuntimeException {
+public class FishException extends GlobalException {
 
-	private final FishErrorCode fishErrorCode;
+	private final ErrorCode errorCode;
 
-	public FishException(final FishErrorCode fishErrorCode) {
-		super(fishErrorCode.getMessage());
-		this.fishErrorCode = fishErrorCode;
+	public FishException(final ErrorCode errorCode) {
+		super(errorCode);
+		this.errorCode = errorCode;
 	}
 
-	public HttpStatus getStatus() {
-
-		return fishErrorCode.getHttpStatus();
+	public FishException(Throwable cause, ErrorCode errorCode) {
+		super(cause, errorCode);
+		this.errorCode = errorCode;
 	}
 }

@@ -21,6 +21,7 @@ import org.springframework.data.domain.Sort;
 
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishRepository;
+import com.backend.domain.reservationdate.repository.ReservationDateRepository;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
@@ -33,6 +34,7 @@ import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.domain.shipfishingpost.service.ShipFishingPostServiceImpl;
+import com.backend.domain.shipfishingpostfish.repository.ShipFishingPostFishRepository;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.util.BaseTest;
 
@@ -47,6 +49,12 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Mock
 	private ShipFishingPostRepository shipFishingPostRepository;
+
+	@Mock
+	private ReservationDateRepository reservationDateRepository;
+
+	@Mock
+	private ShipFishingPostFishRepository shipFishingPostFishRepository;
 
 	@InjectMocks
 	private ShipFishingPostServiceImpl shipFishingPostServiceImpl;
@@ -65,7 +73,8 @@ public class ShipFishingPostServiceTest extends BaseTest {
 			.set("shipId", 1L)
 			.set("memberId", 1L).sample();
 
-		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishPostsRequestCreate(givenRequestDto,
+		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishingPostRequestCreate(
+			givenRequestDto,
 			1L);
 
 		ShipFishingPost savedShipFishingPost = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
@@ -77,7 +86,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// When
 		when(shipRepository.findById(1L)).thenReturn(Optional.of(givenShip));
 		when(fishRepository.findAllById(givenRequestDto.fishList())).thenReturn(List.of(Fish.builder().build()));
-		when(shipFishingPostRepository.save(givenShipFishingPost)).thenReturn(savedShipFishingPost);
+		when(shipFishingPostRepository.save(any(ShipFishingPost.class))).thenReturn(savedShipFishingPost);
 
 		Long savedId = shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L);
 
@@ -92,14 +101,14 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		ShipFishingPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeOne(
 			ShipFishingPostRequest.Create.class);
 
-		ShipFishingPostConverter.fromShipFishPostsRequestCreate(givenRequestDto, 1L);
+		ShipFishingPostConverter.fromShipFishingPostRequestCreate(givenRequestDto, 1L);
 
 		// When
 
 		// Then
 		assertThatThrownBy(() -> shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L))
 			.isInstanceOf(ShipException.class)
-			.hasFieldOrPropertyWithValue("shipErrorCode", ShipErrorCode.SHIP_NOT_FOUND)
+			.hasFieldOrPropertyWithValue("errorCode", ShipErrorCode.SHIP_NOT_FOUND)
 			.hasMessageContaining(ShipErrorCode.SHIP_NOT_FOUND.getMessage());
 
 	}
@@ -118,7 +127,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 			.set("memberId", 2L)
 			.sample();
 
-		ShipFishingPostConverter.fromShipFishPostsRequestCreate(givenRequestDto,
+		ShipFishingPostConverter.fromShipFishingPostRequestCreate(givenRequestDto,
 			1L);
 
 		// When
@@ -127,7 +136,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// Then
 		assertThatThrownBy(() -> shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L))
 			.isInstanceOf(ShipException.class)
-			.hasFieldOrPropertyWithValue("shipErrorCode", ShipErrorCode.SHIP_MISMATCH_MEMBER_ID)
+			.hasFieldOrPropertyWithValue("errorCode", ShipErrorCode.SHIP_MISMATCH_MEMBER_ID)
 			.hasMessageContaining(ShipErrorCode.SHIP_MISMATCH_MEMBER_ID.getMessage());
 	}
 
@@ -159,7 +168,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// Then
 		assertThatThrownBy(() -> shipFishingPostServiceImpl.getShipFishingPost(1L))
 			.isInstanceOf(ShipFishingPostException.class)
-			.hasFieldOrPropertyWithValue("shipFishingPostErrorCode", ShipFishingPostErrorCode.POSTS_NOT_FOUND)
+			.hasFieldOrPropertyWithValue("errorCode", ShipFishingPostErrorCode.POSTS_NOT_FOUND)
 			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_NOT_FOUND.getMessage());
 	}
 
@@ -190,7 +199,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// Then
 		assertThatThrownBy(() -> shipFishingPostServiceImpl.getShipFishingPostAll(1L))
 			.isInstanceOf(ShipFishingPostException.class)
-			.hasFieldOrPropertyWithValue("shipFishingPostErrorCode", ShipFishingPostErrorCode.POSTS_NOT_FOUND)
+			.hasFieldOrPropertyWithValue("errorCode", ShipFishingPostErrorCode.POSTS_NOT_FOUND)
 			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_NOT_FOUND.getMessage());
 	}
 

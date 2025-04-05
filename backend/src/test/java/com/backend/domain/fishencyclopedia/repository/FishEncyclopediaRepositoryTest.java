@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -12,11 +13,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Slice;
 
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 
+import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
+import com.backend.domain.catchmaxlength.repository.CatchMaxLengthJpaRepository;
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishJpaRepository;
 import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse;
@@ -27,7 +29,10 @@ import com.backend.domain.member.entity.Member;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
+
+import lombok.extern.slf4j.Slf4j;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
@@ -38,6 +43,7 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 	QuerydslConfig.class
 })
 @DataJpaTest
+@Slf4j
 class FishEncyclopediaRepositoryTest extends BaseTest {
 
 	@Autowired
@@ -53,11 +59,15 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	private FishPointJpaRepository fishPointJpaRepository;
 
 	@Autowired
+	private CatchMaxLengthJpaRepository catchMaxLengthJpaRepository;
+
+	@Autowired
 	private FishJpaRepository fishJpaRepository;
 
 	private List<FishPoint> savedFishPointList;
 	private List<Fish> savedFishList;
 	private List<FishEncyclopedia> savedFishEncyclopediasList;
+	private List<CatchMaxLength> savedCatchMaxLengthList;
 
 	private final Arbitrary<String> englishStringLength = Arbitraries.strings()
 		.withCharRange('a', 'z')
@@ -86,7 +96,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 
 		List<Fish> givenFishList = fishArbitraryBuilder
 			.set("fishId", null)
-			.sampleList(2);
+			.sampleList(20);
 		savedFishList = fishJpaRepository.saveAll(givenFishList);
 
 		List<FishEncyclopedia> fishEncyclopediasList1 = fixtureMonkeyBuilder
@@ -105,7 +115,18 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 			.set("memberId", 2L)
 			.sampleList(10);
 
+		List<CatchMaxLength> catchMaxLengthList = IntStream.range(0, 20)
+			.mapToObj(
+				(i) -> fixtureMonkeyBuilder.giveMeBuilder(CatchMaxLength.class)
+					.set("catchMaxLengthId", null)
+					.set("fishId", savedFishList.get(i).getFishId())
+					.set("memberId", givenMember.getMemberId())
+					.sample()
+			).toList();
+
 		savedFishEncyclopediasList = fishEncyclopediaJpaRepository.saveAll(fishEncyclopediasList1);
+		fishEncyclopediaJpaRepository.saveAll(fishEncyclopediasList2);
+		savedCatchMaxLengthList = catchMaxLengthJpaRepository.saveAll(catchMaxLengthList);
 	}
 
 	@Test
@@ -129,21 +150,21 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Default] [Repository] - Success")
 	void t02() {
 		// Given
-		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
-			null, null, null, null
+		GlobalRequest.CursorRequest givenRequestDto = new GlobalRequest.CursorRequest(
+			null, null, null, null, null, null
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCreatedAt).reversed())
 			.toList();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).createdAt().truncatedTo(ChronoUnit.SECONDS))
 			.isEqualTo(sortedFishEncyclopediaList.get(0).getCreatedAt().truncatedTo(ChronoUnit.SECONDS));
 	}
@@ -152,21 +173,21 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Sort - Default] [Order - Asc] [Repository] - Success")
 	void t03() {
 		// Given
-		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
-			null, null, null, "ASC"
+		GlobalRequest.CursorRequest givenRequestDto = new GlobalRequest.CursorRequest(
+			"ASC", null, null, null, null, null
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCreatedAt))
 			.toList();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).createdAt().truncatedTo(ChronoUnit.SECONDS))
 			.isEqualTo(sortedFishEncyclopediaList.get(0).getCreatedAt().truncatedTo(ChronoUnit.SECONDS));
 	}
@@ -175,21 +196,21 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Sort - Length] [Order - Default] [Repository] - Success")
 	void t04() {
 		// Given
-		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
-			null, null, "length", null
+		GlobalRequest.CursorRequest givenRequestDto = new GlobalRequest.CursorRequest(
+			null, "length", null, null, null, null
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getLength).reversed())
 			.toList();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).length()).isEqualTo(sortedFishEncyclopediaList.get(0).getLength());
 	}
 
@@ -197,21 +218,21 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Sort - Length] [Order - ASC] [Repository] - Success")
 	void t05() {
 		// Given
-		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
-			null, null, "length", "asc"
+		GlobalRequest.CursorRequest givenRequestDto = new GlobalRequest.CursorRequest(
+			"asc", "length", null, null, null, null
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getLength))
 			.toList();
 
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).length()).isEqualTo(sortedFishEncyclopediaList.get(0).getLength());
 	}
 
@@ -219,21 +240,21 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Sort - Count] [Order - Default] [Repository] - Success")
 	void t06() {
 		// Given
-		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
-			null, null, "count", null
+		GlobalRequest.CursorRequest givenRequestDto = new GlobalRequest.CursorRequest(
+			null, "count", null, null, null, null
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCount).reversed())
 			.toList();
 
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).count()).isEqualTo(sortedFishEncyclopediaList.get(0).getCount());
 	}
 
@@ -241,28 +262,39 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 상세 조회 [Sort - Count] [Order - Asc] [Repository] - Success")
 	void t07() {
 		// Given
-		GlobalRequest.PageRequest givenRequestDto = new GlobalRequest.PageRequest(
-			null, null, "count", "asc"
+		GlobalRequest.CursorRequest givenRequestDto = new GlobalRequest.CursorRequest(
+			"asc", "count", null, null, null, null
 		);
 
 		// When
-		Slice<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
+		ScrollResponse<FishEncyclopediaResponse.Detail> savedFishEncyclopedia = executeQuery(givenRequestDto);
 
 		// Then
 		List<FishEncyclopedia> sortedFishEncyclopediaList = savedFishEncyclopediasList.stream()
 			.sorted(Comparator.comparing(FishEncyclopedia::getCount))
 			.toList();
 
-		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.getContent();
+		List<FishEncyclopediaResponse.Detail> content = savedFishEncyclopedia.content();
 
-		assertThat(savedFishEncyclopedia).hasSize(7);
+		assertThat(content).hasSize(7);
 		assertThat(content.get(0).count()).isEqualTo(sortedFishEncyclopediaList.get(0).getCount());
 	}
 
+	@Test
+	@DisplayName("물고기 도감 전체 조회 [Repository] - Success")
+	void t08() {
+		// When
+		List<FishEncyclopediaResponse.DetailPage> detailPageList = fishEncyclopediaRepository
+			.findDetailPageByAllByMemberId(givenMember.getMemberId());
+
+		// Then
+		assertThat(detailPageList).hasSize(savedCatchMaxLengthList.size());
+	}
+
 	// 유틸리티 메서드
-	private Slice<FishEncyclopediaResponse.Detail> executeQuery(GlobalRequest.PageRequest pageRequestDto) {
-		return fishEncyclopediaQueryRepository.findDetailByAllByFishPointIdAndFishId(
-			pageRequestDto,
+	private ScrollResponse<FishEncyclopediaResponse.Detail> executeQuery(GlobalRequest.CursorRequest cursorRequestDto) {
+		return fishEncyclopediaQueryRepository.findDetailByAllByMemberIdAndFishId(
+			cursorRequestDto,
 			savedFishList.get(0).getFishId(),
 			givenMember.getMemberId()
 		);

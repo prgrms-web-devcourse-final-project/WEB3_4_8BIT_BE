@@ -8,7 +8,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -21,7 +20,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString
 @IdClass(ShipFishingPostFishId.class)
-@EqualsAndHashCode(callSuper = false)
 public class ShipFishingPostFish extends BaseEntity {
 
 	@Id

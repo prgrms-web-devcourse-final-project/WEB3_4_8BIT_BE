@@ -48,7 +48,7 @@ class CaptainServiceTest extends BaseTest {
 		CaptainRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(CaptainRequest.Create.class)
 			.set("nickname", "해적왕")
 			.set("profileImg", "http://example.com/image.jpg")
-			.set("descrption", "해적왕이 되고싶은 루피 입니다.")
+			.set("description", "해적왕이 되고싶은 루피 입니다.")
 			.set("shipLicenseNumber", "1-2019123456")
 			.set("shipList", List.of(1L, 2L, 3L))
 			.sample();
@@ -73,7 +73,7 @@ class CaptainServiceTest extends BaseTest {
 		// member가 업데이트 되었는지 확인
 		assertThat(givenMember.getNickname()).isEqualTo(givenRequestDto.nickname());
 		assertThat(givenMember.getProfileImg()).isEqualTo(givenRequestDto.profileImg());
-		assertThat(givenMember.getDescription()).isEqualTo(givenRequestDto.descrption());
+		assertThat(givenMember.getDescription()).isEqualTo(givenRequestDto.description());
 		assertThat(givenMember.getRole().name()).isEqualTo("CAPTAIN");
 		assertThat(givenMember.getIsAddInfo()).isTrue();
 
@@ -139,7 +139,7 @@ class CaptainServiceTest extends BaseTest {
 		// When & Then
 		assertThatThrownBy(() -> captainService.getCaptainDetail(invalidCaptainId))
 			.isInstanceOf(CaptainException.class)
-			.hasFieldOrPropertyWithValue("captainErrorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
+			.hasFieldOrPropertyWithValue("errorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
 			.hasMessageContaining(CaptainErrorCode.CAPTAIN_NOT_FOUND.getMessage());
 
 		verify(captainRepository, times(1)).findDetailById(invalidCaptainId);
@@ -152,13 +152,9 @@ class CaptainServiceTest extends BaseTest {
 		Long memberId = 1L;
 
 		// 일반 멤버 (선장이 아님)
-		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
-			.set("memberId", memberId)
-			.set("role", MemberRole.USER)
-			.sample();
-
 		CaptainResponse.Detail givenResponseDto = fixtureMonkeyValidation.giveMeBuilder(CaptainResponse.Detail.class)
 			.set("memberId", memberId)
+			.set("role", MemberRole.USER)
 			.sample();
 
 		when(captainRepository.findDetailById(memberId)).thenReturn(Optional.of(givenResponseDto));
@@ -166,7 +162,7 @@ class CaptainServiceTest extends BaseTest {
 		// When & Then
 		assertThatThrownBy(() -> captainService.getCaptainDetail(memberId))
 			.isInstanceOf(CaptainException.class)
-			.hasFieldOrPropertyWithValue("captainErrorCode", CaptainErrorCode.NOT_CAPTAIN)
+			.hasFieldOrPropertyWithValue("errorCode", CaptainErrorCode.NOT_CAPTAIN)
 			.hasMessageContaining(CaptainErrorCode.NOT_CAPTAIN.getMessage());
 
 		verify(captainRepository, times(1)).findDetailById(memberId);
@@ -178,7 +174,9 @@ class CaptainServiceTest extends BaseTest {
 	void t06() {
 		// Given
 		Long captainId = 1L;
-		CaptainRequest.Update updateRequest = new CaptainRequest.Update(List.of(2L, 3L, 4L));
+		CaptainRequest.Update givenRequest = fixtureMonkeyValidation.giveMeBuilder(CaptainRequest.Update.class)
+			.set("shipList", List.of(2L, 3L, 4L))
+			.sample();
 
 		Captain existingCaptain = fixtureMonkeyBuilder.giveMeBuilder(Captain.class)
 			.set("memberId", captainId)
@@ -188,11 +186,11 @@ class CaptainServiceTest extends BaseTest {
 		when(captainRepository.findById(captainId)).thenReturn(Optional.of(existingCaptain));
 
 		// When
-		Long updatedId = captainService.updateCaptainShipList(captainId, updateRequest);
+		Long updatedId = captainService.updateCaptainShipList(captainId, givenRequest);
 
 		// Then
 		assertThat(updatedId).isEqualTo(captainId);
-		assertThat(existingCaptain.getShipList()).isEqualTo(updateRequest.shipList());
+		assertThat(existingCaptain.getShipList()).isEqualTo(givenRequest.shipList());
 
 		verify(captainRepository, times(1)).findById(captainId);
 	}
@@ -202,14 +200,16 @@ class CaptainServiceTest extends BaseTest {
 	void t07() {
 		// Given
 		Long invalidCaptainId = 999L;
-		CaptainRequest.Update updateRequest = new CaptainRequest.Update(List.of(10L, 20L, 30L));
+		CaptainRequest.Update givenRequest = fixtureMonkeyValidation.giveMeBuilder(CaptainRequest.Update.class)
+			.set("shipList", List.of(2L, 3L, 4L))
+			.sample();
 
 		when(captainRepository.findById(invalidCaptainId)).thenReturn(Optional.empty());
 
 		// When & Then
-		assertThatThrownBy(() -> captainService.updateCaptainShipList(invalidCaptainId, updateRequest))
+		assertThatThrownBy(() -> captainService.updateCaptainShipList(invalidCaptainId, givenRequest))
 			.isInstanceOf(CaptainException.class)
-			.hasFieldOrPropertyWithValue("captainErrorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
+			.hasFieldOrPropertyWithValue("errorCode", CaptainErrorCode.CAPTAIN_NOT_FOUND)
 			.hasMessageContaining(CaptainErrorCode.CAPTAIN_NOT_FOUND.getMessage());
 
 		verify(captainRepository, times(1)).findById(invalidCaptainId);

@@ -56,13 +56,13 @@ public class CaptainController {
 
 	@PatchMapping
 	@Operation(summary = "선장 배 정보 수정", description = "현재 로그인된 선장의 배 정보를 수정하는 API")
-	public ResponseEntity<GenericResponse<Void>> updateCaptain(
+	public ResponseEntity<GenericResponse<Long>> updateCaptain(
 		@AuthenticationPrincipal final CustomOAuth2User user,
 		@RequestBody @Valid final CaptainRequest.Update requestDto
 	) {
 
 		Long captainId = captainService.updateCaptainShipList(user.getId(), requestDto);
 
-		return ResponseEntity.created(URI.create(captainId.toString())).body(GenericResponse.of(true));
+		return ResponseEntity.ok(GenericResponse.of(true, captainId));
 	}
 }

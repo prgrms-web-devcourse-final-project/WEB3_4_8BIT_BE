@@ -2,6 +2,8 @@ package com.backend.domain.review.exception;
 
 import org.springframework.http.HttpStatus;
 
+import com.backend.global.exception.ErrorCode;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -13,7 +15,7 @@ import lombok.RequiredArgsConstructor;
  */
 @Getter
 @RequiredArgsConstructor
-public enum ReviewErrorCode {
+public enum ReviewErrorCode implements ErrorCode {
 
 	//선상 낚시 리뷰 에러 코드 400
 	DUPLICATE_REVIEW(HttpStatus.CONFLICT, 4001, "리뷰는 동일한 예약에 대해 한 번만 작성할 수 있습니다."),

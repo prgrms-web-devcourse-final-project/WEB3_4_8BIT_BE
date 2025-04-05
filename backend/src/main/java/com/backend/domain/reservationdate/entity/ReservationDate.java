@@ -1,52 +1,56 @@
 package com.backend.domain.reservationdate.entity;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "reservation_dates")
+@Table(name = "reservation_dates", indexes = {
+	@Index(name = "idx_reservation_dates_01", columnList = "shipFishingPostId, reservationDate")
+})
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @SuperBuilder
 @ToString
-@EqualsAndHashCode(callSuper = false)
+@IdClass(ReservationDateId.class)
 public class ReservationDate extends BaseEntity {
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long reservationDateId;
-
-	@Column(nullable = false)
+	@Column(insertable = false, updatable = false)
 	private Long shipFishingPostId;
 
+	@Id
+	@Column(insertable = false, updatable = false)
+	private LocalDate reservationDate;
+
+	@Min(0)
+	@Builder.Default
 	@Column(nullable = false)
-	private Long memberId;
+	private Integer remainCount = 0;
 
 	@Builder.Default
 	@Column(nullable = false)
-	private Integer reservationCount = 0;
+	private Boolean isBan = false;
 
-	@Column(nullable = false)
-	private ZonedDateTime reservationDate;
+	public void remainMinus(final Integer guestCount) {
+		this.remainCount -= guestCount;
+	}
 
-	@Column(nullable = false)
-	private Boolean isEnd;
-
-	@Column(nullable = false)
-	private Boolean isBan;
+	public void remainPlus(final Integer guestCount) {
+		this.remainCount += guestCount;
+	}
 }
