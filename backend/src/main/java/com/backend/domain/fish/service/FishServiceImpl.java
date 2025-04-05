@@ -1,5 +1,7 @@
 package com.backend.domain.fish.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.backend.domain.fish.dto.FishResponse;
@@ -20,5 +22,10 @@ public class FishServiceImpl implements FishService {
 
 		return fishRepository.findDetailById(fishId)
 			.orElseThrow(() -> new FishException(FishErrorCode.FISH_NOT_FOUND));
+	}
+
+	@Override
+	public List<FishResponse.Popular> getPopular(Integer limit) {
+		return fishRepository.findPopular(limit);
 	}
 }
