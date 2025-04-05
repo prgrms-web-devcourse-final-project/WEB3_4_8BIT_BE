@@ -50,10 +50,10 @@ public interface FishRepository {
 	/**
 	 * 인기순으로 limit 개수만큼 물고기 조회하는 메소드
 	 *
-	 * @param limit {@link Integer} 최대 값 10
+	 * @param size {@link Integer} 최대 값 10
 	 * @return {@link List<FishResponse.Popular>}
 	 * @implSpec 인기순으로 물고기 limit 개수만큼 조회 후 반환
 	 * @author Kim Dong O
 	 */
-	List<FishResponse.Popular> findPopular(final Integer limit);
+	List<FishResponse.Popular> findPopular(final Integer size);
 }

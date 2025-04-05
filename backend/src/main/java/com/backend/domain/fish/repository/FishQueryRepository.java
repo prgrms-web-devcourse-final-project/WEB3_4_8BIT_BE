@@ -42,7 +42,7 @@ public class FishQueryRepository {
 		return Optional.ofNullable(findDetail);
 	}
 
-	public List<FishResponse.Popular> findPopular(final Integer limit) {
+	public List<FishResponse.Popular> findPopular(final Integer size) {
 
 		return jpaQueryFactory
 			.select(new QFishResponse_Popular(
@@ -55,7 +55,7 @@ public class FishQueryRepository {
 			.leftJoin(file)
 			.on(fish.fileId.eq(file.fileId))
 			.orderBy(new OrderSpecifier<>(Order.DESC, fish.popularityScore))
-			.limit(limit)
+			.limit(size)
 			.fetch();
 	}
 }

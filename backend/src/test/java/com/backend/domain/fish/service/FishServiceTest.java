@@ -62,16 +62,16 @@ class FishServiceTest extends BaseTest {
 	@DisplayName("물고기 인기순 조회 [Service] - Success")
 	void t03() {
 		// Given
-		Integer givenLimit = 10;
+		Integer givenSize = 10;
 
 		List<FishResponse.Popular> givenPopularList = fixtureMonkeyRecord
 			.giveMeBuilder(FishResponse.Popular.class)
 			.sampleList(10);
 
-		when(fishRepository.findPopular(givenLimit)).thenReturn(givenPopularList);
+		when(fishRepository.findPopular(givenSize)).thenReturn(givenPopularList);
 
 		// When
-		List<FishResponse.Popular> getPopularList = fishServiceImpl.getPopular(givenLimit);
+		List<FishResponse.Popular> getPopularList = fishServiceImpl.getPopular(givenSize);
 
 		// Then
 		assertThat(getPopularList).isEqualTo(givenPopularList);

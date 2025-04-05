@@ -25,7 +25,7 @@ public class FishServiceImpl implements FishService {
 	}
 
 	@Override
-	public List<FishResponse.Popular> getPopular(Integer limit) {
-		return fishRepository.findPopular(limit);
+	public List<FishResponse.Popular> getPopular(Integer size) {
+		return fishRepository.findPopular(size);
 	}
 }

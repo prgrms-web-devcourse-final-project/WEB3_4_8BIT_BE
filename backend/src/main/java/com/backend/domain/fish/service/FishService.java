@@ -19,11 +19,11 @@ public interface FishService {
 	/**
 	 * 물고기 인기순 조회 메소드
 	 *
-	 * @param limit {@link Integer}
+	 * @param size {@link Integer}
 	 * @return {@link List<FishResponse.Popular>}
 	 * @implSpec limit 받아서 limit 개수만큼 조회 후 결과 반환
 	 * @author Kim Dong O
 	 */
-	List<FishResponse.Popular> getPopular(final Integer limit);
+	List<FishResponse.Popular> getPopular(final Integer size);
 
 }

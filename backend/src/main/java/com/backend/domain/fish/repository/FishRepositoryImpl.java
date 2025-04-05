@@ -38,7 +38,7 @@ public class FishRepositoryImpl implements FishRepository {
 	}
 
 	@Override
-	public List<FishResponse.Popular> findPopular(final Integer limit) {
-		return fishQueryRepository.findPopular(limit);
+	public List<FishResponse.Popular> findPopular(final Integer size) {
+		return fishQueryRepository.findPopular(size);
 	}
 }
