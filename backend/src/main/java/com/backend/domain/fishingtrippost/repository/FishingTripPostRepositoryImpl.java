@@ -27,7 +27,7 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	}
 
 	@Override
-	public Optional<FishingTripPostResponse.Detail> findDetailById(final Long fishingTripPostId) {
-		return fishingTripPostQueryRepository.findDetailById(fishingTripPostId);
+	public Optional<FishingTripPostResponse.DetailQueryDto> findDetailQueryDtoById(Long fishingTripPostId) {
+		return fishingTripPostQueryRepository.findDetailDtoById(fishingTripPostId);
 	}
 }
