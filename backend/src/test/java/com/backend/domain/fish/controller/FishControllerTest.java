@@ -4,6 +4,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,4 +79,29 @@ class FishControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.code").value(FishErrorCode.FISH_NOT_FOUND.getCode()))
 			.andExpect(jsonPath("$.message").value(FishErrorCode.FISH_NOT_FOUND.getMessage()));
 	}
+
+	@Test
+	@DisplayName("물고기 인기순 조회 [Controller] - Success")
+	@WithMockCustomUser
+	void t03() throws Exception {
+		// Given
+		Integer givenSize = 10;
+
+		List<FishResponse.Popular> givenPopularList = fixtureMonkeyRecord
+			.giveMeBuilder(FishResponse.Popular.class)
+			.sampleList(10);
+
+		when(fishService.getPopular(givenSize)).thenReturn(givenPopularList);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes/popular")
+			.param("size", givenSize.toString()));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.size()").value(givenSize));
+	}
+
 }
