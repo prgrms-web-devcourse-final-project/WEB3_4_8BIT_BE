@@ -20,4 +20,18 @@ public class FishResponse {
 		}
 
 	}
+
+	public record Popular(
+		Long fishId,
+		String name,
+		List<Long> spawnSeasonList,
+		Long popularityScore,
+		String fileUrl
+	) {
+
+		@QueryProjection
+		public Popular {
+
+		}
+	}
 }
