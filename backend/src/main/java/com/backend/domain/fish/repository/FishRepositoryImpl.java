@@ -36,4 +36,9 @@ public class FishRepositoryImpl implements FishRepository {
 	public List<Fish> findAllById(final List<Long> fishIdList) {
 		return fishJpaRepository.findAllById(fishIdList);
 	}
+
+	@Override
+	public void updateFishPopularityScores() {
+		fishQueryRepository.updateFishPopularityScores();
+	}
 }

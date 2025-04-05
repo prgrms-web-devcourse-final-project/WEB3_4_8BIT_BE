@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "fishs")
+@Table(name = "fishes")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -52,5 +52,4 @@ public class Fish extends BaseEntity {
 	@Column(nullable = false)
 	@Builder.Default
 	private Long popularityScore = 0L; //인기 점수
-	// TODO 스케줄링 하나 만들어서 일정 간격마다 잡은 횟수 초기화
 }
