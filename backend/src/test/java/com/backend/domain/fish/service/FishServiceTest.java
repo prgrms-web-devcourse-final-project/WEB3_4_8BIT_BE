@@ -3,6 +3,7 @@ package com.backend.domain.fish.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -55,5 +56,24 @@ class FishServiceTest extends BaseTest {
 			() -> fishServiceImpl.getFishDetail(givenFishId))
 			.isExactlyInstanceOf(FishException.class)
 			.hasMessage(FishErrorCode.FISH_NOT_FOUND.getMessage());
+	}
+
+	@Test
+	@DisplayName("물고기 인기순 조회 [Service] - Success")
+	void t03() {
+		// Given
+		Integer givenLimit = 10;
+
+		List<FishResponse.Popular> givenPopularList = fixtureMonkeyRecord
+			.giveMeBuilder(FishResponse.Popular.class)
+			.sampleList(10);
+
+		when(fishRepository.findPopular(givenLimit)).thenReturn(givenPopularList);
+
+		// When
+		List<FishResponse.Popular> getPopularList = fishServiceImpl.getPopular(givenLimit);
+
+		// Then
+		assertThat(getPopularList).isEqualTo(givenPopularList);
 	}
 }
