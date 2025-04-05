@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "fishs")
+@Table(name = "fishes")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter

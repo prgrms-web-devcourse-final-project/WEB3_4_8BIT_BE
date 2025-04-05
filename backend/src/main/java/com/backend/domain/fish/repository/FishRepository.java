@@ -46,4 +46,12 @@ public interface FishRepository {
 	 * @author swjoon
 	 */
 	List<Fish> findAllById(final List<Long> fishIdList);
+
+	/**
+	 * 현재 시간부터 1시간 전까지 물고기 도감에 추가된 잡은 횟수를 인기도로 설정하는 메소드
+	 *
+	 * @implSpec 현재 시간부터 1시간 전까지 물고기 도감에 추가된 잡은 횟수를 인기도로 설정
+	 * @author swjoon
+	 */
+	void updateFishPopularityScores();
 }
