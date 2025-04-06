@@ -6,6 +6,7 @@ import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
+import com.querydsl.core.Tuple;
 
 public interface FishEncyclopediaRepository {
 
@@ -24,7 +25,7 @@ public interface FishEncyclopediaRepository {
 	 *
 	 * @param cursorRequestDto {@link GlobalRequest.CursorRequest}
 	 * @param fishId           {@link Long}
-	 * @param memberId           {@link Long}
+	 * @param memberId         {@link Long}
 	 * @return {@link ScrollResponse}
 	 * @implSpec FishId가 일치하는 데이터 동적 조회 후 결과 반환
 	 * Sort - length, sort, createdAt(default)
@@ -38,7 +39,7 @@ public interface FishEncyclopediaRepository {
 	);
 
 	/**
-	 * @param memberId         {@link Long}
+	 * @param memberId {@link Long}
 	 * @return {@link ScrollResponse}
 	 * @implSpec FishId가 일치하는 데이터 동적 조회 후 결과 반환
 	 * 관리자가 직접 추가하는 데이터이기 때문에 일단은 findAll 형태로 구현
@@ -47,4 +48,14 @@ public interface FishEncyclopediaRepository {
 	List<FishEncyclopediaResponse.DetailPage> findDetailPageByAllByMemberId(
 		final Long memberId
 	);
+
+	/**
+	 * 현재 시간 1시간 전부터 현재 시간까지 도감에 추가된 물고기 count 조회 메소드
+	 * <p>첫 번째: fishId, 두 번째: count</p>
+	 *
+	 * @return {@link List<Tuple>}
+	 * @implSpec 현재 시간 1시간 전부터 현재 시간까지 도감에 추가된 물고기 count를
+	 * 조회하여 {@link List<Tuple>}로 반환
+	 */
+	List<Tuple> findHourlyFishCountSummary();
 }

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.fish.entity.Fish;
+import com.querydsl.core.Tuple;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,5 +36,10 @@ public class FishRepositoryImpl implements FishRepository {
 	@Override
 	public List<Fish> findAllById(final List<Long> fishIdList) {
 		return fishJpaRepository.findAllById(fishIdList);
+	}
+
+	@Override
+	public void updateFishPopularityScores(List<Tuple> hourlyFishCountSummaryList) {
+		fishQueryRepository.updateFishPopularityScores(hourlyFishCountSummaryList);
 	}
 }
