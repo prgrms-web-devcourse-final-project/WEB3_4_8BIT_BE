@@ -18,17 +18,24 @@ import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaJpaRepository;
+import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaQueryRepository;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageJpaRepository;
 import com.backend.global.util.BaseTest;
+import com.querydsl.core.Tuple;
 
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
-@Import({FishRepositoryImpl.class, FishQueryRepository.class, QuerydslConfig.class})
+@Import({
+	FishRepositoryImpl.class,
+	FishQueryRepository.class,
+	FishEncyclopediaQueryRepository.class,
+	QuerydslConfig.class
+})
 @DataJpaTest
 @Slf4j
 class FishRepositoryTest extends BaseTest {
@@ -41,6 +48,10 @@ class FishRepositoryTest extends BaseTest {
 
 	@Autowired
 	private FishEncyclopediaJpaRepository fishEncyclopediaJpaRepository;
+
+	@Autowired
+	private FishEncyclopediaQueryRepository fishEncyclopediaQueryRepository;
+
 	@Autowired
 	private EntityManager entityManager;
 
@@ -155,7 +166,9 @@ class FishRepositoryTest extends BaseTest {
 		// When
 		fishEncyclopediaJpaRepository.saveAll(givenFishEncyclopediaList);
 
-		fishRepository.updateFishPopularityScores();
+		List<Tuple> findHourlyFishCountSummaryList = fishEncyclopediaQueryRepository.findHourlyFishCountSummary();
+
+		fishRepository.updateFishPopularityScores(findHourlyFishCountSummaryList);
 
 		entityManager.flush();
 		entityManager.clear();

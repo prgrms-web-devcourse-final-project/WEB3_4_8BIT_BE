@@ -1,10 +1,8 @@
 package com.backend.domain.fish.repository;
 
 import static com.backend.domain.fish.entity.QFish.*;
-import static com.backend.domain.fishencyclopedia.entity.QFishEncyclopedia.*;
 import static com.backend.global.storage.entity.QFile.*;
 
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,25 +38,10 @@ public class FishQueryRepository {
 		return Optional.ofNullable(findDetail);
 	}
 
-	public void updateFishPopularityScores() {
-		// 현재 시간과 1시간 전 시간 계산
-		ZonedDateTime now = ZonedDateTime.now();
-		ZonedDateTime oneHourAgo = now.minusHours(1);
+	public void updateFishPopularityScores(List<Tuple> hourlyFishCountSummaryList) {
 
-		log.debug("검색 시간 조건: {} ~ {}", oneHourAgo, now);
-
-		// 최근 1시간 동안 생성된 데이터에 대해 물고기 ID별 count 합계 조회
-		List<Tuple> fishCountSums = jpaQueryFactory
-			.select(fishEncyclopedia.fishId, fishEncyclopedia.count.sum())
-			.from(fishEncyclopedia)
-			.where(fishEncyclopedia.createdAt.between(oneHourAgo, now))
-			.groupBy(fishEncyclopedia.fishId)
-			.fetch();
-
-		log.debug("조회된 물고기 수: {}", fishCountSums.size());
-
-		if (!fishCountSums.isEmpty()) {
-			for (Tuple tuple : fishCountSums) {
+		if (!hourlyFishCountSummaryList.isEmpty()) {
+			for (Tuple tuple : hourlyFishCountSummaryList) {
 				log.debug("물고기 ID: {}, 카운트 합계: {}",
 					tuple.get(0, Long.class),
 					tuple.get(1, Number.class).longValue());
@@ -66,7 +49,7 @@ public class FishQueryRepository {
 
 			// JDBC batch update 사용
 			String sql = "UPDATE fishes SET fishes.popularity_score = ? WHERE fishes.fish_id = ?";
-			jdbcTemplate.batchUpdate(sql, fishCountSums, fishCountSums.size(),
+			jdbcTemplate.batchUpdate(sql, hourlyFishCountSummaryList, hourlyFishCountSummaryList.size(),
 				(ps, tuple) -> {
 					Long fishId = tuple.get(0, Long.class);
 					Long count = tuple.get(1, Number.class).longValue();
