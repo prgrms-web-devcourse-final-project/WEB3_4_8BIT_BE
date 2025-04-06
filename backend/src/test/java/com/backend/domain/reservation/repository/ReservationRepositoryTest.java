@@ -2,6 +2,9 @@ package com.backend.domain.reservation.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -17,9 +20,16 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.domain.reservation.dto.response.ReservationResponse;
 import com.backend.domain.reservation.entity.Reservation;
+import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
+import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.config.QuerydslConfig;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Import(QuerydslConfig.class)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 public class ReservationRepositoryTest extends BaseTest {
@@ -29,6 +39,9 @@ public class ReservationRepositoryTest extends BaseTest {
 
 	@Autowired
 	private ReservationRepository reservationRepository;
+
+	@Autowired
+	private ShipFishingPostRepository shipFishingPostRepository;
 
 	@Test
 	@DisplayName("예약 정보 저장 [Repository] - Success")
@@ -69,8 +82,8 @@ public class ReservationRepositoryTest extends BaseTest {
 		Reservation savedReservation = reservationRepository.save(givenReservation);
 
 		// When
-		Optional<ReservationResponse.DetailWithMember> optionalResponseDto = reservationRepository
-			.findDetailWithMemberById(savedReservation.getReservationId());
+		Optional<ReservationResponse.DetailWithMember> optionalResponseDto = reservationRepository.findDetailWithMemberById(
+			savedReservation.getReservationId());
 
 		// Then
 		assertThat(optionalResponseDto.isPresent()).isTrue();
@@ -87,5 +100,244 @@ public class ReservationRepositoryTest extends BaseTest {
 		assertThat(responseDto.totalPrice()).isEqualTo(savedReservation.getTotalPrice());
 		assertThat(responseDto.reservationDate()).isEqualTo(savedReservation.getReservationDate());
 		assertThat(responseDto.reservationStatus()).isEqualTo(savedReservation.getStatus());
+	}
+
+	@Test
+	@DisplayName("유저별 예약 리스트 조회 [Repository] - Success")
+	void t03() {
+		// Given
+		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", null)
+			.set("email", "test@test.com")
+			.set("name", "member")
+			.set("nickname", "nickname")
+			.set("phone", "telephone")
+			.sample();
+
+		Member savedMember = memberRepository.save(givenMember);
+
+		Long memberId = savedMember.getMemberId();
+
+		for (int i = 1; i <= 7; i++) {
+			fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("memberId", memberId)
+				.set("guestCount", 1)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.sampleStream()
+				.limit(2)
+				.forEach(reservation -> {
+					reservationRepository.save(reservation);
+				});
+		}
+
+		GlobalRequest.CursorRequest givenCursorRequest1 = fixtureMonkeyValidation.giveMeBuilder(
+				GlobalRequest.CursorRequest.class)
+			.set("order", "desc")
+			.set("sort", "reservationDate")
+			.set("type", "next")
+			.set("fieldValue", null)
+			.set("id", null)
+			.set("size", 6)
+			.sample();
+
+		ScrollResponse<ReservationResponse.DetailWithName> findResponseDto1 = reservationRepository.findDetailWithNameByMemberId(
+			memberId, givenCursorRequest1);
+
+		assertThat(findResponseDto1.content().get(0).reservationDate()).isEqualTo(LocalDate.now().plusDays(7));
+		assertThat(findResponseDto1.pageSize()).isEqualTo(givenCursorRequest1.size());
+		assertThat(findResponseDto1.numberOfElements()).isEqualTo(6);
+		assertThat(findResponseDto1.isFirst()).isTrue();
+		assertThat(findResponseDto1.isLast()).isFalse();
+
+		String lastFieldValue1 = findResponseDto1.content().get(5).reservationDate().toString();
+		Long lastId1 = findResponseDto1.content().get(5).reservationId();
+
+		GlobalRequest.CursorRequest givenCursorRequest2 = fixtureMonkeyValidation.giveMeBuilder(
+				GlobalRequest.CursorRequest.class)
+			.set("order", "desc")
+			.set("sort", "reservationDate")
+			.set("type", "next")
+			.set("fieldValue", lastFieldValue1)
+			.set("id", lastId1)
+			.set("size", 6)
+			.sample();
+
+		ScrollResponse<ReservationResponse.DetailWithName> findResponseDto2 = reservationRepository.findDetailWithNameByMemberId(
+			memberId, givenCursorRequest2);
+
+		assertThat(findResponseDto2.content().get(0).reservationDate()).isEqualTo(LocalDate.now().plusDays(4));
+		assertThat(findResponseDto2.pageSize()).isEqualTo(givenCursorRequest2.size());
+		assertThat(findResponseDto2.numberOfElements()).isEqualTo(6);
+		assertThat(findResponseDto2.isFirst()).isFalse();
+		assertThat(findResponseDto2.isLast()).isFalse();
+	}
+
+	@Test
+	@DisplayName("선장 예약 리스트 조회 [선박 선택] [Repository] - Success")
+	void t04() {
+		// Given
+		Member givenCaptain = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", null)
+			.set("email", "test@test.com1")
+			.set("name", "member1")
+			.set("nickname", "nickname1")
+			.set("phone", "telephone1")
+			.sample();
+
+		Member savedCaptain = memberRepository.save(givenCaptain);
+
+		Long captainId = savedCaptain.getMemberId();
+
+		List<Long> savedShipFishingPostIdList = new ArrayList<>();
+
+		for (int i = 1; i <= 2; i++) {
+			ShipFishingPost givenShipFishingPost = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+				.set("shipFishingPostId", null)
+				.set("memberId", captainId)
+				.set("subject", "subject")
+				.sample();
+
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenShipFishingPost);
+
+			Long savedShipFishingPostId = savedShipFishingPost.getShipFishingPostId();
+
+			savedShipFishingPostIdList.add(savedShipFishingPostId);
+		}
+
+		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", null)
+			.set("email", "test@test2.com")
+			.set("name", "member2")
+			.set("nickname", "nickname2")
+			.set("phone", "telephone2")
+			.sample();
+
+		Member savedMember = memberRepository.save(givenMember);
+
+		Long memberId = savedMember.getMemberId();
+
+		for (Long id : savedShipFishingPostIdList) {
+			for (int j = 1; j <= 7; j++) {
+				fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+					.set("reservationId", null)
+					.set("shipFishingPostId", id)
+					.set("memberId", memberId)
+					.set("guestCount", 1)
+					.set("reservationDate", LocalDate.now().plusDays(j))
+					.sampleStream()
+					.limit(2)
+					.forEach(reservation -> {
+						reservationRepository.save(reservation);
+					});
+			}
+		}
+
+		GlobalRequest.CursorRequest givenCursorRequest1 = fixtureMonkeyValidation
+			.giveMeBuilder(GlobalRequest.CursorRequest.class)
+			.set("order", "desc")
+			.set("sort", "reservationDate")
+			.set("type", "next")
+			.set("fieldValue", null)
+			.set("id", null)
+			.set("size", 6)
+			.sample();
+
+		ScrollResponse<ReservationResponse.DetailWithName> findResponseDto1 = reservationRepository
+			.findDetailWithNameByMemberIdAndShipFishingPostId(
+				captainId, savedShipFishingPostIdList.get(0), givenCursorRequest1);
+
+		assertThat(findResponseDto1.content().get(0).reservationDate()).isEqualTo(LocalDate.now().plusDays(7));
+		assertThat(findResponseDto1.content().get(0).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(0));
+		assertThat(findResponseDto1.content().get(1).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(0));
+		assertThat(findResponseDto1.content().get(2).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(0));
+		assertThat(findResponseDto1.content().get(3).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(0));
+		assertThat(findResponseDto1.pageSize()).isEqualTo(givenCursorRequest1.size());
+		assertThat(findResponseDto1.numberOfElements()).isEqualTo(6);
+		assertThat(findResponseDto1.isFirst()).isTrue();
+		assertThat(findResponseDto1.isLast()).isFalse();
+	}
+
+	@Test
+	@DisplayName("선장 예약 리스트 조회 [전체] [Repository] - Success")
+	void t05() {
+		// Given
+		Member givenCaptain = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", null)
+			.set("email", "test@test.com1")
+			.set("name", "member1")
+			.set("nickname", "nickname1")
+			.set("phone", "telephone1")
+			.sample();
+
+		Member savedCaptain = memberRepository.save(givenCaptain);
+
+		Long captainId = savedCaptain.getMemberId();
+
+		List<Long> savedShipFishingPostIdList = new ArrayList<>();
+
+		for (int i = 1; i <= 2; i++) {
+			ShipFishingPost givenShipFishingPost = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+				.set("shipFishingPostId", null)
+				.set("memberId", captainId)
+				.set("subject", "subject")
+				.sample();
+
+			ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenShipFishingPost);
+
+			Long savedShipFishingPostId = savedShipFishingPost.getShipFishingPostId();
+
+			savedShipFishingPostIdList.add(savedShipFishingPostId);
+		}
+
+		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", null)
+			.set("email", "test@test2.com")
+			.set("name", "member2")
+			.set("nickname", "nickname2")
+			.set("phone", "telephone2")
+			.sample();
+
+		Member savedMember = memberRepository.save(givenMember);
+
+		Long memberId = savedMember.getMemberId();
+
+		for (Long id : savedShipFishingPostIdList) {
+			for (int j = 1; j <= 7; j++) {
+				fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+					.set("reservationId", null)
+					.set("shipFishingPostId", id)
+					.set("memberId", memberId)
+					.set("guestCount", 1)
+					.set("reservationDate", LocalDate.now().plusDays(j))
+					.sampleStream()
+					.limit(2)
+					.forEach(reservation -> {
+						reservationRepository.save(reservation);
+					});
+			}
+		}
+
+		GlobalRequest.CursorRequest givenCursorRequest1 = fixtureMonkeyValidation
+			.giveMeBuilder(GlobalRequest.CursorRequest.class)
+			.set("order", "desc")
+			.set("sort", "reservationDate")
+			.set("type", "next")
+			.set("fieldValue", null)
+			.set("id", null)
+			.set("size", 6)
+			.sample();
+
+		ScrollResponse<ReservationResponse.DetailWithName> findResponseDto1 = reservationRepository
+			.findDetailWithNameByMemberIdAndShipFishingPostId(
+				captainId, null, givenCursorRequest1);
+
+		assertThat(findResponseDto1.content().get(0).reservationDate()).isEqualTo(LocalDate.now().plusDays(7));
+		assertThat(findResponseDto1.content().get(0).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(0));
+		assertThat(findResponseDto1.content().get(4).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(1));
+		assertThat(findResponseDto1.pageSize()).isEqualTo(givenCursorRequest1.size());
+		assertThat(findResponseDto1.numberOfElements()).isEqualTo(6);
+		assertThat(findResponseDto1.isFirst()).isTrue();
+		assertThat(findResponseDto1.isLast()).isFalse();
 	}
 }
