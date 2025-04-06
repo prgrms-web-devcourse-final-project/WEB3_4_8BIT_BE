@@ -318,23 +318,29 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@DisplayName("물고기 시간대별 카운트 집계 조회 [시간대 조회 검증] [Repository] - Success")
 	void t10() {
 		// Given
-		// 2시간 전으로 생성일 수정
+		fishEncyclopediaJpaRepository.deleteAll();
+
+		List<FishEncyclopedia> givenFishEncyclopediaList = fixtureMonkeyBuilder.giveMeBuilder(FishEncyclopedia.class)
+			.set("fishEncyclopediaId", null)
+			.set("fishId", 1L)
+			.set("count", 5)
+			.sampleList(5);
+
+		fishEncyclopediaJpaRepository.saveAll(givenFishEncyclopediaList);
+
+		// 저장한 물고기 도감 데이터 전부 2시간 전으로 생성일 수정
 		jdbcTemplate.update(
         "UPDATE fish_encyclopedias AS f " +
         "SET f.created_at = ? " +
-        "WHERE f.fish_encyclopedia_id = ?",
+        "WHERE f.fish_id = ?",
         ZonedDateTime.now().minusHours(2),
         1L);
 
 		// When
 		List<Tuple> findHourlyFishCountSummaryList = fishEncyclopediaRepository.findHourlyFishCountSummary();
 
-		List<Tuple> sortedHourlyFishCountSummaryList = findHourlyFishCountSummaryList.stream()
-			.sorted(Comparator.comparing((Tuple t) -> t.get(1, Integer.class)).reversed())
-			.toList();
-
 		// Then
-		assertThat(sortedHourlyFishCountSummaryList.get(1).get(1, Integer.class)).isEqualTo(30);
+		assertThat(findHourlyFishCountSummaryList).isEmpty();
 	}
 
 	// 유틸리티 메서드
