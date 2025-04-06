@@ -32,21 +32,29 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 	}
 
 	@Override
-	public Slice<ReviewWithMemberResponse> findReviewsWithMemberByPostId(final Long postId, final Pageable pageable) {
-		return reviewQueryRepository.findReviewsByPostId(postId, pageable);
+	public Slice<ReviewWithMemberResponse> findReviewsWithMemberByPostId(
+		final Long postId,
+		final Long memberId,
+		final Pageable pageable
+	) {
+		return reviewQueryRepository.findReviewsByPostId(postId, memberId, pageable);
 	}
 
 	@Override
-	public Slice<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(final Long memberId, final Pageable pageable) {
+	public Slice<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(
+		final Long memberId,
+		final Pageable pageable
+	) {
 		return reviewQueryRepository.findReviewsByMemberId(memberId, pageable);
 	}
 
 	@Override
 	public ScrollResponse<ReviewWithMemberResponse> findReviewsByPostIdWithCursor(
 		final Long postId,
+		final Long memberId,
 		final GlobalRequest.CursorRequest cursorRequestDto
 	) {
-		return reviewQueryRepository.findReviewsByPostIdWithCursor(postId, cursorRequestDto);
+		return reviewQueryRepository.findReviewsByPostIdWithCursor(postId, memberId, cursorRequestDto);
 	}
 
 	@Override

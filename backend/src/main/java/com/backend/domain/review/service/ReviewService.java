@@ -21,40 +21,50 @@ public interface ReviewService {
 	Long save(final Long memberId, final Long reservationId, final ReviewRequest.Create request);
 
 	/**
-	 * 선상 낚시 리뷰 조회
+	 * 선상 낚시 리뷰 조회 - 오프셋
 	 *
 	 * @param postId 게시글 ID
+	 * @param memberId 요청 회원 ID
 	 * @param pageable 페이지 객체
 	 * @return {@link Slice<ReviewWithMemberResponse>}
 	 */
-	Slice<ReviewWithMemberResponse> getReviewListByPostId(final Long postId, final Pageable pageable);
+	Slice<ReviewWithMemberResponse> getReviewListByPostId(
+		final Long postId,
+		final Long memberId,
+		final Pageable pageable
+	);
 
 	/**
-	 * 내가 작성한 리뷰 조회
+	 * 내가 작성한 리뷰 조회 - 오프셋
 	 *
 	 * @param memberId	회원 ID
 	 * @param pageable 페이지 객체
 	 * @return {@link Slice<ReviewWithMemberResponse>}
 	 */
-	Slice<ReviewWithMemberResponse> getReviewListByMemberId(final Long memberId, final Pageable pageable);
+	Slice<ReviewWithMemberResponse> getReviewListByMemberId(
+		final Long memberId,
+		final Pageable pageable
+	);
 
 	/**
-	 * 선상 낚시 리뷰 조회 커서 방식
+	 * 선상 낚시 리뷰 조회 - 커서
 	 *
 	 * @param postId 게시글 ID
+	 * @param memberId 요청 회원 ID
 	 * @param cursorRequestDto 커서 객체
 	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
 	 */
 	ScrollResponse<ReviewWithMemberResponse> getReviewListByPostIdWithCursor(
 		final Long postId,
+		final Long memberId,
 		final GlobalRequest.CursorRequest cursorRequestDto
 	);
 
 	/**
-	 * 내가 작성한 리뷰 조회 커서 방식
+	 * 내가 작성한 리뷰 조회 - 커서
 	 *
 	 * @param memberId	회원 ID
-	 @param cursorRequestDto 커서 객체
+	 * @param cursorRequestDto 커서 객체
 	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
 	 */
 	ScrollResponse<ReviewWithMemberResponse> getReviewListByMemberIdWithCursor(

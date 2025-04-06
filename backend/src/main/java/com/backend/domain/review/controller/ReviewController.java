@@ -47,10 +47,13 @@ public class ReviewController {
 	@Operation(summary = "선상 낚시 리뷰 조회", description = "게시글 ID로 리뷰를 조회하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByPostId(
 		@PathVariable final Long postId,
+		@AuthenticationPrincipal final CustomOAuth2User user,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto
 	) {
 		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewService.getReviewListByPostIdWithCursor(
-			postId, cursorRequestDto);
+			postId,
+			user.getId(),
+			cursorRequestDto);
 
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(GenericResponse.of(true, reviewList));
@@ -63,7 +66,9 @@ public class ReviewController {
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto
 	) {
 		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewService.getReviewListByMemberIdWithCursor(
-			user.getId(), cursorRequestDto);
+			user.getId(),
+			cursorRequestDto
+		);
 
 		return ResponseEntity.status(HttpStatus.OK)
 			.body(GenericResponse.of(true, reviewList));

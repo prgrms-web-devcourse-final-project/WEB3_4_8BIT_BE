@@ -11,11 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -199,7 +194,7 @@ class ReviewControllerTest extends BaseTest {
 			true
 		);
 
-		when(reviewService.getReviewListByPostIdWithCursor(eq(postId), any())).thenReturn(scrollResponse);
+		when(reviewService.getReviewListByPostIdWithCursor(eq(postId), eq(1L), any())).thenReturn(scrollResponse);
 
 		// when
 		ResultActions resultActions = mockMvc.perform(get("/api/v1/ship-posts/{postId}/reviews", postId)

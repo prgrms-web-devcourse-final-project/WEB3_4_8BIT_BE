@@ -159,7 +159,9 @@ class ReviewRepositoryTest extends BaseTest {
 
 		// when
 		Slice<ReviewWithMemberResponse> result = reviewRepository.findReviewsWithMemberByPostId(
-			givenPost.getShipFishingPostId(), pageable
+			givenMember.getMemberId(),
+			givenPost.getShipFishingPostId(),
+			pageable
 		);
 
 		// then

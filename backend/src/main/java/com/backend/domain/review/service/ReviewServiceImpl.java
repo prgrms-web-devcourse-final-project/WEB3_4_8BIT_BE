@@ -43,9 +43,9 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Slice<ReviewWithMemberResponse> getReviewListByPostId(final Long postId, final Pageable pageable) {
+	public Slice<ReviewWithMemberResponse> getReviewListByPostId(final Long memberId, final Long postId, final Pageable pageable) {
 
-		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(postId, pageable);
+		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(memberId, postId, pageable);
 
 		logReviewList("게시글", postId, reviewList);
 		return reviewList;
@@ -62,20 +62,23 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	@Override
-	public ScrollResponse<ReviewWithMemberResponse> getReviewListByPostIdWithCursor(Long postId,
-		GlobalRequest.CursorRequest cursorRequestDto) {
-
+	public ScrollResponse<ReviewWithMemberResponse> getReviewListByPostIdWithCursor(
+		final Long postId,
+		final Long memberId,
+		final GlobalRequest.CursorRequest cursorRequestDto
+	) {
 		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsByPostIdWithCursor(
-			postId, cursorRequestDto);
+			postId, memberId, cursorRequestDto);
 
 		logReviewList("게시글", postId, reviewList);
 		return reviewList;
 	}
 
 	@Override
-	public ScrollResponse<ReviewWithMemberResponse> getReviewListByMemberIdWithCursor(Long memberId,
-		GlobalRequest.CursorRequest cursorRequestDto) {
-
+	public ScrollResponse<ReviewWithMemberResponse> getReviewListByMemberIdWithCursor(
+		final Long memberId,
+		final GlobalRequest.CursorRequest cursorRequestDto
+	) {
 		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsByMemberIdWithCursor(
 			memberId, cursorRequestDto);
 

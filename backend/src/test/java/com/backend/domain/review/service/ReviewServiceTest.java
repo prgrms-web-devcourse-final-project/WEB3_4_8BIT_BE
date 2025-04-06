@@ -42,21 +42,21 @@ public class ReviewServiceTest extends BaseTest {
 	@DisplayName("리뷰 저장 [Service] - Success")
 	void t01() {
 	    //given
-		Long memberId = 1L;
-		Long reservationId = 1L;
+		Long givenMemberId = 1L;
+		Long givenReservationId = 1L;
 		ReviewRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(ReviewRequest.Create.class);
 
-		Review givenReview = ReviewConverter.fromReviewRequestCreate(memberId, reservationId, givenRequest);
+		Review givenReview = ReviewConverter.fromReviewRequestCreate(givenMemberId, givenReservationId, givenRequest);
 		ReflectionTestUtils.setField(givenReview, "reviewId", 1L);
 
-		given(reviewRepository.existsByReservationId(reservationId)).willReturn(false);
+		given(reviewRepository.existsByReservationId(givenReservationId)).willReturn(false);
 		given(reviewRepository.save(any(Review.class))).willReturn(givenReview);
 
 		//when
-		Long savedReviewId = reviewServiceImpl.save(memberId, reservationId, givenRequest);
+		Long savedReviewId = reviewServiceImpl.save(givenMemberId, givenReservationId, givenRequest);
 
 	    //then
-		verify(reviewRepository).existsByReservationId(reservationId);
+		verify(reviewRepository).existsByReservationId(givenReservationId);
 		verify(reviewRepository).save(any(Review.class));
 		assertThat(savedReviewId).isEqualTo(1L);
 	}
@@ -65,56 +65,58 @@ public class ReviewServiceTest extends BaseTest {
 	@DisplayName("리뷰 저장 [Service] - Fail (중복 리뷰)")
 	void t02() {
 		// given
-		Long memberId = 1L;
-		Long reservationId = 1L;
+		Long givenMemberId = 1L;
+		Long givenReservationId = 1L;
 		ReviewRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(ReviewRequest.Create.class);
 
-		given(reviewRepository.existsByReservationId(reservationId)).willReturn(true);
+		given(reviewRepository.existsByReservationId(givenReservationId)).willReturn(true);
 
 		// when & then
-		assertThatThrownBy(() -> reviewServiceImpl.save(memberId, reservationId, givenRequest))
+		assertThatThrownBy(() -> reviewServiceImpl.save(givenMemberId, givenReservationId, givenRequest))
 			.isInstanceOf(ReviewException.class)
 			.hasMessageContaining(ReviewErrorCode.DUPLICATE_REVIEW.getMessage());
 
-		verify(reviewRepository).existsByReservationId(reservationId);
+		verify(reviewRepository).existsByReservationId(givenReservationId);
 		verify(reviewRepository, never()).save(any());
 	}
 
 	@Test
-	@DisplayName("게시글 ID로 리뷰 목록 조회 [Service] - Success")
+	@DisplayName("게시글 ID로 리뷰 목록 오프셋 조회 [Service] - Success")
 	void t03() {
 		// given
-		Long postId = 1L;
+		Long givenMemberId = 1L;
+		Long givenPostId = 1L;
 		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<ReviewWithMemberResponse> reviewList = fixtureMonkeyValidation.giveMe(ReviewWithMemberResponse.class, 2);
 		Page<ReviewWithMemberResponse> givenPage = new PageImpl<>(reviewList, pageable, reviewList.size());
 
-		given(reviewRepository.findReviewsWithMemberByPostId(postId, pageable)).willReturn(givenPage);
+		given(reviewRepository.findReviewsWithMemberByPostId(givenMemberId, givenPostId, pageable)).willReturn(givenPage);
 
 		// when
-		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(postId, pageable);
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(givenMemberId, givenPostId, pageable);
 
 		// then
 		assertThat(result).hasSize(2);
-		verify(reviewRepository).findReviewsWithMemberByPostId(postId, pageable);
+		verify(reviewRepository).findReviewsWithMemberByPostId(givenMemberId, givenPostId, pageable);
 	}
 
 	@Test
-	@DisplayName("게시글 ID로 리뷰 목록 조회 [Service] - Empty")
+	@DisplayName("게시글 ID로 리뷰 목록 오프셋 조회 [Service] - Empty")
 	void t04() {
 		// given
-		Long postId = 999L;
+		Long givenMemberId = 1L;
+		Long givenPostId = 999L;
 		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 		Page<ReviewWithMemberResponse> emptyPage = Page.empty(pageable);
 
-		given(reviewRepository.findReviewsWithMemberByPostId(postId, pageable)).willReturn(emptyPage);
+		given(reviewRepository.findReviewsWithMemberByPostId(givenMemberId, givenPostId, pageable)).willReturn(emptyPage);
 
 		// when
-		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(postId, pageable);
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(givenMemberId, givenPostId, pageable);
 
 		// then
 		assertThat(result).isEmpty();
-		verify(reviewRepository).findReviewsWithMemberByPostId(postId, pageable);
+		verify(reviewRepository).findReviewsWithMemberByPostId(givenMemberId, givenPostId, pageable);
 	}
 
 	@Test

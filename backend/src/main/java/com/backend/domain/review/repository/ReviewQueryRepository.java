@@ -33,7 +33,11 @@ public class ReviewQueryRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	// Offset 방식 - 게시글 기준
-	public Slice<ReviewWithMemberResponse> findReviewsByPostId(final Long postId, final Pageable pageable) {
+	public Slice<ReviewWithMemberResponse> findReviewsByPostId(
+		final Long postId,
+		final Long memberId,
+		final Pageable pageable
+	) {
 		List<Review> reviews = jpaQueryFactory
 			.selectFrom(review)
 			.where(review.shipFishingPostId.eq(postId))
@@ -41,11 +45,14 @@ public class ReviewQueryRepository {
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
 
-		return getReviewWithMemberResponses(pageable, reviews);
+		return getReviewWithMemberResponses(memberId, pageable, reviews);
 	}
 
 	// Offset 방식 - 작성자 기준
-	public Slice<ReviewWithMemberResponse> findReviewsByMemberId(final Long memberId, final Pageable pageable) {
+	public Slice<ReviewWithMemberResponse> findReviewsByMemberId(
+		final Long memberId,
+		final Pageable pageable
+	) {
 		List<Review> reviews = jpaQueryFactory
 			.selectFrom(review)
 			.where(review.memberId.eq(memberId))
@@ -53,22 +60,27 @@ public class ReviewQueryRepository {
 			.limit(pageable.getPageSize() + 1)
 			.fetch();
 
-		return getReviewWithMemberResponses(pageable, reviews);
+		return getReviewWithMemberResponses(memberId, pageable, reviews);
 	}
 
-	private Slice<ReviewWithMemberResponse> getReviewWithMemberResponses(final Pageable pageable, List<Review> reviews) {
+	private Slice<ReviewWithMemberResponse> getReviewWithMemberResponses(
+		final Long memberId,
+		final Pageable pageable,
+		List<Review> reviews
+	) {
 		boolean hasNext = reviews.size() > pageable.getPageSize();
 		if (hasNext) {
 			reviews = reviews.subList(0, pageable.getPageSize());
 		}
 
-		List<ReviewWithMemberResponse> content = mapToDto(reviews);
+		List<ReviewWithMemberResponse> content = mapToDto(memberId, reviews);
 		return new SliceImpl<>(content, pageable, hasNext);
 	}
 
 	// Cursor 방식 - 게시글 기준
 	public ScrollResponse<ReviewWithMemberResponse> findReviewsByPostIdWithCursor(
 		final Long postId,
+		final Long memberId,
 		final GlobalRequest.CursorRequest cursor
 	) {
 		int limit = cursor.size();
@@ -82,7 +94,7 @@ public class ReviewQueryRepository {
 			.limit(limit + 1)
 			.fetch();
 
-		return getReviewWithMemberResponseScrollResponse(cursor, limit, reviews);
+		return getReviewWithMemberResponseScrollResponse(cursor, limit, memberId, reviews);
 	}
 
 	// Cursor 방식 - 작성자 기준
@@ -101,12 +113,13 @@ public class ReviewQueryRepository {
 			.limit(limit + 1)
 			.fetch();
 
-		return getReviewWithMemberResponseScrollResponse(cursor, limit, reviews);
+		return getReviewWithMemberResponseScrollResponse(cursor, limit, memberId, reviews);
 	}
 
 	private ScrollResponse<ReviewWithMemberResponse> getReviewWithMemberResponseScrollResponse(
 		final GlobalRequest.CursorRequest cursor,
 		final int limit,
+		final Long memberId,
 		List<Review> reviews
 	) {
 		boolean hasNext = reviews.size() > limit;
@@ -114,7 +127,7 @@ public class ReviewQueryRepository {
 			reviews = reviews.subList(0, limit);
 		}
 
-		List<ReviewWithMemberResponse> content = mapToDto(reviews);
+		List<ReviewWithMemberResponse> content = mapToDto(memberId, reviews);
 		return ScrollResponse.from(content, limit, content.size(), cursor.fieldValue() == null, !hasNext);
 	}
 
@@ -129,7 +142,10 @@ public class ReviewQueryRepository {
 	}
 
 	// 공통 DTO 변환
-	private List<ReviewWithMemberResponse> mapToDto(final List<Review> reviews) {
+	private List<ReviewWithMemberResponse> mapToDto(
+		final Long requestMemberId,
+		final List<Review> reviews
+	) {
 		Set<Long> allFileIds = reviews.stream()
 			.flatMap(r -> r.getFileIdList().stream())
 			.collect(Collectors.toSet());
@@ -170,15 +186,19 @@ public class ReviewQueryRepository {
 					.filter(Objects::nonNull)
 					.toList();
 
+				boolean isAuthor = requestMemberId != null && requestMemberId.equals(r.getMemberId());
+				Long safeMemberId = isAuthor ? r.getMemberId() : null;
+
 				return new ReviewWithMemberResponse(
 					r.getReviewId(),
 					r.getRating(),
 					r.getContent(),
 					fileUrlList,
 					r.getShipFishingPostId(),
-					r.getMemberId(),
+					safeMemberId,
 					nickname,
 					profileImg,
+					isAuthor,
 					r.getCreatedAt()
 				);
 			})

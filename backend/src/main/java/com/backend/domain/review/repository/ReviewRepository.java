@@ -32,38 +32,50 @@ public interface ReviewRepository {
 	boolean existsByReservationId(final Long reservationId);
 
 	/**
-	 * 리뷰 조회 메서드
+	 * 리뷰 조회 메서드 - 오프셋
 	 *
 	 * @param postId 선상 낚시 게시글 ID
+	 * @param memberId 요청 회원 ID
+	 * @param pageable 페이지 객체
 	 * @return {@link Slice<ReviewWithMemberResponse>}
 	 * @implSpec 게시글 ID를 기반으로 작성된 리뷰 조회
 	 */
-	Slice<ReviewWithMemberResponse> findReviewsWithMemberByPostId(final Long postId, final Pageable pageable);
+	Slice<ReviewWithMemberResponse> findReviewsWithMemberByPostId(
+		final Long postId,
+		final Long memberId,
+		final Pageable pageable
+	);
 
 	/**
-	 * 내가 작성한 리뷰 조회
+	 * 내가 작성한 리뷰 조회 - 오프셋
 	 *
 	 * @param memberId 회원 ID
+	 * @param pageable 페이지 객체
 	 * @return {@link Slice<ReviewWithMemberResponse>}
 	 * @implSpec 회원 ID를 기반으로 작성된 리뷰 조회
 	 */
-	Slice<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(final Long memberId, final Pageable pageable);
+	Slice<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(
+		final Long memberId,
+		final Pageable pageable
+	);
 
 	/**
-	 * 리뷰 조회 메서드 커서 방식
+	 * 리뷰 조회 메서드 - 커서
 	 *
 	 * @param postId 선상 낚시 게시글 ID
+	 * @param memberId 요청 회원 ID
 	 * @param cursorRequestDto 커서 request 객체
 	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
 	 * @implSpec 게시글 ID를 기반으로 작성된 리뷰 조회
 	 */
 	ScrollResponse<ReviewWithMemberResponse> findReviewsByPostIdWithCursor(
 		final Long postId,
+		final Long memberId,
 		final GlobalRequest.CursorRequest cursorRequestDto
 	);
 
 	/**
-	 * 내가 작성한 리뷰 조회 커서 방식
+	 * 내가 작성한 리뷰 조회 - 커서
 	 *
 	 * @param memberId 회원 ID
 	 * @param cursorRequestDto 커서 request 객체
