@@ -17,11 +17,20 @@ public interface ReservationRepository {
 	Reservation save(final Reservation reservation);
 
 	/**
+	 * 예약 entity 조회 메서드
+	 *
+	 * @param reservationId {@link Long}
+	 * @return {@link Optional<Reservation>}
+	 * @implSpec 예약 상세정보를 조회하고 반환합니다.
+	 */
+	Optional<Reservation> findById(final Long reservationId);
+
+	/**
 	 * 예약 상세정보를 조회하는 메서드입니다.
 	 *
 	 * @param reservationId {@link Long}
 	 * @return {@link Optional<ReservationResponse.DetailWithMember>}
-	 * @implSpec 예약 상세정보를 조회하고 예약자 이름을 함께 반환합니다.
+	 * @implSpec 예약 상세정보를 조회하고 예약자 정보와 게시글 id 를 함께 반환합니다.
 	 */
 	Optional<ReservationResponse.DetailWithMember> findDetailWithMemberById(final Long reservationId);
 

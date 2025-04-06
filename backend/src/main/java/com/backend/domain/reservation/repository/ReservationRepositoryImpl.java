@@ -23,6 +23,12 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 	}
 
 	@Override
+	public Optional<Reservation> findById(final Long reservationId) {
+
+		return reservationJpaRepository.findById(reservationId);
+	}
+
+	@Override
 	public Optional<ReservationResponse.DetailWithMember> findDetailWithMemberById(final Long reservationId) {
 
 		return reservationQueryRepository.findDetailWithMemberNameById(reservationId);
