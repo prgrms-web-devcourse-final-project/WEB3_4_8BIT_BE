@@ -33,7 +33,7 @@ public class CaptainRequest {
 		@Schema(description = "선장 닉네임", example = "해적왕")
 		String nickname,
 
-		@Schema(description = "프로필 이미지 URL", example = "http://example.com/image1.jpg")
+		@Schema(description = "프로필 이미지 ID", example = "101")
 		Long fileId,
 
 		@NotBlank(message = "자기 소개글은 필수 항목입니다.")
