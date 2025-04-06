@@ -45,7 +45,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 		// 예약 적용
 		updateReservationDateWithRemainCount(requestDto.shipFishingPostId(), requestDto.reservationDate(),
-			requestDto.guestCount());
+			requestDto.guestCount(), false);
 
 		// 예약 정보 저장
 		Reservation reservation = reservationRepository.save(
@@ -63,9 +63,26 @@ public class ReservationServiceImpl implements ReservationService {
 			.findDetailWithMemberById(reservationId)
 			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
-		verifyAuthorization(responseDto, memberId);
+		verifyAuthorization(responseDto.shipFishingPostId(), responseDto.memberId(), memberId);
 
 		return responseDto;
+	}
+
+	@Override
+	@Transactional
+	public void updateReservation(final Long reservationId, final Long memberId) {
+
+		Reservation reservation = getReservationEntity(reservationId);
+
+		verifyAuthorization(reservation.getShipFishingPostId(), reservation.getMemberId(), memberId);
+
+		reservation.updateCanceled();
+
+		reservationRepository.save(reservation);
+
+		// 예약 취소 적용
+		updateReservationDateWithRemainCount(reservation.getShipFishingPostId(), reservation.getReservationDate(),
+			reservation.getGuestCount(), true);
 	}
 
 	/**
@@ -94,23 +111,35 @@ public class ReservationServiceImpl implements ReservationService {
 	 * @param shipFishingPostId {@link Long}
 	 * @param reservationDate {@link LocalDate}
 	 * @param guestCount {@link Long}
+	 * @param type {@link Boolean}
 	 */
-	private void updateReservationDateWithRemainCount(final Long shipFishingPostId, final LocalDate reservationDate,
-		final Integer guestCount) {
+	private void updateReservationDateWithRemainCount(
+		final Long shipFishingPostId,
+		final LocalDate reservationDate,
+		final Integer guestCount,
+		final Boolean type) {
 
-		log.debug("예약 일자 검증 및 업데이트 method start");
+		log.debug("예약 일자 검증 및 업데이트");
 
 		ReservationDate findReservationDate = reservationDateRepository
 			.findByIdWithPessimistic(shipFishingPostId, reservationDate)
 			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
-		verifyReservationDate(findReservationDate, guestCount);
+		if (type) {
+			findReservationDate.remainPlus(guestCount);
 
-		findReservationDate.remainMinus(guestCount);
+			log.debug("예약 잔여인원 증가");
+		} else {
+			verifyReservationDate(findReservationDate, guestCount);
+			findReservationDate.remainMinus(guestCount);
 
-		reservationDateRepository.save(findReservationDate);
+			log.debug("예약 잔여인원 차감");
+		}
 
-		log.debug("예약 일자 예약 여부 검증 및 잔여인원 차감 method end");
+		ReservationDate savedReservationDate = reservationDateRepository.save(findReservationDate);
+
+		log.debug("선상낚시게시글 : {}, 예약 일자: {}, 잔여 인원: {}", shipFishingPostId, reservationDate,
+			savedReservationDate.getRemainCount());
 	}
 
 	/**
@@ -133,16 +162,32 @@ public class ReservationServiceImpl implements ReservationService {
 	/**
 	 * 예약 소유자 인지 예약을 한 게시글의 선상인지 검증하는 메서드입니다.
 	 *
-	 * @param responseDto {@link ReservationResponse.DetailWithMember}
+	 * @param shipFishingPostId {@link ReservationResponse.DetailWithMember}
+	 * @param reservationMemberId {@link Long}
 	 * @param memberId {@link Long}
 	 */
-	private void verifyAuthorization(final ReservationResponse.DetailWithMember responseDto, final Long memberId) {
+	private void verifyAuthorization(
+		final Long shipFishingPostId,
+		final Long reservationMemberId,
+		final Long memberId) {
 
-		ShipFishingPost shipFishingPost = getShipFishingPostEntity(responseDto.shipFishingPostId());
+		ShipFishingPost shipFishingPost = getShipFishingPostEntity(shipFishingPostId);
 
-		if (!shipFishingPost.getMemberId().equals(memberId) && !responseDto.memberId().equals(memberId)) {
+		if (!shipFishingPost.getMemberId().equals(memberId) && !reservationMemberId.equals(memberId)) {
+			log.debug("권한이 없습니다.");
 			throw new ReservationException(ReservationErrorCode.NOT_AUTHORITY_RESERVATION);
 		}
+	}
+
+	/**
+	 * 선상 낚시 예약 Entity 를 반환합니다.
+	 *
+	 * @param reservationId {@link Long}
+	 * @return {@link Reservation}
+	 */
+	private Reservation getReservationEntity(final Long reservationId) {
+		return reservationRepository.findById(reservationId)
+			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 	}
 
 	/**
