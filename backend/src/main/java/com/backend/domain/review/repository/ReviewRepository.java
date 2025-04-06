@@ -2,7 +2,6 @@ package com.backend.domain.review.repository;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.repository.query.Param;
 
 import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
 import java.util.Optional;
