@@ -68,11 +68,6 @@ class FishRepositoryTest extends BaseTest {
 		.set("name", englishString)
 		.set("icon", englishString)
 		.set("spawnLocation", englishString);
-	@Autowired
-	private FishJpaRepository fishJpaRepository;
-
-  @Autowired
-	private FishQueryRepository fishQueryRepository;
 
 	@Test
 	@DisplayName("물고기 저장 [Repository] - Success")
@@ -160,7 +155,7 @@ class FishRepositoryTest extends BaseTest {
 		// Then
 		assertThat(findPopular).hasSize(10);
 		assertThat(findPopular.get(0).popularityScore()).isEqualTo(sortedFishList.get(0).getPopularityScore());
-  }
+	}
 
 	@DisplayName("물고기 인기도 수정 [Repository] - Success")
 	void t05() {
