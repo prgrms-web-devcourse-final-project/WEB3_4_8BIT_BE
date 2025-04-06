@@ -12,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
@@ -24,6 +25,10 @@ import lombok.experimental.SuperBuilder;
 	name = "reviews",
 	uniqueConstraints = {
 		@UniqueConstraint(columnNames = {"reservation_id"})
+	},
+	indexes = {
+		@Index(name = "idx_member_created_review", columnList = "memberId, createdAt, reviewId"),
+		@Index(name = "idx_post_created_review", columnList = "shipFishingPostId, createdAt, reviewId")
 	}
 )
 @Entity
