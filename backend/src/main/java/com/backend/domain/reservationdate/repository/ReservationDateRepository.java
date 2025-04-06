@@ -38,6 +38,18 @@ public interface ReservationDateRepository {
 	Optional<ReservationDate> findById(final ReservationDateId reservationDateId);
 
 	/**
+	 * 게시글 id 와 예약 날짜가 같은 예약 일자 정보를 조회하는 메서드입니다
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @param reservationDate {@link LocalDate}
+	 * @return {@link Optional<ReservationDate>}
+	 * @implSpec 예약 일자 정보를 반환하는 메서드입니다.
+	 */
+	Optional<ReservationDate> findByShipFishingPostIdAndReservationDate(
+		final Long shipFishingPostId,
+		final LocalDate reservationDate);
+
+	/**
 	 * 비관적 락 적용하여 데이터를 조회 및 저장시 동시성 문제 해결한 메서드 입니다.
 	 *
 	 * @param shipFishingPostId {@link Long}
