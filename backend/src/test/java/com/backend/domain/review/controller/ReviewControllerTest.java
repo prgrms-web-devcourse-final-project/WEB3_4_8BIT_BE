@@ -26,6 +26,7 @@ import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
 import com.backend.domain.review.service.ReviewService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -188,14 +189,17 @@ class ReviewControllerTest extends BaseTest {
 	void t7() throws Exception {
 		// given
 		Long postId = 1L;
-		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<ReviewWithMemberResponse> givenResponse = fixtureMonkeyValidation.giveMe(ReviewWithMemberResponse.class, 5);
 
-		Page<ReviewWithMemberResponse> slicedPage =
-			new PageImpl<>(givenResponse.subList(0, 3), pageable, givenResponse.size());
+		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
+			givenResponse.subList(0, 3),
+			3,
+			3,
+			true,
+			true
+		);
 
-		when(reviewService.getReviewListByPostId(eq(postId), any(Pageable.class)))
-			.thenReturn(slicedPage);
+		when(reviewService.getReviewListByPostIdWithCursor(eq(postId), any())).thenReturn(scrollResponse);
 
 		// when
 		ResultActions resultActions = mockMvc.perform(get("/api/v1/ship-posts/{postId}/reviews", postId)
@@ -213,15 +217,18 @@ class ReviewControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t8() throws Exception {
 		// given
-		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
-		List<ReviewWithMemberResponse> givenResponse =
-			fixtureMonkeyValidation.giveMe(ReviewWithMemberResponse.class, 4);
+		List<ReviewWithMemberResponse> givenResponse = fixtureMonkeyValidation.giveMe(ReviewWithMemberResponse.class, 4);
 
-		Page<ReviewWithMemberResponse> slicedPage =
-			new PageImpl<>(givenResponse.subList(0, 3), pageable, givenResponse.size());
+		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
+			givenResponse.subList(0, 3),
+			3,
+			3,
+			true,
+			true
+		);
 
-		when(reviewService.getReviewListByMemberId(eq(1L), any(Pageable.class)))
-			.thenReturn(slicedPage);
+		when(reviewService.getReviewListByMemberIdWithCursor(eq(1L), any()))
+			.thenReturn(scrollResponse);
 
 		// when
 		ResultActions resultActions = mockMvc.perform(get("/api/v1/members/reviews")

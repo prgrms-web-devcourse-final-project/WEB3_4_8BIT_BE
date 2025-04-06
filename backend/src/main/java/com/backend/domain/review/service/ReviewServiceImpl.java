@@ -29,10 +29,10 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional
 	public Long save(final Long memberId, final Long reservationId, final ReviewRequest.Create request) {
 
-		// 리뷰 중복 검증 TODO 예약 검증은 선상 낚시 예약 기능 구현 이후에 추가
-		if(reviewRepository.existsByReservationId(reservationId)) {
-			throw new ReviewException(ReviewErrorCode.DUPLICATE_REVIEW);
-		}
+		// 리뷰 중복 검증
+		validateDuplicate(reservationId);
+
+		// TODO 예약 검증은 선상 낚시 예약 기능 구현 이후에 추가
 
 		Review review = ReviewConverter.fromReviewRequestCreate(memberId, reservationId, request);
 		Review savedReview = reviewRepository.save(review);
@@ -47,7 +47,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(postId, pageable);
 
-		log.debug("[리뷰 조회] 게시글 ID {}의 리뷰 목록: {}", postId, reviewList);
+		logReviewList("게시글", postId, reviewList);
 		return reviewList;
 	}
 
@@ -57,7 +57,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable);
 
-		log.debug("[리뷰 조회] 회원 ID {}의 리뷰 목록: {}", memberId, reviewList);
+		logReviewList("회원", memberId, reviewList);
 		return reviewList;
 	}
 
@@ -68,7 +68,7 @@ public class ReviewServiceImpl implements ReviewService {
 		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsByPostIdWithCursor(
 			postId, cursorRequestDto);
 
-		log.debug("[리뷰 조회] 게시글 ID {}의 리뷰 목록: {}", postId, reviewList);
+		logReviewList("게시글", postId, reviewList);
 		return reviewList;
 	}
 
@@ -79,7 +79,7 @@ public class ReviewServiceImpl implements ReviewService {
 		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsByMemberIdWithCursor(
 			memberId, cursorRequestDto);
 
-		log.debug("[리뷰 조회] 회원 ID {}의 리뷰 목록: {}", memberId, reviewList);
+		logReviewList("회원", memberId, reviewList);
 		return reviewList;
 	}
 
@@ -105,5 +105,15 @@ public class ReviewServiceImpl implements ReviewService {
 		if (!review.getMemberId().equals(memberId)) {
 			throw new ReviewException(ReviewErrorCode.FORBIDDEN_REVIEW_DELETE);
 		}
+	}
+
+	private void validateDuplicate(final Long reservationId) {
+		if(reviewRepository.existsByReservationId(reservationId)) {
+			throw new ReviewException(ReviewErrorCode.DUPLICATE_REVIEW);
+		}
+	}
+
+	private void logReviewList(final String targetType, final Long targetId, final Object result) {
+		log.debug("[리뷰 조회] {} ID {}의 리뷰 목록: {}", targetType, targetId, result);
 	}
 }

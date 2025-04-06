@@ -1,6 +1,5 @@
 package com.backend.domain.review.controller;
 
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -48,45 +47,26 @@ public class ReviewController {
 	@Operation(summary = "선상 낚시 리뷰 조회", description = "게시글 ID로 리뷰를 조회하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByPostId(
 		@PathVariable final Long postId,
-		@Valid final GlobalRequest.PageRequest pageRequest
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto
 	) {
-		Slice<ReviewWithMemberResponse> reviewWithMemberResponseSlice = reviewService.getReviewListByPostId(
-			postId,
-			pageRequest.toPageable()
-		);
-
-		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
-			reviewWithMemberResponseSlice.getContent(),
-			reviewWithMemberResponseSlice.getSize(),
-			reviewWithMemberResponseSlice.getNumberOfElements(),
-			reviewWithMemberResponseSlice.isFirst(),
-			reviewWithMemberResponseSlice.isLast()
-		);
+		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewService.getReviewListByPostIdWithCursor(
+			postId, cursorRequestDto);
 
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(GenericResponse.of(true, scrollResponse));
+			.body(GenericResponse.of(true, reviewList));
 	}
 
 	@GetMapping("/members/reviews")
 	@Operation(summary = "내가 작성한 리뷰 조회", description = "회원 ID로 리뷰를 조회하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByMemberId(
 		@AuthenticationPrincipal final CustomOAuth2User user,
-		@Valid final GlobalRequest.PageRequest pageRequest
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto
 	) {
-		Slice<ReviewWithMemberResponse> reviewWithMemberResponseSlice = reviewService.getReviewListByMemberId(
-			user.getId(),
-			pageRequest.toPageable()
-		);
+		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewService.getReviewListByMemberIdWithCursor(
+			user.getId(), cursorRequestDto);
 
-		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
-			reviewWithMemberResponseSlice.getContent(),
-			reviewWithMemberResponseSlice.getSize(),
-			reviewWithMemberResponseSlice.getNumberOfElements(),
-			reviewWithMemberResponseSlice.isFirst(),
-			reviewWithMemberResponseSlice.isLast()
-		);
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(GenericResponse.of(true, scrollResponse));
+			.body(GenericResponse.of(true, reviewList));
 	}
 
 	@DeleteMapping("/reviews/{reviewId}")

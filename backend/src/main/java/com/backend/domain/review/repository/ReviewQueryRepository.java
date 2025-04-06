@@ -33,10 +33,7 @@ public class ReviewQueryRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 
 	// Offset 방식 - 게시글 기준
-	public Slice<ReviewWithMemberResponse> findReviewsByPostId(
-		final Long postId,
-		final Pageable pageable
-	) {
+	public Slice<ReviewWithMemberResponse> findReviewsByPostId(final Long postId, final Pageable pageable) {
 		List<Review> reviews = jpaQueryFactory
 			.selectFrom(review)
 			.where(review.shipFishingPostId.eq(postId))
@@ -48,10 +45,7 @@ public class ReviewQueryRepository {
 	}
 
 	// Offset 방식 - 작성자 기준
-	public Slice<ReviewWithMemberResponse> findReviewsByMemberId(
-		final Long memberId,
-		final Pageable pageable
-	) {
+	public Slice<ReviewWithMemberResponse> findReviewsByMemberId(final Long memberId, final Pageable pageable) {
 		List<Review> reviews = jpaQueryFactory
 			.selectFrom(review)
 			.where(review.memberId.eq(memberId))
@@ -62,7 +56,7 @@ public class ReviewQueryRepository {
 		return getReviewWithMemberResponses(pageable, reviews);
 	}
 
-	private Slice<ReviewWithMemberResponse> getReviewWithMemberResponses(Pageable pageable, List<Review> reviews) {
+	private Slice<ReviewWithMemberResponse> getReviewWithMemberResponses(final Pageable pageable, List<Review> reviews) {
 		boolean hasNext = reviews.size() > pageable.getPageSize();
 		if (hasNext) {
 			reviews = reviews.subList(0, pageable.getPageSize());
@@ -111,18 +105,21 @@ public class ReviewQueryRepository {
 	}
 
 	private ScrollResponse<ReviewWithMemberResponse> getReviewWithMemberResponseScrollResponse(
-		GlobalRequest.CursorRequest cursor, int limit, List<Review> reviews) {
+		final GlobalRequest.CursorRequest cursor,
+		final int limit,
+		List<Review> reviews
+	) {
 		boolean hasNext = reviews.size() > limit;
 		if (hasNext) {
 			reviews = reviews.subList(0, limit);
 		}
 
 		List<ReviewWithMemberResponse> content = mapToDto(reviews);
-		return ScrollResponse.from(content, limit, content.size(), cursor.fieldValue() == null, hasNext);
+		return ScrollResponse.from(content, limit, content.size(), cursor.fieldValue() == null, !hasNext);
 	}
 
 	// 커서 조건 생성
-	private BooleanExpression cursorCondition(GlobalRequest.CursorRequest cursor) {
+	private BooleanExpression cursorCondition(final GlobalRequest.CursorRequest cursor) {
 		if (cursor.fieldValue() == null || cursor.id() == null) return null;
 
 		ZonedDateTime fieldTime = ZonedDateTime.parse(cursor.fieldValue());
@@ -132,7 +129,7 @@ public class ReviewQueryRepository {
 	}
 
 	// 공통 DTO 변환
-	private List<ReviewWithMemberResponse> mapToDto(List<Review> reviews) {
+	private List<ReviewWithMemberResponse> mapToDto(final List<Review> reviews) {
 		Set<Long> allFileIds = reviews.stream()
 			.flatMap(r -> r.getFileIdList().stream())
 			.collect(Collectors.toSet());

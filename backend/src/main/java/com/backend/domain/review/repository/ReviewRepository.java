@@ -38,7 +38,7 @@ public interface ReviewRepository {
 	 * @return {@link Slice<ReviewWithMemberResponse>}
 	 * @implSpec 게시글 ID를 기반으로 작성된 리뷰 조회
 	 */
-	Slice<ReviewWithMemberResponse> findReviewsWithMemberByPostId(@Param("postId") final Long postId, final Pageable pageable);
+	Slice<ReviewWithMemberResponse> findReviewsWithMemberByPostId(final Long postId, final Pageable pageable);
 
 	/**
 	 * 내가 작성한 리뷰 조회
@@ -47,7 +47,7 @@ public interface ReviewRepository {
 	 * @return {@link Slice<ReviewWithMemberResponse>}
 	 * @implSpec 회원 ID를 기반으로 작성된 리뷰 조회
 	 */
-	Slice<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(@Param("memberId") final Long memberId, final Pageable pageable);
+	Slice<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(final Long memberId, final Pageable pageable);
 
 	/**
 	 * 리뷰 조회 메서드 커서 방식

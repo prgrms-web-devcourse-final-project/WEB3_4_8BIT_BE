@@ -24,6 +24,7 @@ public interface ReviewService {
 	 * 선상 낚시 리뷰 조회
 	 *
 	 * @param postId 게시글 ID
+	 * @param pageable 페이지 객체
 	 * @return {@link Slice<ReviewWithMemberResponse>}
 	 */
 	Slice<ReviewWithMemberResponse> getReviewListByPostId(final Long postId, final Pageable pageable);
@@ -32,6 +33,7 @@ public interface ReviewService {
 	 * 내가 작성한 리뷰 조회
 	 *
 	 * @param memberId	회원 ID
+	 * @param pageable 페이지 객체
 	 * @return {@link Slice<ReviewWithMemberResponse>}
 	 */
 	Slice<ReviewWithMemberResponse> getReviewListByMemberId(final Long memberId, final Pageable pageable);
@@ -40,6 +42,7 @@ public interface ReviewService {
 	 * 선상 낚시 리뷰 조회 커서 방식
 	 *
 	 * @param postId 게시글 ID
+	 * @param cursorRequestDto 커서 객체
 	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
 	 */
 	ScrollResponse<ReviewWithMemberResponse> getReviewListByPostIdWithCursor(
@@ -51,6 +54,7 @@ public interface ReviewService {
 	 * 내가 작성한 리뷰 조회 커서 방식
 	 *
 	 * @param memberId	회원 ID
+	 @param cursorRequestDto 커서 객체
 	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
 	 */
 	ScrollResponse<ReviewWithMemberResponse> getReviewListByMemberIdWithCursor(
