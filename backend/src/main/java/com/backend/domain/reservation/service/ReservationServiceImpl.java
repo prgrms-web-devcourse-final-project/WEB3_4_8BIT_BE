@@ -18,6 +18,8 @@ import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +71,23 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public ScrollResponse<ReservationResponse.DetailWithName> getUserReservationList(final Long memberId,
+		final GlobalRequest.CursorRequest cursorRequestDto) {
+
+		return reservationRepository.findDetailWithNameByMemberId(memberId, cursorRequestDto);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ScrollResponse<ReservationResponse.DetailWithName> getCaptainReservationList(final Long shipFishingPostId,
+		final Long memberId, final GlobalRequest.CursorRequest cursorRequestDto) {
+
+		return reservationRepository
+			.findDetailWithNameByMemberIdAndShipFishingPostId(memberId, shipFishingPostId, cursorRequestDto);
+	}
+
+	@Override
 	@Transactional
 	public void updateReservation(final Long reservationId, final Long memberId) {
 
@@ -113,6 +132,7 @@ public class ReservationServiceImpl implements ReservationService {
 	 * @param guestCount {@link Long}
 	 * @param type {@link Boolean}
 	 */
+
 	private void updateReservationDateWithRemainCount(
 		final Long shipFishingPostId,
 		final LocalDate reservationDate,
