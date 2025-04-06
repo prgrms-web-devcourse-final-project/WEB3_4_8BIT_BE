@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -86,7 +87,7 @@ public class ReservationController {
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
 
-	@PostMapping("/{id}")
+	@PatchMapping("/{id}")
 	@Operation(summary = "예약 취소", description = "유저가 선상 낚시 예약을 취소 할 때 사용하는 API")
 	@Parameter(name = "id", required = true, description = "예약 Id", example = "1")
 	public ResponseEntity<GenericResponse<ReservationResponse.DetailWithMember>> updateReservation(
