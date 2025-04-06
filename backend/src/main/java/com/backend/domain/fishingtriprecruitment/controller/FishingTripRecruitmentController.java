@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,12 +47,12 @@ public class FishingTripRecruitmentController {
 			.body(GenericResponse.of(true));
 	}
 
-	@PatchMapping
-	@Parameter(name = "id", required = true, description = "동출모집 신청 ID", example = "1")
+	@PatchMapping("/refuse/{fishingTripRecruitmentId}")
+	@Parameter(name = "fishingTripRecruitmentId", required = true, description = "동출모집 신청 ID", example = "1")
 	@Operation(summary = "동출 모집 거절", description = "동출모집 게시글 작성자가 동출모집 신청에 대해서 거절을 하는 API")
 	public ResponseEntity<GenericResponse<Void>> refuseFishingTripRecruitment(
 		@AuthenticationPrincipal final CustomOAuth2User user,
-		@RequestParam("id") final Long fishingTripRecruitmentId
+		@PathVariable final Long fishingTripRecruitmentId
 	) {
 		fishingTripRecruitmentService.refuseFishingTripRecruitment(user.getId(), fishingTripRecruitmentId);
 		return ResponseEntity.ok().body(GenericResponse.of(true));

@@ -177,8 +177,8 @@ class FishingTripRecruitmentControllerTest extends BaseTest {
 		doNothing().when(fishingTripRecruitmentService).refuseFishingTripRecruitment(anyLong(), eq(recruitmentId));
 
 		// When
-		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/fishing-trip-recruitment")
-			.param("id", recruitmentId.toString())
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders
+			.patch("/api/v1/fishing-trip-recruitment/refuse/{fishingTripRecruitmentId}", recruitmentId)
 			.accept(MediaType.APPLICATION_JSON));
 
 		// Then
@@ -200,8 +200,8 @@ class FishingTripRecruitmentControllerTest extends BaseTest {
 			.when(fishingTripRecruitmentService).refuseFishingTripRecruitment(anyLong(), eq(recruitmentId));
 
 		// When
-		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/fishing-trip-recruitment")
-			.param("id", recruitmentId.toString())
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders
+			.patch("/api/v1/fishing-trip-recruitment/refuse/{fishingTripRecruitmentId}", recruitmentId)
 			.accept(MediaType.APPLICATION_JSON));
 
 		// Then
