@@ -12,6 +12,8 @@ import com.backend.domain.review.entity.Review;
 import com.backend.domain.review.exception.ReviewErrorCode;
 import com.backend.domain.review.exception.ReviewException;
 import com.backend.domain.review.repository.ReviewRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +56,28 @@ public class ReviewServiceImpl implements ReviewService {
 	public Slice<ReviewWithMemberResponse> getReviewListByMemberId(final Long memberId, final Pageable pageable) {
 
 		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable);
+
+		log.debug("[리뷰 조회] 회원 ID {}의 리뷰 목록: {}", memberId, reviewList);
+		return reviewList;
+	}
+
+	@Override
+	public ScrollResponse<ReviewWithMemberResponse> getReviewListByPostIdWithCursor(Long postId,
+		GlobalRequest.CursorRequest cursorRequestDto) {
+
+		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsByPostIdWithCursor(
+			postId, cursorRequestDto);
+
+		log.debug("[리뷰 조회] 게시글 ID {}의 리뷰 목록: {}", postId, reviewList);
+		return reviewList;
+	}
+
+	@Override
+	public ScrollResponse<ReviewWithMemberResponse> getReviewListByMemberIdWithCursor(Long memberId,
+		GlobalRequest.CursorRequest cursorRequestDto) {
+
+		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsByMemberIdWithCursor(
+			memberId, cursorRequestDto);
 
 		log.debug("[리뷰 조회] 회원 ID {}의 리뷰 목록: {}", memberId, reviewList);
 		return reviewList;

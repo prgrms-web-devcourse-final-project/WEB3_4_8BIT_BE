@@ -53,6 +53,7 @@ public interface ReviewRepository {
 	 * 리뷰 조회 메서드 커서 방식
 	 *
 	 * @param postId 선상 낚시 게시글 ID
+	 * @param cursorRequestDto 커서 request 객체
 	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
 	 * @implSpec 게시글 ID를 기반으로 작성된 리뷰 조회
 	 */
@@ -65,6 +66,7 @@ public interface ReviewRepository {
 	 * 내가 작성한 리뷰 조회 커서 방식
 	 *
 	 * @param memberId 회원 ID
+	 * @param cursorRequestDto 커서 request 객체
 	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
 	 * @implSpec 회원 ID를 기반으로 작성된 리뷰 조회
 	 */

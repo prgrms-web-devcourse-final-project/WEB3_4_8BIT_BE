@@ -5,6 +5,8 @@ import org.springframework.data.domain.Slice;
 
 import com.backend.domain.review.dto.request.ReviewRequest;
 import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 public interface ReviewService {
 
@@ -33,6 +35,28 @@ public interface ReviewService {
 	 * @return {@link Slice<ReviewWithMemberResponse>}
 	 */
 	Slice<ReviewWithMemberResponse> getReviewListByMemberId(final Long memberId, final Pageable pageable);
+
+	/**
+	 * 선상 낚시 리뷰 조회 커서 방식
+	 *
+	 * @param postId 게시글 ID
+	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
+	 */
+	ScrollResponse<ReviewWithMemberResponse> getReviewListByPostIdWithCursor(
+		final Long postId,
+		final GlobalRequest.CursorRequest cursorRequestDto
+	);
+
+	/**
+	 * 내가 작성한 리뷰 조회 커서 방식
+	 *
+	 * @param memberId	회원 ID
+	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
+	 */
+	ScrollResponse<ReviewWithMemberResponse> getReviewListByMemberIdWithCursor(
+		final Long memberId,
+		final GlobalRequest.CursorRequest cursorRequestDto
+	);
 
 	/**
 	 * 선상 낚시 리뷰 삭제
