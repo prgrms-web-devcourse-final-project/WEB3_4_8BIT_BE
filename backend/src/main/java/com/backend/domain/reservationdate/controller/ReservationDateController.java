@@ -1,4 +1,4 @@
-package com.backend.domain.reservationdate.Controller;
+package com.backend.domain.reservationdate.controller;
 
 import java.time.LocalDate;
 

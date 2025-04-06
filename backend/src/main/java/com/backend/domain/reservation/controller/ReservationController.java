@@ -54,4 +54,16 @@ public class ReservationController {
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
+
+	@PostMapping("/{id}")
+	@Operation(summary = "예약 취소", description = "유저가 선상 낚시 예약을 취소 할 때 사용하는 API")
+	@Parameter(name = "id", required = true, description = "예약 Id", example = "1")
+	public ResponseEntity<GenericResponse<ReservationResponse.DetailWithMember>> updateReservation(
+		@PathVariable("id") final Long reservationId,
+		@AuthenticationPrincipal final CustomOAuth2User user) {
+
+		reservationService.updateReservation(reservationId, user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true));
+	}
 }
