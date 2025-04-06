@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.backend.domain.fishingtrippost.converter.FishingTripPostConvert;
+import com.backend.domain.fishingtrippost.converter.FishingTripPostConverter;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
@@ -43,7 +43,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		// 멤버, 낚시 포인트 존재 검증
 		validMemberAndFishPoint(memberId, requestDto);
 
-		FishingTripPost fishingTripPost = FishingTripPostConvert.fromFishingTripPostCreate(memberId, requestDto);
+		FishingTripPost fishingTripPost = FishingTripPostConverter.fromFishingTripPostCreate(memberId, requestDto);
 
 		return fishingTripPostRepository.save(fishingTripPost).getFishingTripPostId();
 	}
@@ -94,8 +94,11 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 	@Override
 	public FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId) {
+		//
 		FishingTripPostResponse.DetailQueryDto detailQueryDto = getDetailDtoById(fishingTripPostId);
+
 		List<String> fileUrlList = getFileUrlList(detailQueryDto);
+
 		return FishingTripPostResponse.Detail.fromDetailQueryDtoAndFileUrlList(detailQueryDto, fileUrlList);
 	}
 
@@ -124,9 +127,9 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @throws FishingTripPostException 게시글이 존재하지 않는 경우
 	 */
 	private FishingTripPostResponse.DetailQueryDto getDetailDtoById(final Long fishingTripPostId) {
-		FishingTripPostResponse.DetailQueryDto detailQueryDto = fishingTripPostRepository.findDetailQueryDtoById(
-				fishingTripPostId)
-			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
+		FishingTripPostResponse.DetailQueryDto detailQueryDto =
+			fishingTripPostRepository.findDetailQueryDtoById(fishingTripPostId)
+				.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
 		log.debug("[동출 모집 상세 조회 Dto 조회] : {}", detailQueryDto);
 		return detailQueryDto;
 	}

@@ -35,14 +35,21 @@ public interface FishingTripPostRepository {
 	 * <p>이 DTO는 최종 응답 DTO {@link com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse.Detail}
 	 * 를 생성하기 위한 중간 단계로 사용됩니다. 이미지 파일 ID를 통해 실제 URL을 조회하는 로직은 서비스 계층에서 처리됩니다.</p>
 	 *
-	 * @implSpec
-	 * 이 메서드는 QueryDSL을 기반으로 동출 게시글, 작성자(member), 낚시 포인트(fishPoint) 정보를 조인하여
-	 * 단일 쿼리로 가져옵니다. 결과가 없을 경우 {@link Optional#empty()}를 반환합니다.
-	 *
-	 * 구현 시 성능과 확장성을 고려하여 필요한 필드만 조회하도록 주의해야 합니다.
-	 *
 	 * @param fishingTripPostId 조회할 동출 게시글의 고유 ID
 	 * @return 게시글 상세 정보를 담은 DTO를 {@link Optional}로 감싼 값. 존재하지 않으면 {@link Optional#empty()}
+	 * @implSpec 이 메서드는 QueryDSL을 기반으로 동출 게시글, 작성자(member), 낚시 포인트(fishPoint) 정보를 조인하여
+	 * 단일 쿼리로 가져옵니다. 결과가 없을 경우 {@link Optional#empty()}를 반환합니다.
+	 * <p>
+	 * 구현 시 성능과 확장성을 고려하여 필요한 필드만 조회하도록 주의해야 합니다.
 	 */
 	Optional<FishingTripPostResponse.DetailQueryDto> findDetailQueryDtoById(final Long fishingTripPostId);
+
+	/**
+	 * 동출 모집 게시글 존재 여부 조회 메소드
+	 *
+	 * @param fishingTripPostId {@link Long}
+	 * @return {@link Boolean} 데이터가 있다면 true, 없으면 false
+	 * @implSpec fishingTripPostId 데이터가 있는지 확인 후 결과 반한
+	 */
+	boolean existsById(final Long fishingTripPostId);
 }
