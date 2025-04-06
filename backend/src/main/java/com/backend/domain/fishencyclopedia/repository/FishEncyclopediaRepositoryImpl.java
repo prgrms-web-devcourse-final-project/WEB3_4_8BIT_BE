@@ -8,6 +8,7 @@ import com.backend.domain.fishencyclopedia.dto.response.FishEncyclopediaResponse
 import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
+import com.querydsl.core.Tuple;
 
 import lombok.RequiredArgsConstructor;
 
@@ -44,5 +45,10 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 		return fishEncyclopediaQueryRepository.findDetailPageByAllByMemberId(
 			memberId
 		);
+	}
+
+	@Override
+	public List<Tuple> findHourlyFishCountSummary() {
+		return fishEncyclopediaQueryRepository.findHourlyFishCountSummary();
 	}
 }

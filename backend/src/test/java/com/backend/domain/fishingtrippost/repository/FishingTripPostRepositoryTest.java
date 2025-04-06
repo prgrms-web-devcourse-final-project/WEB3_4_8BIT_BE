@@ -6,6 +6,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -141,7 +142,6 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		assertThat(result.getContent()).isEqualTo("테스트 내용");
 	}
 
-
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [Repository] - Success")
 	void t03() {
@@ -149,7 +149,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
 		FishPoint savedFishPoint = fishPointRepository.save(fishPointArbitraryBuilder.sample());
 
-		List<File> savedFiles = List.of(1, 2, 3).stream()
+		List<File> savedFiles = Stream.of(1, 2, 3)
 			.map(i -> File.builder()
 				.fileName("file_" + i + ".jpg")
 				.originalFileName("original_" + i + ".jpg")
@@ -187,7 +187,8 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			.map(File::getUrl)
 			.toList();
 
-		FishingTripPostResponse.Detail detail = FishingTripPostResponse.Detail.fromDetailQueryDtoAndFileUrlList(detailDto, fileUrlList);
+		FishingTripPostResponse.Detail detail = FishingTripPostResponse.Detail.fromDetailQueryDtoAndFileUrlList(
+			detailDto, fileUrlList);
 
 		// then
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());

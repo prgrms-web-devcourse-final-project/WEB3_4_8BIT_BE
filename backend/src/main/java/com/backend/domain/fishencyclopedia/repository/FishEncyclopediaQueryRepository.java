@@ -23,6 +23,7 @@ import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.util.QuerydslUtil;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -30,12 +31,14 @@ import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Repository
 @RequiredArgsConstructor
+@Slf4j
 public class FishEncyclopediaQueryRepository {
 
-	private final JPAQueryFactory queryFactory;
+	private final JPAQueryFactory jpaQueryFactory;
 
 	// 정렬 필드를 매핑
 	private static final Map<String, ComparableExpressionBase<?>> FIELD_MAP = Map.of(
@@ -45,9 +48,9 @@ public class FishEncyclopediaQueryRepository {
 	);
 
 	//fishId와 memberId가 일치하는 데이터를 가져오는 조건식 생성 함수
-    private static final BiFunction<Long, Long, BooleanExpression> BOOLEAN_EXPRESSION_BI_FUNCTION =
-        (fishId, memberId) -> fishEncyclopedia.fishId.eq(fishId)
-            .and(fishEncyclopedia.memberId.eq(memberId));
+	private static final BiFunction<Long, Long, BooleanExpression> BOOLEAN_EXPRESSION_BI_FUNCTION =
+		(fishId, memberId) -> fishEncyclopedia.fishId.eq(fishId)
+			.and(fishEncyclopedia.memberId.eq(memberId));
 
 	public ScrollResponse<FishEncyclopediaResponse.Detail> findDetailByAllByMemberIdAndFishId(
 		final GlobalRequest.CursorRequest cursorRequestDto,
@@ -55,7 +58,7 @@ public class FishEncyclopediaQueryRepository {
 		final Long memberId
 	) {
 
-		List<FishEncyclopediaResponse.Detail> detailList = queryFactory
+		List<FishEncyclopediaResponse.Detail> detailList = jpaQueryFactory
 			.selectDistinct(
 				new QFishEncyclopediaResponse_Detail(
 					fishEncyclopedia.fishEncyclopediaId,
@@ -102,7 +105,7 @@ public class FishEncyclopediaQueryRepository {
 		final Long memberId
 	) {
 
-		return queryFactory
+		return jpaQueryFactory
 			.select(
 				new QFishEncyclopediaResponse_DetailPage(
 					fish.fishId,
@@ -205,6 +208,22 @@ public class FishEncyclopediaQueryRepository {
 		} catch (NumberFormatException | DateTimeParseException e) {
 			throw new GlobalException(GlobalErrorCode.REPOSITORY_FORMAT_PARSE_ERROR);
 		}
+	}
+
+	public List<Tuple> findHourlyFishCountSummary() {
+		// 현재 시간과 1시간 전 시간 계산
+		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime oneHourAgo = now.minusHours(1);
+
+		log.debug("검색 시간 조건: {} ~ {}", oneHourAgo, now);
+
+		// 최근 1시간 동안 생성된 데이터에 대해 물고기 ID별 count 합계 조회
+		return jpaQueryFactory
+			.select(fishEncyclopedia.fishId, fishEncyclopedia.count.sum())
+			.from(fishEncyclopedia)
+			.where(fishEncyclopedia.createdAt.between(oneHourAgo, now))
+			.groupBy(fishEncyclopedia.fishId)
+			.fetch();
 	}
 
 	/**

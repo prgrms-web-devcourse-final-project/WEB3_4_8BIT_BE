@@ -18,9 +18,10 @@ import lombok.experimental.SuperBuilder;
 @Table(
 	name = "fish_encyclopedias",
 	indexes = {
-		@Index(name = "idx_fish_encyclopedias_01", columnList = ("fish_id, member_id, created_at, fish_encyclopedia_id")),
-		@Index(name = "idx_fish_encyclopedias_02", columnList = ("fish_id, member_id, count, fish_encyclopedia_id")),
-		@Index(name = "idx_fish_encyclopedias_03", columnList = ("fish_id, member_id, length, fish_encyclopedia_id"))
+		@Index(name = "idx_fish_encyclopedias_01", columnList = "fish_id, member_id, created_at, fish_encyclopedia_id"),
+		@Index(name = "idx_fish_encyclopedias_02", columnList = "fish_id, member_id, count, fish_encyclopedia_id"),
+		@Index(name = "idx_fish_encyclopedias_03", columnList = "fish_id, member_id, length, fish_encyclopedia_id"),
+		@Index(name = "idx_fish_encyclopedias_04", columnList = "created_at, fish_id, count")
 	}
 )
 @Entity

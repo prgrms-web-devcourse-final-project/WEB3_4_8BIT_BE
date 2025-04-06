@@ -23,7 +23,7 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 @Table(
-	name = "fishs",
+	name = "fishes",
 	indexes = {
 		@Index(name = "idx_fish_01", columnList = "fish_id, file_id")
 	})
@@ -57,5 +57,4 @@ public class Fish extends BaseEntity {
 	@Column(nullable = false)
 	@Builder.Default
 	private Long popularityScore = 0L; //인기 점수
-	// TODO 스케줄링 하나 만들어서 일정 간격마다 잡은 횟수 초기화
 }

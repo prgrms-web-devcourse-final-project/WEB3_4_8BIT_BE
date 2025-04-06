@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.fish.entity.Fish;
+import com.querydsl.core.Tuple;
 
 public interface FishRepository {
 	/**
@@ -56,4 +57,12 @@ public interface FishRepository {
 	 * @author Kim Dong O
 	 */
 	List<FishResponse.Popular> findPopular(final Integer size);
+  /**
+	 * 현재 시간부터 1시간 전까지 물고기 도감에 추가된 잡은 횟수를 인기도로 설정하는 메소드
+	 *
+	 * @param hourlyFishCountSummaryList 물고기 count 집계 리스트
+	 * @implSpec 현재 시간부터 1시간 전까지 물고기 도감에 추가된 잡은 횟수를 인기도로 설정
+	 * @author Kim Dong O
+	 */
+	void updateFishPopularityScores(List<Tuple> hourlyFishCountSummaryList);
 }

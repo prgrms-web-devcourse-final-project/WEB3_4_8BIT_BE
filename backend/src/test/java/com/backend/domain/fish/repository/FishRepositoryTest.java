@@ -17,16 +17,28 @@ import net.jqwik.api.Arbitrary;
 
 import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.fish.entity.Fish;
-import com.backend.global.config.JpaAuditingConfig;
+import com.backend.domain.fishencyclopedia.entity.FishEncyclopedia;
+import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaJpaRepository;
+import com.backend.domain.fishencyclopedia.repository.FishEncyclopediaQueryRepository;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageJpaRepository;
 import com.backend.global.util.BaseTest;
+import com.querydsl.core.Tuple;
+
+import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
-@Import({FishRepositoryImpl.class, FishQueryRepository.class, JpaAuditingConfig.class, QuerydslConfig.class})
+@Import({
+	FishRepositoryImpl.class,
+	FishQueryRepository.class,
+	FishEncyclopediaQueryRepository.class,
+	QuerydslConfig.class
+})
 @DataJpaTest
+@Slf4j
 class FishRepositoryTest extends BaseTest {
 
 	@Autowired
@@ -34,6 +46,18 @@ class FishRepositoryTest extends BaseTest {
 
 	@Autowired
 	private StorageJpaRepository storageJpaRepository;
+
+	@Autowired
+	private FishEncyclopediaJpaRepository fishEncyclopediaJpaRepository;
+
+	@Autowired
+	private FishEncyclopediaQueryRepository fishEncyclopediaQueryRepository;
+
+	@Autowired
+	private EntityManager entityManager;
+
+	@Autowired
+	private FishJpaRepository fishJpaRepository;
 
 	final Arbitrary<String> englishString = Arbitraries.strings()
 		.withCharRange('a', 'z')
@@ -46,6 +70,9 @@ class FishRepositoryTest extends BaseTest {
 		.set("spawnLocation", englishString);
 	@Autowired
 	private FishJpaRepository fishJpaRepository;
+
+  @Autowired
+	private FishQueryRepository fishQueryRepository;
 
 	@Test
 	@DisplayName("물고기 저장 [Repository] - Success")
@@ -106,7 +133,6 @@ class FishRepositoryTest extends BaseTest {
 			.set("fileId", savedFile.getFileId())
 			.sample();
 
-
 		Fish savedFish = fishRepository.save(givenFish);
 
 		// When
@@ -134,5 +160,45 @@ class FishRepositoryTest extends BaseTest {
 		// Then
 		assertThat(findPopular).hasSize(10);
 		assertThat(findPopular.get(0).popularityScore()).isEqualTo(sortedFishList.get(0).getPopularityScore());
+  }
+
+	@DisplayName("물고기 인기도 수정 [Repository] - Success")
+	void t05() {
+		// Given
+		List<Fish> givenFishList = fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
+			.set("fishId", null)
+			.set("name", "fish")
+			.set("spawnLocation", englishString)
+			.set("popularityScore", 0L)
+			.sampleList(5);
+
+		List<Fish> savedFish = fishJpaRepository.saveAll(givenFishList);
+		List<FishEncyclopedia> givenFishEncyclopediaList = new ArrayList<>();
+
+		for (Fish fish : savedFish) {
+			FishEncyclopedia fishEncyclopedia = fixtureMonkeyBuilder.giveMeBuilder(FishEncyclopedia.class)
+				.set("fishEncyclopediaId", null)
+				.set("fishId", fish.getFishId())
+				.set("count", 5)
+				.sample();
+
+			givenFishEncyclopediaList.add(fishEncyclopedia);
+		}
+
+		// When
+		fishEncyclopediaJpaRepository.saveAll(givenFishEncyclopediaList);
+
+		List<Tuple> findHourlyFishCountSummaryList = fishEncyclopediaQueryRepository.findHourlyFishCountSummary();
+
+		fishRepository.updateFishPopularityScores(findHourlyFishCountSummaryList);
+
+		entityManager.flush();
+		entityManager.clear();
+
+		// Then
+		List<Fish> updateFishList = fishJpaRepository.findAll();
+
+		assertThat(updateFishList)
+			.allMatch(fish -> fish.getPopularityScore() == 5L);
 	}
 }

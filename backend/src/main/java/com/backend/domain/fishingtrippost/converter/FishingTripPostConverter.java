@@ -3,13 +3,13 @@ package com.backend.domain.fishingtrippost.converter;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 
-public class FishingTripPostConvert {
+public class FishingTripPostConverter {
 
 	/**
 	 * 로그인한 멤버가 모집 게시글 작성 Dto를 Entity로 변환 메서드
 	 *
-	 * @param requestDto {@link FishingTripPostRequest.Form}
 	 * @param memberId   {@link Long}
+	 * @param requestDto {@link FishingTripPostRequest.Form}
 	 * @return {@link FishingTripPost}
 	 */
 
