@@ -31,7 +31,7 @@ public class FishServiceImpl implements FishService {
 	}
 
 	@Override
-	public List<FishResponse.Popular> getPopular(Integer size) {
+	public List<FishResponse.Popular> getPopular(final Integer size) {
 		List<FishResponse.Popular> getPopularList = fishRepository.findPopular(size);
 
 		log.debug("물고기 인기순 조회: {}", getPopularList);
