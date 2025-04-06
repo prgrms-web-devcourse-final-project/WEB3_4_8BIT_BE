@@ -3,10 +3,12 @@ package com.backend.domain.fishingtriprecruitment.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 import com.backend.domain.fishingtriprecruitment.converter.FishingTripRecruitmentConverter;
+import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.domain.fishingtriprecruitment.dto.request.FishingTripRecruitmentRequest;
 import com.backend.domain.fishingtriprecruitment.entity.FishingTripRecruitment;
 import com.backend.domain.fishingtriprecruitment.exception.FishingTripRecruitmentErrorCode;
@@ -46,6 +48,35 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 		log.debug("[동출 모집 생성] : {}", savedRecruitment);
 
 		return savedRecruitment.getFishingTripRecruitmentId();
+	}
+
+	@Override
+	@Transactional
+	public void refuseFishingTripRecruitment(final Long memberId, final Long fishingTripRecruitmentId) {
+
+		FishingTripRecruitment fishingTripRecruitment = getFishingTripRecruitmentById(fishingTripRecruitmentId);
+
+		validateFishingTripPostOwner(memberId, fishingTripRecruitment.getFishingTripPostId());
+
+		fishingTripRecruitment.setRecruitmentStatus(RecruitmentStatus.REJECTED);
+	}
+
+	/**
+	 * 낚시 동행 모집글의 작성자인지를 검증합니다.
+	 *
+	 * <p>현재 로그인한 사용자 ID({@code memberId})가 해당 모집글({@code fishingTripPostId})의 작성자인지 확인하여,
+	 * 작성자가 아닌 경우 예외를 발생시킵니다.</p>
+	 * @param memberId 현재 로그인한 사용자(검증 대상)의 ID
+	 * @param fishingTripPostId 검증할 낚시 동행 모집글의 ID
+	 * @throws FishingTripPostException 모집글이 없거나 작성자가 아닌 경우 예외 발생
+	 */
+	public void validateFishingTripPostOwner(final Long memberId, final Long fishingTripPostId) {
+		FishingTripPost fishingTripPost = fishingTripPostRepository.findById(fishingTripPostId)
+			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
+
+		if (!fishingTripPost.getMemberId().equals(memberId)) {
+			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR);
+		}
 	}
 
 	/**
