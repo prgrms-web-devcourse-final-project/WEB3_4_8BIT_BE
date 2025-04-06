@@ -9,13 +9,16 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.reservation.dto.request.ReservationRequest;
 import com.backend.domain.reservation.dto.response.ReservationResponse;
 import com.backend.domain.reservation.service.ReservationService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
+import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.GenericResponse;
+import com.backend.global.dto.response.ScrollResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -25,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "예약 정보 API")
 @RestController
-@RequestMapping("/api/v1/reservation")
+@RequestMapping("/api/v1/reservations")
 @RequiredArgsConstructor
 public class ReservationController {
 
@@ -51,6 +54,34 @@ public class ReservationController {
 		@AuthenticationPrincipal final CustomOAuth2User user) {
 
 		ReservationResponse.DetailWithMember response = reservationService.getReservation(reservationId, user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
+
+	@GetMapping("/members")
+	@Operation(summary = "예약 내역 조회 (유저)", description = "유저가 본인이 예약한 내역을 조회 할 때 사용하는 API")
+	public ResponseEntity<GenericResponse<ScrollResponse<ReservationResponse.DetailWithName>>> getUserReservationList(
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		ScrollResponse<ReservationResponse.DetailWithName> response = reservationService
+			.getUserReservationList(user.getId(), cursorRequestDto);
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
+
+	@GetMapping("/captains")
+	@Operation(summary = "예약 내역 조회 (선장)", description = "선장이 예약 리스트를 조회 할 때 사용하는 API")
+	@Parameter(name = "shipId", description = "선상 낚시 게시글 ID", example = "1")
+	public ResponseEntity<GenericResponse<ScrollResponse<ReservationResponse.DetailWithName>>> getCaptainReservationList(
+		@RequestParam final Long shipFishingPostId,
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		ScrollResponse<ReservationResponse.DetailWithName> response = reservationService
+			.getCaptainReservationList(shipFishingPostId, user.getId(), cursorRequestDto);
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
