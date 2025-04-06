@@ -2,6 +2,7 @@ package com.backend.domain.fishencyclopedia.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
@@ -31,6 +33,7 @@ import com.backend.global.config.QuerydslConfig;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
+import com.querydsl.core.Tuple;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,6 +66,9 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 
 	@Autowired
 	private FishJpaRepository fishJpaRepository;
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
 	private List<FishPoint> savedFishPointList;
 	private List<Fish> savedFishList;
@@ -104,6 +110,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 			.set("fishEncyclopediaId", null)
 			.set("fishId", savedFishList.get(0).getFishId())
 			.set("fishPointId", savedFishPointList.get(1).getFishPointId())
+			.set("count", 5)
 			.set("memberId", givenMember.getMemberId())
 			.sampleList(7);
 
@@ -112,6 +119,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 			.set("fishEncyclopediaId", null)
 			.set("fishId", savedFishList.get(1).getFishId())
 			.set("fishPointId", savedFishPointList.get(0).getFishPointId())
+			.set("count", 5)
 			.set("memberId", 2L)
 			.sampleList(10);
 
@@ -136,6 +144,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		FishEncyclopedia givenFishEncyclopedia = fixtureMonkeyBuilder
 			.giveMeBuilder(FishEncyclopedia.class)
 			.set("fishEncyclopediaId", null)
+			.set("count", 5)
 			.sample();
 
 		// When
@@ -289,6 +298,43 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 
 		// Then
 		assertThat(detailPageList).hasSize(savedCatchMaxLengthList.size());
+	}
+
+	@Test
+	@DisplayName("물고기 시간대별 카운트 집계 조회 [Repository] - Success")
+	void t09() {
+		// When
+		List<Tuple> findHourlyFishCountSummaryList = fishEncyclopediaRepository.findHourlyFishCountSummary();
+
+		List<Tuple> sortedHourlyFishCountSummaryList = findHourlyFishCountSummaryList.stream()
+			.sorted(Comparator.comparing((Tuple t) -> t.get(1, Integer.class)).reversed())
+			.toList();
+
+		// Then
+		assertThat(sortedHourlyFishCountSummaryList.get(0).get(1, Integer.class)).isEqualTo(50);
+	}
+
+	@Test
+	@DisplayName("물고기 시간대별 카운트 집계 조회 [시간대 조회 검증] [Repository] - Success")
+	void t10() {
+		// Given
+		// 2시간 전으로 생성일 수정
+		jdbcTemplate.update(
+        "UPDATE fish_encyclopedias AS f " +
+        "SET f.created_at = ? " +
+        "WHERE f.fish_encyclopedia_id = ?",
+        ZonedDateTime.now().minusHours(2),
+        1L);
+
+		// When
+		List<Tuple> findHourlyFishCountSummaryList = fishEncyclopediaRepository.findHourlyFishCountSummary();
+
+		List<Tuple> sortedHourlyFishCountSummaryList = findHourlyFishCountSummaryList.stream()
+			.sorted(Comparator.comparing((Tuple t) -> t.get(1, Integer.class)).reversed())
+			.toList();
+
+		// Then
+		assertThat(sortedHourlyFishCountSummaryList.get(1).get(1, Integer.class)).isEqualTo(30);
 	}
 
 	// 유틸리티 메서드
