@@ -8,6 +8,8 @@ import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
 import java.util.Optional;
 
 import com.backend.domain.review.entity.Review;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 public interface ReviewRepository {
 
@@ -46,6 +48,30 @@ public interface ReviewRepository {
 	 * @implSpec 회원 ID를 기반으로 작성된 리뷰 조회
 	 */
 	Slice<ReviewWithMemberResponse> findReviewsWithMemberByMemberId(@Param("memberId") final Long memberId, final Pageable pageable);
+
+	/**
+	 * 리뷰 조회 메서드 커서 방식
+	 *
+	 * @param postId 선상 낚시 게시글 ID
+	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
+	 * @implSpec 게시글 ID를 기반으로 작성된 리뷰 조회
+	 */
+	ScrollResponse<ReviewWithMemberResponse> findReviewsByPostIdWithCursor(
+		final Long postId,
+		final GlobalRequest.CursorRequest cursorRequestDto
+	);
+
+	/**
+	 * 내가 작성한 리뷰 조회 커서 방식
+	 *
+	 * @param memberId 회원 ID
+	 * @return {@link ScrollResponse<ReviewWithMemberResponse>}
+	 * @implSpec 회원 ID를 기반으로 작성된 리뷰 조회
+	 */
+	ScrollResponse<ReviewWithMemberResponse> findReviewsByMemberIdWithCursor(
+		final Long memberId,
+		final GlobalRequest.CursorRequest cursorRequestDto
+	);
 
 	/**
 	 * 리뷰 조회

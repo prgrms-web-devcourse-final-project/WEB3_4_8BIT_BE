@@ -12,6 +12,7 @@ import java.util.List;
  *   "memberId": 1,
  *   "nickname": 강태공,
  *   "profileImg": "profileImage1.jpg",
+ // *   "isAuthor": false,
  *   "createdAt": "2025-03-31T03:41:11.789203Z"
  * }
  *
@@ -23,6 +24,7 @@ import java.util.List;
  * @param memberId	작성자 ID
  * @param nickname	작성자 닉네임
  * @param profileImg	작성자 프로필 이미지
+ // * @param isAuthor	작성자 확인 값
  * @param createdAt	리뷰 작성 일자
  */
 public record ReviewWithMemberResponse(
@@ -34,5 +36,6 @@ public record ReviewWithMemberResponse(
 	Long memberId,
 	String nickname,
 	String profileImg,
+	// Boolean isAuthor,
 	ZonedDateTime createdAt
 ) {}
