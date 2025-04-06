@@ -3,6 +3,7 @@ package com.backend.domain.review.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,8 @@ import com.backend.domain.review.exception.ReviewErrorCode;
 import com.backend.domain.review.exception.ReviewException;
 
 import com.backend.domain.review.repository.ReviewRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
@@ -123,37 +126,170 @@ public class ReviewServiceTest extends BaseTest {
 	@DisplayName("회원 ID로 리뷰 목록 조회 [Service] - Success")
 	void t05() {
 		// given
-		Long memberId = 1L;
+		Long givenMemberId = 1L;
 		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 		List<ReviewWithMemberResponse> reviewList = fixtureMonkeyValidation.giveMe(ReviewWithMemberResponse.class, 3);
 		Page<ReviewWithMemberResponse> givenPage = new PageImpl<>(reviewList, pageable, reviewList.size());
 
-		given(reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable)).willReturn(givenPage);
+		given(reviewRepository.findReviewsWithMemberByMemberId(givenMemberId, pageable)).willReturn(givenPage);
 
 		// when
-		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByMemberId(memberId, pageable);
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByMemberId(givenMemberId, pageable);
 
 		// then
 		assertThat(result).hasSize(3);
-		verify(reviewRepository).findReviewsWithMemberByMemberId(memberId, pageable);
+		verify(reviewRepository).findReviewsWithMemberByMemberId(givenMemberId, pageable);
 	}
 
 	@Test
 	@DisplayName("회원 ID로 리뷰 목록 조회 [Service] - Empty")
 	void t06() {
 		// given
-		Long memberId = 999L;
+		Long givenMemberId = 999L;
 		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 		Page<ReviewWithMemberResponse> emptyPage = Page.empty(pageable);
 
-		given(reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable)).willReturn(emptyPage);
+		given(reviewRepository.findReviewsWithMemberByMemberId(givenMemberId, pageable)).willReturn(emptyPage);
 
 		// when
-		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByMemberId(memberId, pageable);
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByMemberId(givenMemberId, pageable);
 
 		// then
 		assertThat(result).isEmpty();
-		verify(reviewRepository).findReviewsWithMemberByMemberId(memberId, pageable);
+		verify(reviewRepository).findReviewsWithMemberByMemberId(givenMemberId, pageable);
+	}
+
+	@Test
+	@DisplayName("게시글 ID로 리뷰 커서 조회 [Service] - Success (작성자가 아닌 경우)")
+	void t07() {
+		// given
+		Long givenPostId = 1L;
+		Long givenRequestMemberId = 999L;
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			null, null, null, null, null, 3
+		);
+
+		ReviewWithMemberResponse givenReview = new ReviewWithMemberResponse(
+			101L,
+			5,
+			"리뷰 내용",
+			List.of("img1.jpg", "img2.png"),
+			givenPostId,
+			null,
+			"작성자 닉네임",
+			"profile.jpg",
+			false,
+			ZonedDateTime.now()
+		);
+		List<ReviewWithMemberResponse> content = List.of(givenReview);
+
+		ScrollResponse<ReviewWithMemberResponse> expected = ScrollResponse.from(
+			content,
+			cursorRequest.size(),
+			content.size(),
+			true,
+			true
+		);
+
+		given(reviewRepository.findReviewsByPostIdWithCursor(givenPostId, givenRequestMemberId, cursorRequest))
+			.willReturn(expected);
+
+		// when
+		ScrollResponse<ReviewWithMemberResponse> result =
+			reviewServiceImpl.getReviewListByPostIdWithCursor(givenPostId, givenRequestMemberId, cursorRequest);
+
+		// then
+		assertThat(result.content()).hasSize(1);
+		assertThat(result.isFirst()).isTrue();
+		assertThat(result.isLast()).isTrue();
+		assertThat(result.content().get(0).isAuthor()).isFalse();
+		assertThat(result.content().get(0).memberId()).isNull();
+		verify(reviewRepository).findReviewsByPostIdWithCursor(givenPostId, givenRequestMemberId, cursorRequest);
+	}
+
+	@Test
+	@DisplayName("게시글 ID로 리뷰 커서 조회 [Service] - Success (다음 페이지가 있는 경우)")
+	void t08() {
+		// given
+		Long givenPostId = 1L;
+		Long givenMemberId = 1L;
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			null, null, null, null, null, 3
+		);
+
+		List<ReviewWithMemberResponse> fullContent = fixtureMonkeyRecord.giveMeBuilder(ReviewWithMemberResponse.class)
+			.set("shipFishingPostId", givenPostId)
+			.set("isAuthor", true)
+			.set("memberId", givenMemberId)
+			.sampleList(4);
+		List<ReviewWithMemberResponse> expectedContent = fullContent.subList(0, cursorRequest.size());
+
+		ScrollResponse<ReviewWithMemberResponse> expected = ScrollResponse.from(
+			expectedContent,
+			cursorRequest.size(),
+			expectedContent.size(),
+			true,
+			false
+		);
+
+		given(reviewRepository.findReviewsByPostIdWithCursor(givenPostId, givenMemberId, cursorRequest))
+			.willReturn(expected);
+
+		// when
+		ScrollResponse<ReviewWithMemberResponse> result =
+			reviewServiceImpl.getReviewListByPostIdWithCursor(givenPostId, givenMemberId, cursorRequest);
+
+		// then
+		assertThat(result.content()).hasSize(3);
+		assertThat(result.isFirst()).isTrue();
+		assertThat(result.isLast()).isFalse();
+		assertThat(result.content()).allSatisfy(r -> {
+			assertThat(r.isAuthor()).isTrue();
+			assertThat(r.memberId()).isEqualTo(givenMemberId);
+		});
+		verify(reviewRepository).findReviewsByPostIdWithCursor(givenPostId, givenMemberId, cursorRequest);
+	}
+
+	@Test
+	@DisplayName("회원 ID로 리뷰 커서 조회 [Service] - Success")
+	void t09() {
+		// given
+		Long givenMemberId = 1L;
+		Long givenPostId = 1L;
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			null, null, null, null, null, 3
+		);
+
+		List<ReviewWithMemberResponse> content = fixtureMonkeyRecord.giveMeBuilder(ReviewWithMemberResponse.class)
+			.set("shipFishingPostId", givenPostId)
+			.set("isAuthor", true)
+			.set("memberId", givenMemberId)
+			.sampleList(2);
+
+		ScrollResponse<ReviewWithMemberResponse> expected = ScrollResponse.from(
+			content,
+			cursorRequest.size(),
+			content.size(),
+			true,
+			true
+		);
+
+		given(reviewRepository.findReviewsByMemberIdWithCursor(givenMemberId, cursorRequest))
+			.willReturn(expected);
+
+		// when
+		ScrollResponse<ReviewWithMemberResponse> result =
+			reviewServiceImpl.getReviewListByMemberIdWithCursor(givenMemberId, cursorRequest);
+
+		// then
+		assertThat(result.content()).hasSize(2);
+		assertThat(result.isFirst()).isTrue();
+		assertThat(result.isLast()).isTrue();
+		assertThat(result.content()).allSatisfy(r -> {
+			assertThat(r.isAuthor()).isTrue();
+			assertThat(r.memberId()).isEqualTo(givenMemberId);
+		});
+		verify(reviewRepository).findReviewsByMemberIdWithCursor(givenMemberId, cursorRequest);
 	}
 
 	@Test
