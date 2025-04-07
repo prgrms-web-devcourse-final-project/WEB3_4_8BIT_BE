@@ -48,7 +48,7 @@ public class MemberControllerTest extends BaseTest {
 		MemberRequest.Form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Form.class);
 		Long memberId = 1L;
 
-		when(memberService.saveAddInfo(eq(memberId), any())).thenReturn(memberId);
+		when(memberService.createAddInfo(eq(memberId), any())).thenReturn(memberId);
 
 		// When
 		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/members")
@@ -71,7 +71,7 @@ public class MemberControllerTest extends BaseTest {
 		MemberRequest.Form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Form.class);
 
 		doThrow(new MemberException(MemberErrorCode.MEMBER_NOT_FOUND))
-			.when(memberService).saveAddInfo(anyLong(), any());
+			.when(memberService).createAddInfo(anyLong(), any());
 
 		// When
 		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/members")
@@ -94,7 +94,7 @@ public class MemberControllerTest extends BaseTest {
 		MemberRequest.Form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Form.class);
 
 		doThrow(new MemberException(MemberErrorCode.ALREADY_ADDED_INFO))
-			.when(memberService).saveAddInfo(anyLong(), any());
+			.when(memberService).createAddInfo(anyLong(), any());
 
 		// When
 		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/members")

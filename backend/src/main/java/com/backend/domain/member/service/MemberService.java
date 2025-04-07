@@ -15,7 +15,7 @@ public interface MemberService {
 	 * @throws MemberException 이미 추가 정보가 등록된 경우 예외 발생
 	 * @implSpec 회원의 추가 정보를 최초 1회 저장하며, 이미 저장된 경우 예외를 던진다.
 	 */
-	Long saveAddInfo(final Long memberId, final MemberRequest.Form requestDto);
+	Long createAddInfo(final Long memberId, final MemberRequest.Form requestDto);
 
 	/**
 	 * 회원 상세 정보 조회 메소드

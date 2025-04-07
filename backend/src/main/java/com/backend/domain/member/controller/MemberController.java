@@ -36,7 +36,7 @@ public class MemberController {
 		@AuthenticationPrincipal CustomOAuth2User user,
 		@RequestBody @Valid MemberRequest.Form requestDto) {
 
-		Long memberId = memberService.saveAddInfo(user.getId(), requestDto);
+		Long memberId = memberService.createAddInfo(user.getId(), requestDto);
 
 		return ResponseEntity.created(URI.create(memberId.toString())).body(GenericResponse.of(true));
 	}

@@ -59,7 +59,7 @@ class MemberServiceTest extends BaseTest {
 		when(memberRepository.findById(givenMember.getMemberId())).thenReturn(Optional.of(givenMember));
 
 		// When
-		Long saveAddInfo = memberService.saveAddInfo(givenMember.getMemberId(), givenRequest);
+		Long saveAddInfo = memberService.createAddInfo(givenMember.getMemberId(), givenRequest);
 
 		// Then
 		assertThat(saveAddInfo).isEqualTo(givenMember.getMemberId());
@@ -80,7 +80,7 @@ class MemberServiceTest extends BaseTest {
 		when(memberRepository.findById(invalidMemberId)).thenReturn(Optional.empty());
 
 		// When & Then
-		assertThatThrownBy(() -> memberService.saveAddInfo(invalidMemberId, givenRequest))
+		assertThatThrownBy(() -> memberService.createAddInfo(invalidMemberId, givenRequest))
 			.isInstanceOf(MemberException.class)
 			.hasMessage(MemberErrorCode.MEMBER_NOT_FOUND.getMessage());
 
@@ -101,7 +101,7 @@ class MemberServiceTest extends BaseTest {
 		when(memberRepository.findById(alreadyAddedMember.getMemberId())).thenReturn(Optional.of(alreadyAddedMember));
 
 		// When & Then
-		assertThatThrownBy(() -> memberService.saveAddInfo(alreadyAddedMember.getMemberId(), givenRequest))
+		assertThatThrownBy(() -> memberService.createAddInfo(alreadyAddedMember.getMemberId(), givenRequest))
 			.isInstanceOf(MemberException.class)
 			.hasMessage(MemberErrorCode.ALREADY_ADDED_INFO.getMessage());
 
