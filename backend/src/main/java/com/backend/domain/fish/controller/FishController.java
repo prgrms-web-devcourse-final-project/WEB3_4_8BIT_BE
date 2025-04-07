@@ -46,4 +46,13 @@ public class FishController {
 
 		return ResponseEntity.ok(GenericResponse.of(true, getPopularList));
 	}
+
+	@Operation(summary = "물고기 전체 조회", description = "물고기 전체 조회시 사용하는 API")
+	@GetMapping
+	public ResponseEntity<GenericResponse<List<FishResponse.FishAll>>> getDetailList() {
+
+		List<FishResponse.FishAll> getFishAll = fishService.getFishAll();
+
+		return ResponseEntity.ok(GenericResponse.of(true, getFishAll));
+	}
 }
