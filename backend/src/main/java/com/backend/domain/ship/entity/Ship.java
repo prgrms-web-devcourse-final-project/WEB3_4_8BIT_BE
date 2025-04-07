@@ -1,14 +1,18 @@
 package com.backend.domain.ship.entity;
 
+import com.backend.domain.ship.domain.RestroomType;
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -40,7 +44,13 @@ public class Ship extends BaseEntity {
 	private String departurePort;
 
 	@Column(nullable = false)
-	private Boolean publicRestroom;
+	private Integer passengerCapacity;
+
+	//TODO 추후 화장실 ENUM으로 변경
+	@Column(nullable = false, length = 15)
+	@Enumerated(EnumType.STRING)
+	@Builder.Default
+	private RestroomType restroomType = RestroomType.NONE;
 
 	@Column(nullable = false)
 	private Boolean loungeArea;
