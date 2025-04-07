@@ -18,6 +18,8 @@ public class ShipServiceImpl implements ShipService {
 	@Override
 	public Long createShip(final Long memberId, final ShipRequest.Create requestDto) {
 
+		//TODO 추후 최대 몇개까지 등록 허용할건지 정해야함
+
 		Ship ship = ShipConverter.fromCreate(memberId, requestDto);
 
 		return shipRepository.save(ship).getShipId();
