@@ -33,4 +33,11 @@ public interface ReservationDateService {
 		final Long shipFishingPostId,
 		final LocalDate reservationDate
 	);
+
+	/**
+	 * 선상낚시 게시글의 예약 일자를 삭제하는 메서드
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 */
+	void deleteReservationDateList(final Long shipFishingPostId);
 }

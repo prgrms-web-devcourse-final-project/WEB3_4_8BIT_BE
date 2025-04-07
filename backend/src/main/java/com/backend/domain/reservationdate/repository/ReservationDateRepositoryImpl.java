@@ -68,4 +68,16 @@ public class ReservationDateRepositoryImpl implements ReservationDateRepository 
 		return reservationDateQueryRepository
 			.findUnAvailableDatesByStartDateBetweenEndDate(shipFishingPostId, startDate, endDate);
 	}
+
+	@Override
+	public void deleteByShipFishingPostId(final Long shipFishingPostId) {
+
+		reservationDateQueryRepository.deleteByShipFishingPostId(shipFishingPostId);
+	}
+
+	@Override
+	public void deleteOrphanReservationDate() {
+
+		reservationDateQueryRepository.deleteOrphanReservationDate();
+	}
 }

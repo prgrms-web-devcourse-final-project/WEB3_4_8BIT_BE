@@ -4,8 +4,10 @@ import java.net.URI;
 
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Slice;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,7 +40,7 @@ public class ShipFishingPostController {
 
 	@PostMapping
 	@Operation(summary = "선상 낚시 게시글 생성", description = "유저가 새로운 선상 낚시 게시글을 생성할 때 사용하는 API")
-	public ResponseEntity<GenericResponse<Void>> createShipFishPost(
+	public ResponseEntity<GenericResponse<Void>> createShipFishingPost(
 		@RequestBody @Valid final ShipFishingPostRequest.Create requestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
@@ -51,7 +53,7 @@ public class ShipFishingPostController {
 	@GetMapping("/{id}")
 	@Operation(summary = "선상 낚시 게시글 상세 조회", description = "유저가 선상 낚시 게시글을 상세 조회할 때 사용하는 API")
 	@Parameter(name = "id", required = true, description = "조회할 선상 낚시 게시글 ID", example = "1")
-	public ResponseEntity<GenericResponse<ShipFishingPostResponse.DetailAll>> getShipFishPost(
+	public ResponseEntity<GenericResponse<ShipFishingPostResponse.DetailAll>> getShipFishingPost(
 		@PathVariable("id") final Long shipFishPostsId
 	) {
 
@@ -62,7 +64,7 @@ public class ShipFishingPostController {
 
 	@GetMapping
 	@Operation(summary = "선상 낚시 게시글 조회", description = "유저가 선상 낚시 게시글을 조회할 때 사용하는 API")
-	public ResponseEntity<GenericResponse<ScrollResponse<ShipFishingPostResponse.DetailPage>>> getShipFishPostList(
+	public ResponseEntity<GenericResponse<ScrollResponse<ShipFishingPostResponse.DetailPage>>> getShipFishingPostList(
 		@ParameterObject @ModelAttribute final ShipFishingPostRequest.Search requestDto,
 		@Valid final GlobalRequest.PageRequest pageRequestDto
 	) {
@@ -77,5 +79,18 @@ public class ShipFishingPostController {
 			response.isFirst(),
 			response.isLast()
 		)));
+	}
+
+	@DeleteMapping("/{id}")
+	@Operation(summary = "선상 낚시 게시글 삭제", description = "유저가 선상 낚시 게시글을 삭제할 때 사용하는 API")
+	@Parameter(name = "id", required = true, description = "삭제할 선상 낚시 게시글 ID", example = "1")
+	public ResponseEntity<GenericResponse<Void>> deleteShipFishingPost(
+		@PathVariable("id") final Long shipFishPostsId,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		shipFishingPostService.deleteShipFishingPost(shipFishPostsId, user.getId());
+
+		return ResponseEntity.status(HttpStatus.OK).body(GenericResponse.of(true));
 	}
 }

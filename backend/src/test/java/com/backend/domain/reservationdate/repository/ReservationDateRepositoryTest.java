@@ -47,10 +47,6 @@ public class ReservationDateRepositoryTest extends BaseTest {
 				.sample());
 		}
 
-		for (ReservationDate reservationDate : givenResrvationList) {
-			System.out.println(reservationDate.getShipFishingPostId());
-		}
-
 		// When
 		long startTime = System.currentTimeMillis();
 		reservationDateRepository.saveAllByBulkQuery(givenResrvationList, givenResrvationList.size());
@@ -162,6 +158,59 @@ public class ReservationDateRepositoryTest extends BaseTest {
 		//Then
 		assertThat(findReservationDate).isPresent();
 		assertThat(findReservationDate.get().getShipFishingPostId()).isEqualTo(1L);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 예약 일자 전체 삭제 [Repository] - Success")
+	void t06() {
+		// Given
+		Long givenShipFishingPostId = 1L;
+
+		List<ReservationDate> givenResrvationList = new ArrayList<>();
+
+		for (long i = 0; i < 100; i++) {
+			givenResrvationList.add(fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
+				.set("shipFishingPostId", givenShipFishingPostId)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("remainCount", 10)
+				.sample());
+		}
+
+		reservationDateRepository.saveAllByBulkQuery(givenResrvationList, givenResrvationList.size());
+
+		// When
+		reservationDateRepository.deleteByShipFishingPostId(givenShipFishingPostId);
+
+		// Then
+		List<ReservationDate> findReservationDateList = reservationDateRepository.findAll();
+
+		assertThat(findReservationDateList.isEmpty()).isTrue();
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 예약 일자 전체 삭제 [Repository] - Success")
+	void t07() {
+		Long givenShipFishingPostId = 1L;
+
+		List<ReservationDate> givenResrvationList = new ArrayList<>();
+
+		for (long i = 0; i < 100; i++) {
+			givenResrvationList.add(fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
+				.set("shipFishingPostId", givenShipFishingPostId)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("remainCount", 10)
+				.sample());
+		}
+
+		reservationDateRepository.saveAllByBulkQuery(givenResrvationList, givenResrvationList.size());
+
+		// When
+		reservationDateRepository.deleteOrphanReservationDate();
+
+		// Then
+		List<ReservationDate> findReservationDateList = reservationDateRepository.findAll();
+
+		assertThat(findReservationDateList.isEmpty()).isTrue();
 	}
 
 }
