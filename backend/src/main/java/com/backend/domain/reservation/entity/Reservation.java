@@ -11,16 +11,18 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "reservations")
+@Table(name = "reservations", indexes = {
+	@Index(name = "idx_reservation_01", columnList = "reservationId, reservationDate")
+})
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter

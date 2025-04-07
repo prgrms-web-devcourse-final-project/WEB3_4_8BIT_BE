@@ -90,4 +90,40 @@ public class ReservationResponse {
 		ZonedDateTime modifiedAt
 	) {
 	}
+
+	/**
+	 * {
+	 * 	 	"reservationId": 12345,
+	 * 	 	"shipFishingPostId": 1,
+	 * 	 	"name": "이름"
+	 * 	 	"reservationNumber": "20250402-202345",
+	 * 	 	"guestCount": 4,
+	 * 	 	"reservationDate": "2025-04-01",
+	 * 	 	"reservationStatus": "CONFIRMED",
+	 * 	 	"createdAt": "",
+	 * 	 	"modifiedAt": ""
+	 * }
+	 *
+	 * @param reservationId - 예약 id
+	 * @param shipFishingPostId - 게시글 id
+	 * @param name - 예약자 이름
+	 * @param reservationNumber - 예약 번호
+	 * @param guestCount - 예약 인원
+	 * @param reservationDate - 예약 일자
+	 * @param reservationStatus - 예약 상태
+	 * @param createdAt - 예약 생성 일자
+	 * @param modifiedAt - 예약 수정 일자
+	 */
+	public record DetailWithName(
+		Long reservationId,
+		Long shipFishingPostId,
+		String name,
+		String reservationNumber,
+		Integer guestCount,
+		LocalDate reservationDate,
+		ReservationStatus reservationStatus,
+		ZonedDateTime createdAt,
+		ZonedDateTime modifiedAt
+	) {
+	}
 }

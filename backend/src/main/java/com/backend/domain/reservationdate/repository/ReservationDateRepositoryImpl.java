@@ -37,6 +37,14 @@ public class ReservationDateRepositoryImpl implements ReservationDateRepository 
 	}
 
 	@Override
+	public Optional<ReservationDate> findByShipFishingPostIdAndReservationDate(
+		final Long shipFishingPostId, final LocalDate reservationDate) {
+
+		return reservationDateJpaRepository.findByShipFishingPostIdAndReservationDate(
+			shipFishingPostId, reservationDate);
+	}
+
+	@Override
 	public Optional<ReservationDate> findByIdWithPessimistic(
 		final Long shipFishingPostId,
 		final LocalDate reservationDate) {

@@ -1,13 +1,14 @@
 package com.backend.global.util;
 
+import java.time.LocalDate;
 import java.time.ZonedDateTime;
 
 import com.backend.global.dto.request.GlobalRequest;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.DatePath;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.NumberPath;
-
 
 public class QuerydslUtil {
 
@@ -65,6 +66,31 @@ public class QuerydslUtil {
 		final Long idFieldValue,
 		final DateTimePath<ZonedDateTime> sortField,
 		final ZonedDateTime sortFieldValue,
+		final Order order
+	) {
+
+		return sortField.eq(sortFieldValue)
+			.and(idField.gt(idFieldValue))
+			.or(order.equals(Order.DESC) ? sortField.lt(sortFieldValue) : sortField.gt(sortFieldValue));
+	}
+
+	/**
+	 * 커서 방식 Where 조건절 생성 메소드 입니다.
+	 * <p>ZonedDateTime 타입의 필드만 사용 가능합니다.</p>
+	 *
+	 * @param idField 기본키 필드
+	 * @param idFieldValue 기본키 필드 값
+	 * @param sortField 정렬 대상 필드
+	 * @param sortFieldValue 정렬 대상 필드 값
+	 * @param order 정렬 순서
+	 *
+	 * @return {@link BooleanExpression}
+	 */
+	public static BooleanExpression createFieldPredicate(
+		final NumberPath<Long> idField,
+		final Long idFieldValue,
+		final DatePath<LocalDate> sortField,
+		final LocalDate sortFieldValue,
 		final Order order
 	) {
 
