@@ -42,6 +42,7 @@ public class CookieUtil {
 			.httpOnly(httpOnly)
 			.secure(secure)
 			.sameSite("Lax")
+			.domain("localhost") //TODO 추후 배포시 다시 수정
 			.path("/")
 			.maxAge(refreshTokenValidityInSeconds)
 			.build();
@@ -55,6 +56,7 @@ public class CookieUtil {
 			.httpOnly(httpOnly)
 			.secure(secure)
 			.sameSite("Lax")
+			.domain("localhost") //TODO 추후 배포시 다시 수정
 			.path("/")
 			.maxAge(0)
 			.build();
