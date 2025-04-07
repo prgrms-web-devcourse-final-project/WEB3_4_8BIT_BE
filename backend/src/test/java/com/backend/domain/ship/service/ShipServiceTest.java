@@ -1,6 +1,7 @@
 package com.backend.domain.ship.service;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ class ShipServiceTest extends BaseTest {
 			.set("mealProvided", givenCreate.mealProvided())
 			.set("parkingAvailable", givenCreate.parkingAvailable());
 
-		Mockito.when(shipRepository.save(shipArbitraryBuilder.sample())).thenReturn(
+		Mockito.when(shipRepository.save(any(Ship.class))).thenReturn(
 			shipArbitraryBuilder.set("shipId", 1L)
 			.sample()
 		);
