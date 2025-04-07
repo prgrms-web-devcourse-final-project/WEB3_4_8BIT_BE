@@ -49,4 +49,7 @@ public class FishPoint extends BaseEntity {
 
 	@Column(nullable = false, columnDefinition = "POINT SRID 4326")
 	private Point location;
+
+	@Column(nullable = false)
+	private Long regionId;
 }
