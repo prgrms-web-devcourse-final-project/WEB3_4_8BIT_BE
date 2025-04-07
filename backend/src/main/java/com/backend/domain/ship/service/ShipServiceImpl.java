@@ -8,7 +8,9 @@ import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.repository.ShipRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ShipServiceImpl implements ShipService {
@@ -22,6 +24,10 @@ public class ShipServiceImpl implements ShipService {
 
 		Ship ship = ShipConverter.fromCreate(memberId, requestDto);
 
-		return shipRepository.save(ship).getShipId();
+		Ship savedShip = shipRepository.save(ship);
+
+		log.debug("선박 저장: {}", savedShip);
+
+		return savedShip.getShipId();
 	}
 }
