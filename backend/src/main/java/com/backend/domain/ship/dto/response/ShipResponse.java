@@ -1,5 +1,9 @@
 package com.backend.domain.ship.dto.response;
 
+import com.backend.domain.ship.domain.RestroomType;
+
+import lombok.Builder;
+
 public class ShipResponse {
 
 	/**
@@ -8,7 +12,7 @@ public class ShipResponse {
 	 * 	 "shipName": "나로호",
 	 *   "shipNumber": "01234567890123",
 	 *   "departurePort": "부산",
-	 *   "restroomType": "PUBLIC",
+	 *   "restroomType": "공용",
 	 *   "loungeArea": false,
 	 *   "kitchenFacility": true,
 	 *   "fishingChair": false,
@@ -31,12 +35,13 @@ public class ShipResponse {
 	 * @param mealProvided 식사 제공 여부
 	 * @param parkingAvailable 주차 시설 여부
 	 */
+	@Builder
 	public record Detail(
 		Long shipId,
 		String shipName,
 		String shipNumber,
 		String departurePort,
-		String restroomType,
+		RestroomType restroomType,
 		Boolean loungeArea,
 		Boolean kitchenFacility,
 		Boolean fishingChair,

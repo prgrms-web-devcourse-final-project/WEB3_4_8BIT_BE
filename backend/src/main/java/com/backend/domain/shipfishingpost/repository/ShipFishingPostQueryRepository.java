@@ -87,7 +87,7 @@ public class ShipFishingPostQueryRepository {
 					ship.shipName,
 					ship.shipNumber,
 					ship.departurePort,
-					ship.restroomType.stringValue(),
+					ship.restroomType,
 					ship.loungeArea,
 					ship.kitchenFacility,
 					ship.fishingChair,
