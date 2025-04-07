@@ -78,4 +78,15 @@ public class FishingTripRecruitmentController {
 
 		return ResponseEntity.ok(GenericResponse.of(true, detailPageList));
 	}
+
+	@PatchMapping("/{fishingTripRecruitmentId}/accept")
+	@Parameter(name = "fishingTripRecruitmentId", required = true, description = "동출모집 신청 ID", example = "1")
+	@Operation(summary = "동출 모집 승인", description = "동출모집 게시글 작성자가 동출모집 신청에 대해서 승인 하는 API")
+	public ResponseEntity<GenericResponse<Void>> acceptFishingTripRecruitment(
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@PathVariable final Long fishingTripRecruitmentId
+	) {
+		fishingTripRecruitmentService.acceptFishingTripRecruitment(user.getId(), fishingTripRecruitmentId);
+		return ResponseEntity.ok().body(GenericResponse.of(true));
+	}
 }

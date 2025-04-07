@@ -44,6 +44,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 	@Value("${jwt.refresh-token-expire-time-seconds}")
 	private long refreshTokenValidityInSeconds;
 
+	//todo 로그인 실패시 토큰발행이 되지않도록 바꿔야함
+
 	/**
 	 * OAuth2 로그인 성공 시 실행되는 메서드
 	 *

@@ -38,7 +38,8 @@ public class FishingTripPostQueryRepository {
 					fishPoint.fishPointName,
 					fishPoint.longitude,
 					fishPoint.latitude,
-					fishingTripPost.fileIdList
+					fishingTripPost.fileIdList,
+					fishingTripPost.postStatus
 				))
 				.from(fishingTripPost)
 				.leftJoin(member).on(member.memberId.eq(fishingTripPost.memberId))

@@ -6,12 +6,15 @@ import java.util.List;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -57,6 +60,10 @@ public class FishingTripPost extends BaseEntity {
 	private Boolean isShipFish;
 
 	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
+	private PostStatus postStatus;
+
+	@Column(nullable = false)
 	private ZonedDateTime fishingDate;
 
 	@Column(nullable = false)
@@ -93,5 +100,9 @@ public class FishingTripPost extends BaseEntity {
 		this.fishingDate = fishingDate;
 		this.fishingPointId = fishingPointId;
 		this.fileIdList = fileIdList;
+	}
+
+	public void setPostStatus(PostStatus postStatus) {
+		this.postStatus = postStatus;
 	}
 }

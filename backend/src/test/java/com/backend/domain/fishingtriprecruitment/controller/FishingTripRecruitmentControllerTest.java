@@ -290,4 +290,48 @@ class FishingTripRecruitmentControllerTest extends BaseTest {
 			RecruitmentStatus.PENDING));
 	}
 
+	@Test
+	@DisplayName("동출 모집 신청 승인 [Controller] - Success")
+	@WithMockCustomUser
+	void t10() throws Exception {
+		// Given
+		Long recruitmentId = 1L;
+
+		doNothing().when(fishingTripRecruitmentService).acceptFishingTripRecruitment(anyLong(), eq(recruitmentId));
+
+		// When
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders
+			.patch("/api/v1/fishing-trip-recruitment/{fishingTripRecruitmentId}/accept", recruitmentId)
+			.accept(MediaType.APPLICATION_JSON));
+
+		// Then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true));
+
+		verify(fishingTripRecruitmentService).acceptFishingTripRecruitment(anyLong(), eq(recruitmentId));
+	}
+
+	@Test
+	@DisplayName("동출 모집 신청 승인 실패 [FISHING_TRIP_POST_OVER_RECRUITMENT] [Controller] - Fail")
+	@WithMockCustomUser
+	void t11() throws Exception {
+		// Given
+		Long recruitmentId = 1L;
+
+		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_OVER_RECRUITMENT))
+			.when(fishingTripRecruitmentService).acceptFishingTripRecruitment(anyLong(), eq(recruitmentId));
+
+		// When
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders
+			.patch("/api/v1/fishing-trip-recruitment/{fishingTripRecruitmentId}/accept", recruitmentId)
+			.accept(MediaType.APPLICATION_JSON));
+
+		// Then
+		result.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_OVER_RECRUITMENT.getCode()))
+			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_OVER_RECRUITMENT.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+
+		verify(fishingTripRecruitmentService).acceptFishingTripRecruitment(anyLong(), eq(recruitmentId));
+	}
 }
