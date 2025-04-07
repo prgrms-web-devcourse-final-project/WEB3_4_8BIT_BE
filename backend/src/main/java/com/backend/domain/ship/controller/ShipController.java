@@ -25,7 +25,7 @@ public class ShipController {
 	private final ShipService shipService;
 
 	@PostMapping
-	public ResponseEntity<GenericResponse<Void>> save(
+	public ResponseEntity<GenericResponse<Void>> createShip(
 		@RequestBody @Valid final ShipRequest.Create requestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
