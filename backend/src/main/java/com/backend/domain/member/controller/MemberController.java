@@ -33,8 +33,8 @@ public class MemberController {
 	@PostMapping
 	@Operation(summary = "추가 회원 정보 입력", description = "회원가입 후에 추가정보를 입력받는 API")
 	public ResponseEntity<GenericResponse<Void>> createAddInfo(
-		@AuthenticationPrincipal CustomOAuth2User user,
-		@RequestBody @Valid MemberRequest.Form requestDto) {
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@RequestBody @Valid final MemberRequest.Form requestDto) {
 
 		Long memberId = memberService.createAddInfo(user.getId(), requestDto);
 
@@ -44,7 +44,7 @@ public class MemberController {
 	@GetMapping
 	@Operation(summary = "회원 정보 조회", description = "현재 로그인된 사용자의 회원 정보를 조회하는 API")
 	public ResponseEntity<GenericResponse<MemberResponse.Detail>> getMemberDetail(
-		@AuthenticationPrincipal CustomOAuth2User user) {
+		@AuthenticationPrincipal final CustomOAuth2User user) {
 
 		MemberResponse.Detail responseDto = memberService.getMemberDetail(user.getId());
 
@@ -54,8 +54,8 @@ public class MemberController {
 	@PatchMapping
 	@Operation(summary = "회원 정보 수정", description = "현재 로그인된 사용자의 회원 정보를 수정하는 API")
 	public ResponseEntity<GenericResponse<Void>> updateMember(
-		@AuthenticationPrincipal CustomOAuth2User user,
-		@RequestBody @Valid MemberRequest.Form requestDto) {
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@RequestBody @Valid final MemberRequest.Form requestDto) {
 
 		Long memberId = memberService.updateMember(user.getId(), requestDto);
 
