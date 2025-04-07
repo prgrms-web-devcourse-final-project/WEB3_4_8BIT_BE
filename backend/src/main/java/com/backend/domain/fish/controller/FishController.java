@@ -26,6 +26,7 @@ public class FishController {
 
 	private final FishService fishService;
 
+	// TODO 어종 전체 조회 추가해야함
 	@Operation(summary = "물고기 조회", description = "물고기 조회시 사용하는 API")
 	@GetMapping("/{fishId}")
 	public ResponseEntity<GenericResponse<FishResponse.Detail>> getDetail(@PathVariable final Long fishId) {
