@@ -1,5 +1,8 @@
 package com.backend.domain.fishpoint.repository;
 
+import java.util.List;
+
+import com.backend.domain.fishpoint.dto.response.FishPointResponse;
 import com.backend.domain.fishpoint.entity.FishPoint;
 
 public interface FishPointRepository {
@@ -23,4 +26,15 @@ public interface FishPointRepository {
 	 * @author Kim Dong O
 	 */
 	FishPoint save(final FishPoint fishPoint);
+
+	/**
+	 * 지도에서 특정 바운드 영역 내에 포함된 낚시 포인트 목록을 조회
+	 *
+	 * @param swLat 남서쪽(South-West) 위도
+	 * @param swLng 남서쪽(South-West) 경도
+	 * @param neLat 북동쪽(North-East) 위도
+	 * @param neLng 북동쪽(North-East) 경도
+	 * @return 바운드 내에 존재하는 낚시 포인트 정보를 담은 DTO 리스트
+	 */
+	List<FishPointResponse> findByBounds(double swLat, double swLng, double neLat, double neLng);
 }

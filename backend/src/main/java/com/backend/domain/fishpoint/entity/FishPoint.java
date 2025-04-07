@@ -20,10 +20,10 @@ import lombok.experimental.SuperBuilder;
 
 @Table(name = "fish_points")
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @SuperBuilder
 @ToString
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FishPoint extends BaseEntity {
 
 	@Id
