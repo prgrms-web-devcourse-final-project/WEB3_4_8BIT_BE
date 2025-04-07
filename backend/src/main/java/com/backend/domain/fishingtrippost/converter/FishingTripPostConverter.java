@@ -1,5 +1,6 @@
 package com.backend.domain.fishingtrippost.converter;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 
@@ -27,6 +28,7 @@ public class FishingTripPostConverter {
 			.fishingPointId(requestDto.fishingPointId())
 			.memberId(memberId)
 			.fileIdList(requestDto.fileIdList())
+			.postStatus(PostStatus.RECRUITING)
 			.build();
 	}
 }
