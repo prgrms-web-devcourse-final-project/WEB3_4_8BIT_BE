@@ -16,7 +16,6 @@ import com.backend.domain.reservation.entity.QReservation;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.QuerydslUtil;
-import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -52,7 +51,18 @@ public class ReservationQueryRepository {
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
 		List<ReservationResponse.DetailWithName> detailWithNameList = jpaQueryFactory
-			.select(detailWithNameProjection())
+			.select(Projections.constructor(
+				ReservationResponse.DetailWithName.class,
+				reservation.reservationId,
+				reservation.shipFishingPostId,
+				member.name,
+				reservation.reservationNumber,
+				reservation.guestCount,
+				reservation.reservationDate,
+				reservation.status,
+				reservation.createdAt,
+				reservation.modifiedAt
+			))
 			.from(reservation)
 			.leftJoin(member)
 			.on(reservation.memberId.eq(member.memberId))
@@ -81,7 +91,18 @@ public class ReservationQueryRepository {
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
 		List<ReservationResponse.DetailWithName> detailWithNameList = jpaQueryFactory
-			.select(detailWithNameProjection())
+			.select(Projections.constructor(
+				ReservationResponse.DetailWithName.class,
+				reservation.reservationId,
+				reservation.shipFishingPostId,
+				member.name,
+				reservation.reservationNumber,
+				reservation.guestCount,
+				reservation.reservationDate,
+				reservation.status,
+				reservation.createdAt,
+				reservation.modifiedAt
+			))
 			.from(reservation)
 			.leftJoin(member)
 			.on(reservation.memberId.eq(member.memberId))
@@ -96,9 +117,9 @@ public class ReservationQueryRepository {
 			.limit(cursorRequestDto.size() + 1)
 			.fetch();
 
-		boolean hasNext = detailWithNameList.size() > cursorRequestDto.size();
+		boolean hasNext = detailWithNameList.size() <= cursorRequestDto.size();
 
-		if (hasNext) {
+		if (!hasNext) {
 			detailWithNameList.remove(detailWithNameList.size() - 1);
 		}
 
@@ -107,23 +128,7 @@ public class ReservationQueryRepository {
 			cursorRequestDto.size(),
 			detailWithNameList.size(),
 			cursorRequestDto.fieldValue() == null,
-			!hasNext);
-	}
-
-	private ConstructorExpression<ReservationResponse.DetailWithName> detailWithNameProjection() {
-
-		return Projections.constructor(
-			ReservationResponse.DetailWithName.class,
-			reservation.reservationId,
-			reservation.shipFishingPostId,
-			member.name,
-			reservation.reservationNumber,
-			reservation.guestCount,
-			reservation.reservationDate,
-			reservation.status,
-			reservation.createdAt,
-			reservation.modifiedAt
-		);
+			hasNext);
 	}
 
 	private BooleanExpression shipFishingPostIdCondition(final Long shipFishingPostId) {
