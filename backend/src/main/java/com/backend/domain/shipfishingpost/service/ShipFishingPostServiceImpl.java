@@ -114,6 +114,8 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 		shipFishingPostRepository.deleteById(shipFishingPostId);
 
 		reservationDateService.deleteReservationDateList(shipFishingPostId);
+
+		// Todo : 이미지 리스트 삭제
 	}
 
 	/**
