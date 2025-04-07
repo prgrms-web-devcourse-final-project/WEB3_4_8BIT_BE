@@ -1,5 +1,7 @@
 package com.backend.domain.reservation.repository;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import com.backend.domain.reservation.dto.response.ReservationResponse;
@@ -32,10 +34,18 @@ public interface ReservationRepository {
 	 *
 	 * @param reservationId {@link Long}
 	 * @return {@link Optional<ReservationResponse.DetailWithMember>}
-	 * @implSpec 예약 상세정보를 조회하고 예약자 정보와 게시글 id 를 함께 반환합니다.
+	 * @implSpec 예약 상세정보를 조회하고 예약자 이름을 함께 반환합니다.
 	 */
 	Optional<ReservationResponse.DetailWithMember> findDetailWithMemberById(final Long reservationId);
 
+	/**
+	 * 현재 날짜 기준으로 예약 내역을 조회하는 메서드입니다.
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @param today {@link LocalDate}
+	 * @return {@link List<Reservation>}
+	 */
+	List<Reservation> findByShipFishingPostIdAndTodayAfter(final Long shipFishingPostId, final LocalDate today);
 	/**
 	 * 예약 기록 조회 메서드 입니다. (일반 유저)
 	 *
