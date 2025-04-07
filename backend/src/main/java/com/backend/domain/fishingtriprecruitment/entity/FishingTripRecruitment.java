@@ -46,4 +46,8 @@ public class FishingTripRecruitment extends BaseEntity {
 
 	@Column(nullable = false)
 	private Long memberId;
+
+	public void setRecruitmentStatus(final RecruitmentStatus recruitmentStatus) {
+		this.recruitmentStatus = recruitmentStatus;
+	}
 }

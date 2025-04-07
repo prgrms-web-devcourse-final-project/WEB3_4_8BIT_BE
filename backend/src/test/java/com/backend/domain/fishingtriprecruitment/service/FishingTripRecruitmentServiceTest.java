@@ -10,9 +10,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
+import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.domain.fishingtriprecruitment.dto.request.FishingTripRecruitmentRequest;
 import com.backend.domain.fishingtriprecruitment.entity.FishingTripRecruitment;
 import com.backend.domain.fishingtriprecruitment.repository.FishingTripRecruitmentRepository;
@@ -117,5 +119,70 @@ class FishingTripRecruitmentServiceTest extends BaseTest {
 		verify(memberRepository).existsById(memberId);
 		verify(fishingTripPostRepository).existsById(requestDto.fishingTripPostId());
 		verify(fishingTripRecruitmentRepository, never()).save(any());
+	}
+
+	@Test
+	@DisplayName("동출 모집 신청 거절 [Service] - Success")
+	void t04() {
+		// Given
+		Long authorId = 1L;
+		Long recruitmentId = 10L;
+		Long postId = 100L;
+
+		FishingTripRecruitment recruitment = recruitmentBuilder
+			.set("fishingTripRecruitmentId", recruitmentId)
+			.set("memberId", 2L)
+			.set("fishingTripPostId", postId)
+			.set("recruitmentStatus", RecruitmentStatus.PENDING)
+			.sample();
+
+		FishingTripPost post = FishingTripPost.builder()
+			.fishingTripPostId(postId)
+			.memberId(authorId)
+			.subject("같이 가요~")
+			.build();
+
+		when(fishingTripRecruitmentRepository.findById(recruitmentId)).thenReturn(java.util.Optional.of(recruitment));
+		when(fishingTripPostRepository.findById(postId)).thenReturn(java.util.Optional.of(post));
+
+		// When
+		fishingTripRecruitmentService.refuseFishingTripRecruitment(authorId, recruitmentId);
+
+		// Then
+		assertThat(recruitment.getRecruitmentStatus()).isEqualTo(RecruitmentStatus.REJECTED);
+		verify(fishingTripRecruitmentRepository).findById(recruitmentId);
+		verify(fishingTripPostRepository).findById(postId);
+	}
+
+	@Test
+	@DisplayName("동출 모집 신청 거절 실패 [FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR] [Service] - Fail")
+	void t05() {
+		// Given
+		Long unauthorizedUserId = 2L;
+		Long recruitmentId = 10L;
+		Long postId = 100L;
+
+		FishingTripRecruitment recruitment = recruitmentBuilder
+			.set("fishingTripRecruitmentId", recruitmentId)
+			.set("fishingTripPostId", postId)
+			.sample();
+
+		FishingTripPost post = FishingTripPost.builder()
+			.fishingTripPostId(postId)
+			.memberId(1L)
+			.build();
+
+		when(fishingTripRecruitmentRepository.findById(recruitmentId)).thenReturn(java.util.Optional.of(recruitment));
+		when(fishingTripPostRepository.findById(postId)).thenReturn(java.util.Optional.of(post));
+
+		// When & Then
+		assertThatThrownBy(() ->
+			fishingTripRecruitmentService.refuseFishingTripRecruitment(unauthorizedUserId, recruitmentId))
+			.isInstanceOf(FishingTripPostException.class)
+			.hasFieldOrPropertyWithValue("errorCode", FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR)
+			.hasMessageContaining(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage());
+
+		verify(fishingTripRecruitmentRepository).findById(recruitmentId);
+		verify(fishingTripPostRepository).findById(postId);
 	}
 }

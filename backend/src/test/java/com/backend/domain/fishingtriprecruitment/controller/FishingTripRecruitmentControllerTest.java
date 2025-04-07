@@ -168,4 +168,49 @@ class FishingTripRecruitmentControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data[0].reason").value("올바른 낚시 실력을 입력해주세요."));
 	}
 
+	@Test
+	@DisplayName("동출 모집 신청 거절 [Controller] - Success")
+	@WithMockCustomUser
+	void t06() throws Exception {
+		// Given
+		Long recruitmentId = 1L;
+		doNothing().when(fishingTripRecruitmentService).refuseFishingTripRecruitment(anyLong(), eq(recruitmentId));
+
+		// When
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders
+			.patch("/api/v1/fishing-trip-recruitment/refuse/{fishingTripRecruitmentId}", recruitmentId)
+			.accept(MediaType.APPLICATION_JSON));
+
+		// Then
+		result
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true));
+
+		verify(fishingTripRecruitmentService).refuseFishingTripRecruitment(anyLong(), eq(recruitmentId));
+	}
+
+	@Test
+	@DisplayName("동출 모집 신청 거절 실패 [FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR] [Controller] - Fail")
+	@WithMockCustomUser
+	void t07() throws Exception {
+		// Given
+		Long recruitmentId = 999L;
+
+		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR))
+			.when(fishingTripRecruitmentService).refuseFishingTripRecruitment(anyLong(), eq(recruitmentId));
+
+		// When
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders
+			.patch("/api/v1/fishing-trip-recruitment/refuse/{fishingTripRecruitmentId}", recruitmentId)
+			.accept(MediaType.APPLICATION_JSON));
+
+		// Then
+		result
+			.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getCode()))
+			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+
+		verify(fishingTripRecruitmentService).refuseFishingTripRecruitment(anyLong(), eq(recruitmentId));
+	}
 }
