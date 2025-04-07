@@ -3,6 +3,10 @@ package com.backend.domain.fishingtriprecruitment.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,13 +18,17 @@ import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
+import com.backend.domain.fishingtriprecruitment.domain.FishingLevel;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.domain.fishingtriprecruitment.dto.request.FishingTripRecruitmentRequest;
+import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruitmentResponse;
 import com.backend.domain.fishingtriprecruitment.entity.FishingTripRecruitment;
 import com.backend.domain.fishingtriprecruitment.repository.FishingTripRecruitmentRepository;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -185,4 +193,73 @@ class FishingTripRecruitmentServiceTest extends BaseTest {
 		verify(fishingTripRecruitmentRepository).findById(recruitmentId);
 		verify(fishingTripPostRepository).findById(postId);
 	}
+
+	@Test
+	@DisplayName("동출 모집 신청자 목록 커서 페이징 조회 [Service] - Success")
+	void t06() {
+		// Given
+		Long memberId = 1L;
+		Long fishingTripPostId = 100L;
+		RecruitmentStatus status = RecruitmentStatus.PENDING;
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(null, "createdAt", "next", null, null, 10);
+
+		FishingTripPost post = FishingTripPost.builder()
+			.fishingTripPostId(fishingTripPostId)
+			.memberId(memberId)
+			.build();
+
+		List<FishingTripRecruitmentResponse.DetailPage> content = List.of(
+			new FishingTripRecruitmentResponse.DetailPage(
+				1L, "닉네임", "image.png", FishingLevel.BEGINNER, "소개글", status, ZonedDateTime.now()
+			)
+		);
+
+		ScrollResponse<FishingTripRecruitmentResponse.DetailPage> expected = ScrollResponse.from(
+			content, 10, 1, true, true
+		);
+
+		when(fishingTripPostRepository.findById(fishingTripPostId)).thenReturn(Optional.of(post));
+		when(fishingTripRecruitmentRepository.findDetailPageByFishingTripPostIdAndStatus(
+			cursorRequest, fishingTripPostId, status
+		)).thenReturn(expected);
+
+		// When
+		ScrollResponse<FishingTripRecruitmentResponse.DetailPage> actual =
+			fishingTripRecruitmentService.getDetailPageList(memberId, cursorRequest, fishingTripPostId, status);
+
+		// Then
+		assertThat(actual).isNotNull();
+		assertThat(actual.content()).hasSize(1);
+		assertThat(actual.content().get(0).recruitmentStatus()).isEqualTo(status);
+
+		verify(fishingTripPostRepository).findById(fishingTripPostId);
+		verify(fishingTripRecruitmentRepository).findDetailPageByFishingTripPostIdAndStatus(cursorRequest, fishingTripPostId, status);
+	}
+
+	@Test
+	@DisplayName("동출 모집 신청자 목록 조회 실패 [FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR] [Service] - Fail")
+	void t07() {
+		// Given
+		Long memberId = 2L;
+		Long fishingTripPostId = 100L;
+		RecruitmentStatus status = RecruitmentStatus.PENDING;
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(null, "createdAt", "next", null, null, 10);
+
+		FishingTripPost post = FishingTripPost.builder()
+			.fishingTripPostId(fishingTripPostId)
+			.memberId(1L)
+			.build();
+
+		when(fishingTripPostRepository.findById(fishingTripPostId)).thenReturn(Optional.of(post));
+
+		// When & Then
+		assertThatThrownBy(() -> fishingTripRecruitmentService.getDetailPageList(memberId, cursorRequest, fishingTripPostId, status))
+			.isInstanceOf(FishingTripPostException.class)
+			.hasFieldOrPropertyWithValue("errorCode", FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR)
+			.hasMessageContaining(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage());
+
+		verify(fishingTripPostRepository).findById(fishingTripPostId);
+		verify(fishingTripRecruitmentRepository, never()).findDetailPageByFishingTripPostIdAndStatus(any(), any(), any());
+	}
+
 }

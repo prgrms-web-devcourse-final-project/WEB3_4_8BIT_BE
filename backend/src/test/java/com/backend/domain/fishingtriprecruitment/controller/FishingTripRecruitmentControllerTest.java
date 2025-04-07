@@ -3,6 +3,8 @@ package com.backend.domain.fishingtriprecruitment.controller;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,12 +20,16 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
+import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.domain.fishingtriprecruitment.dto.request.FishingTripRecruitmentRequest;
+import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruitmentResponse;
 import com.backend.domain.fishingtriprecruitment.service.FishingTripRecruitmentService;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -178,7 +184,7 @@ class FishingTripRecruitmentControllerTest extends BaseTest {
 
 		// When
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders
-			.patch("/api/v1/fishing-trip-recruitment/refuse/{fishingTripRecruitmentId}", recruitmentId)
+			.patch("/api/v1/fishing-trip-recruitment/{fishingTripRecruitmentId}/refuse", recruitmentId)
 			.accept(MediaType.APPLICATION_JSON));
 
 		// Then
@@ -201,7 +207,7 @@ class FishingTripRecruitmentControllerTest extends BaseTest {
 
 		// When
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders
-			.patch("/api/v1/fishing-trip-recruitment/refuse/{fishingTripRecruitmentId}", recruitmentId)
+			.patch("/api/v1/fishing-trip-recruitment/{fishingTripRecruitmentId}/refuse", recruitmentId)
 			.accept(MediaType.APPLICATION_JSON));
 
 		// Then
@@ -213,4 +219,75 @@ class FishingTripRecruitmentControllerTest extends BaseTest {
 
 		verify(fishingTripRecruitmentService).refuseFishingTripRecruitment(anyLong(), eq(recruitmentId));
 	}
+
+	@Test
+	@DisplayName("동출 모집 신청자 조회 [Controller] - Success")
+	@WithMockCustomUser
+	void t08() throws Exception {
+		// Given
+		Long fishingTripPostId = 1L;
+		String status = "PENDING";
+		int size = 10;
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			"asc", "createdAt", "next", null, null, size
+		);
+
+		ScrollResponse<FishingTripRecruitmentResponse.DetailPage> response = ScrollResponse.from(
+			List.of(), size, 0, true, true
+		);
+
+		when(fishingTripRecruitmentService.getDetailPageList(anyLong(), any(), eq(fishingTripPostId), eq(RecruitmentStatus.PENDING)))
+			.thenReturn(response);
+
+		// When
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders
+			.get("/api/v1/fishing-trip-recruitment/participants")
+			.param("fishingTripPostId", fishingTripPostId.toString())
+			.param("status", status)
+			.param("sort", "createdAt")
+			.param("order", "asc")
+			.param("type", "next")
+			.param("size", String.valueOf(size))
+			.accept(MediaType.APPLICATION_JSON));
+
+		// Then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true));
+
+		verify(fishingTripRecruitmentService).getDetailPageList(anyLong(), any(), eq(fishingTripPostId), eq(RecruitmentStatus.PENDING));
+	}
+
+	@Test
+	@DisplayName("동출 모집 신청자 조회 실패 [FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR] [Controller] - Fail")
+	@WithMockCustomUser
+	void t09() throws Exception {
+		// Given
+		Long fishingTripPostId = 999L;
+		String status = "PENDING";
+
+		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR))
+			.when(fishingTripRecruitmentService).getDetailPageList(anyLong(), any(), eq(fishingTripPostId), eq(RecruitmentStatus.PENDING));
+
+		// When
+		ResultActions result = mockMvc.perform(MockMvcRequestBuilders
+			.get("/api/v1/fishing-trip-recruitment/participants")
+			.param("fishingTripPostId", fishingTripPostId.toString())
+			.param("status", status)
+			.param("sort", "createdAt")
+			.param("order", "asc")
+			.param("type", "next")
+			.param("size", "10")
+			.accept(MediaType.APPLICATION_JSON));
+
+		// Then
+		result.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getCode()))
+			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+
+		verify(fishingTripRecruitmentService).getDetailPageList(anyLong(), any(), eq(fishingTripPostId), eq(
+			RecruitmentStatus.PENDING));
+	}
+
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepositoryImpl;
 import com.backend.domain.fishingtriprecruitment.domain.FishingLevel;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
+import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruitmentResponse;
 import com.backend.domain.fishingtriprecruitment.entity.FishingTripRecruitment;
 import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.entity.Member;
@@ -26,6 +28,8 @@ import com.backend.domain.member.repository.MemberRepository;
 import com.backend.domain.member.repository.MemberRepositoryImpl;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -99,5 +103,45 @@ class FishingTripRecruitmentRepositoryTest extends BaseTest {
 		// then
 		assertThat(saved).isNotNull();
 		assertThat(saved.getFishingTripPostId()).isNotNull();
+	}
+
+	@Test
+	@DisplayName("동출 모집 신청자 페이징 조회 [Repository] - Success")
+	void t02() {
+		// Given
+		Member savedMember = memberRepository.save(memberArbitraryBuilder
+			.set("nickname", "테스터")
+			.set("email", "test1@example.com")
+			.sample());
+
+		FishingTripPost savedPost = fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
+			.set("memberId", savedMember.getMemberId())
+			.sample());
+
+		List<FishingTripRecruitment> recruitments = LongStream.rangeClosed(1, 5)
+			.mapToObj(i -> fishingTripRecruitmentArbitraryBuilder
+				.set("fishingTripPostId", savedPost.getFishingTripPostId())
+				.set("memberId", savedMember.getMemberId())
+				.set("introduction", "신청자 소개글 " + i)
+				.set("recruitmentStatus", RecruitmentStatus.PENDING)
+				.build().sample())
+			.toList();
+
+		recruitments.forEach(fishingTripRecruitmentRepository::save);
+
+		GlobalRequest.CursorRequest cursor = new GlobalRequest.CursorRequest(
+			"asc", "createdAt", "next", null, null, 3
+		);
+
+		// When
+		ScrollResponse<FishingTripRecruitmentResponse.DetailPage> response =
+			fishingTripRecruitmentRepository.findDetailPageByFishingTripPostIdAndStatus(
+				cursor, savedPost.getFishingTripPostId(), RecruitmentStatus.PENDING
+			);
+
+		// Then
+		assertThat(response.content()).hasSize(3);
+		assertThat(response.isFirst()).isTrue();
+		assertThat(response.isLast()).isFalse();
 	}
 }
