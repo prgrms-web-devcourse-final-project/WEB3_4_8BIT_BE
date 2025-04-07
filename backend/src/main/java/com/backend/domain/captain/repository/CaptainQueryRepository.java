@@ -2,6 +2,7 @@ package com.backend.domain.captain.repository;
 
 import static com.backend.domain.captain.entity.QCaptain.*;
 import static com.backend.domain.member.entity.QMember.*;
+import static com.backend.global.storage.entity.QFile.*;
 
 import java.util.Optional;
 
@@ -28,13 +29,15 @@ public class CaptainQueryRepository {
 				member.name,
 				member.nickname,
 				member.phone,
-				member.profileImg,
+				file.url,
 				member.description,
 				member.role,
 				captain.shipLicenseNumber,
 				captain.shipList
 			))
 			.from(member)
+			.leftJoin(file)
+			.on(member.fileId.eq(file.fileId))
 			.leftJoin(captain)
 			.on(member.memberId.eq(captain.memberId))
 			.where(member.memberId.eq(captainId))

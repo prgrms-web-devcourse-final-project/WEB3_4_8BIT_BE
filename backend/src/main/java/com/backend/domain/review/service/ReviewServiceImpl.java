@@ -12,6 +12,8 @@ import com.backend.domain.review.entity.Review;
 import com.backend.domain.review.exception.ReviewErrorCode;
 import com.backend.domain.review.exception.ReviewException;
 import com.backend.domain.review.repository.ReviewRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,10 +29,10 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional
 	public Long save(final Long memberId, final Long reservationId, final ReviewRequest.Create request) {
 
-		// 리뷰 중복 검증 TODO 예약 검증은 선상 낚시 예약 기능 구현 이후에 추가
-		if(reviewRepository.existsByReservationId(reservationId)) {
-			throw new ReviewException(ReviewErrorCode.DUPLICATE_REVIEW);
-		}
+		// 리뷰 중복 검증
+		validateDuplicate(reservationId);
+
+		// TODO 예약 검증은 선상 낚시 예약 기능 구현 이후에 추가
 
 		Review review = ReviewConverter.fromReviewRequestCreate(memberId, reservationId, request);
 		Review savedReview = reviewRepository.save(review);
@@ -41,11 +43,11 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Slice<ReviewWithMemberResponse> getReviewListByPostId(final Long postId, final Pageable pageable) {
+	public Slice<ReviewWithMemberResponse> getReviewListByPostId(final Long memberId, final Long postId, final Pageable pageable) {
 
-		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(postId, pageable);
+		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(memberId, postId, pageable);
 
-		log.debug("[리뷰 조회] 게시글 ID {}의 리뷰 목록: {}", postId, reviewList);
+		logReviewList("게시글", postId, reviewList);
 		return reviewList;
 	}
 
@@ -55,7 +57,32 @@ public class ReviewServiceImpl implements ReviewService {
 
 		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable);
 
-		log.debug("[리뷰 조회] 회원 ID {}의 리뷰 목록: {}", memberId, reviewList);
+		logReviewList("회원", memberId, reviewList);
+		return reviewList;
+	}
+
+	@Override
+	public ScrollResponse<ReviewWithMemberResponse> getReviewListByPostIdWithCursor(
+		final Long postId,
+		final Long memberId,
+		final GlobalRequest.CursorRequest cursorRequestDto
+	) {
+		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsByPostIdWithCursor(
+			postId, memberId, cursorRequestDto);
+
+		logReviewList("게시글", postId, reviewList);
+		return reviewList;
+	}
+
+	@Override
+	public ScrollResponse<ReviewWithMemberResponse> getReviewListByMemberIdWithCursor(
+		final Long memberId,
+		final GlobalRequest.CursorRequest cursorRequestDto
+	) {
+		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsByMemberIdWithCursor(
+			memberId, cursorRequestDto);
+
+		logReviewList("회원", memberId, reviewList);
 		return reviewList;
 	}
 
@@ -81,5 +108,15 @@ public class ReviewServiceImpl implements ReviewService {
 		if (!review.getMemberId().equals(memberId)) {
 			throw new ReviewException(ReviewErrorCode.FORBIDDEN_REVIEW_DELETE);
 		}
+	}
+
+	private void validateDuplicate(final Long reservationId) {
+		if(reviewRepository.existsByReservationId(reservationId)) {
+			throw new ReviewException(ReviewErrorCode.DUPLICATE_REVIEW);
+		}
+	}
+
+	private void logReviewList(final String targetType, final Long targetId, final Object result) {
+		log.debug("[리뷰 조회] {} ID {}의 리뷰 목록: {}", targetType, targetId, result);
 	}
 }

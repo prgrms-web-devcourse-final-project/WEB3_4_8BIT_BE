@@ -5,6 +5,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Repository;
 
 import static com.backend.domain.member.entity.QMember.*;
+import static com.backend.global.storage.entity.QFile.*;
+
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.dto.QMemberResponse_Detail;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -25,10 +27,12 @@ public class MemberQueryRepository {
 				member.name,
 				member.nickname,
 				member.phone,
-				member.profileImg,
+				file.url,
 				member.description
 			))
 			.from(member)
+			.leftJoin(file)
+			.on(member.fileId.eq(file.fileId))
 			.where(member.memberId.eq(memberId))
 			.fetchOne();
 

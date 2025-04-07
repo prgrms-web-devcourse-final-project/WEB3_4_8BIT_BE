@@ -9,12 +9,12 @@ public class MemberRequest {
 	/**
 	 * {
 	 *   "nickname": "낚시중인낚시왕",
-	 *   "profileImg": "http://example.com/profile.jpg",
+	 *   "fileId": 101,
 	 *   "description": "낚시를 좋아합니다."
 	 * }
 	 *
 	 * @param nickname 유저 닉네임 (최대 30자, 필수)
-	 * @param profileImg 유저 프로필 이미지 URL (선택)
+	 * @param fileId 유저 프로필 이미지 ID (필수)
 	 * @param description 유저 자기소개 (최대 500자)
 	 */
 	public record Form(
@@ -23,8 +23,8 @@ public class MemberRequest {
 		@Schema(description = "유저 닉네임", example = "낚시중인낚시왕")
 		String nickname,
 
-		@Schema(description = "프로필 이미지 URL", example = "http://example.com/profile.jpg")
-		String profileImg,
+		@Schema(description = "프로필 이미지 ID", example = "101")
+		Long fileId,
 
 		@NotBlank(message = "자기소개는 필수 항목입니다.")
 		@Size(max = 500, message = "자개소개는 최대 500자까지 가능합니다.")

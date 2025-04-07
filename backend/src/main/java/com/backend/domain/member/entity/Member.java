@@ -53,7 +53,7 @@ public class Member extends BaseEntity {
 	@Column(nullable = false, unique = true)
 	private String providerId;
 
-	private String profileImg;
+	private Long fileId;
 
 	@Column(columnDefinition = "TEXT", length = 500)
 	private String description;
@@ -66,9 +66,9 @@ public class Member extends BaseEntity {
 		this.email = email;
 	}
 
-	public void updateMember(final String nickname, final String profileImg, final String description) {
+	public void updateMember(final String nickname, final Long fileId, final String description) {
 		this.nickname = nickname;
-		this.profileImg = profileImg;
+		this.fileId = fileId;
 		this.description = description;
 		if (!this.isAddInfo)
 			this.isAddInfo = true;

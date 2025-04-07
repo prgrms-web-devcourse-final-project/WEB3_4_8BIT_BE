@@ -139,7 +139,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			Member member = Member.builder()
 				.email(userInfo.getEmail())
 				.name(userInfo.getName())
-				.profileImg(userInfo.getImageUrl())
+				// .profileImg(userInfo.getImageUrl())
 				.phone(formattedPhone)
 				.providerId(userInfo.getId())
 				.provider(provider)

@@ -127,7 +127,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 			// 1. 추가정보 미입력 상태
 			loginResponse.put("id", member.getMemberId());
 			loginResponse.put("name", member.getName());
-			loginResponse.put("profileImg", member.getProfileImg());
+			loginResponse.put("profileImg", member.getFileId());
 			loginResponse.put("role", member.getRole().name());
 			loginResponse.put("provider", member.getProvider().name());
 			loginResponse.put("isAddInfo", false);
@@ -140,7 +140,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 				loginResponse.put("id", memberId);
 				loginResponse.put("name", member.getName());
 				loginResponse.put("nickname", member.getNickname());
-				loginResponse.put("profileImg", member.getProfileImg());
+				loginResponse.put("profileImg", member.getFileId());
 				loginResponse.put("role", member.getRole().name());
 				loginResponse.put("provider", member.getProvider().name());
 				loginResponse.put("isAddInfo", true);
@@ -151,7 +151,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 				loginResponse.put("id", memberId);
 				loginResponse.put("name", member.getName());
 				loginResponse.put("nickname", member.getNickname());
-				loginResponse.put("profileImg", member.getProfileImg());
+				loginResponse.put("profileImg", member.getFileId());
 				loginResponse.put("role", member.getRole().name());
 				loginResponse.put("provider", member.getProvider().name());
 				loginResponse.put("isAddInfo", true);

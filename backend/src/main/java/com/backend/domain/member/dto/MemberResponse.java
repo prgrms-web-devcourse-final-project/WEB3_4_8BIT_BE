@@ -13,7 +13,7 @@ public class MemberResponse {
 	 *   "name": "홍길동",
 	 *   "nickname": "테스트닉",
 	 *   "phone": "010-1234-5678",
-	 *   "profileImg": "http://example.com/profile.jpg",
+	 *   "fileUrl": "http://example.com/profile.jpg",
 	 *   "description": "자기소개입니다.",
 	 * }
 	 *
@@ -22,7 +22,7 @@ public class MemberResponse {
 	 * @param name 이름
 	 * @param nickname 닉네임
 	 * @param phone 전화번호
-	 * @param profileImg 프로필 이미지 URL
+	 * @param fileUrl 프로필 이미지 URL
 	 * @param description 자기소개
 	 */
 	@Builder
@@ -32,7 +32,7 @@ public class MemberResponse {
 		String name,
 		String nickname,
 		String phone,
-		String profileImg,
+		String fileUrl,
 		String description
 	) {
 		@QueryProjection

@@ -72,7 +72,7 @@ class CaptainServiceTest extends BaseTest {
 
 		// member가 업데이트 되었는지 확인
 		assertThat(givenMember.getNickname()).isEqualTo(givenRequestDto.nickname());
-		assertThat(givenMember.getProfileImg()).isEqualTo(givenRequestDto.profileImg());
+		assertThat(givenMember.getFileId()).isEqualTo(givenRequestDto.fileId());
 		assertThat(givenMember.getDescription()).isEqualTo(givenRequestDto.description());
 		assertThat(givenMember.getRole().name()).isEqualTo("CAPTAIN");
 		assertThat(givenMember.getIsAddInfo()).isTrue();
