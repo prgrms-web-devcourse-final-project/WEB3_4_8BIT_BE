@@ -1,10 +1,11 @@
 package com.backend.domain.fishpoint.service;
 
+import static com.backend.domain.fishpoint.dto.response.FishPointResponse.*;
+
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.backend.domain.fishpoint.dto.response.FishPointResponse;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,7 @@ public class FishPointServiceImpl implements FishPointService {
 	private final FishPointRepository fishPointRepository;
 
 	@Override
-	public List<FishPointResponse> getFishPointsByBounds(
+	public List<Response> getFishPointsByBounds(
 		final double swLat,
 		final double swLng,
 		final double neLat,
@@ -28,7 +29,12 @@ public class FishPointServiceImpl implements FishPointService {
 	}
 
 	@Override
-	public List<FishPointResponse> searchFishPoints(final String fishPointName) {
+	public List<ResponseWithDistance> getNearbyFishPoints(final double lat, final double lng, final double radiusKm) {
+		return fishPointRepository.findByDistanceWithin(lat, lng, radiusKm);
+	}
+
+	@Override
+	public List<Response> searchFishPoints(final String fishPointName) {
 		return fishPointRepository.findByFishPointName(fishPointName);
 	}
 }

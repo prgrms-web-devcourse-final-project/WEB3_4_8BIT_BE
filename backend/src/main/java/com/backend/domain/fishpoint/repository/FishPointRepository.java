@@ -1,8 +1,9 @@
 package com.backend.domain.fishpoint.repository;
 
+import static com.backend.domain.fishpoint.dto.response.FishPointResponse.*;
+
 import java.util.List;
 
-import com.backend.domain.fishpoint.dto.response.FishPointResponse;
 import com.backend.domain.fishpoint.entity.FishPoint;
 
 public interface FishPointRepository {
@@ -36,7 +37,17 @@ public interface FishPointRepository {
 	 * @param neLng 북동쪽(North-East) 경도
 	 * @return 바운드 내에 존재하는 낚시 포인트 정보를 담은 DTO 리스트
 	 */
-	List<FishPointResponse> findByBounds(double swLat, double swLng, double neLat, double neLng);
+	List<Response> findByBounds(double swLat, double swLng, double neLat, double neLng);
+
+	/**
+	 * 중심 좌표 기준으로 반경 내 낚시 포인트 조회
+	 *
+	 * @param lat 중심 위도
+	 * @param lng 중심 경도
+	 * @param radiusKm 반경 (킬로미터 단위)
+	 * @return 반경 내 낚시 포인트 리스트
+	 */
+	List<ResponseWithDistance> findByDistanceWithin(final double lat, final  double lng, final  double radiusKm);
 
 	/**
 	 * 지역명을 기준으로 낚시 포인트 전체 조회
@@ -44,5 +55,5 @@ public interface FishPointRepository {
 	 * @param fishPointName 지역명 (부분 일치 검색)
 	 * @return 낚시 포인트 정보 DTO 리스트
 	 */
-	List<FishPointResponse> findByFishPointName(final String fishPointName);
+	List<Response> findByFishPointName(final String fishPointName);
 }

@@ -1,15 +1,16 @@
 package com.backend.domain.fishpoint.controller;
 
+import static com.backend.domain.fishpoint.dto.response.FishPointResponse.*;
+
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.fishpoint.dto.request.FishPointRequest;
-import com.backend.domain.fishpoint.dto.response.FishPointResponse;
 import com.backend.domain.fishpoint.service.FishPointService;
 import com.backend.global.dto.response.GenericResponse;
 
@@ -28,10 +29,10 @@ public class FishPointController {
 
 	@GetMapping("/bounds")
 	@Operation(summary = "지도 내 낚시 포인트 조회", description = "지도 범위 내에 있는 낚시 포인트 조회 API")
-	public ResponseEntity<GenericResponse<List<FishPointResponse>>> getFishPointByBounds(
-		@Valid final FishPointRequest.Bounds boundsRequestDto
+	public ResponseEntity<GenericResponse<List<Response>>> getFishPointByBounds(
+		@Valid @ModelAttribute  final FishPointRequest.Bounds boundsRequestDto
 	) {
-		List<FishPointResponse> fishPointList = fishPointService.getFishPointsByBounds(
+		List<Response> fishPointList = fishPointService.getFishPointsByBounds(
 			boundsRequestDto.swLat(),
 			boundsRequestDto.swLng(),
 			boundsRequestDto.neLat(),
@@ -41,12 +42,29 @@ public class FishPointController {
 		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
 	}
 
+	@GetMapping("/nearby")
+	@Operation(
+		summary = "내 위치 근처 낚시 포인트 조회",
+		description = "사용자의 현재 위치를 기준으로 설정한 반경(km) 내에 있는 낚시 포인트 목록 조회 API"
+	)
+	public ResponseEntity<GenericResponse<List<ResponseWithDistance>>> getNearbyFishPoints(
+		@Valid @ModelAttribute final FishPointRequest.Nearby nearbyRequestDto
+	) {
+		List<ResponseWithDistance> fishPointList = fishPointService.getNearbyFishPoints(
+			nearbyRequestDto.lat(),
+			nearbyRequestDto.lng(),
+			nearbyRequestDto.radiusKm()
+		);
+
+		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
+	}
+
 	@GetMapping
 	@Operation(summary = "낚시 포인트 검색", description = "지역명을 기준으로 낚시 포인트 검색 API")
-	public ResponseEntity<GenericResponse<List<FishPointResponse>>> getFishPointBySearch(
-		@Valid final FishPointRequest.Search searchRequestDto
+	public ResponseEntity<GenericResponse<List<Response>>> getFishPointBySearch(
+		@Valid @ModelAttribute final FishPointRequest.Search searchRequestDto
 	) {
-		List<FishPointResponse> fishPointList = fishPointService.searchFishPoints(searchRequestDto.region());
+		List<Response> fishPointList = fishPointService.searchFishPoints(searchRequestDto.region());
 
 		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
 	}

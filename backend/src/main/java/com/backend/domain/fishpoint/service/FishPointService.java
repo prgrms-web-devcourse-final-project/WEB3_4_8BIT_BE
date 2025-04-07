@@ -1,8 +1,8 @@
 package com.backend.domain.fishpoint.service;
 
-import java.util.List;
+import static com.backend.domain.fishpoint.dto.response.FishPointResponse.*;
 
-import com.backend.domain.fishpoint.dto.response.FishPointResponse;
+import java.util.List;
 
 public interface FishPointService {
 
@@ -15,7 +15,7 @@ public interface FishPointService {
 	 * @param neLng 지도 바운드의 북동쪽(North-East) 경도
 	 * @return 조회된 낚시 포인트 응답 DTO 리스트
 	 */
-	List<FishPointResponse> getFishPointsByBounds(
+	List<Response> getFishPointsByBounds(
 		final double swLat,
 		final double swLng,
 		final double neLat,
@@ -23,10 +23,20 @@ public interface FishPointService {
 	);
 
 	/**
+	 * 사용자의 현재 위치를 기준으로 지정된 반경(km) 내의 낚시 포인트를 조회
+	 *
+	 * @param lat 위도 (latitude) - 사용자의 현재 위치 위도
+	 * @param lng 경도 (longitude) - 사용자의 현재 위치 경도
+	 * @param radiusKm 반경 거리 (단위: km) - 조회할 거리 범위
+	 * @return 반경 내에 위치한 낚시 포인트 정보를 담은 DTO 리스트
+	 */
+	List<ResponseWithDistance> getNearbyFishPoints(final double lat, final double lng, final double radiusKm);
+
+	/**
 	 * 낚시 포인트 이름을 기준으로 검색
 	 *
 	 * @param fishPointName 검색할 낚시 포인트 이름 (부분 일치)
 	 * @return 검색된 낚시 포인트 목록 (isBan = false인 데이터만 반환)
 	 */
-	List<FishPointResponse> searchFishPoints(final String fishPointName);
+	List<Response> searchFishPoints(final String fishPointName);
 }
