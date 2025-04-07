@@ -20,6 +20,8 @@ import com.backend.domain.fishingtriprecruitment.repository.FishingTripRecruitme
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -64,6 +66,23 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 		fishingTripRecruitment.setRecruitmentStatus(RecruitmentStatus.REJECTED);
 	}
 
+	@Override
+	public ScrollResponse<FishingTripRecruitmentResponse.DetailPage> getDetailPageList(
+		final Long memberId,
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long fishingTripPostId,
+		final RecruitmentStatus status) {
+
+		validateFishingTripPostOwner(memberId, fishingTripPostId);
+
+		ScrollResponse<FishingTripRecruitmentResponse.DetailPage> detailPageList = fishingTripRecruitmentRepository.findDetailPageByFishingTripPostIdAndStatus(
+			cursorRequestDto, fishingTripPostId, status);
+
+		log.debug("동출 신청 조회하였습니다.");
+
+		return detailPageList;
+	}
+
 	/**
 	 * 낚시 동행 모집글의 작성자인지를 검증합니다.
 	 *
@@ -73,20 +92,13 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 	 * @param fishingTripPostId 검증할 낚시 동행 모집글의 ID
 	 * @throws FishingTripPostException 모집글이 없거나 작성자가 아닌 경우 예외 발생
 	 */
-	public void validateFishingTripPostOwner(final Long memberId, final Long fishingTripPostId) {
+	private void validateFishingTripPostOwner(final Long memberId, final Long fishingTripPostId) {
 		FishingTripPost fishingTripPost = fishingTripPostRepository.findById(fishingTripPostId)
 			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
 
 		if (!fishingTripPost.getMemberId().equals(memberId)) {
 			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR);
 		}
-	}
-
-	@Override
-	public List<FishingTripRecruitmentResponse.DetailPage> getFishingTripRecruitmentDetailPage(
-		Long fishingTripPostId, RecruitmentStatus status) {
-
-		return List.of();
 	}
 
 	/**
