@@ -1,5 +1,6 @@
 package com.backend.domain.fishingtriprecruitment.service;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 
 import java.util.List;
@@ -75,4 +76,27 @@ public interface FishingTripRecruitmentService {
 		final Long fishingTripPostId,
 		final RecruitmentStatus status
 	);
+
+	/**
+	 * 동출 모집 신청을 승인합니다.
+	 *
+	 * <p>모집글 작성자가 신청을 승인할 때 사용되며, 신청자의 상태를 {@code APPROVED}로 변경하고
+	 * 모집글의 현재 참여 인원({@code currentCount})을 1 증가시킵니다.
+	 * 승인 후 인원이 모집 정원에 도달하면 게시글 상태를 {@code COMPLETED}로 변경합니다.</p>
+	 *
+	 * @implSpec
+	 * <ol>
+	 *     <li>{@code fishingTripRecruitmentId}를 통해 신청 엔티티를 조회합니다.</li>
+	 *     <li>신청자가 속한 모집글의 작성자와 {@code memberId}가 일치하는지 검증합니다.</li>
+	 *     <li>모집글의 현재 인원이 모집 정원을 초과하지 않는지 확인합니다.</li>
+	 *     <li>모든 검증을 통과하면 신청 상태를 {@link RecruitmentStatus#APPROVED}로 변경하고, 인원을 1명 증가시킵니다.</li>
+	 *     <li>모집 정원에 도달한 경우 {@link PostStatus#COMPLETED} 상태로 게시글 상태를 변경합니다.</li>
+	 * </ol>
+	 *
+	 * @param memberId 현재 로그인한 사용자(모집글 작성자)의 ID
+	 * @param fishingTripRecruitmentId 승인할 동출 모집 신청의 고유 ID
+	 * @throws FishingTripPostException 작성자가 아닐 경우 또는 모집 정원이 초과된 경우 발생
+	 */
+	void acceptFishingTripRecruitment(final Long memberId, final Long fishingTripRecruitmentId);
+
 }

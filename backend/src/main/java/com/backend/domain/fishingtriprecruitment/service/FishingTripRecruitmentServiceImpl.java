@@ -1,10 +1,9 @@
 package com.backend.domain.fishingtriprecruitment.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
@@ -67,6 +66,7 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ScrollResponse<FishingTripRecruitmentResponse.DetailPage> getDetailPageList(
 		final Long memberId,
 		final GlobalRequest.CursorRequest cursorRequestDto,
@@ -83,6 +83,51 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 		return detailPageList;
 	}
 
+	@Override
+	@Transactional
+	public void acceptFishingTripRecruitment(final Long memberId, final Long fishingTripRecruitmentId) {
+
+		FishingTripRecruitment fishingTripRecruitment = getFishingTripRecruitmentById(fishingTripRecruitmentId);
+
+		FishingTripPost fishingTripPost = validateFishingTripPostOwner(memberId,
+			fishingTripRecruitment.getFishingTripPostId());
+		validateFishingTripPost(fishingTripPost);
+
+		fishingTripRecruitment.setRecruitmentStatus(RecruitmentStatus.APPROVED);
+		fishingTripPost.increaseCurrentCount(1);
+		completedFishingTripPost(fishingTripPost);
+	}
+
+	/**
+	 * 모집 인원이 정원에 도달했는지 확인하고, 도달한 경우 게시글 상태를 {@code COMPLETED}로 변경합니다.
+	 *
+	 * <p>현재 인원({@code currentCount})이 모집 정원({@code recruitmentCount}) 이상일 경우,
+	 * 더 이상 모집할 수 없으므로 게시글 상태를 {@link PostStatus#COMPLETED}로 설정합니다.</p>
+	 *
+	 * @param fishingTripPost 상태를 검사할 낚시 동행 모집글 엔티티
+	 */
+	private static void completedFishingTripPost(FishingTripPost fishingTripPost) {
+		if (fishingTripPost.getCurrentCount() >= fishingTripPost.getRecruitmentCount())
+			fishingTripPost.setPostStatus(PostStatus.COMPLETED);
+	}
+
+	/**
+	 * 동출 모집글의 현재 인원이 모집 정원을 초과했는지 검증합니다.
+	 *
+	 * <p>모집글의 {@code currentCount}가 {@code recruitmentCount} 이상일 경우,
+	 * 더 이상 신청을 승인할 수 없으므로 예외를 발생시킵니다.</p>
+	 *
+	 * @param fishingTripPost 검증할 동출 모집글 엔티티
+	 *
+	 * @throws FishingTripPostException 모집 정원이 초과된 경우 발생하며,
+	 *         {@link com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode#FISHING_TRIP_POST_OVER_RECRUITMENT}
+	 *         에러 코드를 포함합니다.
+	 */
+	private static void validateFishingTripPost(final FishingTripPost fishingTripPost) {
+		if (fishingTripPost.getCurrentCount() >= fishingTripPost.getRecruitmentCount())
+			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_OVER_RECRUITMENT);
+	}
+
 	/**
 	 * 낚시 동행 모집글의 작성자인지를 검증합니다.
 	 *
@@ -92,13 +137,16 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 	 * @param fishingTripPostId 검증할 낚시 동행 모집글의 ID
 	 * @throws FishingTripPostException 모집글이 없거나 작성자가 아닌 경우 예외 발생
 	 */
-	private void validateFishingTripPostOwner(final Long memberId, final Long fishingTripPostId) {
+	private FishingTripPost validateFishingTripPostOwner(final Long memberId, final Long fishingTripPostId) {
 		FishingTripPost fishingTripPost = fishingTripPostRepository.findById(fishingTripPostId)
 			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
+		log.debug("[동출 모집 게시글 조회] : {}", fishingTripPost);
 
 		if (!fishingTripPost.getMemberId().equals(memberId)) {
 			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR);
 		}
+
+		return fishingTripPost;
 	}
 
 	/**
