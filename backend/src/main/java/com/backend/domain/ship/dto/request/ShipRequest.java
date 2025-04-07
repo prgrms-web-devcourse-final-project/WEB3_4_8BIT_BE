@@ -44,7 +44,7 @@ public class ShipRequest {
 	 */
 	public record Create(
 		@Size(max = 30, message = "선박 이름은 30자 이하여야 합니다.")
-		@NotBlank(message = "선박 이름은 필수 항목입니다,")
+		@NotBlank(message = "선박 이름은 필수 항목입니다.")
 		@Schema(description = "선박 이름", example = "해랑호")
 		String shipName,
 
