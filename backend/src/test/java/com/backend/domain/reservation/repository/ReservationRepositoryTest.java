@@ -5,8 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -234,52 +232,6 @@ public class ReservationRepositoryTest extends BaseTest {
 					});
 			}
 		}
-
-	@Test
-	@DisplayName("오늘자 이후 예약 정보 조회 [Repository] - Success")
-	void t06() {
-		// Given
-		Long givenShipFishingPostId = 1L;
-
-		fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
-			.set("reservationId", null)
-			.set("shipFishingPostId", givenShipFishingPostId)
-			.set("reservationDate", LocalDate.now())
-			.set("guestCount", 1)
-			.sampleStream()
-			.limit(1)
-			.forEach(reservation ->
-				reservationRepository.save(reservation));
-
-		fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
-			.set("reservationId", null)
-			.set("shipFishingPostId", givenShipFishingPostId)
-			.set("reservationDate", LocalDate.now().plusDays(10))
-			.set("guestCount", 1)
-			.sampleStream()
-			.limit(5)
-			.forEach(reservation ->
-				reservationRepository.save(reservation));
-
-		fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
-			.set("reservationId", null)
-			.set("shipFishingPostId", givenShipFishingPostId)
-			.set("reservationDate", LocalDate.now().minusDays(10))
-			.set("guestCount", 1)
-			.sampleStream()
-			.limit(5)
-			.forEach(reservation ->
-				reservationRepository.save(reservation));
-
-		// When
-		List<Reservation> savedReservationList = reservationRepository
-			.findByShipFishingPostIdAndTodayAfter(givenShipFishingPostId, LocalDate.now());
-
-		// Then
-		assertThat(savedReservationList.size()).isEqualTo(6);
-	}
-}
-
 		GlobalRequest.CursorRequest givenCursorRequest1 = fixtureMonkeyValidation
 			.giveMeBuilder(GlobalRequest.CursorRequest.class)
 			.set("order", "desc")
@@ -386,5 +338,49 @@ public class ReservationRepositoryTest extends BaseTest {
 		assertThat(findResponseDto1.numberOfElements()).isEqualTo(6);
 		assertThat(findResponseDto1.isFirst()).isTrue();
 		assertThat(findResponseDto1.isLast()).isFalse();
+	}
+
+	@Test
+	@DisplayName("오늘자 이후 예약 정보 조회 [Repository] - Success")
+	void t06() {
+		// Given
+		Long givenShipFishingPostId = 1L;
+
+		fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+			.set("reservationId", null)
+			.set("shipFishingPostId", givenShipFishingPostId)
+			.set("reservationDate", LocalDate.now())
+			.set("guestCount", 1)
+			.sampleStream()
+			.limit(1)
+			.forEach(reservation ->
+				reservationRepository.save(reservation));
+
+		fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+			.set("reservationId", null)
+			.set("shipFishingPostId", givenShipFishingPostId)
+			.set("reservationDate", LocalDate.now().plusDays(10))
+			.set("guestCount", 1)
+			.sampleStream()
+			.limit(5)
+			.forEach(reservation ->
+				reservationRepository.save(reservation));
+
+		fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+			.set("reservationId", null)
+			.set("shipFishingPostId", givenShipFishingPostId)
+			.set("reservationDate", LocalDate.now().minusDays(10))
+			.set("guestCount", 1)
+			.sampleStream()
+			.limit(5)
+			.forEach(reservation ->
+				reservationRepository.save(reservation));
+
+		// When
+		List<Reservation> savedReservationList = reservationRepository
+			.findByShipFishingPostIdAndTodayAfter(givenShipFishingPostId, LocalDate.now());
+
+		// Then
+		assertThat(savedReservationList.size()).isEqualTo(6);
 	}
 }

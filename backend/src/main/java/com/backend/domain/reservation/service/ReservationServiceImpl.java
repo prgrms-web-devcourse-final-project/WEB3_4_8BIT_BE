@@ -130,13 +130,11 @@ public class ReservationServiceImpl implements ReservationService {
 	 * @param guestCount {@link Long}
 	 * @param type {@link Boolean}
 	 */
-
 	private void updateReservationDateWithRemainCount(
 		final Long shipFishingPostId,
 		final LocalDate reservationDate,
 		final Integer guestCount,
 		final Boolean type) {
-
 
 		ReservationDate findReservationDate = reservationDateRepository
 			.findByIdWithPessimistic(shipFishingPostId, reservationDate)
@@ -146,6 +144,7 @@ public class ReservationServiceImpl implements ReservationService {
 			findReservationDate.remainPlus(guestCount);
 		} else {
 			verifyReservationDate(findReservationDate, guestCount);
+
 			findReservationDate.remainMinus(guestCount);
 		}
 	}
