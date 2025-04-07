@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
@@ -268,7 +269,8 @@ class FishingTripPostServiceTest extends BaseTest {
 			"남해",
 			128.12345,
 			37.12345,
-			fileIds
+			fileIds,
+			PostStatus.RECRUITING
 		);
 
 		List<File> mockFiles = List.of(

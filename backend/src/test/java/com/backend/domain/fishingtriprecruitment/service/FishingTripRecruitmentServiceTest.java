@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
@@ -262,4 +263,107 @@ class FishingTripRecruitmentServiceTest extends BaseTest {
 		verify(fishingTripRecruitmentRepository, never()).findDetailPageByFishingTripPostIdAndStatus(any(), any(), any());
 	}
 
+	@Test
+	@DisplayName("동출 모집 신청 승인 [Service] - Success")
+	void t08() {
+		// Given
+		Long authorId = 1L;
+		Long recruitmentId = 10L;
+		Long postId = 100L;
+
+		FishingTripRecruitment recruitment = recruitmentBuilder
+			.set("fishingTripRecruitmentId", recruitmentId)
+			.set("fishingTripPostId", postId)
+			.set("recruitmentStatus", RecruitmentStatus.PENDING)
+			.sample();
+
+		FishingTripPost post = FishingTripPost.builder()
+			.fishingTripPostId(postId)
+			.memberId(authorId)
+			.recruitmentCount(5)
+			.currentCount(3)
+			.build();
+
+		when(fishingTripRecruitmentRepository.findById(recruitmentId)).thenReturn(Optional.of(recruitment));
+		when(fishingTripPostRepository.findById(postId)).thenReturn(Optional.of(post));
+
+		// When
+		fishingTripRecruitmentService.acceptFishingTripRecruitment(authorId, recruitmentId);
+
+		// Then
+		assertThat(recruitment.getRecruitmentStatus()).isEqualTo(RecruitmentStatus.APPROVED);
+		assertThat(post.getCurrentCount()).isEqualTo(4);
+		verify(fishingTripRecruitmentRepository).findById(recruitmentId);
+		verify(fishingTripPostRepository).findById(postId);
+	}
+
+	@Test
+	@DisplayName("동출 모집 신청 승인 실패 - 모집 정원 초과 [FISHING_TRIP_POST_RECRUITMENT_FULL] - Fail")
+	void t09() {
+		// Given
+		Long authorId = 1L;
+		Long recruitmentId = 10L;
+		Long postId = 100L;
+
+		FishingTripRecruitment recruitment = recruitmentBuilder
+			.set("fishingTripRecruitmentId", recruitmentId)
+			.set("fishingTripPostId", postId)
+			.set("recruitmentStatus", RecruitmentStatus.PENDING)
+			.sample();
+
+		FishingTripPost post = FishingTripPost.builder()
+			.fishingTripPostId(postId)
+			.memberId(authorId)
+			.recruitmentCount(3)
+			.currentCount(3)
+			.build();
+
+		when(fishingTripRecruitmentRepository.findById(recruitmentId)).thenReturn(Optional.of(recruitment));
+		when(fishingTripPostRepository.findById(postId)).thenReturn(Optional.of(post));
+
+		// When & Then
+		assertThatThrownBy(() -> fishingTripRecruitmentService.acceptFishingTripRecruitment(authorId, recruitmentId))
+			.isInstanceOf(FishingTripPostException.class)
+			.hasFieldOrPropertyWithValue("errorCode", FishingTripPostErrorCode.FISHING_TRIP_POST_OVER_RECRUITMENT)
+			.hasMessageContaining(FishingTripPostErrorCode.FISHING_TRIP_POST_OVER_RECRUITMENT.getMessage());
+
+		verify(fishingTripRecruitmentRepository).findById(recruitmentId);
+		verify(fishingTripPostRepository).findById(postId);
+	}
+
+	@Test
+	@DisplayName("동출 모집 신청 승인 [Service] - 모집 정원 도달 시 게시글 상태 COMPLETED로 변경 - Success")
+	void t10() {
+		// Given
+		Long authorId = 1L;
+		Long recruitmentId = 11L;
+		Long postId = 101L;
+
+		FishingTripRecruitment recruitment = recruitmentBuilder
+			.set("fishingTripRecruitmentId", recruitmentId)
+			.set("fishingTripPostId", postId)
+			.set("recruitmentStatus", RecruitmentStatus.PENDING)
+			.sample();
+
+		FishingTripPost post = FishingTripPost.builder()
+			.fishingTripPostId(postId)
+			.memberId(authorId)
+			.recruitmentCount(4) // 총 4명까지 모집 가능
+			.currentCount(3)     // 현재 3명
+			.build();
+
+		when(fishingTripRecruitmentRepository.findById(recruitmentId)).thenReturn(Optional.of(recruitment));
+		when(fishingTripPostRepository.findById(postId)).thenReturn(Optional.of(post));
+
+		// When
+		fishingTripRecruitmentService.acceptFishingTripRecruitment(authorId, recruitmentId);
+
+		// Then
+		assertThat(recruitment.getRecruitmentStatus()).isEqualTo(RecruitmentStatus.APPROVED);
+		assertThat(post.getCurrentCount()).isEqualTo(4); // 정원 도달
+		assertThat(post.getPostStatus()).isEqualTo(PostStatus.COMPLETED); // 상태 변경 확인
+
+		verify(fishingTripRecruitmentRepository).findById(recruitmentId);
+		verify(fishingTripPostRepository).findById(postId);
+	}
 }
