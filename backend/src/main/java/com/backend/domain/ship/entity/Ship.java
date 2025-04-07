@@ -40,7 +40,12 @@ public class Ship extends BaseEntity {
 	private String departurePort;
 
 	@Column(nullable = false)
+	private Integer passengerCapacity;
+
+	//TODO 추후 화장실 ENUM으로 변경
+	@Column(nullable = false)
 	private Boolean publicRestroom;
+	// PUBLIC, SEPARATION, NONE
 
 	@Column(nullable = false)
 	private Boolean loungeArea;
