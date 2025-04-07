@@ -1,5 +1,8 @@
 package com.backend.domain.ship.domain;
 
+import java.util.stream.Stream;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 /**
@@ -23,5 +26,15 @@ public enum RestroomType {
 	@JsonValue
 	public String getDisplayName() {
 		return this.displayName;
+	}
+
+	@JsonCreator
+	public static RestroomType from(String param) {
+		return Stream.of(RestroomType.values())
+			.filter(l ->
+				l.name().equalsIgnoreCase(param) || l.getDisplayName().equalsIgnoreCase(param)
+			)
+			.findFirst()
+			.orElse(null);
 	}
 }
