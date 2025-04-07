@@ -60,7 +60,7 @@ public class ReservationDateServiceImpl implements ReservationDateService {
 	@Async
 	@Override
 	@Transactional
-	public void deleteReservationDateList(Long shipFishingPostId) {
+	public void deleteReservationDateList(final Long shipFishingPostId) {
 
 		reservationDateRepository.deleteByShipFishingPostId(shipFishingPostId);
 	}
