@@ -8,7 +8,7 @@ public class ShipRequest {
 		String shipNumber,
 		String departurePort,
 		Integer passengerCapacity,
-		Boolean publicRestroom,
+		String restroomType,
 		Boolean loungeArea,
 		Boolean kitchenFacility,
 		Boolean fishingChair,

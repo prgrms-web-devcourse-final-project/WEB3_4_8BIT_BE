@@ -8,7 +8,7 @@ public class ShipResponse {
 	 * 	 "shipName": "나로호",
 	 *   "shipNumber": "01234567890123",
 	 *   "departurePort": "부산",
-	 *   "publicRestroom": true,
+	 *   "restroomType": "PUBLIC",
 	 *   "loungeArea": false,
 	 *   "kitchenFacility": true,
 	 *   "fishingChair": false,
@@ -22,7 +22,7 @@ public class ShipResponse {
 	 * @param shipName 선박 이름
 	 * @param shipNumber 선박 번호
 	 * @param departurePort 선박 출항지
-	 * @param publicRestroom 공용 화장실 여부
+	 * @param restroomType 화장실 타입
 	 * @param loungeArea 휴게공간 여부
 	 * @param kitchenFacility 조리시설 여부
 	 * @param fishingChair 의제 제공 여부
@@ -36,7 +36,7 @@ public class ShipResponse {
 		String shipName,
 		String shipNumber,
 		String departurePort,
-		Boolean publicRestroom,
+		String restroomType,
 		Boolean loungeArea,
 		Boolean kitchenFacility,
 		Boolean fishingChair,

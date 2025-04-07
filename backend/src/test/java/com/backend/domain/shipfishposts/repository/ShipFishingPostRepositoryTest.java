@@ -188,7 +188,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		assertThat(shipDetail.shipName()).isEqualTo(savedShip.getShipName());
 		assertThat(shipDetail.shipNumber()).isEqualTo(savedShip.getShipNumber());
 		assertThat(shipDetail.departurePort()).isEqualTo(savedShip.getDeparturePort());
-		assertThat(shipDetail.publicRestroom()).isEqualTo(savedShip.getPublicRestroom());
+		assertThat(shipDetail.restroomType()).isEqualTo(savedShip.getRestroomType().toString());
 		assertThat(shipDetail.loungeArea()).isEqualTo(savedShip.getLoungeArea());
 		assertThat(shipDetail.kitchenFacility()).isEqualTo(savedShip.getKitchenFacility());
 		assertThat(shipDetail.fishingChair()).isEqualTo(savedShip.getFishingChair());
