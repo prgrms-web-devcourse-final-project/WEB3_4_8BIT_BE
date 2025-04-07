@@ -2,17 +2,19 @@ package com.backend.domain.ship.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.backend.domain.ship.dto.request.ShipRequest;
 import com.backend.domain.ship.entity.Ship;
+import com.backend.domain.ship.exception.ShipErrorCode;
+import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.ship.repository.ShipRepository;
 import com.backend.global.util.BaseTest;
 
@@ -49,7 +51,9 @@ class ShipServiceTest extends BaseTest {
 			.set("mealProvided", givenCreate.mealProvided())
 			.set("parkingAvailable", givenCreate.parkingAvailable());
 
-		Mockito.when(shipRepository.save(any(Ship.class))).thenReturn(
+		when(shipRepository.countByMemberId(givenMemberId)).thenReturn(3L);
+
+		when(shipRepository.save(any(Ship.class))).thenReturn(
 			shipArbitraryBuilder.set("shipId", 1L)
 			.sample()
 		);
@@ -59,6 +63,21 @@ class ShipServiceTest extends BaseTest {
 
 		// Then
 		assertThat(savedId).isEqualTo(1L);
+	}
+
+	@Test
+	@DisplayName("선박 저장 [Service] - Success")
+	void t02() {
+		// Given
+		Long givenMemberId = 1L;
+		ShipRequest.Create givenCreate = fixtureMonkeyValidation.giveMeOne(ShipRequest.Create.class);
+
+		when(shipRepository.countByMemberId(givenMemberId)).thenReturn(6L);
+
+		// When & Then
+		assertThatThrownBy(() -> shipService.createShip(givenMemberId, givenCreate))
+			.isInstanceOf(ShipException.class)
+			.hasMessage(ShipErrorCode.MAX_SHIP_COUNT_EXCEEDED.getMessage());
 	}
 
 }

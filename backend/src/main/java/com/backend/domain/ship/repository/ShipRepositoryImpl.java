@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 public class ShipRepositoryImpl implements ShipRepository {
 
 	private final ShipJpaRepository shipJpaRepository;
+	private final ShipQueryRepository shipQueryRepository;
 
 	@Override
 	public Ship save(final Ship ship) {
@@ -26,4 +27,8 @@ public class ShipRepositoryImpl implements ShipRepository {
 		return shipJpaRepository.findById(shipId);
 	}
 
+	@Override
+	public Long countByMemberId(Long memberId) {
+		return shipQueryRepository.countByMemberId(memberId);
+	}
 }
