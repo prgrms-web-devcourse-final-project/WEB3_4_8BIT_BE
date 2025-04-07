@@ -3,6 +3,7 @@ package com.backend.domain.fish.repository;
 import static org.assertj.core.api.Assertions.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -67,8 +68,6 @@ class FishRepositoryTest extends BaseTest {
 		.set("name", englishString)
 		.set("icon", englishString)
 		.set("spawnLocation", englishString);
-	@Autowired
-	private FishQueryRepository fishQueryRepository;
 
 	@Test
 	@DisplayName("물고기 저장 [Repository] - Success")
@@ -140,6 +139,24 @@ class FishRepositoryTest extends BaseTest {
 	}
 
 	@Test
+	@DisplayName("물고기 인기순 조회 [Repository] - Success")
+	void t06() {
+		// Given
+		List<Fish> givenFishList = arbitraryBuilder.set("fishId", null).sampleList(10);
+		List<Fish> savedFishList = fishJpaRepository.saveAll(givenFishList);
+
+		// When
+		List<FishResponse.Popular> findPopular = fishRepository.findPopular(10);
+		// Then
+		List<Fish> sortedFishList = savedFishList.stream()
+			.sorted(Comparator.comparing(Fish::getPopularityScore).reversed())
+			.toList();
+
+		// Then
+		assertThat(findPopular).hasSize(10);
+		assertThat(findPopular.get(0).popularityScore()).isEqualTo(sortedFishList.get(0).getPopularityScore());
+	}
+
 	@DisplayName("물고기 인기도 수정 [Repository] - Success")
 	void t05() {
 		// Given

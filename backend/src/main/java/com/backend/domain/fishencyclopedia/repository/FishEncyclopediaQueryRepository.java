@@ -77,10 +77,10 @@ public class FishEncyclopediaQueryRepository {
 			.limit(cursorRequestDto.size() + 1)
 			.fetch();
 
-		// 다음 페이지가 있는지 확인
-		boolean hasNext = detailList.size() > cursorRequestDto.size();
+		// 다음 페이지가 있는지 확인 마지막 페이지라면 True
+		boolean isLast = detailList.size() <= cursorRequestDto.size();
 
-		if (hasNext) {
+		if (!isLast) {
 			detailList.remove(detailList.size() - 1);
 		}
 
@@ -97,7 +97,7 @@ public class FishEncyclopediaQueryRepository {
 			cursorRequestDto.size(),
 			detailList.size(),
 			cursorRequestDto.fieldValue() == null,
-			hasNext
+			isLast
 		);
 	}
 

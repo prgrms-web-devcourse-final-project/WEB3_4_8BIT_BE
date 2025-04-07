@@ -49,6 +49,15 @@ public interface FishRepository {
 	List<Fish> findAllById(final List<Long> fishIdList);
 
 	/**
+	 * 인기순으로 limit 개수만큼 물고기 조회하는 메소드
+	 *
+	 * @param size {@link Integer} 최대 값 10
+	 * @return {@link List<FishResponse.Popular>}
+	 * @implSpec 인기순으로 물고기 limit 개수만큼 조회 후 반환
+	 * @author Kim Dong O
+	 */
+	List<FishResponse.Popular> findPopular(final Integer size);
+  /**
 	 * 현재 시간부터 1시간 전까지 물고기 도감에 추가된 잡은 횟수를 인기도로 설정하는 메소드
 	 *
 	 * @param hourlyFishCountSummaryList 물고기 count 집계 리스트
