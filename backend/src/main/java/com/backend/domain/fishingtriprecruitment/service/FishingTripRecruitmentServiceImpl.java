@@ -1,5 +1,7 @@
 package com.backend.domain.fishingtriprecruitment.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -10,6 +12,7 @@ import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 import com.backend.domain.fishingtriprecruitment.converter.FishingTripRecruitmentConverter;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.domain.fishingtriprecruitment.dto.request.FishingTripRecruitmentRequest;
+import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruitmentResponse;
 import com.backend.domain.fishingtriprecruitment.entity.FishingTripRecruitment;
 import com.backend.domain.fishingtriprecruitment.exception.FishingTripRecruitmentErrorCode;
 import com.backend.domain.fishingtriprecruitment.exception.FishingTripRecruitmentException;
@@ -77,6 +80,13 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 		if (!fishingTripPost.getMemberId().equals(memberId)) {
 			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR);
 		}
+	}
+
+	@Override
+	public List<FishingTripRecruitmentResponse.DetailPage> getFishingTripRecruitmentDetailPage(
+		Long fishingTripPostId, RecruitmentStatus status) {
+
+		return List.of();
 	}
 
 	/**

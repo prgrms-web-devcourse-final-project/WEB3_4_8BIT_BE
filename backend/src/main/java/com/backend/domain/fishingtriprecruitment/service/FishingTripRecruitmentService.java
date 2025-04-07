@@ -1,7 +1,11 @@
 package com.backend.domain.fishingtriprecruitment.service;
 
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
+import java.util.List;
+
+import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.domain.fishingtriprecruitment.dto.request.FishingTripRecruitmentRequest;
+import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruitmentResponse;
 
 public interface FishingTripRecruitmentService {
 
@@ -38,4 +42,9 @@ public interface FishingTripRecruitmentService {
 	 * @throws FishingTripPostException 작성자가 아닐 경우 또는 모집글/신청이 존재하지 않을 경우 발생
 	 */
 	void refuseFishingTripRecruitment(final Long memberId, final Long fishingTripRecruitmentId);
+
+	List<FishingTripRecruitmentResponse.DetailPage> getFishingTripRecruitmentDetailPage(
+		final Long fishingTripPostId,
+		final RecruitmentStatus status
+	);
 }

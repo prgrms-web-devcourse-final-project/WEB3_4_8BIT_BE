@@ -55,6 +55,8 @@ public class Member extends BaseEntity {
 
 	private Long fileId;
 
+	private Long fileId;
+
 	@Column(columnDefinition = "TEXT", length = 500)
 	private String description;
 

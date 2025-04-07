@@ -1,9 +1,12 @@
 package com.backend.domain.fishingtriprecruitment.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
+import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
+import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruitmentResponse;
 import com.backend.domain.fishingtriprecruitment.entity.FishingTripRecruitment;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +26,13 @@ public class FishingTripRecruitmentRepositoryImpl implements FishingTripRecruitm
 	@Override
 	public Optional<FishingTripRecruitment> findById(final Long fishingTripRecruitmentId) {
 		return fishingTripRecruitmentJpaRepository.findById(fishingTripRecruitmentId);
+	}
+
+	@Override
+	public List<FishingTripRecruitmentResponse.DetailPageQueryDto> findDetailPageQueryDtoByIdAndStatus(
+		final Long fishingTripPostId, final RecruitmentStatus status) {
+		return fishingTripRecruitmentQueryRepository.
+			findDetailPageQueryDtoByIdAndStatus(fishingTripPostId, status);
 	}
 
 }
