@@ -79,4 +79,19 @@ public interface ReservationDateRepository {
 		final Long shipFishingPostId,
 		final LocalDate startDate,
 		final LocalDate endDate);
+
+	/**
+	 * 선상낚시 게시글과 연관된 예약 일자 목록 삭제 메서드
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @implSpec 선택된 선상 낚시 게시글의 예약 일자 리스트를 전체 삭제한다.
+	 */
+	void deleteByShipFishingPostId(final Long shipFishingPostId);
+
+	/**
+	 * 선상 낚시 게시글이 없는 예약 일자 삭제 메서드
+	 *
+	 * @implSpec 선상 낚시 게시글 데이터가 없는 예약 일자 리스트를 전체 삭제한다.
+	 */
+	void deleteOrphanReservationDate();
 }

@@ -1,6 +1,7 @@
 package com.backend.domain.reservationdate.repository;
 
 import static com.backend.domain.reservationdate.entity.QReservationDate.*;
+import static com.backend.domain.shipfishingpost.entity.QShipFishingPost.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.reservationdate.entity.ReservationDate;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import jakarta.persistence.LockModeType;
@@ -67,5 +69,22 @@ public class ReservationDateQueryRepository {
 			.fetchOne();
 
 		return Optional.ofNullable(reservation);
+	}
+
+	public void deleteByShipFishingPostId(final Long shipFishingPostId) {
+
+		jpaQueryFactory.delete(reservationDate1)
+			.where(reservationDate1.shipFishingPostId.eq(shipFishingPostId))
+			.execute();
+	}
+
+	public void deleteOrphanReservationDate() {
+
+		jpaQueryFactory.delete(reservationDate1)
+			.where(
+				reservationDate1.shipFishingPostId
+					.notIn(JPAExpressions.select(shipFishingPost.shipFishingPostId).from(shipFishingPost))
+			)
+			.execute();
 	}
 }
