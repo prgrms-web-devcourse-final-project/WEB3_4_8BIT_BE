@@ -97,8 +97,6 @@ public class ReservationServiceImpl implements ReservationService {
 
 		reservation.updateCanceled();
 
-		reservationRepository.save(reservation);
-
 		// 예약 취소 적용
 		updateReservationDateWithRemainCount(reservation.getShipFishingPostId(), reservation.getReservationDate(),
 			reservation.getGuestCount(), true);
