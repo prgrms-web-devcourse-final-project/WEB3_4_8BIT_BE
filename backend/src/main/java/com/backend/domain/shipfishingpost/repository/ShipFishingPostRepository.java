@@ -57,4 +57,12 @@ public interface ShipFishingPostRepository {
 	 */
 	Slice<ShipFishingPostResponse.DetailPage> findAllBySearchAndCondition(final ShipFishingPostRequest.Search search,
 		final Pageable pageable);
+
+	/**
+	 * 선상 낚시 게시글 삭제 메서드
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @implSpec 선상 낚시 게시글을 삭제합니다.
+	 */
+	void deleteById(final Long shipFishingPostId);
 }

@@ -50,4 +50,10 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 
 		return shipFishingPostQueryRepository.findDetailPage(search, pageable);
 	}
+
+	@Override
+	public void deleteById(final Long shipFishingPostId) {
+
+		shipFishingPostJpaRepository.deleteById(shipFishingPostId);
+	}
 }
