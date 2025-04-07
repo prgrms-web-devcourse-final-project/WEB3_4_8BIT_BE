@@ -682,4 +682,24 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 			.hasFieldOrPropertyWithValue("errorCode", GlobalErrorCode.WRONG_SORT_CONDITION)
 			.hasMessageContaining(GlobalErrorCode.WRONG_SORT_CONDITION.getMessage());
 	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 삭제 [Repository] - Success")
+	void t18() {
+		// Given
+		ShipFishingPost givenShipFishingPost = arbitraryBuilder
+			.set("shipFishingPostId", null)
+			.sample();
+
+		ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenShipFishingPost);
+
+		// When
+		shipFishingPostRepository.deleteById(savedShipFishingPost.getShipFishingPostId());
+
+		// Then
+		Optional<ShipFishingPost> findShipFishingPost = shipFishingPostRepository.findById(
+			savedShipFishingPost.getShipFishingPostId());
+
+		assertThat(findShipFishingPost.isPresent()).isFalse();
+	}
 }
