@@ -47,4 +47,9 @@ public class FishRepositoryImpl implements FishRepository {
 	public void updateFishPopularityScores(List<Tuple> hourlyFishCountSummaryList) {
 		fishQueryRepository.updateFishPopularityScores(hourlyFishCountSummaryList);
 	}
+
+	@Override
+	public List<FishResponse.FishAll> findFishAll() {
+		return fishQueryRepository.findFishAll();
+	}
 }

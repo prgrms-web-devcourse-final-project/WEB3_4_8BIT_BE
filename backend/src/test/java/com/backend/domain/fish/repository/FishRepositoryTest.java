@@ -48,6 +48,9 @@ class FishRepositoryTest extends BaseTest {
 	private StorageJpaRepository storageJpaRepository;
 
 	@Autowired
+	private FishJpaRepository fishJpaRepository;
+
+	@Autowired
 	private FishEncyclopediaJpaRepository fishEncyclopediaJpaRepository;
 
 	@Autowired
@@ -56,8 +59,6 @@ class FishRepositoryTest extends BaseTest {
 	@Autowired
 	private EntityManager entityManager;
 
-	@Autowired
-	private FishJpaRepository fishJpaRepository;
 
 	final Arbitrary<String> englishString = Arbitraries.strings()
 		.withCharRange('a', 'z')
@@ -140,7 +141,7 @@ class FishRepositoryTest extends BaseTest {
 
 	@Test
 	@DisplayName("물고기 인기순 조회 [Repository] - Success")
-	void t06() {
+	void t05() {
 		// Given
 		List<Fish> givenFishList = arbitraryBuilder.set("fishId", null).sampleList(10);
 		List<Fish> savedFishList = fishJpaRepository.saveAll(givenFishList);
@@ -158,7 +159,7 @@ class FishRepositoryTest extends BaseTest {
 	}
 
 	@DisplayName("물고기 인기도 수정 [Repository] - Success")
-	void t05() {
+	void t06() {
 		// Given
 		List<Fish> givenFishList = fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
 			.set("fishId", null)
@@ -196,4 +197,29 @@ class FishRepositoryTest extends BaseTest {
 		assertThat(updateFishList)
 			.allMatch(fish -> fish.getPopularityScore() == 5L);
 	}
+
+	@Test
+	@DisplayName("물고기 전체 조회 [Repository] - Success")
+	void t07() {
+		// Given
+		File givenFile = fixtureMonkeyBuilder.giveMeBuilder(File.class)
+			.set("fileId", null)
+			.sample();
+
+		File savedFile = storageJpaRepository.save(givenFile);
+
+		List<Fish> givenFishList = arbitraryBuilder
+			.set("fishId", null)
+			.set("fileId", savedFile.getFileId())
+			.sampleList(5);
+
+		List<Fish> savedFishList = fishJpaRepository.saveAll(givenFishList);
+
+		// When
+		List<FishResponse.FishAll> findDetail = fishRepository.findFishAll();
+
+		// Then
+		assertThat(findDetail).hasSize(savedFishList.size());
+	}
+
 }
