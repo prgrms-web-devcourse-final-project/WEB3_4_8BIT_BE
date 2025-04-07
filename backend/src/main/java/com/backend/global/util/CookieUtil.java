@@ -41,7 +41,8 @@ public class CookieUtil {
 		ResponseCookie cookie = ResponseCookie.from("accessToken", token)
 			.httpOnly(httpOnly)
 			.secure(secure)
-			.sameSite("Lax")
+			// .sameSite("Lax")
+			.sameSite("none") //TODO 추후 배포시 다시 수정
 			.domain("localhost") //TODO 추후 배포시 다시 수정
 			.path("/")
 			.maxAge(refreshTokenValidityInSeconds)
@@ -55,7 +56,8 @@ public class CookieUtil {
 		return ResponseCookie.from("accessToken", "")
 			.httpOnly(httpOnly)
 			.secure(secure)
-			.sameSite("Lax")
+			.sameSite("none") //TODO 추후 배포시 다시 수정
+			// .sameSite("Lax")
 			.domain("localhost") //TODO 추후 배포시 다시 수정
 			.path("/")
 			.maxAge(0)
