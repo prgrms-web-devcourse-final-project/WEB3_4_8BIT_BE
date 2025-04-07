@@ -3,6 +3,7 @@ package com.backend.domain.fishingtrippost.dto.response;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Builder;
@@ -11,6 +12,9 @@ public class FishingTripPostResponse {
 
 	/**
 	 * 낚시 동행 게시글 상세 정보를 담는 응답 DTO입니다.
+	 *
+	 * <p>게시글의 기본 정보, 위치, 첨부 파일 URL 목록, 모집 상태 등을 포함하며,
+	 * {@link DetailQueryDto}와 파일 URL 리스트를 기반으로 생성됩니다.</p>
 	 *
 	 * <p>예시 JSON 응답 형태:</p>
 	 * <pre>{@code
@@ -30,7 +34,8 @@ public class FishingTripPostResponse {
 	 *   "fileUrlList": [
 	 *     "https://cdn.example.com/image1.jpg",
 	 *     "https://cdn.example.com/image2.jpg"
-	 *   ]
+	 *   ],
+	 *   "postStatus": "RECRUITING"
 	 * }
 	 * }</pre>
 	 *
@@ -47,6 +52,7 @@ public class FishingTripPostResponse {
 	 * @param longitude 낚시 포인트 경도
 	 * @param latitude 낚시 포인트 위도
 	 * @param fileUrlList 첨부 이미지 URL 리스트
+	 * @param postStatus 게시글 상태 (RECRUITING, COMPLETED 등)
 	 */
 
 	@Builder
@@ -63,7 +69,8 @@ public class FishingTripPostResponse {
 		String fishPointName,
 		Double longitude,
 		Double latitude,
-		List<String> fileUrlList
+		List<String> fileUrlList,
+		PostStatus postStatus
 	) {
 		public static Detail fromDetailQueryDtoAndFileUrlList(DetailQueryDto detailQueryDto,
 			List<String> fileUrlList) {
@@ -81,6 +88,7 @@ public class FishingTripPostResponse {
 				.longitude(detailQueryDto.longitude())
 				.latitude(detailQueryDto.latitude())
 				.fileUrlList(fileUrlList)
+				.postStatus(detailQueryDto.postStatus())
 				.build();
 		}
 	}
@@ -98,7 +106,8 @@ public class FishingTripPostResponse {
 		String fishPointName,
 		Double longitude,
 		Double latitude,
-		List<Long> fileIdList
+		List<Long> fileIdList,
+		PostStatus postStatus
 	) {
 		@QueryProjection
 		public DetailQueryDto {
