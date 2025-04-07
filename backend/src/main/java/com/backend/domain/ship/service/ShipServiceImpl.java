@@ -25,9 +25,9 @@ public class ShipServiceImpl implements ShipService {
 
 		Long countByMemberId = shipRepository.countByMemberId(memberId);
 
-		if (countByMemberId > MAX_SHIPS_PER_MEMBER) {
-			throw new ShipException(ShipErrorCode.MAX_SHIP_COUNT_EXCEEDED);
-		}
+		log.debug("{}번 회원의 저장된 선박 개수: {}", memberId, countByMemberId);
+
+		validateMaxShipLimit(countByMemberId);
 
 		Ship ship = ShipConverter.fromCreate(memberId, requestDto);
 
@@ -36,5 +36,11 @@ public class ShipServiceImpl implements ShipService {
 		log.debug("선박 저장: {}", savedShip);
 
 		return savedShip.getShipId();
+	}
+
+	private void validateMaxShipLimit(final Long countByMemberId) {
+		if (countByMemberId > MAX_SHIPS_PER_MEMBER) {
+			throw new ShipException(ShipErrorCode.MAX_SHIP_COUNT_EXCEEDED);
+		}
 	}
 }
