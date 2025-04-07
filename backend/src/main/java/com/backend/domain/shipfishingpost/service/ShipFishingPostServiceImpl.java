@@ -1,5 +1,6 @@
 package com.backend.domain.shipfishingpost.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.PageRequest;
@@ -13,9 +14,12 @@ import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.exception.FishErrorCode;
 import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fish.repository.FishRepository;
+import com.backend.domain.reservation.entity.Reservation;
+import com.backend.domain.reservation.repository.ReservationRepository;
 import com.backend.domain.reservationdate.converter.ReservationDateConverter;
 import com.backend.domain.reservationdate.entity.ReservationDate;
 import com.backend.domain.reservationdate.repository.ReservationDateRepository;
+import com.backend.domain.reservationdate.service.ReservationDateService;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
@@ -40,8 +44,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
+	private final ReservationDateService reservationDateService;
+
 	private final FishRepository fishRepository;
 	private final ShipRepository shipRepository;
+	private final ReservationRepository reservationRepository;
 	private final ShipFishingPostRepository shipFishingPostRepository;
 	private final ReservationDateRepository reservationDateRepository;
 	private final ShipFishingPostFishRepository shipFishingPostFishRepository;
@@ -96,6 +103,19 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 		return shipFishingPostRepository.findAllBySearchAndCondition(requestDto, pageable);
 	}
 
+	@Override
+	@Transactional
+	public void deleteShipFishingPost(final Long shipFishingPostId, final Long memberId) {
+
+		verifyPostOwnership(shipFishingPostId, memberId);
+
+		verifyReservationExist(shipFishingPostId);
+
+		shipFishingPostRepository.deleteById(shipFishingPostId);
+
+		reservationDateService.deleteReservationDateList(shipFishingPostId);
+	}
+
 	/**
 	 * shipId 등록 여부 & 선박 소유자 정보 일치 검증 메서드
 	 *
@@ -109,6 +129,20 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 		if (!ship.getMemberId().equals(memberId)) {
 			throw new ShipException(ShipErrorCode.SHIP_MISMATCH_MEMBER_ID);
+		}
+	}
+
+	/**
+	 * 게시글의 소유자 여부 검증 메서드
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @param memberId {@link Long}
+	 */
+	private void verifyPostOwnership(final Long shipFishingPostId, final Long memberId) {
+		ShipFishingPost shipFishingPost = getShipFishingPostEntity(shipFishingPostId);
+
+		if (!shipFishingPost.getMemberId().equals(memberId)) {
+			throw new ShipFishingPostException(ShipFishingPostErrorCode.NOT_AUTHORITY_POSTS);
 		}
 	}
 
@@ -158,6 +192,33 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 			(shipFishingPostId, requestDto.fishList());
 
 		shipFishingPostFishRepository.saveAllByBulkQuery(shipFishingPostFishList, requestDto.fishList().size());
+	}
+
+	/**
+	 * 삭제할 게시글의 남은 예약 내역 검증
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 */
+	private void verifyReservationExist(final Long shipFishingPostId) {
+
+		List<Reservation> reservationList = reservationRepository
+			.findByShipFishingPostIdAndTodayAfter(shipFishingPostId, LocalDate.now());
+
+		if (!reservationList.isEmpty()) {
+			throw new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_RESERVATION_EXIST);
+		}
+	}
+
+	/**
+	 * 선상 낚시 게시글 Entity 를 반환합니다.
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @return {@link ShipFishingPost}
+	 */
+	private ShipFishingPost getShipFishingPostEntity(final Long shipFishingPostId) {
+
+		return shipFishingPostRepository.findById(shipFishingPostId)
+			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
 	}
 
 	/**

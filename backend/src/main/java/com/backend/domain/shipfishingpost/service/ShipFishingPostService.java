@@ -41,4 +41,13 @@ public interface ShipFishingPostService {
 	Slice<ShipFishingPostResponse.DetailPage> getShipFishingPostPage(final ShipFishingPostRequest.Search requestDto,
 		final GlobalRequest.PageRequest pageRequestDto);
 
+	/**
+	 * 선상 낚시 게시글 삭제 메서드
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @param memberId {@link Long}
+	 * @implSpec 입력된 선상 낚시 게시글의 예약 내역을 검증하고 삭제하는 메서드 입니다.
+	 * @author swjoon
+	 */
+	void deleteShipFishingPost(final Long shipFishingPostId, final Long memberId);
 }
