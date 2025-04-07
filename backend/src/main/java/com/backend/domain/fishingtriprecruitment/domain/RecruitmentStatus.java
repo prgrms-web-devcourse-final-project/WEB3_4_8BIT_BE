@@ -6,7 +6,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "모집 상태")
 public enum RecruitmentStatus {
 
@@ -18,11 +20,6 @@ public enum RecruitmentStatus {
 
 	RecruitmentStatus(String displayName) {
 		this.displayName = displayName;
-	}
-
-	@JsonValue
-	public String getDisplayName() {
-		return displayName;
 	}
 
 	@JsonCreator
