@@ -21,4 +21,12 @@ public interface FishPointService {
 		final double neLat,
 		final double neLng
 	);
+
+	/**
+	 * 낚시 포인트 이름을 기준으로 검색
+	 *
+	 * @param fishPointName 검색할 낚시 포인트 이름 (부분 일치)
+	 * @return 검색된 낚시 포인트 목록 (isBan = false인 데이터만 반환)
+	 */
+	List<FishPointResponse> searchFishPoints(final String fishPointName);
 }

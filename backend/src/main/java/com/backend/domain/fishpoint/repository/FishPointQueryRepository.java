@@ -54,4 +54,24 @@ public class FishPointQueryRepository {
 			.where(withinExpr)
 			.fetch();
 	}
+
+	public List<FishPointResponse> findByFishPointName(final String fishPointName) {
+
+		return jpaQueryFactory
+			.select(new QFishPointResponse(
+				fishPoint.fishPointId,
+				fishPoint.fishPointName,
+				fishPoint.fishPointDetailName,
+				fishPoint.latitude,
+				fishPoint.longitude,
+				fishPoint.isBan
+			))
+			.from(fishPoint)
+			.where(
+				fishPoint.fishPointName.containsIgnoreCase(fishPointName),
+				fishPoint.isBan.isFalse()
+			)
+			.orderBy(fishPoint.fishPointId.asc())
+			.fetch();
+	}
 }

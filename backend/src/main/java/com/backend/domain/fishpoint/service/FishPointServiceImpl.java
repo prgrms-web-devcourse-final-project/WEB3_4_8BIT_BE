@@ -26,4 +26,9 @@ public class FishPointServiceImpl implements FishPointService {
 	) {
 		return fishPointRepository.findByBounds(swLat, swLng, neLat, neLng);
 	}
+
+	@Override
+	public List<FishPointResponse> searchFishPoints(final String fishPointName) {
+		return fishPointRepository.findByFishPointName(fishPointName);
+	}
 }

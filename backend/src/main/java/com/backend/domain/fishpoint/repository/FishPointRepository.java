@@ -37,4 +37,12 @@ public interface FishPointRepository {
 	 * @return 바운드 내에 존재하는 낚시 포인트 정보를 담은 DTO 리스트
 	 */
 	List<FishPointResponse> findByBounds(double swLat, double swLng, double neLat, double neLng);
+
+	/**
+	 * 지역명을 기준으로 낚시 포인트 전체 조회
+	 *
+	 * @param fishPointName 지역명 (부분 일치 검색)
+	 * @return 낚시 포인트 정보 DTO 리스트
+	 */
+	List<FishPointResponse> findByFishPointName(final String fishPointName);
 }
