@@ -46,6 +46,7 @@ public interface ReservationRepository {
 	 * @return {@link List<Reservation>}
 	 */
 	List<Reservation> findByShipFishingPostIdAndTodayAfter(final Long shipFishingPostId, final LocalDate today);
+
 	/**
 	 * 예약 기록 조회 메서드 입니다. (일반 유저)
 	 *
@@ -54,7 +55,8 @@ public interface ReservationRepository {
 	 * @return {@link ScrollResponse<ReservationResponse.DetailWithName>}
 	 * @implSpec 로그인 된 유저 id를 기반으로 예약 기록들을 조회하고 반환합니다.
 	 */
-	ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberId(final Long memberId,
+	ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberId(
+		final Long memberId,
 		final GlobalRequest.CursorRequest cursorRequestDto);
 
 	/**
