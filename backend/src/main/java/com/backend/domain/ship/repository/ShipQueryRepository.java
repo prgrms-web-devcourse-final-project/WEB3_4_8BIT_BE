@@ -14,7 +14,7 @@ public class ShipQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
 
-	public Long countByMemberId(Long memberId) {
+	public Long countByMemberId(final Long memberId) {
 		return jpaQueryFactory
 			.select(ship.count())
 			.from(ship)

@@ -31,8 +31,8 @@ public interface ShipRepository {
 	 *
 	 * @param memberId 회원 ID
 	 * @return {@link Long}
-	 * @implSpec 선박 정보 조회 메서드 입니다.
+	 * @implSpec 회원 ID로 등록된 선박 개수 조회 후 결과 값 반환
 	 * @author Kim Dong O
 	 */
-	Long countByMemberId(Long memberId);
+	Long countByMemberId(final Long memberId);
 }

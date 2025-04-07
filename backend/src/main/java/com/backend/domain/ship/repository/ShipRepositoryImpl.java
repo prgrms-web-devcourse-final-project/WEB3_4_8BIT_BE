@@ -28,7 +28,7 @@ public class ShipRepositoryImpl implements ShipRepository {
 	}
 
 	@Override
-	public Long countByMemberId(Long memberId) {
+	public Long countByMemberId(final Long memberId) {
 		return shipQueryRepository.countByMemberId(memberId);
 	}
 }
