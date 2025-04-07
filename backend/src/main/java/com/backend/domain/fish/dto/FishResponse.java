@@ -31,7 +31,16 @@ public class FishResponse {
 
 		@QueryProjection
 		public Popular {
+		}
+	}
 
+	public record FishAll(
+		Long fishId,
+		String fishName
+	) {
+
+		@QueryProjection
+		public FishAll {
 		}
 	}
 }
