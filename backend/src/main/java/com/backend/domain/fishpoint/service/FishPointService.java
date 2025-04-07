@@ -33,6 +33,15 @@ public interface FishPointService {
 	List<ResponseWithDistance> getNearbyFishPoints(final double lat, final double lng, final double radiusKm);
 
 	/**
+	 * 사용자의 현재 위치를 기준으로 가장 가까운 낚시 포인트 3개를 조회
+	 *
+	 * @param lat 사용자의 현재 위도
+	 * @param lng 사용자의 현재 경도
+	 * @return 거리 정보가 포함된 낚시 포인트 응답 리스트 (최대 3개)
+	 */
+	List<ResponseWithDistance> getNearestFishPoints(final double lat, final double lng);
+
+	/**
 	 * 낚시 포인트 이름을 기준으로 검색
 	 *
 	 * @param fishPointName 검색할 낚시 포인트 이름 (부분 일치)

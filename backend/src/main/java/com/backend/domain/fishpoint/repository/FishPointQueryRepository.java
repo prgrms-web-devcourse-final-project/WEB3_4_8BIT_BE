@@ -97,6 +97,36 @@ public class FishPointQueryRepository {
 			.fetch();
 	}
 
+	public List<ResponseWithDistance> findByNearestFishPoints(final double lat, final double lng) {
+		Point center = geometryFactory.createPoint(new Coordinate(lng, lat));
+		center.setSRID(4326);
+
+		NumberExpression<Double> distanceExpr = Expressions.numberTemplate(
+			Double.class,
+			"ST_Distance({0}, {1})",
+			fishPoint.location,
+			center
+		);
+
+		BooleanExpression notBanned = fishPoint.isBan.isFalse();
+
+		return jpaQueryFactory
+			.select(new QFishPointResponse_ResponseWithDistance(
+				fishPoint.fishPointId,
+				fishPoint.fishPointName,
+				fishPoint.fishPointDetailName,
+				fishPoint.latitude,
+				fishPoint.longitude,
+				fishPoint.isBan,
+				distanceExpr.divide(1000.0)
+			))
+			.from(fishPoint)
+			.where(notBanned)
+			.orderBy(distanceExpr.asc())
+			.limit(3)
+			.fetch();
+	}
+
 	public List<Response> findByFishPointName(final String fishPointName) {
 
 		return jpaQueryFactory

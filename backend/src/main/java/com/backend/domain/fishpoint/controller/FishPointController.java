@@ -59,6 +59,22 @@ public class FishPointController {
 		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
 	}
 
+	@GetMapping("/nearest")
+	@Operation(
+		summary = "내 위치 근처 낚시 포인트 조회",
+		description = "사용자의 현재 위치를 기준으로 가장 가까이 있는 낚시 포인트 3개 조회 API"
+	)
+	public ResponseEntity<GenericResponse<List<ResponseWithDistance>>> getNearestFishPoints(
+		@Valid @ModelAttribute final FishPointRequest.Nearby nearbyRequestDto
+	) {
+		List<ResponseWithDistance> fishPointList = fishPointService.getNearestFishPoints(
+			nearbyRequestDto.lat(),
+			nearbyRequestDto.lng()
+		);
+
+		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
+	}
+
 	@GetMapping
 	@Operation(summary = "낚시 포인트 검색", description = "지역명을 기준으로 낚시 포인트 검색 API")
 	public ResponseEntity<GenericResponse<List<Response>>> getFishPointBySearch(

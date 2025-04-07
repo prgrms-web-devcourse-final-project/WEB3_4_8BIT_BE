@@ -38,6 +38,11 @@ public class FishPointRepositoryImpl implements FishPointRepository {
 	}
 
 	@Override
+	public List<ResponseWithDistance> findNearestFishPoints(final double lat, final double lng) {
+		return fishPointQueryRepository.findByNearestFishPoints(lat, lng);
+	}
+
+	@Override
 	public List<Response> findByFishPointName(final String fishPointName) {
 		return fishPointQueryRepository.findByFishPointName(fishPointName);
 	}

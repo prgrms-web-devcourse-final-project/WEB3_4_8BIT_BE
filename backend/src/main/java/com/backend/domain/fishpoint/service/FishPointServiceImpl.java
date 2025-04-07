@@ -34,6 +34,11 @@ public class FishPointServiceImpl implements FishPointService {
 	}
 
 	@Override
+	public List<ResponseWithDistance> getNearestFishPoints(final double lat, final double lng) {
+		return fishPointRepository.findNearestFishPoints(lat, lng);
+	}
+
+	@Override
 	public List<Response> searchFishPoints(final String fishPointName) {
 		return fishPointRepository.findByFishPointName(fishPointName);
 	}
