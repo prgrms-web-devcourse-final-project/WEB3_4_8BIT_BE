@@ -37,7 +37,6 @@ public class ReservationServiceImpl implements ReservationService {
 	@Transactional
 	public ReservationResponse.Detail createReservation(final ReservationRequest.Reserve requestDto,
 		final Long memberId) {
-		log.debug("예약 신청 transaction start");
 		// 선상 낚시 게시글 정보 조회
 		ShipFishingPost shipFishingPost = getShipFishingPostEntity(requestDto.shipFishingPostId());
 
@@ -53,7 +52,8 @@ public class ReservationServiceImpl implements ReservationService {
 		Reservation reservation = reservationRepository.save(
 			ReservationConverter.fromReservationRequest(requestDto, memberId));
 
-		log.debug("예약 신청 transaction end");
+		log.debug("선상 낚시 예약 신청 {} , {}", shipFishingPost.toString(), reservation.toString());
+
 		return ReservationConverter.fromReservationResponseDetail(reservation);
 	}
 
@@ -123,7 +123,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	/**
-	 * 예약 일자 조회, 예약 가능하면 예약 일자 정보 남은 인원 차감 메서드입니다.
+	 * 예약 일자 조회, 예약 가능하면 예약 일자 정보 남은 인원 업데이트 메서드입니다.
 	 *
 	 * @param shipFishingPostId {@link Long}
 	 * @param reservationDate {@link LocalDate}
@@ -137,7 +137,6 @@ public class ReservationServiceImpl implements ReservationService {
 		final Integer guestCount,
 		final Boolean type) {
 
-		log.debug("예약 일자 검증 및 업데이트");
 
 		ReservationDate findReservationDate = reservationDateRepository
 			.findByIdWithPessimistic(shipFishingPostId, reservationDate)
@@ -145,19 +144,10 @@ public class ReservationServiceImpl implements ReservationService {
 
 		if (type) {
 			findReservationDate.remainPlus(guestCount);
-
-			log.debug("예약 잔여인원 증가");
 		} else {
 			verifyReservationDate(findReservationDate, guestCount);
 			findReservationDate.remainMinus(guestCount);
-
-			log.debug("예약 잔여인원 차감");
 		}
-
-		ReservationDate savedReservationDate = reservationDateRepository.save(findReservationDate);
-
-		log.debug("선상낚시게시글 : {}, 예약 일자: {}, 잔여 인원: {}", shipFishingPostId, reservationDate,
-			savedReservationDate.getRemainCount());
 	}
 
 	/**
