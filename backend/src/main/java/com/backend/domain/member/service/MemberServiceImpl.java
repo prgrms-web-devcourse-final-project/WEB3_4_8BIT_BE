@@ -22,7 +22,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	@Transactional
-	public Long saveAddInfo(final Long memberId, final MemberRequest.Form requestDto) {
+	public Long createAddInfo(final Long memberId, final MemberRequest.Form requestDto) {
 
 		Member member = getMemberById(memberId);
 

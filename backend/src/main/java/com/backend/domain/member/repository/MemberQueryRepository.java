@@ -28,7 +28,8 @@ public class MemberQueryRepository {
 				member.nickname,
 				member.phone,
 				file.url,
-				member.description
+				member.description,
+				member.isAddInfo
 			))
 			.from(member)
 			.leftJoin(file)
