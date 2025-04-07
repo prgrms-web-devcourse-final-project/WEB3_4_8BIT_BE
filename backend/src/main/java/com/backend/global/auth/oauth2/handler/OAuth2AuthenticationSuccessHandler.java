@@ -101,8 +101,6 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		GenericResponse<Map<String, Object>> successResponse
 			= GenericResponse.of(true, loginResponse, "OAuth2 로그인 성공");
 
-		response.sendRedirect("https://api.mikki.kr/swagger-ui/index.html");
-
 		AuthResponseUtil.success(response, accessTokenCookie, HttpServletResponse.SC_OK, successResponse, objectMapper);
 	}
 

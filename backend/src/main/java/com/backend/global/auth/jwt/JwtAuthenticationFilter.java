@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.backend.global.auth.exception.JwtAuthenticationErrorCode;
@@ -48,6 +49,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			// 쿠키에서 JWT 토큰 추출
 			String accessToken = cookieUtil.extractTokenFromCookie(request);
 			log.debug("JwtAuthenticationFilter - 쿠키에서 accessToken 추출: {}", accessToken);
+			// TODO 개발용으로 헤더 추가했으나 배포 때는 제거해야 합니다.
+			if (!StringUtils.hasText(accessToken)) {
+				accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
+			}
 
 			if (accessToken != null) {
 				// Access Token 블랙리스트 확인
