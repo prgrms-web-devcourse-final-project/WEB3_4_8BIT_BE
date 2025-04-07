@@ -101,7 +101,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		GenericResponse<Map<String, Object>> successResponse
 			= GenericResponse.of(true, loginResponse, "OAuth2 로그인 성공");
 
-		response.sendRedirect("http://localhost:3000/");
+		response.sendRedirect("https://mikki.kr/");
 
 		AuthResponseUtil.success(response, accessTokenCookie, HttpServletResponse.SC_OK, successResponse, objectMapper);
 	}
