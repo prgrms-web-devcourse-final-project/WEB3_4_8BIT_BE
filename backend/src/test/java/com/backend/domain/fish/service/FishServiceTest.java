@@ -26,7 +26,7 @@ class FishServiceTest extends BaseTest {
 	private FishRepository fishRepository;
 
 	@InjectMocks
-	private FishServiceImpl fishServiceImpl;
+	private FishServiceImpl fishService;
 
 	@Test
 	@DisplayName("물고기 상세 조회 [Service] - Success")
@@ -39,7 +39,7 @@ class FishServiceTest extends BaseTest {
 		when(fishRepository.findDetailById(fishId)).thenReturn(Optional.ofNullable(givenDetail));
 
 		// When
-		FishResponse.Detail getDetail = fishServiceImpl.getFishDetail(fishId);
+		FishResponse.Detail getDetail = fishService.getFishDetail(fishId);
 
 		// Then
 		assertThat(getDetail).isEqualTo(givenDetail);
@@ -53,7 +53,7 @@ class FishServiceTest extends BaseTest {
 
 		// When & Then
 		assertThatThrownBy(
-			() -> fishServiceImpl.getFishDetail(givenFishId))
+			() -> fishService.getFishDetail(givenFishId))
 			.isExactlyInstanceOf(FishException.class)
 			.hasMessage(FishErrorCode.FISH_NOT_FOUND.getMessage());
 	}
@@ -71,9 +71,26 @@ class FishServiceTest extends BaseTest {
 		when(fishRepository.findPopular(givenSize)).thenReturn(givenPopularList);
 
 		// When
-		List<FishResponse.Popular> getPopularList = fishServiceImpl.getPopular(givenSize);
+		List<FishResponse.Popular> getPopularList = fishService.getPopular(givenSize);
 
 		// Then
 		assertThat(getPopularList).isEqualTo(givenPopularList);
+	}
+
+	@Test
+	@DisplayName("물고기 전체 조회 [Service] - Success")
+	void t04() {
+		// Given
+		List<FishResponse.FishAll> givenFishAllList = fixtureMonkeyRecord
+			.giveMeBuilder(FishResponse.FishAll.class)
+			.sampleList(10);
+
+		when(fishRepository.findFishAll()).thenReturn(givenFishAllList);
+
+		// When
+		List<FishResponse.FishAll> getFishAllList = fishService.getFishAll();
+
+		// Then
+		assertThat(getFishAllList).isEqualTo(givenFishAllList);
 	}
 }

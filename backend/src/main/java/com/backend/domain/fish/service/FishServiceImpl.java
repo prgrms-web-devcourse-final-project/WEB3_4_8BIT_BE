@@ -38,4 +38,14 @@ public class FishServiceImpl implements FishService {
 
 		return getPopularList;
 	}
+
+	@Override
+	public List<FishResponse.FishAll> getFishAll() {
+
+		List<FishResponse.FishAll> getFishAllList = fishRepository.findFishAll();
+
+		log.debug("물고기 전체 조회: {}", getFishAllList);
+
+		return getFishAllList;
+	}
 }

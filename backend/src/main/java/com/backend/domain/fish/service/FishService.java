@@ -26,4 +26,12 @@ public interface FishService {
 	 */
 	List<FishResponse.Popular> getPopular(final Integer size);
 
+	/**
+	 * 물고기 전체 조회 메소드
+	 *
+	 * @return {@link List<FishResponse.FishAll>}
+	 * @implSpec limit 받아서 limit 개수만큼 조회 후 결과 반환
+	 * @author Kim Dong O
+	 */
+	List<FishResponse.FishAll> getFishAll();
 }
