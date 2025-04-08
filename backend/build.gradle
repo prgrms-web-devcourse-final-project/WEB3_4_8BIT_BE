@@ -81,6 +81,9 @@ dependencies {
 
     // Spring Security Test 라이브러리
 	testImplementation 'org.springframework.security:spring-security-test'
+
+    // 메일 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {
