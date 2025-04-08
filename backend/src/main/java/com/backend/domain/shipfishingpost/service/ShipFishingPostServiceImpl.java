@@ -153,7 +153,9 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 			throw new ShipException(ShipErrorCode.SHIP_MISMATCH_MEMBER_ID);
 		}
 
-		// Todo: 선박 최대 인원수 보다 큰 값을 갖는지 검증
+		if (ship.getPassengerCapacity() < maxGuestCount) {
+			throw new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_CAPACITY_EXCEEDED);
+		}
 	}
 
 	/**
