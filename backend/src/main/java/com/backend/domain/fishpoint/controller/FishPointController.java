@@ -79,7 +79,7 @@ public class FishPointController {
 	@GetMapping("/regions/{regionId}")
 	@Operation(summary = "지역 기반 낚시 포인트 조회", description = "지역 ID(도 단위) 기준 낚시 포인트를 조회하는 API")
 	public ResponseEntity<GenericResponse<List<Basic>>> getRegionFishPoints(
-		@PathVariable Long regionId
+		@PathVariable final Long regionId
 	) {
 		List<Basic> fishPointList = fishPointService.getFishPointsByRegionId(regionId);
 
