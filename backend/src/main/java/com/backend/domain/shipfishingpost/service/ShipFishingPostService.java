@@ -1,10 +1,9 @@
 package com.backend.domain.shipfishingpost.service;
 
-import org.springframework.data.domain.Slice;
-
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 public interface ShipFishingPostService {
 
@@ -16,17 +15,7 @@ public interface ShipFishingPostService {
 	 * @implSpec 선상 낚시 게시글 정보를 파라미터로 받고 저장한다.
 	 * @author swjoon
 	 */
-	Long saveShipFishingPost(final ShipFishingPostRequest.Create requestDto, final Long memberId);
-
-	/**
-	 * 선상 낚시 게시글 상세 조회 메서드
-	 *
-	 * @param shipFishingPostId {@link Long}
-	 * @return {@link ShipFishingPostResponse.Detail}
-	 * @implSpec 선상 낚시 게시글 번호를 파라미터로 받고 조회한다.
-	 * @author swjoon
-	 */
-	ShipFishingPostResponse.Detail getShipFishingPost(final Long shipFishingPostId);
+	Long createShipFishingPost(final ShipFishingPostRequest.Create requestDto, final Long memberId);
 
 	/**
 	 * 선상 낚시 게시글 상세 조회 메서드 (게시글, 멤버, 선박 정보 포함)
@@ -36,10 +25,20 @@ public interface ShipFishingPostService {
 	 * @implSpec 선상 낚시 게시글 번호를 파라미터로 받고 조회한다.
 	 * @author swjoon
 	 */
-	ShipFishingPostResponse.DetailAll getShipFishingPostAll(final Long shipFishingPostId);
+	ShipFishingPostResponse.DetailWithFileUrlAndFishName getShipFishingPostAll(final Long shipFishingPostId);
 
-	Slice<ShipFishingPostResponse.DetailPage> getShipFishingPostPage(final ShipFishingPostRequest.Search requestDto,
-		final GlobalRequest.PageRequest pageRequestDto);
+	/**
+	 * 선상 낚시 게시글 조회 메서드
+	 *
+	 * @param searchDto {@link ShipFishingPostRequest.Search}
+	 * @param cursorRequestDto {@link GlobalRequest.CursorRequest}
+	 * @return {@link ScrollResponse<ShipFishingPostResponse.DetailScroll>}
+	 * @implSpec 선상 낚시 게시글을 검색합니다.
+	 * @author swjoon
+	 */
+	ScrollResponse<ShipFishingPostResponse.DetailScroll> getShipFishingPostScroll(
+		final ShipFishingPostRequest.Search searchDto,
+		final GlobalRequest.CursorRequest cursorRequestDto);
 
 	/**
 	 * 선상 낚시 게시글 삭제 메서드
