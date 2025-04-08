@@ -73,9 +73,17 @@ public class ShipFishingPostServiceTest extends BaseTest {
 	void t01() {
 		// Given
 		ShipFishingPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
-			ShipFishingPostRequest.Create.class).set("shipId", 1L).set("fishIdList", List.of(1L)).sample();
+				ShipFishingPostRequest.Create.class)
+			.set("shipId", 1L)
+			.set("fishIdList", List.of(1L))
+			.set("maxGuestCount", 5)
+			.sample();
 
-		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class).set("shipId", 1L).set("memberId", 1L).sample();
+		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class)
+			.set("shipId", 1L)
+			.set("memberId", 1L)
+			.set("passengerCapacity", 10)
+			.sample();
 
 		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishingPostRequestCreate(
 			givenRequestDto, 1L);
@@ -139,8 +147,44 @@ public class ShipFishingPostServiceTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("선상 낚시 게시글 상세 조회 [ShipFishingPostResponse.DetailAll] [Service] - Success")
+	@DisplayName("선상 낚시 게시글 저장 [POSTS_CAPACITY_EXCEEDED] [Service] - Fail")
 	void t04() {
+		// Given
+		ShipFishingPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
+				ShipFishingPostRequest.Create.class)
+			.set("shipId", 1L)
+			.set("fishIdList", List.of(1L))
+			.set("maxGuestCount", 15)
+			.sample();
+
+		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class)
+			.set("shipId", 1L)
+			.set("memberId", 1L)
+			.set("passengerCapacity", 10)
+			.sample();
+
+		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishingPostRequestCreate(
+			givenRequestDto, 1L);
+
+		fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+			.set("shipFishingPostId", 1L)
+			.set("subject", givenShipFishingPost.getSubject())
+			.set("content", givenShipFishingPost.getContent())
+			.sample();
+
+		// When
+		when(shipRepository.findById(1L)).thenReturn(Optional.of(givenShip));
+
+		// Then
+		assertThatThrownBy(() -> shipFishingPostServiceImpl.createShipFishingPost(givenRequestDto, 1L)).isInstanceOf(
+				ShipFishingPostException.class)
+			.hasFieldOrPropertyWithValue("errorCode", ShipFishingPostErrorCode.POSTS_CAPACITY_EXCEEDED)
+			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_CAPACITY_EXCEEDED.getMessage());
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 상세 조회 [ShipFishingPostResponse.DetailAll] [Service] - Success")
+	void t05() {
 		// given
 		Long shipFishingPostId = 1L;
 		List<Long> fileIdList = List.of(101L, 102L);
@@ -194,7 +238,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Test
 	@DisplayName("선상 낚시 게시글 상세 조회 [ShipFishingPostResponse.DetailAll] [POSTS_NOT_FOUND] [Service] - Fail")
-	void t05() {
+	void t06() {
 		// Given
 
 		// When
@@ -209,7 +253,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Test
 	@DisplayName("선상 낚시 게시글 삭제 [Service] - Success")
-	void t06() {
+	void t07() {
 		// Given
 		Long givenShipFishingPostId = 1L;
 		Long givenMemberId = 1L;
@@ -234,7 +278,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Test
 	@DisplayName("선상 낚시 게시글 삭제 [게시글 없음] [Service] - Fail")
-	void t07() {
+	void t08() {
 		// Given
 		Long givenShipFishingPostId = 1L;
 		Long givenMemberId = 1L;
@@ -258,7 +302,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Test
 	@DisplayName("선상 낚시 게시글 삭제 [게시글 권한 없음] [Service] - Fail")
-	void t08() {
+	void t09() {
 		// Given
 		Long givenShipFishingPostId = 1L;
 		Long givenMemberId = 1L;
@@ -283,7 +327,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Test
 	@DisplayName("선상 낚시 게시글 삭제 [잔여 예약 존재] [Service] - Fail")
-	void t09() {
+	void t10() {
 		// Given
 		Long givenShipFishingPostId = 1L;
 		Long givenMemberId = 1L;
