@@ -2,6 +2,7 @@ package com.backend.domain.member.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -29,8 +30,8 @@ class MemberRepositoryTest extends BaseTest {
 		.giveMeBuilder(Member.class)
 		.set("memberId", null)
 		.set("phone", "010-1234-5678")
-		.set("email","test@naver.com")
-		.set("nickname","테스트")
+		.set("email", "test@naver.com")
+		.set("nickname", "테스트")
 		.set("role", MemberRole.USER)
 		.set("name", "test");
 
@@ -86,5 +87,35 @@ class MemberRepositoryTest extends BaseTest {
 		assertThat(result).isPresent();
 		assertThat(result.get().getName()).isEqualTo("test");
 		assertThat(result.get().getPhone()).isEqualTo("010-1234-5678");
+	}
+
+	@Test
+	@DisplayName("회원 ID 목록으로 이메일 리스트 조회 [Repository] - Success")
+	void t04() {
+		// given
+		Member member1 = arbitraryBuilder.set("nickname", "tester1")
+			.set("phone", "010-0000-0001")
+			.set("email", "test1@naver.com").sample();
+
+		Member member2 = arbitraryBuilder.set("nickname", "tester2")
+			.set("phone", "010-0000-0002")
+			.set("email", "test2@naver.com").sample();
+
+		Member member3 = arbitraryBuilder.set("nickname", "tester3")
+			.set("phone", "010-0000-0003")
+			.set("email", "test3@naver.com").sample();
+
+		Member saved1 = memberRepository.save(member1);
+		Member saved2 = memberRepository.save(member2);
+		Member saved3 = memberRepository.save(member3);
+
+		List<Long> memberIds = List.of(saved1.getMemberId(), saved2.getMemberId(), saved3.getMemberId());
+
+		// when
+		List<String> result = memberRepository.findEmailListByIdList(memberIds);
+
+		// then
+		assertThat(result).hasSize(3);
+		assertThat(result).containsExactlyInAnyOrder("test1@naver.com", "test2@naver.com", "test3@naver.com");
 	}
 }
