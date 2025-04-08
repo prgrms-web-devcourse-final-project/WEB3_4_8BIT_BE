@@ -1,5 +1,6 @@
 package com.backend.domain.member.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -16,27 +17,32 @@ public class MemberRepositoryImpl implements MemberRepository {
 	private final MemberQueryRepository memberQueryRepository;
 
 	@Override
-	public Member save(Member member) {
+	public Member save(final Member member) {
 		return memberJpaRepository.save(member);
 	}
 
 	@Override
-	public Optional<Member> findByPhone(String phone) {
+	public Optional<Member> findByPhone(final String phone) {
 		return memberJpaRepository.findByPhone(phone);
 	}
 
 	@Override
-	public Optional<Member> findById(Long id) {
+	public Optional<Member> findById(final Long id) {
 		return memberJpaRepository.findById(id);
 	}
 
 	@Override
-	public Optional<MemberResponse.Detail> findDetailById(Long memberId) {
+	public Optional<MemberResponse.Detail> findDetailById(final Long memberId) {
 		return memberQueryRepository.findDetailById(memberId);
 	}
 
 	@Override
-	public boolean existsById(Long memberId) {
+	public boolean existsById(final Long memberId) {
 		return memberJpaRepository.existsById(memberId);
+	}
+
+	@Override
+	public List<String> findEmailListByIdList(final List<Long> memberIdList) {
+		return memberQueryRepository.findEmailListByIdList(memberIdList);
 	}
 }
