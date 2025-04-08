@@ -24,7 +24,7 @@ public class AsyncConfig {
 		//대기열이 가득차면 추가로 사용할 스레드 최대 사이즈 설정
 		executor.setMaxPoolSize(10);
 		//corePoolSize가 가득 찬 상태에서 대기시킬 작업 개수
-		executor.setQueueCapacity(500);
+		executor.setQueueCapacity(20);
 		//스레드 prefix
 		executor.setThreadNamePrefix("Executor-");
 		executor.initialize();
