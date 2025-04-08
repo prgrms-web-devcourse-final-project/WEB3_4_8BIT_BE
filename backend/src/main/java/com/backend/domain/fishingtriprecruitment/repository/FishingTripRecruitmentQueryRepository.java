@@ -68,4 +68,14 @@ public class FishingTripRecruitmentQueryRepository {
 			return null;
 		return fishingTripRecruitment.fishingTripRecruitmentId.gt(cursorId);
 	}
+
+	public List<Long> findMemberIdListByPostId(final Long fishingTripPostId) {
+		return jpaQueryFactory
+			.select(fishingTripRecruitment.memberId)
+			.from(fishingTripRecruitment)
+			.where(fishingTripRecruitment.fishingTripPostId.eq(fishingTripPostId),
+				fishingTripRecruitment.recruitmentStatus.eq(RecruitmentStatus.APPROVED)
+			)
+			.fetch();
+	}
 }
