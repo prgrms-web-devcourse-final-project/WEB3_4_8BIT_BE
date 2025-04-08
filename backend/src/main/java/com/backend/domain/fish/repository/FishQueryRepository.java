@@ -3,6 +3,7 @@ package com.backend.domain.fish.repository;
 import static com.backend.domain.fish.entity.QFish.*;
 import static com.backend.global.storage.entity.QFile.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,6 +17,7 @@ import com.backend.domain.fish.dto.QFishResponse_Popular;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -48,7 +50,6 @@ public class FishQueryRepository {
 		return Optional.ofNullable(findDetail);
 	}
 
-
 	public List<FishResponse.Popular> findPopular(final Integer size) {
 
 		return jpaQueryFactory
@@ -64,7 +65,7 @@ public class FishQueryRepository {
 			.orderBy(new OrderSpecifier<>(Order.DESC, fish.popularityScore))
 			.limit(size)
 			.fetch();
-  }
+	}
 
 	public void updateFishPopularityScores(List<Tuple> hourlyFishCountSummaryList) {
 
@@ -94,6 +95,27 @@ public class FishQueryRepository {
 		return jpaQueryFactory
 			.select(new QFishResponse_FishAll(fish.fishId, fish.name))
 			.from(fish)
+			.fetch();
+	}
+
+	public List<FishResponse.Summary> findSummaryById(final List<Long> fishIdList) {
+		if (fishIdList == null || fishIdList.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		return jpaQueryFactory.select(
+				Projections.constructor(
+					FishResponse.Summary.class,
+					fish.fishId,
+					fish.name,
+					file.url,
+					fish.spawnSeasonList,
+					fish.spawnLocation
+				))
+			.from(fish)
+			.leftJoin(file)
+			.on(fish.fileId.eq(file.fileId))
+			.where(fish.fishId.in(fishIdList))
 			.fetch();
 	}
 }

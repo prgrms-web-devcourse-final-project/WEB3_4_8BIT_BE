@@ -52,4 +52,9 @@ public class FishRepositoryImpl implements FishRepository {
 	public List<FishResponse.FishAll> findFishAll() {
 		return fishQueryRepository.findFishAll();
 	}
+
+	@Override
+	public List<FishResponse.Summary> findFishSummaryById(final List<Long> fishIdList) {
+		return fishQueryRepository.findSummaryById(fishIdList);
+	}
 }
