@@ -11,8 +11,8 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Repository;
 
-import com.backend.domain.fishpoint.dto.response.QFishPointResponse_Response;
-import com.backend.domain.fishpoint.dto.response.QFishPointResponse_ResponseWithDistance;
+import com.backend.domain.fishpoint.dto.response.QFishPointResponse_Basic;
+import com.backend.domain.fishpoint.dto.response.QFishPointResponse_WithDistance;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -29,7 +29,7 @@ public class FishPointQueryRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 	private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
-	public List<Response> findByBounds(final double swLat, final double swLng, final double neLat, final double neLng) {
+	public List<Basic> findByBounds(final double swLat, final double swLng, final double neLat, final double neLng) {
 
 		String polygonWKT = String.format(
 			"POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))",
@@ -49,7 +49,7 @@ public class FishPointQueryRepository {
 		);
 
 		return jpaQueryFactory
-			.select(new QFishPointResponse_Response(
+			.select(new QFishPointResponse_Basic(
 				fishPoint.fishPointId,
 				fishPoint.fishPointName,
 				fishPoint.fishPointDetailName,
@@ -62,7 +62,7 @@ public class FishPointQueryRepository {
 			.fetch();
 	}
 
-	public List<ResponseWithDistance> findByDistanceWithin(final double lat, final double lng, final double radiusKm) {
+	public List<WithDistance> findByDistanceWithin(final double lat, final double lng, final double radiusKm) {
 		Point center = geometryFactory.createPoint(new Coordinate(lng, lat));
 		center.setSRID(4326);
 
@@ -83,7 +83,7 @@ public class FishPointQueryRepository {
 		BooleanExpression notBanned = fishPoint.isBan.isFalse();
 
 		return jpaQueryFactory
-			.select(new QFishPointResponse_ResponseWithDistance(
+			.select(new QFishPointResponse_WithDistance(
 				fishPoint.fishPointId,
 				fishPoint.fishPointName,
 				fishPoint.fishPointDetailName,
@@ -97,7 +97,7 @@ public class FishPointQueryRepository {
 			.fetch();
 	}
 
-	public List<ResponseWithDistance> findByNearestFishPoints(final double lat, final double lng) {
+	public List<WithDistance> findByNearestFishPoints(final double lat, final double lng) {
 		Point center = geometryFactory.createPoint(new Coordinate(lng, lat));
 		center.setSRID(4326);
 
@@ -111,7 +111,7 @@ public class FishPointQueryRepository {
 		BooleanExpression notBanned = fishPoint.isBan.isFalse();
 
 		return jpaQueryFactory
-			.select(new QFishPointResponse_ResponseWithDistance(
+			.select(new QFishPointResponse_WithDistance(
 				fishPoint.fishPointId,
 				fishPoint.fishPointName,
 				fishPoint.fishPointDetailName,
@@ -127,10 +127,10 @@ public class FishPointQueryRepository {
 			.fetch();
 	}
 
-	public List<Response> findByRegionId(final Long regionId) {
+	public List<Basic> findByRegionId(final Long regionId) {
 
 		return jpaQueryFactory
-			.select(new QFishPointResponse_Response(
+			.select(new QFishPointResponse_Basic(
 				fishPoint.fishPointId,
 				fishPoint.fishPointName,
 				fishPoint.fishPointDetailName,
@@ -144,10 +144,10 @@ public class FishPointQueryRepository {
 			.fetch();
 	}
 
-	public List<Response> findByFishPointName(final String fishPointName) {
+	public List<Basic> findByFishPointName(final String fishPointName) {
 
 		return jpaQueryFactory
-			.select(new QFishPointResponse_Response(
+			.select(new QFishPointResponse_Basic(
 				fishPoint.fishPointId,
 				fishPoint.fishPointName,
 				fishPoint.fishPointDetailName,

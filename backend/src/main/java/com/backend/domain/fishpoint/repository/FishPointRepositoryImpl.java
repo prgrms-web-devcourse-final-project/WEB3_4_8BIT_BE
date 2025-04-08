@@ -28,27 +28,27 @@ public class FishPointRepositoryImpl implements FishPointRepository {
 	}
 
 	@Override
-	public List<Response> findByBounds(final double swLat, final double swLng, final double neLat, final double neLng) {
+	public List<Basic> findByBounds(final double swLat, final double swLng, final double neLat, final double neLng) {
 		return fishPointQueryRepository.findByBounds(swLat, swLng, neLat, neLng);
 	}
 
 	@Override
-	public List<ResponseWithDistance> findByDistanceWithin(final double lat, final  double lng, final double radiusKm) {
+	public List<WithDistance> findByDistanceWithin(final double lat, final  double lng, final double radiusKm) {
 		return fishPointQueryRepository.findByDistanceWithin(lat, lng, radiusKm);
 	}
 
 	@Override
-	public List<ResponseWithDistance> findNearestFishPoints(final double lat, final double lng) {
+	public List<WithDistance> findNearestFishPoints(final double lat, final double lng) {
 		return fishPointQueryRepository.findByNearestFishPoints(lat, lng);
 	}
 
 	@Override
-	public List<Response> findByRegionId(final Long regionId) {
+	public List<Basic> findByRegionId(final Long regionId) {
 		return fishPointQueryRepository.findByRegionId(regionId);
 	}
 
 	@Override
-	public List<Response> findByFishPointName(final String fishPointName) {
+	public List<Basic> findByFishPointName(final String fishPointName) {
 		return fishPointQueryRepository.findByFishPointName(fishPointName);
 	}
 }

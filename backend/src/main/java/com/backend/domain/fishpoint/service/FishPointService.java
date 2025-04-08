@@ -15,7 +15,7 @@ public interface FishPointService {
 	 * @param neLng 지도 바운드의 북동쪽(North-East) 경도
 	 * @return 조회된 낚시 포인트 응답 DTO 리스트
 	 */
-	List<Response> getFishPointsByBounds(
+	List<Basic> getFishPointsByBounds(
 		final double swLat,
 		final double swLng,
 		final double neLat,
@@ -30,7 +30,7 @@ public interface FishPointService {
 	 * @param radiusKm 반경 거리 (단위: km) - 조회할 거리 범위
 	 * @return 반경 내에 위치한 낚시 포인트 정보를 담은 DTO 리스트
 	 */
-	List<ResponseWithDistance> getNearbyFishPoints(final double lat, final double lng, final double radiusKm);
+	List<WithDistance> getNearbyFishPoints(final double lat, final double lng, final double radiusKm);
 
 	/**
 	 * 사용자의 현재 위치를 기준으로 가장 가까운 낚시 포인트 3개를 조회
@@ -39,7 +39,7 @@ public interface FishPointService {
 	 * @param lng 사용자의 현재 경도
 	 * @return 거리 정보가 포함된 낚시 포인트 응답 리스트 (최대 3개)
 	 */
-	List<ResponseWithDistance> getNearestFishPoints(final double lat, final double lng);
+	List<WithDistance> getNearestFishPoints(final double lat, final double lng);
 
 	/**
 	 * 주어진 지역 ID에 해당하는 낚시 포인트 목록을 조회
@@ -47,7 +47,7 @@ public interface FishPointService {
 	 * @param regionId 조회할 지역의 ID
 	 * @return 해당 지역에 속한 낚시 포인트 정보를 담은 Response 리스트
 	 */
-	List<Response> getFishPointsByRegionId(final Long regionId);
+	List<Basic> getFishPointsByRegionId(final Long regionId);
 
 	/**
 	 * 낚시 포인트 이름을 기준으로 검색
@@ -55,5 +55,5 @@ public interface FishPointService {
 	 * @param fishPointName 검색할 낚시 포인트 이름 (부분 일치)
 	 * @return 검색된 낚시 포인트 목록 (isBan = false인 데이터만 반환)
 	 */
-	List<Response> searchFishPoints(final String fishPointName);
+	List<Basic> searchFishPoints(final String fishPointName);
 }

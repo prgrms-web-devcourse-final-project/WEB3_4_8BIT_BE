@@ -37,7 +37,7 @@ public interface FishPointRepository {
 	 * @param neLng 북동쪽(North-East) 경도
 	 * @return 바운드 내에 존재하는 낚시 포인트 정보를 담은 DTO 리스트
 	 */
-	List<Response> findByBounds(final double swLat, final double swLng, final double neLat, final double neLng);
+	List<Basic> findByBounds(final double swLat, final double swLng, final double neLat, final double neLng);
 
 	/**
 	 * 중심 좌표 기준으로 반경 내 낚시 포인트 조회
@@ -47,7 +47,7 @@ public interface FishPointRepository {
 	 * @param radiusKm 반경 (킬로미터 단위)
 	 * @return 반경 내 낚시 포인트 리스트
 	 */
-	List<ResponseWithDistance> findByDistanceWithin(final double lat, final double lng, final double radiusKm);
+	List<WithDistance> findByDistanceWithin(final double lat, final double lng, final double radiusKm);
 
 	/**
 	 * 사용자의 현재 위치를 기준으로 가장 가까운 낚시 포인트 3개를 조회
@@ -56,7 +56,7 @@ public interface FishPointRepository {
 	 * @param lng 사용자의 현재 경도
 	 * @return 거리 정보가 포함된 낚시 포인트 응답 리스트 (최대 3개)
 	 */
-	List<ResponseWithDistance> findNearestFishPoints(final double lat, final double lng);
+	List<WithDistance> findNearestFishPoints(final double lat, final double lng);
 
 	/**
 	 * 지정한 지역(도 단위) ID에 해당하는 모든 낚시 포인트 정보를 조회
@@ -64,7 +64,7 @@ public interface FishPointRepository {
 	 * @param regionId 조회할 지역의 ID
 	 * @return 해당 지역에 속한 낚시 포인트 리스트
 	 */
-	List<Response> findByRegionId(final Long regionId);
+	List<Basic> findByRegionId(final Long regionId);
 
 	/**
 	 * 지역명을 기준으로 낚시 포인트 전체 조회
@@ -72,5 +72,5 @@ public interface FishPointRepository {
 	 * @param fishPointName 지역명 (부분 일치 검색)
 	 * @return 낚시 포인트 정보 DTO 리스트
 	 */
-	List<Response> findByFishPointName(final String fishPointName);
+	List<Basic> findByFishPointName(final String fishPointName);
 }

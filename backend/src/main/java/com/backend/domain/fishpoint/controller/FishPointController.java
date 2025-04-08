@@ -30,10 +30,10 @@ public class FishPointController {
 
 	@GetMapping("/bounds")
 	@Operation(summary = "지도 내 낚시 포인트 조회", description = "지도 범위 내에 있는 낚시 포인트 조회 API")
-	public ResponseEntity<GenericResponse<List<Response>>> getFishPointByBounds(
+	public ResponseEntity<GenericResponse<List<Basic>>> getFishPointByBounds(
 		@Valid @ModelAttribute  final FishPointRequest.Bounds boundsRequestDto
 	) {
-		List<Response> fishPointList = fishPointService.getFishPointsByBounds(
+		List<Basic> fishPointList = fishPointService.getFishPointsByBounds(
 			boundsRequestDto.swLat(),
 			boundsRequestDto.swLng(),
 			boundsRequestDto.neLat(),
@@ -48,10 +48,10 @@ public class FishPointController {
 		summary = "내 위치 근처 낚시 포인트 조회",
 		description = "사용자의 현재 위치를 기준으로 설정한 반경(km) 내에 있는 낚시 포인트 목록 조회 API"
 	)
-	public ResponseEntity<GenericResponse<List<ResponseWithDistance>>> getNearbyFishPoints(
+	public ResponseEntity<GenericResponse<List<WithDistance>>> getNearbyFishPoints(
 		@Valid @ModelAttribute final FishPointRequest.Nearby nearbyRequestDto
 	) {
-		List<ResponseWithDistance> fishPointList = fishPointService.getNearbyFishPoints(
+		List<WithDistance> fishPointList = fishPointService.getNearbyFishPoints(
 			nearbyRequestDto.lat(),
 			nearbyRequestDto.lng(),
 			nearbyRequestDto.radiusKm()
@@ -65,10 +65,10 @@ public class FishPointController {
 		summary = "내 위치 근처 낚시 포인트 조회",
 		description = "사용자의 현재 위치를 기준으로 가장 가까이 있는 낚시 포인트 3개 조회 API"
 	)
-	public ResponseEntity<GenericResponse<List<ResponseWithDistance>>> getNearestFishPoints(
+	public ResponseEntity<GenericResponse<List<WithDistance>>> getNearestFishPoints(
 		@Valid @ModelAttribute final FishPointRequest.Nearby nearbyRequestDto
 	) {
-		List<ResponseWithDistance> fishPointList = fishPointService.getNearestFishPoints(
+		List<WithDistance> fishPointList = fishPointService.getNearestFishPoints(
 			nearbyRequestDto.lat(),
 			nearbyRequestDto.lng()
 		);
@@ -78,20 +78,20 @@ public class FishPointController {
 
 	@GetMapping("/regions/{regionId}")
 	@Operation(summary = "지역 기반 낚시 포인트 조회", description = "지역 ID(도 단위) 기준 낚시 포인트를 조회 API")
-	public ResponseEntity<GenericResponse<List<Response>>> getRegionFishPoints(
+	public ResponseEntity<GenericResponse<List<Basic>>> getRegionFishPoints(
 		@PathVariable Long regionId
 	) {
-		List<Response> fishPointList = fishPointService.getFishPointsByRegionId(regionId);
+		List<Basic> fishPointList = fishPointService.getFishPointsByRegionId(regionId);
 
 		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
 	}
 
 	@GetMapping
 	@Operation(summary = "낚시 포인트 검색", description = "지역명을 기준으로 낚시 포인트 검색 API")
-	public ResponseEntity<GenericResponse<List<Response>>> getFishPointBySearch(
+	public ResponseEntity<GenericResponse<List<Basic>>> getFishPointBySearch(
 		@Valid @ModelAttribute final FishPointRequest.Search searchRequestDto
 	) {
-		List<Response> fishPointList = fishPointService.searchFishPoints(searchRequestDto.region());
+		List<Basic> fishPointList = fishPointService.searchFishPoints(searchRequestDto.region());
 
 		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
 	}

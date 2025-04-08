@@ -5,7 +5,7 @@ import com.querydsl.core.annotations.QueryProjection;
 
 public class FishPointResponse {
 
-	public record Response(
+	public record Basic(
 		Long fishPointId,
 		String fishPointName,
 		String fishPointDetailName,
@@ -14,10 +14,10 @@ public class FishPointResponse {
 		Boolean isBan
 	) {
 		@QueryProjection
-		public Response {}
+		public Basic {}
 	}
 
-	public record ResponseWithDistance(
+	public record WithDistance(
 		Long fishPointId,
 		String fishPointName,
 		String fishPointDetailName,
@@ -27,6 +27,16 @@ public class FishPointResponse {
 		Double distance
 	) {
 		@QueryProjection
-		public ResponseWithDistance {}
+		public WithDistance {}
+	}
+
+	public record Popularity(
+		Long fishPointId,
+		String fishPointName,
+		String fishPointDetailName,
+		Long recruitmentCount
+	) {
+		@QueryProjection
+		public Popularity {}
 	}
 }
