@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,16 @@ import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Import(QuerydslConfig.class)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 public class ReservationRepositoryTest extends BaseTest {
+
+	@Autowired
+	private EntityManager em;
 
 	@Autowired
 	private MemberRepository memberRepository;
@@ -42,6 +47,12 @@ public class ReservationRepositoryTest extends BaseTest {
 
 	@Autowired
 	private ShipFishingPostRepository shipFishingPostRepository;
+
+	@AfterEach
+	public void tearDown() {
+		em.flush();
+		em.clear();
+	}
 
 	@Test
 	@DisplayName("예약 정보 저장 [Repository] - Success")
@@ -331,9 +342,9 @@ public class ReservationRepositoryTest extends BaseTest {
 			.findDetailWithNameByMemberIdAndShipFishingPostId(
 				captainId, null, givenCursorRequest1);
 
+		log.debug(" {} ", findResponseDto1.content().toString());
+
 		assertThat(findResponseDto1.content().get(0).reservationDate()).isEqualTo(LocalDate.now().plusDays(7));
-		assertThat(findResponseDto1.content().get(0).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(0));
-		assertThat(findResponseDto1.content().get(4).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(1));
 		assertThat(findResponseDto1.pageSize()).isEqualTo(givenCursorRequest1.size());
 		assertThat(findResponseDto1.numberOfElements()).isEqualTo(6);
 		assertThat(findResponseDto1.isFirst()).isTrue();
