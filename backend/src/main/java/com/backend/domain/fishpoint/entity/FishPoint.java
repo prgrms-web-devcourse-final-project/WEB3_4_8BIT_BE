@@ -10,6 +10,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,7 +19,13 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "fish_points")
+@Table(
+	name = "fish_points",
+	indexes = {
+		@Index(name = "idx_region_isban", columnList = "regionId, isBan"),
+		@Index(name = "idx_name_isban", columnList = "fishPointName, isBan")
+	}
+)
 @Entity
 @Getter
 @SuperBuilder
