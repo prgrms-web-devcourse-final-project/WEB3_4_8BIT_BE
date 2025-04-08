@@ -51,4 +51,9 @@ public class FishPointRepositoryImpl implements FishPointRepository {
 	public List<Basic> findByFishPointName(final String fishPointName) {
 		return fishPointQueryRepository.findByFishPointName(fishPointName);
 	}
+
+	@Override
+	public List<Popularity> findPopularityFishPoints() {
+		return fishPointQueryRepository.findPopularityFishPoints();
+	}
 }

@@ -73,4 +73,11 @@ public interface FishPointRepository {
 	 * @return 낚시 포인트 정보 DTO 리스트
 	 */
 	List<Basic> findByFishPointName(final String fishPointName);
+
+	/**
+	 * 인기 낚시 포인트 상위 3개를 조회합니다.
+	 *
+	 * @return 인기 순으로 정렬된 낚시 포인트 3개의 리스트
+	 */
+	List<Popularity> findPopularityFishPoints();
 }

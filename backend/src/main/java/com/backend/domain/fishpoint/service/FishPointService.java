@@ -56,4 +56,11 @@ public interface FishPointService {
 	 * @return 검색된 낚시 포인트 목록 (isBan = false인 데이터만 반환)
 	 */
 	List<Basic> searchFishPoints(final String fishPointName);
+
+	/**
+	 * 동출 게시글 수를 기준으로 인기 있는 낚시 포인트 상위 3개를 조회합니다.
+	 *
+	 * @return 동출 게시글 수가 많은 순으로 정렬된 인기 낚시 포인트 3개의 리스트
+	 */
+	List<Popularity> getPopularityFishPoints();
 }

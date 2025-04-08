@@ -1,5 +1,6 @@
 package com.backend.domain.fishpoint.repository;
 
+import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
 import static com.backend.domain.fishpoint.dto.response.FishPointResponse.*;
 import static com.backend.domain.fishpoint.entity.QFishPoint.*;
 
@@ -12,7 +13,9 @@ import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.fishpoint.dto.response.QFishPointResponse_Basic;
+import com.backend.domain.fishpoint.dto.response.QFishPointResponse_Popularity;
 import com.backend.domain.fishpoint.dto.response.QFishPointResponse_WithDistance;
+import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -161,6 +164,22 @@ public class FishPointQueryRepository {
 				fishPoint.isBan.isFalse()
 			)
 			.orderBy(fishPoint.fishPointId.asc())
+			.fetch();
+	}
+
+	public List<Popularity> findPopularityFishPoints() {
+		return jpaQueryFactory
+			.select(new QFishPointResponse_Popularity(
+				fishPoint.fishPointId,
+				fishPoint.fishPointName,
+				fishPoint.fishPointDetailName,
+				fishingTripPost.fishingPointId.count()
+			))
+			.from(fishingTripPost)
+			.join(fishPoint).on(fishingTripPost.fishingPointId.eq(fishPoint.fishPointId))
+			.groupBy(fishPoint.fishPointId)
+			.orderBy(fishingTripPost.fishingPointId.count().desc())
+			.limit(3)
 			.fetch();
 	}
 }
