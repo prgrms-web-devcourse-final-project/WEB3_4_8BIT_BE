@@ -5,6 +5,7 @@ import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 
 import java.util.List;
 
+import com.backend.domain.fishingtrippost.notifier.FishingTripPostNotifier;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.domain.fishingtriprecruitment.dto.request.FishingTripRecruitmentRequest;
 import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruitmentResponse;
@@ -80,17 +81,20 @@ public interface FishingTripRecruitmentService {
 	/**
 	 * 동출 모집 신청을 승인합니다.
 	 *
-	 * <p>모집글 작성자가 신청을 승인할 때 사용되며, 신청자의 상태를 {@code APPROVED}로 변경하고
-	 * 모집글의 현재 참여 인원({@code currentCount})을 1 증가시킵니다.
-	 * 승인 후 인원이 모집 정원에 도달하면 게시글 상태를 {@code COMPLETED}로 변경합니다.</p>
+	 * <p>모집글 작성자(author)가 특정 사용자의 신청을 승인할 때 사용하는 메서드입니다.
+	 * 신청자의 상태를 {@link RecruitmentStatus#APPROVED}로 변경하고,
+	 * 모집글의 현재 참여 인원(currentCount)을 1 증가시킵니다.
+	 * 만약 증가된 인원이 모집 정원(recruitmentCount)에 도달하면,
+	 * 게시글 상태를 {@link PostStatus#COMPLETED}로 변경하고,
+	 * 해당 게시글에 신청했던 사용자들에게 신청 완료 메일을 발송합니다.</p>
 	 *
 	 * @implSpec
 	 * <ol>
 	 *     <li>{@code fishingTripRecruitmentId}를 통해 신청 엔티티를 조회합니다.</li>
 	 *     <li>신청자가 속한 모집글의 작성자와 {@code memberId}가 일치하는지 검증합니다.</li>
 	 *     <li>모집글의 현재 인원이 모집 정원을 초과하지 않는지 확인합니다.</li>
-	 *     <li>모든 검증을 통과하면 신청 상태를 {@link RecruitmentStatus#APPROVED}로 변경하고, 인원을 1명 증가시킵니다.</li>
-	 *     <li>모집 정원에 도달한 경우 {@link PostStatus#COMPLETED} 상태로 게시글 상태를 변경합니다.</li>
+	 *     <li>모든 검증을 통과하면 신청 상태를 {@link RecruitmentStatus#APPROVED}로 변경하고 인원을 1명 증가시킵니다.</li>
+	 *     <li>모집 정원에 도달한 경우 {@link PostStatus#COMPLETED} 상태로 변경하고, {@link FishingTripPostNotifier}를 통해 메일 발송을 트리거합니다.</li>
 	 * </ol>
 	 *
 	 * @param memberId 현재 로그인한 사용자(모집글 작성자)의 ID
