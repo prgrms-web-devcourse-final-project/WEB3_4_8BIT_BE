@@ -6,7 +6,7 @@ import com.backend.domain.region.entity.Region;
 
 public class RegionConverter {
 
-	public static Basic from(Region region) {
+	public static Basic from(final Region region) {
 
 		return Basic.builder()
 			.regionId(region.getRegionId())
