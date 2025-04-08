@@ -37,7 +37,7 @@ public interface FishPointRepository {
 	 * @param neLng 북동쪽(North-East) 경도
 	 * @return 바운드 내에 존재하는 낚시 포인트 정보를 담은 DTO 리스트
 	 */
-	List<Response> findByBounds(double swLat, double swLng, double neLat, double neLng);
+	List<Response> findByBounds(final double swLat, final double swLng, final double neLat, final double neLng);
 
 	/**
 	 * 중심 좌표 기준으로 반경 내 낚시 포인트 조회
@@ -47,7 +47,7 @@ public interface FishPointRepository {
 	 * @param radiusKm 반경 (킬로미터 단위)
 	 * @return 반경 내 낚시 포인트 리스트
 	 */
-	List<ResponseWithDistance> findByDistanceWithin(final double lat, final  double lng, final  double radiusKm);
+	List<ResponseWithDistance> findByDistanceWithin(final double lat, final double lng, final double radiusKm);
 
 	/**
 	 * 사용자의 현재 위치를 기준으로 가장 가까운 낚시 포인트 3개를 조회

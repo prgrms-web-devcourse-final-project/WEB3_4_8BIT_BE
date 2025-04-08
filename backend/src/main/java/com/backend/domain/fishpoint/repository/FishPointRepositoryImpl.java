@@ -28,7 +28,7 @@ public class FishPointRepositoryImpl implements FishPointRepository {
 	}
 
 	@Override
-	public List<Response> findByBounds(double swLat, double swLng, double neLat, double neLng) {
+	public List<Response> findByBounds(final double swLat, final double swLng, final double neLat, final double neLng) {
 		return fishPointQueryRepository.findByBounds(swLat, swLng, neLat, neLng);
 	}
 

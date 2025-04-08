@@ -29,7 +29,7 @@ public class FishPointQueryRepository {
 	private final JPAQueryFactory jpaQueryFactory;
 	private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
-	public List<Response> findByBounds(double swLat, double swLng, double neLat, double neLng) {
+	public List<Response> findByBounds(final double swLat, final double swLng, final double neLat, final double neLng) {
 
 		String polygonWKT = String.format(
 			"POLYGON((%f %f, %f %f, %f %f, %f %f, %f %f))",
