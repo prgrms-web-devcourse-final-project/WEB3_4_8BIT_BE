@@ -16,7 +16,7 @@ public class FishPointSummaryRepositoryImpl implements FishPointSummaryRepositor
 	private final FishPointSummaryQueryRepository fishPointSummaryQueryRepository;
 
 	@Override
-	public List<Basic> findTop4ByFishPointIdOrderByTotalCountDesc(Long fishPointId) {
+	public List<Basic> findTop4ByFishPointIdOrderByTotalCountDesc(final Long fishPointId) {
 		return fishPointSummaryQueryRepository.findTop4ByFishPointIdOrderByTotalCountDesc(fishPointId);
 	}
 }

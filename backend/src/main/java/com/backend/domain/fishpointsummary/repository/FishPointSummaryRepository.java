@@ -12,5 +12,5 @@ public interface FishPointSummaryRepository {
 	 * @param fishPointId 조회할 낚시 포인트 ID
 	 * @return 해당 낚시 포인트에서 가장 많이 잡힌 어종 요약 정보 최대 4건 (없으면 빈 리스트 반환)
 	 */
-	List<Basic> findTop4ByFishPointIdOrderByTotalCountDesc(Long fishPointId);
+	List<Basic> findTop4ByFishPointIdOrderByTotalCountDesc(final Long fishPointId);
 }
