@@ -103,6 +103,7 @@ public class ReservationQueryRepository {
 				reservation.createdAt,
 				reservation.modifiedAt
 			))
+			.distinct()
 			.from(reservation)
 			.leftJoin(member)
 			.on(reservation.memberId.eq(member.memberId))
