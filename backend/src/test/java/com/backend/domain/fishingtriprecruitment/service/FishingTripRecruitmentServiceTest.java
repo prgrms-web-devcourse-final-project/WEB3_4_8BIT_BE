@@ -18,6 +18,7 @@ import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
+import com.backend.domain.fishingtrippost.notifier.FishingTripPostNotifier;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 import com.backend.domain.fishingtriprecruitment.domain.FishingLevel;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
@@ -48,6 +49,9 @@ class FishingTripRecruitmentServiceTest extends BaseTest {
 
 	@Mock
 	private FishingTripPostRepository fishingTripPostRepository;
+
+	@Mock
+	private FishingTripPostNotifier fishingTripPostNotifier;
 
 	private final ArbitraryBuilder<FishingTripRecruitmentRequest.Create> createRequestBuilder =
 		fixtureMonkeyValidation.giveMeBuilder(FishingTripRecruitmentRequest.Create.class)
@@ -295,6 +299,7 @@ class FishingTripRecruitmentServiceTest extends BaseTest {
 		assertThat(post.getCurrentCount()).isEqualTo(4);
 		verify(fishingTripRecruitmentRepository).findById(recruitmentId);
 		verify(fishingTripPostRepository).findById(postId);
+		verify(fishingTripPostNotifier).notifyMailIfCompleted(post);
 	}
 
 	@Test

@@ -82,11 +82,6 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 
 	private final Member givenMember = Member.builder().memberId(1L).build();
 
-	private final ArbitraryBuilder<FishPoint> fishPointarbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(
-			FishPoint.class)
-		.set("fishPointName", englishStringLength)
-		.set("fishPointDetailName", englishStringLength);
-
 	final ArbitraryBuilder<Fish> fishArbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
 		.set("name", englishStringLength)
 		.set("icon", englishStringLength)
@@ -95,10 +90,9 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 	@BeforeEach
 	void setUp() {
 		// 공통 테스트 데이터 설정
-		List<FishPoint> givenFishPointList = fishPointarbitraryBuilder
-			.set("fishPointId", null)
-			.sampleList(2);
-		savedFishPointList = fishPointJpaRepository.saveAll(givenFishPointList);
+		FishPoint point1 = createRandomFishPoint();
+		FishPoint point2 = createRandomFishPoint();
+		savedFishPointList = fishPointJpaRepository.saveAll(List.of(point1, point2));
 
 		List<Fish> givenFishList = fishArbitraryBuilder
 			.set("fishId", null)

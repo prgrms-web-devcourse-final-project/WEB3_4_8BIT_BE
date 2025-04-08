@@ -1,5 +1,6 @@
 package com.backend.domain.fishingtriprecruitment.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -36,5 +37,10 @@ public class FishingTripRecruitmentRepositoryImpl implements FishingTripRecruitm
 		final RecruitmentStatus status) {
 		return fishingTripRecruitmentQueryRepository
 			.findDetailPageQueryDtoByIdAndStatus(cursorRequestDto, fishingTripPostId, status);
+	}
+
+	@Override
+	public List<Long> findMemberIdListByPostId(final Long fishingTripPostId) {
+		return fishingTripRecruitmentQueryRepository.findMemberIdListByPostId(fishingTripPostId);
 	}
 }

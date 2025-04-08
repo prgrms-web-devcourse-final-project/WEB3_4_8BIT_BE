@@ -34,6 +34,10 @@ dependencies {
     annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
     annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 
+    // QueryDSL Spatial
+    implementation 'com.querydsl:querydsl-spatial'
+    annotationProcessor 'com.querydsl:querydsl-spatial'
+
     // Redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
@@ -51,6 +55,12 @@ dependencies {
 
     // S3
     implementation 'software.amazon.awssdk:s3:2.20.50'
+
+    // JTS Core - 공간 데이터(Point 등) 다루는 라이브러리
+    implementation 'org.locationtech.jts:jts-core:1.18.2'
+
+    // Hibernate Spatial - 공간 데이터를 DB에 매핑할 때 사용
+    implementation 'org.hibernate.orm:hibernate-spatial:6.4.4.Final'
 
     // Lombok
     compileOnly 'org.projectlombok:lombok'
@@ -71,6 +81,9 @@ dependencies {
 
     // Spring Security Test 라이브러리
 	testImplementation 'org.springframework.security:spring-security-test'
+
+    // 메일 라이브러리
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
 }
 
 tasks.named('test') {

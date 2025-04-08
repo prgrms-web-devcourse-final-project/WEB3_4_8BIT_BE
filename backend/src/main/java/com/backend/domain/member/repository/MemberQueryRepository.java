@@ -1,5 +1,6 @@
 package com.backend.domain.member.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -19,7 +20,7 @@ public class MemberQueryRepository {
 
 	private final JPAQueryFactory queryFactory;
 
-	public Optional<MemberResponse.Detail> findDetailById(Long memberId) {
+	public Optional<MemberResponse.Detail> findDetailById(final Long memberId) {
 		MemberResponse.Detail detail = queryFactory
 			.select(new QMemberResponse_Detail(
 				member.memberId,
@@ -38,5 +39,13 @@ public class MemberQueryRepository {
 			.fetchOne();
 
 		return Optional.ofNullable(detail);
+	}
+
+	public List<String> findEmailListByIdList(final List<Long> memberIdList) {
+		return queryFactory
+			.select(member.email)
+			.from(member)
+			.where(member.memberId.in(memberIdList))
+			.fetch();
 	}
 }

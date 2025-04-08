@@ -3,14 +3,18 @@ package com.backend.domain.fishingtrippost.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.fishingtrippost.converter.FishingTripPostConverter;
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
+import com.backend.domain.fishingtrippost.notifier.FishingTripPostNotifier;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
+import com.backend.domain.fishingtriprecruitment.repository.FishingTripRecruitmentRepository;
 import com.backend.domain.fishpoint.exception.FishPointErrorCode;
 import com.backend.domain.fishpoint.exception.FishPointException;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
@@ -22,7 +26,6 @@ import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.StorageService;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,6 +39,8 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final FishPointRepository fishPointRepository;
 	private final StorageService storageService;
 	private final StorageRepository storageRepository;
+	private final FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
+	private final FishingTripPostNotifier fishingTripPostNotifier;
 
 	@Override
 	@Transactional
@@ -93,6 +98,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId) {
 		//
 		FishingTripPostResponse.DetailQueryDto detailQueryDto = getDetailDtoById(fishingTripPostId);
@@ -100,6 +106,18 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		List<String> fileUrlList = getFileUrlList(detailQueryDto);
 
 		return FishingTripPostResponse.Detail.fromDetailQueryDtoAndFileUrlList(detailQueryDto, fileUrlList);
+	}
+
+	@Override
+	@Transactional
+	public void completeFishingTripPost(final Long memberId, final Long fishingTripPostId) {
+
+		FishingTripPost fishingTripPost = getFishingTripPostById(fishingTripPostId);
+
+		validAuthor(fishingTripPost, memberId);
+
+		fishingTripPost.setPostStatus(PostStatus.COMPLETED);
+		fishingTripPostNotifier.notifyMailIfCompleted(fishingTripPost);
 	}
 
 	/**

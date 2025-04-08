@@ -20,6 +20,7 @@ import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
+import com.backend.domain.fishingtrippost.notifier.FishingTripPostNotifier;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 import com.backend.domain.fishpoint.exception.FishPointErrorCode;
 import com.backend.domain.fishpoint.exception.FishPointException;
@@ -55,6 +56,9 @@ class FishingTripPostServiceTest extends BaseTest {
 
 	@Mock
 	private StorageRepository storageRepository;
+
+	@Mock
+	private FishingTripPostNotifier fishingTripPostNotifier;
 
 	private final ArbitraryBuilder<FishingTripPostRequest.Form> createRequestBuilder =
 		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Form.class);
@@ -322,5 +326,50 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verifyNoInteractions(storageRepository); // 파일 조회는 호출되지 않아야 함
+	}
+
+	@Test
+	@DisplayName("동출 게시글 모집 완료 처리 [작성자 본인일 경우] - Success")
+	void t09() {
+		// Given
+		Long memberId = 1L;
+		Long postId = 100L;
+
+		FishingTripPost post = postBuilder
+			.set("fishingTripPostId", postId)
+			.set("memberId", memberId)
+			.set("postStatus", PostStatus.RECRUITING)
+			.sample();
+
+		when(fishingTripPostRepository.findById(postId)).thenReturn(Optional.of(post));
+
+		// When
+		fishingTripPostService.completeFishingTripPost(memberId, postId);
+
+		// Then
+		assertThat(post.getPostStatus()).isEqualTo(PostStatus.COMPLETED);
+		verify(fishingTripPostNotifier).notifyMailIfCompleted(post);
+	}
+
+	@Test
+	@DisplayName("동출 게시글 모집 완료 처리 [작성자가 아닌 경우] - Fail")
+	void t10() {
+		// Given
+		Long memberId = 1L;       // 요청자
+		Long postId = 100L;
+
+		FishingTripPost post = postBuilder
+			.set("fishingTripPostId", postId)
+			.set("memberId", 2L)   // 실제 작성자
+			.sample();
+
+		when(fishingTripPostRepository.findById(postId)).thenReturn(Optional.of(post));
+
+		// When & Then
+		assertThatThrownBy(() -> fishingTripPostService.completeFishingTripPost(memberId, postId))
+			.isInstanceOf(FishingTripPostException.class)
+			.hasMessage(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage());
+
+		verify(fishingTripPostNotifier, never()).notifyMailIfCompleted(any());
 	}
 }

@@ -47,4 +47,18 @@ public interface FishingTripRecruitmentRepository {
 		final Long fishingTripPostId,
 		final RecruitmentStatus status
 	);
+
+	/**
+	 * 주어진 낚시 게시글 ID에 해당하는 승인된 신청자들의 회원 ID 목록을 조회합니다.
+	 *
+	 * <p>모집 신청 테이블에서 {@code fishingTripPostId}에 해당하는 게시글에 대해
+	 * 신청 상태가 {@link RecruitmentStatus#APPROVED}인 회원들의 ID만 추출하여 반환합니다.</p>
+	 *
+	 * @param fishingTripPostId 신청자를 조회할 대상 낚시 게시글 ID
+	 * @return 승인된 신청자의 회원 ID 목록 (없을 경우 빈 리스트 반환)
+	 * @implSpec 내부적으로 {@code fishingTripRecruitment.fishingTripPostId = :fishingTripPostId}
+	 *           AND {@code recruitmentStatus = 'APPROVED'} 조건으로 쿼리하여,
+	 *           {@code memberId} 컬럼만 조회합니다.
+	 */
+	List<Long> findMemberIdListByPostId(Long fishingTripPostId);
 }

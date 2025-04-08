@@ -74,4 +74,16 @@ public class FishingTripPostController {
 		return ResponseEntity.ok().body(GenericResponse.of(true, responseDto));
 	}
 
+	@PatchMapping("/{fishingTripPostId}/completed")
+	@Operation(summary = "동출 모집 게시글 모집완료", description = "로그인한 사용자가 동출 모집 게시글 모집완료하는 API")
+	@Parameter(name = "fishingTripPostId", required = true, description = "조회할 동출 모집 게시글 ID", example = "1")
+	public ResponseEntity<GenericResponse<Void>> completeFishingTripPost(
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@PathVariable final Long fishingTripPostId
+	) {
+		fishingTripPostService.completeFishingTripPost(user.getId(), fishingTripPostId);
+
+		return ResponseEntity.ok(GenericResponse.of(true));
+	}
+
 }

@@ -1,5 +1,7 @@
 package com.backend.domain.fishingtriprecruitment.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -7,6 +9,7 @@ import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
+import com.backend.domain.fishingtrippost.notifier.FishingTripPostNotifier;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 import com.backend.domain.fishingtriprecruitment.converter.FishingTripRecruitmentConverter;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
@@ -21,6 +24,7 @@ import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
+import com.backend.global.email.service.EmailService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +37,7 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 	private final FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
 	private final MemberRepository memberRepository;
 	private final FishingTripPostRepository fishingTripPostRepository;
+	private final FishingTripPostNotifier fishingTripPostNotifier;
 
 	@Override
 	@Transactional
@@ -96,6 +101,7 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 		fishingTripRecruitment.setRecruitmentStatus(RecruitmentStatus.APPROVED);
 		fishingTripPost.increaseCurrentCount(1);
 		completedFishingTripPost(fishingTripPost);
+		fishingTripPostNotifier.notifyMailIfCompleted(fishingTripPost);
 	}
 
 	/**
@@ -106,7 +112,7 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 	 *
 	 * @param fishingTripPost 상태를 검사할 낚시 동행 모집글 엔티티
 	 */
-	private static void completedFishingTripPost(FishingTripPost fishingTripPost) {
+	private static void completedFishingTripPost(final FishingTripPost fishingTripPost) {
 		if (fishingTripPost.getCurrentCount() >= fishingTripPost.getRecruitmentCount())
 			fishingTripPost.setPostStatus(PostStatus.COMPLETED);
 	}
