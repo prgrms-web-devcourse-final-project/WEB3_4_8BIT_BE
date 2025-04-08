@@ -72,9 +72,9 @@ public class GlobalRequest {
 		String sort,
 		@Schema(description = "이전, 이후 [prev, next] (default next)", example = "next")
 		String type,
-		@Schema(description = "정렬 필드 값 [이전이면 처음 값, 이후면 마지막 값]", example = "next")
+		@Schema(description = "정렬 필드 값 [이전이면 처음 값, 이후면 마지막 값]", example = "2025-04-05")
 		String fieldValue,
-		@Schema(description = "정렬 필드 ID값 [이전이면 처음 값, 이후면 마지막 값]", example = "next")
+		@Schema(description = "정렬 필드 ID값 [이전이면 처음 값, 이후면 마지막 값]", example = "1")
 		Long id,
 		@Min(value = 1, message = "페이지 사이즈는 1 이상이어야 합니다.")
 		@Schema(description = "페이지 사이즈", example = "10")
