@@ -144,4 +144,38 @@ class FishingTripRecruitmentRepositoryTest extends BaseTest {
 		assertThat(response.isFirst()).isTrue();
 		assertThat(response.isLast()).isFalse();
 	}
+
+	@Test
+	@DisplayName("게시글 ID로 APPROVED 상태인 신청자들의 회원 ID 조회 [Repository] - Success")
+	void t03() {
+		// Given
+		FishingTripPost post = fishingTripPostRepository.save(fishingTripPostArbitraryBuilder.sample());
+
+		List<Member> members = LongStream.rangeClosed(1, 3)
+			.mapToObj(i -> memberRepository.save(
+				memberArbitraryBuilder
+					.set("nickname", "강태공" + i)
+					.set("email", "test0" + i + "@naver.com")
+					.set("phone", "010-0000-000" + i)
+					.sample()))
+			.toList();
+
+		List<FishingTripRecruitment> recruitments = members.stream()
+			.map(member -> fishingTripRecruitmentArbitraryBuilder
+				.set("fishingTripPostId", post.getFishingTripPostId())
+				.set("memberId", member.getMemberId())
+				.set("recruitmentStatus", RecruitmentStatus.APPROVED)
+				.sample())
+			.toList();
+
+		recruitments.forEach(fishingTripRecruitmentRepository::save);
+
+		// When
+		List<Long> result = fishingTripRecruitmentRepository.findMemberIdListByPostId(post.getFishingTripPostId());
+
+		// Then
+		List<Long> expectedIds = members.stream().map(Member::getMemberId).toList();
+		assertThat(result).hasSize(3);
+		assertThat(result).containsExactlyInAnyOrderElementsOf(expectedIds);
+	}
 }
