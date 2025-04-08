@@ -84,7 +84,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			throw e;
 
 		} catch (Exception e) {
-			log.warn("사용자 인증 정보를 설정할 수 없음: {}", e.getMessage());
+			log.warn("알 수 없는 예외 발생: ", e);
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 	}

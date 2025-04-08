@@ -66,10 +66,8 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 
 		log.debug("잡은 물고기 데이터 갱신: {}", catchMaxLength);
 
-		if (
-			catchMaxLength.getBestLength().equals(requestDto.length()) ||
-			catchMaxLength.getCatchCount().equals(requestDto.count())
-		) {
+		if (catchMaxLength.getBestLength().equals(requestDto.length()) ||
+			catchMaxLength.getCatchCount().equals(requestDto.count())) {
 			catchMaxLengthRepository.save(catchMaxLength);
 		}
 
