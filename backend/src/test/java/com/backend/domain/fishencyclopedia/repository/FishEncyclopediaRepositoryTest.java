@@ -11,10 +11,6 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.Point;
-import org.locationtech.jts.geom.PrecisionModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -96,28 +92,11 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 		.set("icon", englishStringLength)
 		.set("spawnLocation", englishStringLength);
 
-	private final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
-
-	private FishPoint createFishPoint(String name, double lat, double lng, boolean isBan, Long regionId) {
-		Point location = geometryFactory.createPoint(new Coordinate(lng, lat));
-		location.setSRID(4326);
-
-		return FishPoint.builder()
-			.fishPointName(name)
-			.fishPointDetailName(name + " 상세")
-			.latitude(lat)
-			.longitude(lng)
-			.location(location)
-			.isBan(isBan)
-			.regionId(regionId)
-			.build();
-	}
-
 	@BeforeEach
 	void setUp() {
 		// 공통 테스트 데이터 설정
-		FishPoint point1 = createFishPoint("A포인트", 37.0, 127.0, false, 1L);
-		FishPoint point2 = createFishPoint("B포인트", 38.0, 128.0, false, 1L);
+		FishPoint point1 = createRandomFishPoint();
+		FishPoint point2 = createRandomFishPoint();
 		savedFishPointList = fishPointJpaRepository.saveAll(List.of(point1, point2));
 
 		List<Fish> givenFishList = fishArbitraryBuilder

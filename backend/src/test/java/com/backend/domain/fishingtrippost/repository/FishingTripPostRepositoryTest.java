@@ -20,6 +20,7 @@ import net.jqwik.api.Arbitrary;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishpoint.entity.FishPoint;
+import com.backend.domain.fishpoint.repository.FishPointQueryRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepositoryImpl;
 import com.backend.domain.member.domain.MemberRole;
@@ -43,6 +44,7 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 	MemberRepositoryImpl.class,
 	MemberQueryRepository.class,
 	FishPointRepositoryImpl.class,
+	FishPointQueryRepository.class,
 	FishingTripPostRepositoryImpl.class,
 	FishingTripPostQueryRepository.class,
 	StorageRepositoryImpl.class,
@@ -101,7 +103,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 	void t01() {
 		// given
 		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
-		FishPoint savedFishPoint = fishPointRepository.save(fishPointArbitraryBuilder.sample());
+		FishPoint savedFishPoint = fishPointRepository.save(createRandomFishPoint());
 
 		FishingTripPost givenPost = fishingTripPostArbitraryBuilder
 			.set("fishingTripPostId", null)
@@ -122,7 +124,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 	void t02() {
 		// given
 		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
-		FishPoint savedFishPoint = fishPointRepository.save(fishPointArbitraryBuilder.sample());
+		FishPoint savedFishPoint = fishPointRepository.save(createRandomFishPoint());
 
 		FishingTripPost givenPost = fishingTripPostArbitraryBuilder
 			.set("fishingTripPostId", null)
@@ -147,7 +149,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 	void t03() {
 		// given
 		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
-		FishPoint savedFishPoint = fishPointRepository.save(fishPointArbitraryBuilder.sample());
+		FishPoint savedFishPoint = fishPointRepository.save(createRandomFishPoint());
 
 		List<File> savedFiles = Stream.of(1, 2, 3)
 			.map(i -> File.builder()
