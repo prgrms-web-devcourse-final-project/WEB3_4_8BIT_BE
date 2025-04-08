@@ -8,15 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
-import net.jqwik.api.Arbitraries;
-import net.jqwik.api.Arbitrary;
-
 import com.backend.domain.fishpoint.entity.FishPoint;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.util.BaseTest;
 import com.backend.global.config.JpaAuditingConfig;
-
-import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
 @DataJpaTest
 @Import({
@@ -28,15 +23,6 @@ class FishPointRepositoryTest extends BaseTest {
 
 	@Autowired
 	private FishPointRepository fishPointRepository;
-
-	final Arbitrary<String> englishString = Arbitraries.strings()
-		.withCharRange('a', 'z')
-		.withCharRange('A', 'Z')
-		.ofMinLength(1).ofMaxLength(50);
-
-	final ArbitraryBuilder<FishPoint> arbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(FishPoint.class)
-		.set("fishPointName", englishString)
-		.set("fishPointDetailName", englishString);
 
 	@Test
 	@DisplayName("낚시 포인트 저장 [Repository] - Success")

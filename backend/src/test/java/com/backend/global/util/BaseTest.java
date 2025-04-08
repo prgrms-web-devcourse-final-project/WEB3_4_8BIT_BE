@@ -41,7 +41,7 @@ public abstract class BaseTest {
 		String detailName = englishString.sample();
 		double longitude = randomDouble(126.0, 130.0);
 		double latitude = randomDouble(33.0, 39.0);
-		long regionId = randomLong(1, 16);
+		long regionId = randomLong();
 
 		Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
 		location.setSRID(4326);
@@ -66,8 +66,8 @@ public abstract class BaseTest {
 		return ThreadLocalRandom.current().nextDouble(min, max);
 	}
 
-	private long randomLong(long min, long max) {
-		return ThreadLocalRandom.current().nextLong(min, max + 1);
+	private long randomLong() {
+		return ThreadLocalRandom.current().nextLong(1, (long)16 + 1);
 	}
 
 }

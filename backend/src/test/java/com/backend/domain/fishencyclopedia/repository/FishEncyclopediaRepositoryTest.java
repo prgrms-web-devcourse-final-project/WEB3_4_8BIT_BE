@@ -82,11 +82,6 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 
 	private final Member givenMember = Member.builder().memberId(1L).build();
 
-	private final ArbitraryBuilder<FishPoint> fishPointarbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(
-			FishPoint.class)
-		.set("fishPointName", englishStringLength)
-		.set("fishPointDetailName", englishStringLength);
-
 	final ArbitraryBuilder<Fish> fishArbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
 		.set("name", englishStringLength)
 		.set("icon", englishStringLength)
