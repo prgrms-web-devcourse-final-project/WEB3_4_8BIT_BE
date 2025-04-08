@@ -1,8 +1,11 @@
 package com.backend.domain.fishingtrippost.service;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
+import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
+import com.backend.domain.fishingtrippost.notifier.FishingTripPostNotifier;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 
 public interface FishingTripPostService {
@@ -57,4 +60,17 @@ public interface FishingTripPostService {
 	 * @throws FishingTripPostException 게시글이 존재하지 않는 경우 발생
 	 */
 	FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId);
+
+	/**
+	 * 낚시 동행 모집 게시글을 모집 완료 상태로 변경하고, 신청자들에게 완료 안내 메일을 발송합니다.
+	 *
+	 * <p>게시글 작성자(memberId)가 요청한 게시글(fishingTripPostId)을 조회한 뒤,
+	 * 작성자인지 검증하고 상태를 {@link PostStatus#COMPLETED}로 변경합니다.
+	 * 이후, {@link FishingTripPostNotifier#notifyMailIfCompleted(FishingTripPost)}
+	 * 를 호출하여 신청자들에게 모집 완료 메일을 비동기적으로 전송합니다.</p>
+	 *
+	 * @param memberId 게시글을 모집 완료로 변경하려는 사용자 ID (작성자 본인이어야 함)
+	 * @param fishingTripPostId 모집 완료로 변경할 게시글 ID
+	 */
+	void completeFishingTripPost(final Long memberId, final Long fishingTripPostId);
 }
