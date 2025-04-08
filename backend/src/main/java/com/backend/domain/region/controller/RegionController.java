@@ -23,7 +23,7 @@ public class RegionController {
 
 	private final RegionService regionService;
 
-	@GetMapping("/regions")
+	@GetMapping
 	@Operation(summary = "지역 정보 조회", description = "지역 정보(도 단위)를 조회하는 API")
 	public ResponseEntity<GenericResponse<List<RegionResponse.Basic>>> getAllRegions() {
 

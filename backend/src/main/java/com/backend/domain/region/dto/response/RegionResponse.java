@@ -10,8 +10,7 @@ public class RegionResponse {
 	@Builder
 	public record Basic(
 		Long regionId,
-		String regionName,
-		RegionType type
+		String regionName
 	) {
 		@QueryProjection
 		public Basic {}
