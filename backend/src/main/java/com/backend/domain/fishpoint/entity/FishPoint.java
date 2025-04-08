@@ -47,7 +47,8 @@ public class FishPoint extends BaseEntity {
 	@Builder.Default
 	private Boolean isBan = false;
 
-	@Column(nullable = false, columnDefinition = "POINT SRID 4326")
+	// @Column(nullable = false, columnDefinition = "POINT SRID 4326") -> h2에서 지원 안함, DB 단에서 직접 설정
+	@Column(nullable = false)
 	private Point location;
 
 	@Column(nullable = false)
