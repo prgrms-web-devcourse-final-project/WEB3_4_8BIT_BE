@@ -86,7 +86,7 @@ public class FishPointController {
 		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
 	}
 
-	@GetMapping
+	@GetMapping("/search")
 	@Operation(summary = "낚시 포인트 검색", description = "지역명을 기준으로 낚시 포인트 검색 API")
 	public ResponseEntity<GenericResponse<List<Basic>>> getFishPointBySearch(
 		@Valid @ModelAttribute final FishPointRequest.Search searchRequestDto
