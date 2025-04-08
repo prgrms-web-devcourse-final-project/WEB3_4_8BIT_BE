@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishposts.service;
+package com.backend.domain.shipfishingpost.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -32,7 +32,6 @@ import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
-import com.backend.domain.shipfishingpost.service.ShipFishingPostServiceImpl;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.S3StorageService;

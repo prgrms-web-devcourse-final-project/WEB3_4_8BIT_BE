@@ -1,4 +1,4 @@
-package com.backend.domain.shipfishposts.repository;
+package com.backend.domain.shipfishingpost.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -33,7 +33,6 @@ import com.backend.domain.ship.repository.ShipRepository;
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
-import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;

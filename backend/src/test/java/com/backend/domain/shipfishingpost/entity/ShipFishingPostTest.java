@@ -1,12 +1,10 @@
-package com.backend.domain.shipfishposts.entity;
+package com.backend.domain.shipfishingpost.entity;
 
 import java.time.LocalTime;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 
 public class ShipFishingPostTest {
 
