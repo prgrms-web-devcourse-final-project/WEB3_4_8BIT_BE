@@ -147,7 +147,7 @@ public class ShipFishingPostQueryRepository {
 	}
 
 	private List<ShipFishingPostResponse.DetailScroll> mapToDto(
-		List<ShipFishingPostResponse.DetailQueryDto> detailQueryDtoList) {
+		final List<ShipFishingPostResponse.DetailQueryDto> detailQueryDtoList) {
 
 		Set<Long> fileIdList = detailQueryDtoList.stream()
 			.flatMap(dto -> dto.fileIdList().stream())

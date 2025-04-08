@@ -84,8 +84,7 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 		List<String> fishNameList = getFishNameList(detailAll.detailShipFishingPost().fishIdList());
 
-		return ShipFishingPostResponse.DetailWithFileUrlAndFishName
-			.fromDetailWithFileUrlAndFishName(detailAll, fileUrlList, fishNameList);
+		return ShipFishingPostConverter.fromDetailWithFileUrlAndFishName(detailAll, fileUrlList, fishNameList);
 	}
 
 	@Override

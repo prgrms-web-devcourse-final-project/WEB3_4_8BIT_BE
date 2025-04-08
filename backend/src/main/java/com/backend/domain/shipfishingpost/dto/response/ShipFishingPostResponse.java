@@ -116,26 +116,6 @@ public class ShipFishingPostResponse {
 		ShipResponse.Detail detailShip,
 		MemberResponse.ContactInfo detailMember
 	) {
-		public static DetailWithFileUrlAndFishName fromDetailWithFileUrlAndFishName(
-			ShipFishingPostResponse.DetailAll detail,
-			List<String> fileUrlList,
-			List<String> fishNameList) {
-
-			return DetailWithFileUrlAndFishName.builder()
-				.shipFishingPostId(detail.detailShipFishingPost().shipFishingPostId())
-				.subject(detail.detailShipFishingPost().subject())
-				.content(detail.detailShipFishingPost().content())
-				.price(detail.detailShipFishingPost().price())
-				.fileUrlList(fileUrlList)
-				.fishNameList(fishNameList)
-				.startTime(detail.detailShipFishingPost().startTime())
-				.durationTime(detail.detailShipFishingPost().durationTime())
-				.maxGuestCount(detail.detailShipFishingPost().maxGuestCount())
-				.reviewEverRate(detail.detailShipFishingPost().reviewEverRate())
-				.detailShip(detail.detailShip())
-				.detailMember(detail.detailMember())
-				.build();
-		}
 	}
 
 	/**
@@ -172,9 +152,9 @@ public class ShipFishingPostResponse {
 		// Todo : 위시리스트 반영
 	) {
 		public static DetailScroll fromDetailScroll(
-			ShipFishingPostResponse.DetailQueryDto detail,
-			List<String> fileUrlList,
-			List<String> fishNameList) {
+			final ShipFishingPostResponse.DetailQueryDto detail,
+			final List<String> fileUrlList,
+			final List<String> fishNameList) {
 
 			return DetailScroll.builder()
 				.shipFishingPostId(detail.shipFishingPostId())
