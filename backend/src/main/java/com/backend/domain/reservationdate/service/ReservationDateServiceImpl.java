@@ -113,11 +113,9 @@ public class ReservationDateServiceImpl implements ReservationDateService {
 	 * @return {@link List<LocalDate>}
 	 */
 	private List<LocalDate> getStartDateAndEndDate(final LocalDate reservationDate) {
-		LocalDate now = LocalDate.now();
-		LocalDate firstDayOfMonth = reservationDate.with(TemporalAdjusters.firstDayOfMonth());
+		LocalDate firstDay = reservationDate.with(TemporalAdjusters.firstDayOfMonth());
+		LocalDate lastDay = reservationDate.with(TemporalAdjusters.lastDayOfMonth());
 
-		LocalDate startDate = now.isAfter(firstDayOfMonth) ? now : firstDayOfMonth;
-		LocalDate endDate = reservationDate.with(TemporalAdjusters.lastDayOfMonth());
-		return List.of(startDate, endDate);
+		return List.of(firstDay, lastDay);
 	}
 }
