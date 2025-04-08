@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.fishpoint.dto.request.FishPointRequest;
 import com.backend.domain.fishpoint.service.FishPointService;
-import com.backend.domain.region.dto.response.RegionResponse;
-import com.backend.domain.region.service.RegionService;
 import com.backend.global.dto.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 public class FishPointController {
 
 	private final FishPointService fishPointService;
-	private final RegionService regionService;
 
 	@GetMapping("/bounds")
 	@Operation(summary = "지도 내 낚시 포인트 조회", description = "지도 범위 내에 있는 낚시 포인트를 조회하는 API")
@@ -105,14 +102,5 @@ public class FishPointController {
 		List<Popularity> fishPointList = fishPointService.getPopularityFishPoints();
 
 		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
-	}
-
-	@GetMapping("/regions")
-	@Operation(summary = "낚시 포인트 지역 정보 조회", description = "지역 정보를 조회하는 API")
-	public ResponseEntity<GenericResponse<List<RegionResponse.Basic>>> getAllRegions() {
-
-		List<RegionResponse.Basic> regionList = regionService.getAllRegions();
-
-		return ResponseEntity.ok(GenericResponse.of(true, regionList));
 	}
 }
