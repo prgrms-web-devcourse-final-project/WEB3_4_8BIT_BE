@@ -13,6 +13,7 @@ import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -117,14 +118,17 @@ public class ShipFishingPostQueryRepository {
 				shipFishingPost.fileIdList,
 				shipFishingPost.fishIdList,
 				shipFishingPost.reviewEverRate,
+				shipFishingPost.createdAt,
 				JPAExpressions
 					.select(review.count())
 					.from(review)
 					.where(review.shipFishingPostId.eq(shipFishingPost.shipFishingPostId))
 			))
+			.distinct()
 			.from(shipFishingPost)
 			.leftJoin(reservationDate1)
-			.on(reservationDate1.shipFishingPostId.eq(shipFishingPost.shipFishingPostId))
+			.on(reservationDate1.shipFishingPostId.eq(shipFishingPost.shipFishingPostId)
+				.and(reservationDateCondition(requestDto.searchDate())))
 			.where(conditionList)
 			.orderBy(getSortCondition(cursorRequestDto))
 			.limit(cursorRequestDto.size() + 1)
@@ -150,11 +154,17 @@ public class ShipFishingPostQueryRepository {
 		final List<ShipFishingPostResponse.DetailQueryDto> detailQueryDtoList) {
 
 		Set<Long> fileIdList = detailQueryDtoList.stream()
-			.flatMap(dto -> dto.fileIdList().stream())
+			.flatMap(dto -> {
+				List<Long> ids = dto.fileIdList();
+				return (ids == null ? List.<Long>of() : ids).stream();
+			})
 			.collect(Collectors.toSet());
 
-		Set<Long> allFishIds = detailQueryDtoList.stream()
-			.flatMap(dto -> dto.fishIdList().stream())
+		Set<Long> fishIdList = detailQueryDtoList.stream()
+			.flatMap(dto -> {
+				List<Long> ids = dto.fishIdList();
+				return (ids == null ? List.<Long>of() : ids).stream();
+			})
 			.collect(Collectors.toSet());
 
 		Map<Long, String> fileUrlMap = jpaQueryFactory
@@ -171,7 +181,7 @@ public class ShipFishingPostQueryRepository {
 		Map<Long, String> fishNameMap = jpaQueryFactory
 			.select(fish.fishId, fish.name)
 			.from(fish)
-			.where(fish.fishId.in(allFishIds))
+			.where(fish.fishId.in(fishIdList))
 			.fetch()
 			.stream()
 			.collect(Collectors.toMap(
@@ -181,11 +191,14 @@ public class ShipFishingPostQueryRepository {
 
 		return detailQueryDtoList.stream()
 			.map(dto -> {
-				List<String> fileUrls = dto.fileIdList().stream()
+				List<String> fileUrls = Stream.ofNullable(dto.fileIdList())
+					.flatMap(Collection::stream)
 					.map(fileUrlMap::get)
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList());
-				List<String> fishNames = dto.fishIdList().stream()
+
+				List<String> fishNames = Stream.ofNullable(dto.fishIdList())
+					.flatMap(Collection::stream)
 					.map(fishNameMap::get)
 					.filter(Objects::nonNull)
 					.collect(Collectors.toList());
@@ -253,9 +266,13 @@ public class ShipFishingPostQueryRepository {
 
 	private BooleanExpression searchDateCondition(final LocalDate searchDate) {
 
-		return searchDate == null ? null : reservationDate1.reservationDate.isNull()
-			.or(reservationDate1.reservationDate.eq(searchDate)
-				.and(reservationDate1.isBan.isFalse()));
+		return searchDate == null ? null : reservationDate1.isNull()
+			.or(reservationDate1.isBan.isFalse());
+	}
+
+	private BooleanExpression reservationDateCondition(final LocalDate searchDate) {
+
+		return searchDate == null ? null : reservationDate1.reservationDate.eq(searchDate);
 	}
 
 	// 물고기 검증 : JSON_CONTAINS 고려

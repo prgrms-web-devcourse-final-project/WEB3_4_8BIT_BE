@@ -2,6 +2,7 @@ package com.backend.domain.shipfishingpost.converter;
 
 import java.util.List;
 
+import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
@@ -41,7 +42,7 @@ public class ShipFishingPostConverter {
 	public static ShipFishingPostResponse.DetailWithFileUrlAndFishName fromDetailWithFileUrlAndFishName(
 		final ShipFishingPostResponse.DetailAll detail,
 		final List<String> fileUrlList,
-		final List<String> fishNameList) {
+		final List<FishResponse.Summary> fishInfoList) {
 
 		return ShipFishingPostResponse.DetailWithFileUrlAndFishName.builder()
 			.shipFishingPostId(detail.detailShipFishingPost().shipFishingPostId())
@@ -49,11 +50,11 @@ public class ShipFishingPostConverter {
 			.content(detail.detailShipFishingPost().content())
 			.price(detail.detailShipFishingPost().price())
 			.fileUrlList(fileUrlList)
-			.fishNameList(fishNameList)
 			.startTime(detail.detailShipFishingPost().startTime())
 			.durationTime(detail.detailShipFishingPost().durationTime())
 			.maxGuestCount(detail.detailShipFishingPost().maxGuestCount())
 			.reviewEverRate(detail.detailShipFishingPost().reviewEverRate())
+			.detailFish(fishInfoList)
 			.detailShip(detail.detailShip())
 			.detailMember(detail.detailMember())
 			.build();
