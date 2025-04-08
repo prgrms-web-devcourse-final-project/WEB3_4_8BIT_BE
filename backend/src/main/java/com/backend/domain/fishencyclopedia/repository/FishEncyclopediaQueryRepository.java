@@ -117,10 +117,12 @@ public class FishEncyclopediaQueryRepository {
 			)
 			.from(fish)
 			.leftJoin(catchMaxLength)
-			.on(fish.fishId.eq(catchMaxLength.fishId))
+			.on(
+				fish.fishId.eq(catchMaxLength.fishId)
+					.and(catchMaxLength.memberId.eq(memberId))
+			)
 			.leftJoin(file)
 			.on(file.fileId.eq(fish.fileId))
-			.where(catchMaxLength.memberId.eq(memberId))
 			.fetch();
 	}
 
