@@ -12,7 +12,7 @@ public class ShipResponse {
 	 * 	 "shipName": "나로호",
 	 *   "shipNumber": "01234567890123",
 	 *   "departurePort": "부산",
-	 *   "restroomType": "공용",
+	 *   "publicRestroom": true,
 	 *   "loungeArea": false,
 	 *   "kitchenFacility": true,
 	 *   "fishingChair": false,

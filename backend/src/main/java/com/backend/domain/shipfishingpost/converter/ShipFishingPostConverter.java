@@ -20,13 +20,13 @@ public class ShipFishingPostConverter {
 			.memberId(memberId)
 			.subject(requestDto.subject())
 			.content(requestDto.content())
-			.imageList(requestDto.images())
+			.fileIdList(requestDto.fileIdList())
 			.price(requestDto.price())
 			.location(requestDto.location())
 			.startTime(requestDto.startTime())
 			.endTime(requestDto.endTime())
 			.maxGuestCount(requestDto.maxGuestCount())
-			.fishList(requestDto.fishList())
+			.fishIdList(requestDto.fishIdList())
 			.shipId(requestDto.shipId())
 			.build();
 
