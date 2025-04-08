@@ -15,6 +15,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,7 +24,11 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "ship_fish_posts")
+@Table(name = "ship_fishing_posts", indexes = {
+	@Index(name = "idx_ship_fishing_posts_01", columnList = "shipFishingPostId, price"),
+	@Index(name = "idx_ship_fishing_posts_02", columnList = "shipFishingPostId, durationTime"),
+	@Index(name = "idx_ship_fishing_posts_03", columnList = "shipFishingPostId, reviewEverRate")
+})
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -45,7 +50,7 @@ public class ShipFishingPost extends BaseEntity {
 	private String content;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	private List<String> imageList;
+	private List<Long> fileIdList;
 
 	@Column(nullable = false)
 	private Long price;
@@ -67,7 +72,7 @@ public class ShipFishingPost extends BaseEntity {
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(nullable = false)
-	private List<Long> fishList;
+	private List<Long> fishIdList;
 
 	@Column(nullable = false, unique = true)
 	private Long shipId;

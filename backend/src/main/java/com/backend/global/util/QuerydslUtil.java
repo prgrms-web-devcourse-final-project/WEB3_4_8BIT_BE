@@ -76,7 +76,7 @@ public class QuerydslUtil {
 
 	/**
 	 * 커서 방식 Where 조건절 생성 메소드 입니다.
-	 * <p>ZonedDateTime 타입의 필드만 사용 가능합니다.</p>
+	 * <p>LocalDate 타입의 필드만 사용 가능합니다.</p>
 	 *
 	 * @param idField 기본키 필드
 	 * @param idFieldValue 기본키 필드 값
@@ -91,6 +91,56 @@ public class QuerydslUtil {
 		final Long idFieldValue,
 		final DatePath<LocalDate> sortField,
 		final LocalDate sortFieldValue,
+		final Order order
+	) {
+
+		return sortField.eq(sortFieldValue)
+			.and(idField.gt(idFieldValue))
+			.or(order.equals(Order.DESC) ? sortField.lt(sortFieldValue) : sortField.gt(sortFieldValue));
+	}
+
+	/**
+	 * 커서 방식 Where 조건절 생성 메소드 입니다.
+	 * <p>Long 타입의 필드만 사용 가능합니다.</p>
+	 *
+	 * @param idField 기본키 필드
+	 * @param idFieldValue 기본키 필드 값
+	 * @param sortField 정렬 대상 필드
+	 * @param sortFieldValue 정렬 대상 필드 값
+	 * @param order 정렬 순서
+	 *
+	 * @return {@link BooleanExpression}
+	 */
+	public static BooleanExpression createFieldPredicate(
+		final NumberPath<Long> idField,
+		final Long idFieldValue,
+		final NumberPath<Long> sortField,
+		final Long sortFieldValue,
+		final Order order
+	) {
+
+		return sortField.eq(sortFieldValue)
+			.and(idField.gt(idFieldValue))
+			.or(order.equals(Order.DESC) ? sortField.lt(sortFieldValue) : sortField.gt(sortFieldValue));
+	}
+
+	/**
+	 * 커서 방식 Where 조건절 생성 메소드 입니다.
+	 * <p>Double 타입의 필드만 사용 가능합니다.</p>
+	 *
+	 * @param idField 기본키 필드
+	 * @param idFieldValue 기본키 필드 값
+	 * @param sortField 정렬 대상 필드
+	 * @param sortFieldValue 정렬 대상 필드 값
+	 * @param order 정렬 순서
+	 *
+	 * @return {@link BooleanExpression}
+	 */
+	public static BooleanExpression createFieldPredicate(
+		final NumberPath<Long> idField,
+		final Long idFieldValue,
+		final NumberPath<Double> sortField,
+		final Double sortFieldValue,
 		final Order order
 	) {
 

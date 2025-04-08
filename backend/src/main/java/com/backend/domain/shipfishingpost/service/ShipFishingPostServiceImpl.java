@@ -3,10 +3,6 @@ package com.backend.domain.shipfishingpost.service;
 import java.time.LocalDate;
 import java.util.List;
 
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,10 +27,11 @@ import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
-import com.backend.domain.shipfishingpostfish.converter.ShipFishingPostFishConverter;
-import com.backend.domain.shipfishingpostfish.entity.ShipFishingPostFish;
-import com.backend.domain.shipfishingpostfish.repository.ShipFishingPostFishRepository;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
+import com.backend.global.storage.entity.File;
+import com.backend.global.storage.repository.StorageRepository;
+import com.backend.global.storage.service.S3StorageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,70 +41,67 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
+	private final S3StorageService s3StorageService;
 	private final ReservationDateService reservationDateService;
 
 	private final FishRepository fishRepository;
 	private final ShipRepository shipRepository;
+	private final StorageRepository storageRepository;
 	private final ReservationRepository reservationRepository;
 	private final ShipFishingPostRepository shipFishingPostRepository;
 	private final ReservationDateRepository reservationDateRepository;
-	private final ShipFishingPostFishRepository shipFishingPostFishRepository;
 
 	@Override
 	@Transactional
-	public Long saveShipFishingPost(final ShipFishingPostRequest.Create requestDto, final Long memberId) {
+	public Long createShipFishingPost(final ShipFishingPostRequest.Create requestDto, final Long memberId) {
 
 		ShipFishingPost shipFishingPost = ShipFishingPostConverter.fromShipFishingPostRequestCreate(requestDto,
 			memberId);
 
-		// Verify : 선박 등록 여부 & 선박 소유자 정보 일치 검증
-		verifyShipOwnership(shipFishingPost.getShipId(), memberId);
+		// Verify : 선박 등록 여부 & 선박 소유자 정보 일치 & 승선 최대 인원 수 검증
+		verifyShipOwnership(shipFishingPost.getShipId(), memberId, requestDto.maxGuestCount());
 
 		// Verify : 물고기 검증
-		verifyFishList(shipFishingPost.getFishList());
+		verifyFishList(shipFishingPost.getFishIdList());
 
 		Long savedShipFishingPostId = shipFishingPostRepository.save(shipFishingPost).getShipFishingPostId();
 
 		saveUnAvailableDateList(requestDto, savedShipFishingPostId);
 
-		saveFishList(requestDto, savedShipFishingPostId);
+		log.debug("Save ship fish posts: {}", shipFishingPost.toString());
 
-		log.debug("Save ship fish posts: {}", shipFishingPost);
 		return savedShipFishingPostId;
 	}
 
 	@Override
 	@Transactional(readOnly = true)
-	public ShipFishingPostResponse.Detail getShipFishingPost(final Long shipFishingPostId) {
+	public ShipFishingPostResponse.DetailWithFileUrlAndFishName getShipFishingPostAll(final Long shipFishingPostId) {
 
-		return shipFishingPostRepository.findDetailById(shipFishingPostId)
+		ShipFishingPostResponse.DetailAll detailAll = shipFishingPostRepository.findDetailAllById(shipFishingPostId)
 			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
+
+		List<String> fileUrlList = getFileUrlList(detailAll.detailShipFishingPost().fileIdList());
+
+		List<String> fishNameList = getFishNameList(detailAll.detailShipFishingPost().fishIdList());
+
+		return ShipFishingPostConverter.fromDetailWithFileUrlAndFishName(detailAll, fileUrlList, fishNameList);
 	}
 
 	@Override
-	@Transactional(readOnly = true)
-	public ShipFishingPostResponse.DetailAll getShipFishingPostAll(final Long shipFishingPostId) {
+	public ScrollResponse<ShipFishingPostResponse.DetailScroll> getShipFishingPostScroll(
+		final ShipFishingPostRequest.Search searchDto,
+		final GlobalRequest.CursorRequest cursorRequestDto) {
 
-		return shipFishingPostRepository.findDetailAllById(shipFishingPostId)
-			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
-	}
-
-	@Override
-	@Transactional(readOnly = true)
-	public Slice<ShipFishingPostResponse.DetailPage> getShipFishingPostPage(
-		final ShipFishingPostRequest.Search requestDto,
-		final GlobalRequest.PageRequest pageRequestDto) {
-
-		Pageable pageable = convertPageable(pageRequestDto);
-
-		return shipFishingPostRepository.findAllBySearchAndCondition(requestDto, pageable);
+		return shipFishingPostRepository.findDetailScrollBySearch(searchDto, cursorRequestDto);
 	}
 
 	@Override
 	@Transactional
 	public void deleteShipFishingPost(final Long shipFishingPostId, final Long memberId) {
 
-		verifyPostOwnership(shipFishingPostId, memberId);
+		ShipFishingPost shipFishingPost = getShipFishingPostEntity(shipFishingPostId);
+
+		verifyPostOwnership(shipFishingPost.getMemberId(), memberId);
 
 		verifyReservationExist(shipFishingPostId);
 
@@ -115,7 +109,31 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 		reservationDateService.deleteReservationDateList(shipFishingPostId);
 
-		// Todo : 이미지 리스트 삭제
+		s3StorageService.deleteFilesByIdList(memberId, shipFishingPost.getFileIdList());
+	}
+
+	/**
+	 * 이미지 파일 id 리스트로 해당 이미지 URL 목록을 조회합니다.
+	 *
+	 * @param fileIdList 이미지 파일 id 리스트
+	 * @return 이미지 Url 리스트
+	 */
+	private List<String> getFileUrlList(final List<Long> fileIdList) {
+		return storageRepository.findAllById(fileIdList).stream()
+			.map(File::getUrl)
+			.toList();
+	}
+
+	/**
+	 * 어류 id 리스트로 해당 어류 Name 목록을 조회합니다.
+	 *
+	 * @param fishIdList 어류 id 리스트
+	 * @return 어류 Name 리스트
+	 */
+	private List<String> getFishNameList(final List<Long> fishIdList) {
+		return fishRepository.findAllById(fishIdList).stream()
+			.map(Fish::getName)
+			.toList();
 	}
 
 	/**
@@ -123,8 +141,9 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	 *
 	 * @param shipId {@link Long}
 	 * @param memberId {@link Long}
+	 * @param maxGuestCount {@link Integer}
 	 */
-	private void verifyShipOwnership(final Long shipId, final Long memberId) {
+	private void verifyShipOwnership(final Long shipId, final Long memberId, final int maxGuestCount) {
 
 		Ship ship = shipRepository.findById(shipId)
 			.orElseThrow(() -> new ShipException(ShipErrorCode.SHIP_NOT_FOUND));
@@ -132,18 +151,21 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 		if (!ship.getMemberId().equals(memberId)) {
 			throw new ShipException(ShipErrorCode.SHIP_MISMATCH_MEMBER_ID);
 		}
+
+		if (ship.getPassengerCapacity() < maxGuestCount) {
+			throw new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_CAPACITY_EXCEEDED);
+		}
 	}
 
 	/**
 	 * 게시글의 소유자 여부 검증 메서드
 	 *
-	 * @param shipFishingPostId {@link Long}
+	 * @param postOwnerId {@link Long}
 	 * @param memberId {@link Long}
 	 */
-	private void verifyPostOwnership(final Long shipFishingPostId, final Long memberId) {
-		ShipFishingPost shipFishingPost = getShipFishingPostEntity(shipFishingPostId);
+	private void verifyPostOwnership(final Long postOwnerId, final Long memberId) {
 
-		if (!shipFishingPost.getMemberId().equals(memberId)) {
+		if (!postOwnerId.equals(memberId)) {
 			throw new ShipFishingPostException(ShipFishingPostErrorCode.NOT_AUTHORITY_POSTS);
 		}
 	}
@@ -180,23 +202,6 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	}
 
 	/**
-	 * 물고기 리스트 저장 메서드
-	 *
-	 * @param requestDto {@link ShipFishingPostRequest.Create}
-	 * @param shipFishingPostId {@link Long}
-	 */
-	private void saveFishList(final ShipFishingPostRequest.Create requestDto, final Long shipFishingPostId) {
-		if (requestDto.fishList().isEmpty()) {
-			return;
-		}
-
-		List<ShipFishingPostFish> shipFishingPostFishList = ShipFishingPostFishConverter.fromShipFishingPostFishRequestFishIdList
-			(shipFishingPostId, requestDto.fishList());
-
-		shipFishingPostFishRepository.saveAllByBulkQuery(shipFishingPostFishList, requestDto.fishList().size());
-	}
-
-	/**
 	 * 삭제할 게시글의 남은 예약 내역 검증
 	 *
 	 * @param shipFishingPostId {@link Long}
@@ -221,20 +226,5 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 		return shipFishingPostRepository.findById(shipFishingPostId)
 			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
-	}
-
-	/**
-	 * pageRequestDTO -> pageable
-	 *
-	 * @param pageRequestDto {@link }
-	 * @return {@link Pageable}
-	 */
-	private Pageable convertPageable(final GlobalRequest.PageRequest pageRequestDto) {
-		return PageRequest.of(
-			pageRequestDto.page(),
-			pageRequestDto.size(),
-			Sort.by(Sort.Direction.fromString(
-					pageRequestDto.order().equals("asc") ? "asc" : "desc"),
-				pageRequestDto.sort()));
 	}
 }

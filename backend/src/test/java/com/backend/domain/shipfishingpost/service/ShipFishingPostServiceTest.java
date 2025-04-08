@@ -1,10 +1,10 @@
-package com.backend.domain.shipfishposts.service;
+package com.backend.domain.shipfishingpost.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,11 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.domain.Sort;
 
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishRepository;
@@ -37,9 +32,9 @@ import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
-import com.backend.domain.shipfishingpost.service.ShipFishingPostServiceImpl;
-import com.backend.domain.shipfishingpostfish.repository.ShipFishingPostFishRepository;
-import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.storage.entity.File;
+import com.backend.global.storage.repository.StorageRepository;
+import com.backend.global.storage.service.S3StorageService;
 import com.backend.global.util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,6 +47,9 @@ public class ShipFishingPostServiceTest extends BaseTest {
 	private FishRepository fishRepository;
 
 	@Mock
+	private StorageRepository storageRepository;
+
+	@Mock
 	private ReservationRepository reservationRepository;
 
 	@Mock
@@ -61,7 +59,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 	private ReservationDateRepository reservationDateRepository;
 
 	@Mock
-	private ShipFishingPostFishRepository shipFishingPostFishRepository;
+	private S3StorageService s3StorageService;
 
 	@Mock
 	private ReservationDateService reservationDateService;
@@ -74,9 +72,17 @@ public class ShipFishingPostServiceTest extends BaseTest {
 	void t01() {
 		// Given
 		ShipFishingPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
-			ShipFishingPostRequest.Create.class).set("shipId", 1L).set("fishList", List.of(1L)).sample();
+				ShipFishingPostRequest.Create.class)
+			.set("shipId", 1L)
+			.set("fishIdList", List.of(1L))
+			.set("maxGuestCount", 5)
+			.sample();
 
-		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class).set("shipId", 1L).set("memberId", 1L).sample();
+		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class)
+			.set("shipId", 1L)
+			.set("memberId", 1L)
+			.set("passengerCapacity", 10)
+			.sample();
 
 		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishingPostRequestCreate(
 			givenRequestDto, 1L);
@@ -89,10 +95,11 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 		// When
 		when(shipRepository.findById(1L)).thenReturn(Optional.of(givenShip));
-		when(fishRepository.findAllById(givenRequestDto.fishList())).thenReturn(List.of(Fish.builder().build()));
+		when(fishRepository.findAllById(givenRequestDto.fishIdList())).thenReturn(
+			List.of(Fish.builder().fishId(1L).build()));
 		when(shipFishingPostRepository.save(any(ShipFishingPost.class))).thenReturn(savedShipFishingPost);
 
-		Long savedId = shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L);
+		Long savedId = shipFishingPostServiceImpl.createShipFishingPost(givenRequestDto, 1L);
 
 		// Then
 		assertThat(savedId).isEqualTo(1L);
@@ -110,7 +117,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// When
 
 		// Then
-		assertThatThrownBy(() -> shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L)).isInstanceOf(
+		assertThatThrownBy(() -> shipFishingPostServiceImpl.createShipFishingPost(givenRequestDto, 1L)).isInstanceOf(
 				ShipException.class)
 			.hasFieldOrPropertyWithValue("errorCode", ShipErrorCode.SHIP_NOT_FOUND)
 			.hasMessageContaining(ShipErrorCode.SHIP_NOT_FOUND.getMessage());
@@ -132,63 +139,105 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		when(shipRepository.findById(1L)).thenReturn(Optional.of(givenShip));
 
 		// Then
-		assertThatThrownBy(() -> shipFishingPostServiceImpl.saveShipFishingPost(givenRequestDto, 1L)).isInstanceOf(
+		assertThatThrownBy(() -> shipFishingPostServiceImpl.createShipFishingPost(givenRequestDto, 1L)).isInstanceOf(
 				ShipException.class)
 			.hasFieldOrPropertyWithValue("errorCode", ShipErrorCode.SHIP_MISMATCH_MEMBER_ID)
 			.hasMessageContaining(ShipErrorCode.SHIP_MISMATCH_MEMBER_ID.getMessage());
 	}
 
 	@Test
-	@DisplayName("선상 낚시 게시글 상세 조회 [ShipFishingPostResponse.Detail] [Service] - Success")
+	@DisplayName("선상 낚시 게시글 저장 [POSTS_CAPACITY_EXCEEDED] [Service] - Fail")
 	void t04() {
 		// Given
-		ShipFishingPostResponse.Detail givenResponseDto = fixtureMonkeyValidation.giveMeBuilder(
-			ShipFishingPostResponse.Detail.class).set("shipFishingPostId", 1L).sample();
+		ShipFishingPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
+				ShipFishingPostRequest.Create.class)
+			.set("shipId", 1L)
+			.set("fishIdList", List.of(1L))
+			.set("maxGuestCount", 15)
+			.sample();
+
+		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class)
+			.set("shipId", 1L)
+			.set("memberId", 1L)
+			.set("passengerCapacity", 10)
+			.sample();
+
+		ShipFishingPost givenShipFishingPost = ShipFishingPostConverter.fromShipFishingPostRequestCreate(
+			givenRequestDto, 1L);
+
+		fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+			.set("shipFishingPostId", 1L)
+			.set("subject", givenShipFishingPost.getSubject())
+			.set("content", givenShipFishingPost.getContent())
+			.sample();
 
 		// When
-		when(shipFishingPostRepository.findDetailById(1L)).thenReturn(Optional.of(givenResponseDto));
-
-		ShipFishingPostResponse.Detail savedResponseDto = shipFishingPostServiceImpl.getShipFishingPost(1L);
+		when(shipRepository.findById(1L)).thenReturn(Optional.of(givenShip));
 
 		// Then
-		verify(shipFishingPostRepository, times(1)).findDetailById(1L);
-		assertThat(savedResponseDto).isEqualTo(givenResponseDto);
-	}
-
-	@Test
-	@DisplayName("선상 낚시 게시글 상세 조회 [POSTS_NOT_FOUND] [Service] - Fail")
-	void t05() {
-		// Given
-
-		// When
-		when(shipFishingPostRepository.findDetailById(1L)).thenReturn(Optional.empty());
-
-		// Then
-		assertThatThrownBy(() -> shipFishingPostServiceImpl.getShipFishingPost(1L)).isInstanceOf(
+		assertThatThrownBy(() -> shipFishingPostServiceImpl.createShipFishingPost(givenRequestDto, 1L)).isInstanceOf(
 				ShipFishingPostException.class)
-			.hasFieldOrPropertyWithValue("errorCode", ShipFishingPostErrorCode.POSTS_NOT_FOUND)
-			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_NOT_FOUND.getMessage());
+			.hasFieldOrPropertyWithValue("errorCode", ShipFishingPostErrorCode.POSTS_CAPACITY_EXCEEDED)
+			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_CAPACITY_EXCEEDED.getMessage());
 	}
 
 	@Test
 	@DisplayName("선상 낚시 게시글 상세 조회 [ShipFishingPostResponse.DetailAll] [Service] - Success")
-	void t06() {
-		// Given
-		ShipFishingPostResponse.DetailAll givenDetailAll = fixtureMonkeyValidation.giveMeBuilder(
-			ShipFishingPostResponse.DetailAll.class).sample();
+	void t05() {
+		// given
+		Long shipFishingPostId = 1L;
+		List<Long> fileIdList = List.of(101L, 102L);
+		List<Long> fishIdList = List.of(201L, 202L);
 
-		// When
-		when(shipFishingPostRepository.findDetailAllById(1L)).thenReturn(Optional.of(givenDetailAll));
+		ShipFishingPostResponse.Detail givenDetail = fixtureMonkeyBuilder
+			.giveMeBuilder(ShipFishingPostResponse.Detail.class)
+			.set("shipFishingPostId", shipFishingPostId)
+			.set("fileIdList", fileIdList)
+			.set("fishIdList", fishIdList)
+			.sample();
 
-		ShipFishingPostResponse.DetailAll savedDetailAll = shipFishingPostServiceImpl.getShipFishingPostAll(1L);
+		ShipFishingPostResponse.DetailAll givenDetailAll = fixtureMonkeyBuilder
+			.giveMeBuilder(ShipFishingPostResponse.DetailAll.class)
+			.set("detailShipFishingPost", givenDetail)
+			.sample();
 
-		// Then
-		assertThat(savedDetailAll).isEqualTo(givenDetailAll);
+		List<File> givenFileList = new ArrayList<>();
+
+		for (int i = 1; i <= 2; i++) {
+			givenFileList.add(fixtureMonkeyBuilder
+				.giveMeBuilder(File.class)
+				.set("fileId", 100L + i)
+				.set("url", String.format("http://url%d.com", i))
+				.sample());
+		}
+
+		List<Fish> givenFishList = new ArrayList<>();
+
+		for (int i = 1; i <= 2; i++) {
+			givenFishList.add(fixtureMonkeyBuilder
+				.giveMeBuilder(Fish.class)
+				.set("fishId", 200L + i)
+				.set("name", String.format("test%d", i))
+				.sample());
+		}
+
+		when(shipFishingPostRepository.findDetailAllById(shipFishingPostId)).thenReturn(Optional.of(givenDetailAll));
+		when(storageRepository.findAllById(fileIdList)).thenReturn(givenFileList);
+		when(fishRepository.findAllById(fishIdList)).thenReturn(givenFishList);
+
+		// when
+		ShipFishingPostResponse.DetailWithFileUrlAndFishName responseDto =
+			shipFishingPostServiceImpl.getShipFishingPostAll(shipFishingPostId);
+
+		// then
+		assertThat(responseDto).isNotNull();
+		assertThat(responseDto.fileUrlList()).isEqualTo(List.of("http://url1.com", "http://url2.com"));
+		assertThat(responseDto.fishNameList()).isEqualTo(List.of("test1", "test2"));
 	}
 
 	@Test
 	@DisplayName("선상 낚시 게시글 상세 조회 [ShipFishingPostResponse.DetailAll] [POSTS_NOT_FOUND] [Service] - Fail")
-	void t07() {
+	void t06() {
 		// Given
 
 		// When
@@ -202,123 +251,8 @@ public class ShipFishingPostServiceTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("선상 낚시 게시글 페이징 조회 [Service] - Success")
-	void t08() {
-		// Given
-		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder().build();
-
-		GlobalRequest.PageRequest givenPageRequestDto = fixtureMonkeyRecord.giveMeBuilder(
-				GlobalRequest.PageRequest.class)
-			.set("size", 10)
-			.set("page", 0)
-			.set("order", "DESC")
-			.set("sort", "createdAt")
-			.sample();
-
-		List<ShipFishingPostResponse.DetailPage> givenResponseDto = fixtureMonkeyBuilder.giveMeBuilder(
-			ShipFishingPostResponse.DetailPage.class).sampleList(5);
-
-		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-
-		Slice<ShipFishingPostResponse.DetailPage> sliceResult = new SliceImpl<>(givenResponseDto, pageable, false);
-
-		// When
-		when(shipFishingPostRepository.findAllBySearchAndCondition(givenRequestDto, pageable)).thenReturn(sliceResult);
-
-		Slice<ShipFishingPostResponse.DetailPage> resultPage = shipFishingPostServiceImpl.getShipFishingPostPage(
-			givenRequestDto, givenPageRequestDto);
-
-		// Then
-		verify(shipFishingPostRepository, times(1)).findAllBySearchAndCondition(givenRequestDto, pageable);
-		assertThat(resultPage.getContent().size()).isEqualTo(5);
-		assertThat(resultPage.getNumber()).isEqualTo(0);
-		assertThat(resultPage.hasNext()).isEqualTo(false);
-	}
-
-	@Test
-	@DisplayName("선상 낚시 게시글 페이징 조회 [조건 일부 null 값] [Service] - Success")
-	void t09() {
-		// Given
-		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder()
-			.minPrice(20000L)
-			.maxPrice(null)
-			.minRating(null)
-			.location("부산")
-			.fishId(null)
-			.keyword(null)
-			.build();
-
-		GlobalRequest.PageRequest givenPageRequestDto = fixtureMonkeyRecord.giveMeBuilder(
-				GlobalRequest.PageRequest.class)
-			.set("size", 10)
-			.set("page", 0)
-			.set("order", "DESC")
-			.set("sort", "createdAt")
-			.sample();
-
-		List<ShipFishingPostResponse.DetailPage> givenResponseDto = fixtureMonkeyBuilder.giveMeBuilder(
-			ShipFishingPostResponse.DetailPage.class).sampleList(5);
-
-		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-
-		Slice<ShipFishingPostResponse.DetailPage> sliceResult = new SliceImpl<>(givenResponseDto, pageable, false);
-
-		when(shipFishingPostRepository.findAllBySearchAndCondition(givenRequestDto, pageable)).thenReturn(sliceResult);
-
-		// When
-		Slice<ShipFishingPostResponse.DetailPage> resultPage = shipFishingPostServiceImpl.getShipFishingPostPage(
-			givenRequestDto, givenPageRequestDto);
-
-		// Then
-		verify(shipFishingPostRepository, times(1)).findAllBySearchAndCondition(givenRequestDto, pageable);
-		assertThat(resultPage.getContent().size()).isEqualTo(5);
-		assertThat(resultPage.getNumber()).isEqualTo(0);
-		assertThat(resultPage.hasNext()).isEqualTo(false);
-	}
-
-	@Test
-	@DisplayName("선상 낚시 게시글 페이징 조회 [조건에 일치하는 데이터 없음] [Service] - Success")
-	void t10() {
-		// Given
-		ShipFishingPostRequest.Search givenRequestDto = ShipFishingPostRequest.Search.builder()
-			.minPrice(20000L)
-			.maxPrice(null)
-			.minRating(null)
-			.location("부산")
-			.fishId(null)
-			.keyword(null)
-			.build();
-
-		GlobalRequest.PageRequest givenPageRequestDto = fixtureMonkeyRecord.giveMeBuilder(
-				GlobalRequest.PageRequest.class)
-			.set("size", 10)
-			.set("page", 0)
-			.set("order", "DESC")
-			.set("sort", "createdAt")
-			.sample();
-
-		Pageable pageable = PageRequest.of(0, 10, Sort.by("createdAt").descending());
-
-		List<ShipFishingPostResponse.DetailPage> givenResponseDto = Collections.emptyList();
-
-		Slice<ShipFishingPostResponse.DetailPage> sliceResult = new SliceImpl<>(givenResponseDto, pageable, false);
-
-		when(shipFishingPostRepository.findAllBySearchAndCondition(givenRequestDto, pageable)).thenReturn(sliceResult);
-
-		// When
-		Slice<ShipFishingPostResponse.DetailPage> resultPage = shipFishingPostServiceImpl.getShipFishingPostPage(
-			givenRequestDto, givenPageRequestDto);
-
-		// Then
-		verify(shipFishingPostRepository, times(1)).findAllBySearchAndCondition(givenRequestDto, pageable);
-		assertThat(resultPage.getContent()).isEmpty();
-		assertThat(resultPage.getNumber()).isEqualTo(0);
-		assertThat(resultPage.hasNext()).isEqualTo(false);
-	}
-
-	@Test
 	@DisplayName("선상 낚시 게시글 삭제 [Service] - Success")
-	void t11() {
+	void t07() {
 		// Given
 		Long givenShipFishingPostId = 1L;
 		Long givenMemberId = 1L;
@@ -335,6 +269,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 			.thenReturn(Optional.ofNullable(givenShipFishingPost));
 		when(reservationRepository.findByShipFishingPostIdAndTodayAfter(any(Long.class), any(LocalDate.class)))
 			.thenReturn(List.of());
+		doNothing().when(s3StorageService).deleteFilesByIdList(any(Long.class), any(List.class));
 
 		// Then
 		shipFishingPostServiceImpl.deleteShipFishingPost(givenShipFishingPostId, givenMemberId);
@@ -342,12 +277,12 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Test
 	@DisplayName("선상 낚시 게시글 삭제 [게시글 없음] [Service] - Fail")
-	void t12() {
+	void t08() {
 		// Given
 		Long givenShipFishingPostId = 1L;
 		Long givenMemberId = 1L;
 
-		ShipFishingPost givenShipFishingPost = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+		fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
 			.set("shipFishingPostId", givenShipFishingPostId)
 			.set("subject", "subject")
 			.set("content", "content")
@@ -366,7 +301,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Test
 	@DisplayName("선상 낚시 게시글 삭제 [게시글 권한 없음] [Service] - Fail")
-	void t13() {
+	void t09() {
 		// Given
 		Long givenShipFishingPostId = 1L;
 		Long givenMemberId = 1L;
@@ -391,7 +326,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Test
 	@DisplayName("선상 낚시 게시글 삭제 [잔여 예약 존재] [Service] - Fail")
-	void t14() {
+	void t10() {
 		// Given
 		Long givenShipFishingPostId = 1L;
 		Long givenMemberId = 1L;
