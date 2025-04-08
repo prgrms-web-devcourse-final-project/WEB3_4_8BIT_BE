@@ -345,4 +345,74 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
 	}
+
+	@Test
+	@DisplayName("동출 게시글 모집 완료 처리 [Controller] - Success")
+	@WithMockCustomUser
+	void t12() throws Exception {
+		// Given
+		Long postId = 100L;
+		Long memberId = 1L;
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.patch("/api/v1/fishing-trip-post/{fishingTripPostId}/completed", postId)
+				.contentType(MediaType.APPLICATION_JSON)
+		);
+
+		// Then
+		result
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true));
+
+		verify(fishingTripPostService).completeFishingTripPost(eq(memberId), eq(postId));
+	}
+
+	@Test
+	@DisplayName("동출 게시글 모집 완료 처리 [UNAUTHORIZED_AUTHOR] [Controller] - Fail")
+	@WithMockCustomUser
+	void t13() throws Exception {
+		// Given
+		Long postId = 100L;
+
+		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR))
+			.when(fishingTripPostService).completeFishingTripPost(anyLong(), eq(postId));
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.patch("/api/v1/fishing-trip-post/{fishingTripPostId}/completed", postId)
+				.contentType(MediaType.APPLICATION_JSON)
+		);
+
+		// Then
+		result
+			.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getCode()))
+			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("동출 게시글 모집 완료 처리 [POST_NOT_FOUND] [Controller] - Fail")
+	@WithMockCustomUser
+	void t14() throws Exception {
+		// Given
+		Long postId = 999L;
+
+		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND))
+			.when(fishingTripPostService).completeFishingTripPost(anyLong(), eq(postId));
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.patch("/api/v1/fishing-trip-post/{fishingTripPostId}/completed", postId)
+				.contentType(MediaType.APPLICATION_JSON)
+		);
+
+		// Then
+		result
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getCode()))
+			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+	}
 }
