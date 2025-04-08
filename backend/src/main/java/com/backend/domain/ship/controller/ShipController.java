@@ -14,16 +14,20 @@ import com.backend.domain.ship.service.ShipService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.response.GenericResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/v1/ship")
 @RequiredArgsConstructor
+@Tag(name = "선박 API")
 public class ShipController {
 
 	private final ShipService shipService;
 
+	@Operation(summary = "선박 추가하기", description = "선박 추가시 사용하는 API")
 	@PostMapping
 	public ResponseEntity<GenericResponse<Void>> createShip(
 		@RequestBody @Valid final ShipRequest.Create requestDto,

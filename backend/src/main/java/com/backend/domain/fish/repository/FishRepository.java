@@ -65,4 +65,14 @@ public interface FishRepository {
 	 * @author Kim Dong O
 	 */
 	void updateFishPopularityScores(List<Tuple> hourlyFishCountSummaryList);
+
+	/**
+	 * 물고기 전체 조회 메소드
+	 * <p>물고기 데이터 양이 많지 않고 관리자가 직접 추가하기 때문에 findAll로 구현하였습니다.</p>
+	 *
+	 * @return {@link List<FishResponse.FishAll>}
+	 * @implSpec 물고기 전체 조회 후 결과 값 반환
+	 * @author Kim Dong O
+	 */
+	List<FishResponse.FishAll> findFishAll();
 }

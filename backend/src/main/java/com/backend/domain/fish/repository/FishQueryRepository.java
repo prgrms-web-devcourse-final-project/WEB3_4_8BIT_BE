@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.fish.dto.QFishResponse_Detail;
+import com.backend.domain.fish.dto.QFishResponse_FishAll;
 import com.backend.domain.fish.dto.QFishResponse_Popular;
-
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.Tuple;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -88,5 +88,12 @@ public class FishQueryRepository {
 		} else {
 			log.debug("업데이트할 데이터가 없습니다.");
 		}
+	}
+
+	public List<FishResponse.FishAll> findFishAll() {
+		return jpaQueryFactory
+			.select(new QFishResponse_FishAll(fish.fishId, fish.name))
+			.from(fish)
+			.fetch();
 	}
 }

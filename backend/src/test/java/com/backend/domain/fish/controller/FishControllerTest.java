@@ -163,4 +163,25 @@ class FishControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data[0].field").value("size"))
 			.andExpect(jsonPath("$.data[0].reason").value("사이즈는 필수 항목입니다."));
 	}
+
+	@Test
+	@DisplayName("물고기 전체 조회 [Not Found] [Controller] - Fail")
+	@WithMockCustomUser
+	void t07() throws Exception {
+		// Given
+		List<FishResponse.FishAll> givenFishAllList = fixtureMonkeyRecord
+			.giveMeBuilder(FishResponse.FishAll.class)
+			.sampleList(10);
+
+		when(fishService.getFishAll()).thenReturn(givenFishAllList);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/fishes"));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.size()").value(givenFishAllList.size()));
+	}
 }
