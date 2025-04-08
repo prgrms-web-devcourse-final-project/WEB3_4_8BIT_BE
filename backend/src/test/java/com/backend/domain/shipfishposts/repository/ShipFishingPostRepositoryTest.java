@@ -229,26 +229,50 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 			.searchDate(LocalDate.now())
 			.build();
 
-		GlobalRequest.CursorRequest givenCursorRequest = new GlobalRequest
+		GlobalRequest.CursorRequest givenCursorRequest1 = new GlobalRequest
 			.CursorRequest("desc", "price", "next", null, null, 5);
 
 		// When
-		ScrollResponse<ShipFishingPostResponse.DetailScroll> response = shipFishingPostRepository.findDetailScrollBySearch(
-			givenSearchDto, givenCursorRequest);
+		ScrollResponse<ShipFishingPostResponse.DetailScroll> responsePage1 = shipFishingPostRepository.findDetailScrollBySearch(
+			givenSearchDto, givenCursorRequest1);
 
 		log.debug("{} {} \n {} {} \n {} {} \n {} {} ",
-			response.content().get(0).price(), response.content().get(0).shipFishingPostId(),
-			response.content().get(1).price(), response.content().get(1).shipFishingPostId(),
-			response.content().get(2).price(), response.content().get(2).shipFishingPostId(),
-			response.content().get(3).price(), response.content().get(3).shipFishingPostId());
+			responsePage1.content().get(0).price(), responsePage1.content().get(0).shipFishingPostId(),
+			responsePage1.content().get(1).price(), responsePage1.content().get(1).shipFishingPostId(),
+			responsePage1.content().get(2).price(), responsePage1.content().get(2).shipFishingPostId(),
+			responsePage1.content().get(3).price(), responsePage1.content().get(3).shipFishingPostId());
 
-		// Then
-		assertThat(response).isNotNull();
+		// Then 1
+		assertThat(responsePage1).isNotNull();
 
-		List<ShipFishingPostResponse.DetailScroll> data = response.content();
-		assertThat(data).isNotNull();
-		assertThat(data.size()).isEqualTo(5);
-		assertThat(response.isLast()).isFalse();
+		List<ShipFishingPostResponse.DetailScroll> data1 = responsePage1.content();
+		assertThat(data1).isNotNull();
+		assertThat(data1.get(0).price()).isEqualTo(140000L);
+		assertThat(data1.size()).isEqualTo(5);
+		assertThat(responsePage1.isLast()).isFalse();
+
+		GlobalRequest.CursorRequest givenCursorRequest2 = new GlobalRequest
+			.CursorRequest("desc", "price", "next", data1.get(4).price().toString(), data1.get(4).shipFishingPostId(),
+			5);
+
+		// When
+		ScrollResponse<ShipFishingPostResponse.DetailScroll> responsePage2 = shipFishingPostRepository.findDetailScrollBySearch(
+			givenSearchDto, givenCursorRequest2);
+
+		log.debug("{} {} \n {} {} \n {} {} \n {} {} ",
+			responsePage2.content().get(0).price(), responsePage2.content().get(0).shipFishingPostId(),
+			responsePage2.content().get(1).price(), responsePage2.content().get(1).shipFishingPostId(),
+			responsePage2.content().get(2).price(), responsePage2.content().get(2).shipFishingPostId(),
+			responsePage2.content().get(3).price(), responsePage2.content().get(3).shipFishingPostId());
+
+		// Then 2
+		assertThat(responsePage2).isNotNull();
+
+		List<ShipFishingPostResponse.DetailScroll> data2 = responsePage2.content();
+		assertThat(data2).isNotNull();
+		assertThat(data2.get(0).price()).isEqualTo(90000L);
+		assertThat(data2.size()).isEqualTo(5);
+		assertThat(responsePage2.isLast()).isFalse();
 	}
 
 	@Test
