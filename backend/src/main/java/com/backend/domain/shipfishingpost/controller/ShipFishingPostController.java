@@ -3,7 +3,6 @@ package com.backend.domain.shipfishingpost.controller;
 import java.net.URI;
 
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "선상 낚시 게시글 API")
 @RestController
-@RequestMapping("/api/v1/ship-posts")
+@RequestMapping("/api/v1/ship-fishing-posts")
 @RequiredArgsConstructor
 public class ShipFishingPostController {
 
@@ -45,7 +44,7 @@ public class ShipFishingPostController {
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		Long shipFishingPostId = shipFishingPostService.saveShipFishingPost(requestDto, user.getId());
+		Long shipFishingPostId = shipFishingPostService.createShipFishingPost(requestDto, user.getId());
 
 		return ResponseEntity.created(URI.create(shipFishingPostId.toString())).body(GenericResponse.of(true));
 	}
@@ -53,32 +52,27 @@ public class ShipFishingPostController {
 	@GetMapping("/{id}")
 	@Operation(summary = "선상 낚시 게시글 상세 조회", description = "유저가 선상 낚시 게시글을 상세 조회할 때 사용하는 API")
 	@Parameter(name = "id", required = true, description = "조회할 선상 낚시 게시글 ID", example = "1")
-	public ResponseEntity<GenericResponse<ShipFishingPostResponse.DetailAll>> getShipFishingPost(
+	public ResponseEntity<GenericResponse<ShipFishingPostResponse.DetailWithFileUrlAndFishName>> getShipFishingPost(
 		@PathVariable("id") final Long shipFishPostsId
 	) {
 
-		ShipFishingPostResponse.DetailAll response = shipFishingPostService.getShipFishingPostAll(shipFishPostsId);
+		ShipFishingPostResponse.DetailWithFileUrlAndFishName response = shipFishingPostService
+			.getShipFishingPostAll(shipFishPostsId);
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
 
 	@GetMapping
-	@Operation(summary = "선상 낚시 게시글 조회", description = "유저가 선상 낚시 게시글을 조회할 때 사용하는 API")
-	public ResponseEntity<GenericResponse<ScrollResponse<ShipFishingPostResponse.DetailPage>>> getShipFishingPostList(
+	@Operation(summary = "선상 낚시 게시글 검색 및 조회", description = "유저가 선상 낚시 게시글을 조회할 때 사용하는 API")
+	public ResponseEntity<GenericResponse<ScrollResponse<ShipFishingPostResponse.DetailScroll>>> getShipFishingPostList(
 		@ParameterObject @ModelAttribute final ShipFishingPostRequest.Search requestDto,
-		@Valid final GlobalRequest.PageRequest pageRequestDto
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto
 	) {
 
-		Slice<ShipFishingPostResponse.DetailPage> response = shipFishingPostService
-			.getShipFishingPostPage(requestDto, pageRequestDto);
+		ScrollResponse<ShipFishingPostResponse.DetailScroll> response = shipFishingPostService
+			.getShipFishingPostScroll(requestDto, cursorRequestDto);
 
-		return ResponseEntity.ok(GenericResponse.of(true, ScrollResponse.from(
-			response.getContent(),
-			response.getSize(),
-			response.getNumberOfElements(),
-			response.isFirst(),
-			response.isLast()
-		)));
+		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
 
 	@DeleteMapping("/{id}")
