@@ -127,6 +127,23 @@ public class FishPointQueryRepository {
 			.fetch();
 	}
 
+	public List<Response> findByRegionId(final Long regionId) {
+
+		return jpaQueryFactory
+			.select(new QFishPointResponse_Response(
+				fishPoint.fishPointId,
+				fishPoint.fishPointName,
+				fishPoint.fishPointDetailName,
+				fishPoint.latitude,
+				fishPoint.longitude,
+				fishPoint.isBan
+			))
+			.from(fishPoint)
+			.where(fishPoint.regionId.eq(regionId))
+			.orderBy(fishPoint.fishPointId.asc())
+			.fetch();
+	}
+
 	public List<Response> findByFishPointName(final String fishPointName) {
 
 		return jpaQueryFactory

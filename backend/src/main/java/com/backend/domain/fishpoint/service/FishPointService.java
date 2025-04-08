@@ -42,6 +42,14 @@ public interface FishPointService {
 	List<ResponseWithDistance> getNearestFishPoints(final double lat, final double lng);
 
 	/**
+	 * 주어진 지역 ID에 해당하는 낚시 포인트 목록을 조회
+	 *
+	 * @param regionId 조회할 지역의 ID
+	 * @return 해당 지역에 속한 낚시 포인트 정보를 담은 Response 리스트
+	 */
+	List<Response> getFishPointsByRegionId(final Long regionId);
+
+	/**
 	 * 낚시 포인트 이름을 기준으로 검색
 	 *
 	 * @param fishPointName 검색할 낚시 포인트 이름 (부분 일치)

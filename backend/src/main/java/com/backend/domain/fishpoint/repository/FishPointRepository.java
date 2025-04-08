@@ -56,7 +56,15 @@ public interface FishPointRepository {
 	 * @param lng 사용자의 현재 경도
 	 * @return 거리 정보가 포함된 낚시 포인트 응답 리스트 (최대 3개)
 	 */
-	public List<ResponseWithDistance> findNearestFishPoints(final double lat, final double lng);
+	List<ResponseWithDistance> findNearestFishPoints(final double lat, final double lng);
+
+	/**
+	 * 지정한 지역(도 단위) ID에 해당하는 모든 낚시 포인트 정보를 조회
+	 *
+	 * @param regionId 조회할 지역의 ID
+	 * @return 해당 지역에 속한 낚시 포인트 리스트
+	 */
+	List<Response> findByRegionId(final Long regionId);
 
 	/**
 	 * 지역명을 기준으로 낚시 포인트 전체 조회

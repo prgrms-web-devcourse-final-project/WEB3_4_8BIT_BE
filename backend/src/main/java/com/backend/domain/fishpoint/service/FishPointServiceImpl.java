@@ -39,6 +39,11 @@ public class FishPointServiceImpl implements FishPointService {
 	}
 
 	@Override
+	public List<Response> getFishPointsByRegionId(final Long regionId) {
+		return fishPointRepository.findByRegionId(regionId);
+	}
+
+	@Override
 	public List<Response> searchFishPoints(final String fishPointName) {
 		return fishPointRepository.findByFishPointName(fishPointName);
 	}

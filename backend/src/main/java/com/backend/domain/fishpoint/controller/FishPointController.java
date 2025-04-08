@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -71,6 +72,16 @@ public class FishPointController {
 			nearbyRequestDto.lat(),
 			nearbyRequestDto.lng()
 		);
+
+		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
+	}
+
+	@GetMapping("/regions/{regionId}")
+	@Operation(summary = "지역 기반 낚시 포인트 조회", description = "지역 ID(도 단위) 기준 낚시 포인트를 조회 API")
+	public ResponseEntity<GenericResponse<List<Response>>> getRegionFishPoints(
+		@PathVariable Long regionId
+	) {
+		List<Response> fishPointList = fishPointService.getFishPointsByRegionId(regionId);
 
 		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
 	}
