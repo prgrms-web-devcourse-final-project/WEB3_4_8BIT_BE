@@ -15,7 +15,6 @@ import org.springframework.stereotype.Repository;
 import com.backend.domain.fishpoint.dto.response.QFishPointResponse_Basic;
 import com.backend.domain.fishpoint.dto.response.QFishPointResponse_Popularity;
 import com.backend.domain.fishpoint.dto.response.QFishPointResponse_WithDistance;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -43,13 +42,15 @@ public class FishPointQueryRepository {
 			swLat, swLng
 		);
 
-		log.info("polygonWKT: {}", polygonWKT);
+		log.debug("polygonWKT: {}", polygonWKT);
 
 		BooleanExpression withinExpr = Expressions.booleanTemplate(
 			"ST_Within({0}, ST_GeomFromText({1}, 4326))",
 			fishPoint.location,
 			Expressions.constant(polygonWKT)
 		);
+
+		BooleanExpression notBanned = fishPoint.isBan.isFalse();
 
 		return jpaQueryFactory
 			.select(new QFishPointResponse_Basic(
@@ -61,7 +62,7 @@ public class FishPointQueryRepository {
 				fishPoint.isBan
 			))
 			.from(fishPoint)
-			.where(withinExpr)
+			.where(withinExpr.and(notBanned))
 			.fetch();
 	}
 
@@ -132,6 +133,8 @@ public class FishPointQueryRepository {
 
 	public List<Basic> findByRegionId(final Long regionId) {
 
+		BooleanExpression notBanned = fishPoint.isBan.isFalse();
+
 		return jpaQueryFactory
 			.select(new QFishPointResponse_Basic(
 				fishPoint.fishPointId,
@@ -142,13 +145,15 @@ public class FishPointQueryRepository {
 				fishPoint.isBan
 			))
 			.from(fishPoint)
-			.where(fishPoint.regionId.eq(regionId))
+			.where(fishPoint.regionId.eq(regionId).and(notBanned))
 			.orderBy(fishPoint.fishPointId.asc())
 			.fetch();
 	}
 
 	public List<Basic> findByFishPointName(final String fishPointName) {
 
+		BooleanExpression notBanned = fishPoint.isBan.isFalse();
+
 		return jpaQueryFactory
 			.select(new QFishPointResponse_Basic(
 				fishPoint.fishPointId,
@@ -159,15 +164,15 @@ public class FishPointQueryRepository {
 				fishPoint.isBan
 			))
 			.from(fishPoint)
-			.where(
-				fishPoint.fishPointName.containsIgnoreCase(fishPointName),
-				fishPoint.isBan.isFalse()
-			)
+			.where(fishPoint.fishPointName.containsIgnoreCase(fishPointName).and(notBanned))
 			.orderBy(fishPoint.fishPointId.asc())
 			.fetch();
 	}
 
 	public List<Popularity> findPopularityFishPoints() {
+
+		BooleanExpression notBanned = fishPoint.isBan.isFalse();
+
 		return jpaQueryFactory
 			.select(new QFishPointResponse_Popularity(
 				fishPoint.fishPointId,
@@ -177,6 +182,7 @@ public class FishPointQueryRepository {
 			))
 			.from(fishingTripPost)
 			.join(fishPoint).on(fishingTripPost.fishingPointId.eq(fishPoint.fishPointId))
+			.where(notBanned)
 			.groupBy(fishPoint.fishPointId)
 			.orderBy(fishingTripPost.fishingPointId.count().desc())
 			.limit(3)
