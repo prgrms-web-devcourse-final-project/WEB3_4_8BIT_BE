@@ -23,6 +23,7 @@ import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.ship.repository.ShipRepository;
+import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -32,6 +33,9 @@ class ShipServiceTest extends BaseTest {
 
 	@Mock
 	private ShipRepository shipRepository;
+
+	@Mock
+	private ShipFishingPostRepository shipFishingPostRepository;
 
 	@InjectMocks
 	private ShipServiceImpl shipService;
@@ -73,7 +77,7 @@ class ShipServiceTest extends BaseTest {
 
 		when(shipRepository.save(any(Ship.class))).thenReturn(
 			shipArbitraryBuilder.set("shipId", 1L)
-			.sample()
+				.sample()
 		);
 
 		// When
@@ -134,5 +138,79 @@ class ShipServiceTest extends BaseTest {
 
 		// Then
 		assertThat(updatedShipId).isEqualTo(givenShip.getShipId());
+	}
+
+	@Test
+	@DisplayName("선박 수정 [Not Author] [Service] - Fail")
+	void t05() {
+		// Given
+		Long givenMemberId = 1L;
+
+		ShipRequest.Form givenForm = fixtureMonkeyRecord.giveMeBuilder(ShipRequest.Form.class).sample();
+
+		Ship givenShip = shipArbitraryBuilder
+			.set("memberId", 2L)
+			.sample();
+
+		when(shipRepository.findById(givenShip.getShipId())).thenReturn(Optional.ofNullable(givenShip));
+
+		// When & Then
+		assertThatThrownBy(() -> shipService.updateShip(givenShip.getShipId(), givenMemberId, givenForm))
+			.isInstanceOf(ShipException.class)
+			.hasMessage(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR.getMessage());
+	}
+
+	@Test
+	@DisplayName("선박 삭제 [Service] - Success")
+	void t06() {
+		// Given
+		Long givenMemberId = 1L;
+
+		Ship givenShip = shipArbitraryBuilder
+			.set("memberId", givenMemberId)
+			.sample();
+
+		when(shipRepository.findById(givenShip.getShipId())).thenReturn(Optional.ofNullable(givenShip));
+		doNothing().when(shipRepository).deleteByShipId(givenShip.getShipId());
+		when(shipFishingPostRepository.existsByShipId(givenShip.getShipId())).thenReturn(false);
+
+		// When
+		shipService.deleteById(givenShip.getShipId(), givenMemberId);
+
+		// Then
+		verify(shipRepository).deleteByShipId(givenShip.getShipId());
+	}
+
+	@Test
+	@DisplayName("선박 삭제 [Not Author] [Service] - Fail")
+	void t07() {
+		// Given
+		Long givenMemberId = 1L;
+		Ship givenShip = shipArbitraryBuilder
+			.set("memberId", 2L)
+			.sample();
+		when(shipRepository.findById(givenShip.getShipId())).thenReturn(Optional.ofNullable(givenShip));
+
+		// When & Then
+		assertThatThrownBy(() -> shipService.deleteById(givenShip.getShipId(), givenMemberId))
+			.isInstanceOf(ShipException.class)
+			.hasMessage(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR.getMessage());
+	}
+
+	@Test
+	@DisplayName("선박 삭제 [In Use By Fishing Post] [Service] - Fail")
+	void t08() {
+		// Given
+		Long givenMemberId = 1L;
+		Ship givenShip = shipArbitraryBuilder
+			.set("memberId", givenMemberId)
+			.sample();
+		when(shipRepository.findById(givenShip.getShipId())).thenReturn(Optional.ofNullable(givenShip));
+		when(shipFishingPostRepository.existsByShipId(givenShip.getShipId())).thenReturn(true);
+
+		// When & Then
+		assertThatThrownBy(() -> shipService.deleteById(givenShip.getShipId(), givenMemberId))
+			.isInstanceOf(ShipException.class)
+			.hasMessage(ShipErrorCode.SHIP_IN_USE_BY_FISHING_POST.getMessage());
 	}
 }
