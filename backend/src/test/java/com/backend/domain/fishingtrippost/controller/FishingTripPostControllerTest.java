@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
@@ -31,6 +32,7 @@ import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -170,6 +172,7 @@ class FishingTripPostControllerTest extends BaseTest {
 			.isShipFish(true)
 			.fishingDate(ZonedDateTime.now().plusDays(3))
 			.fishingPointId(99L)
+			.regionId(2L)
 			.fileIdList(updatedFileIds)
 			.build();
 
@@ -189,6 +192,7 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data").value(requestDto.fishingPointId()));
 	}
+
 
 	@Test
 	@DisplayName("동출 게시글 수정 [FISHING_TRIP_POST_NOT_FOUND] [Controller] - Fail")
@@ -414,5 +418,54 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.code").value(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getCode()))
 			.andExpect(jsonPath("$.message").value(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@WithMockCustomUser
+	@DisplayName("동출 게시글 스크롤 조회 [Controller] - Success")
+	void t15() throws Exception {
+		// Given
+		Long postId = 1L;
+
+		FishingTripPostResponse.DetailPage detailPage = FishingTripPostResponse.DetailPage.builder()
+			.fishingTripPostId(postId)
+			.regionType(null)
+			.subject("스크롤 제목")
+			.content("스크롤 내용")
+			.fishingDate(ZonedDateTime.parse("2025-06-10T08:00:00+09:00"))
+			.createdAt(ZonedDateTime.parse("2025-04-09T04:00:00+09:00"))
+			.recruitmentCount(5)
+			.postStatus(PostStatus.RECRUITING)
+			.imageUrl("https://cdn.example.com/file.jpg")
+			.build();
+
+		ScrollResponse<FishingTripPostResponse.DetailPage> response = ScrollResponse.from(
+			List.of(detailPage), 10, 1, true, true
+		);
+
+		when(fishingTripPostService.getDetailPage(any(), isNull(), isNull(), isNull()))
+			.thenReturn(response);
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/v1/fishing-trip-post/scroll")
+				.param("order", "createdAt")
+				.param("sort", "desc")
+				.param("type", "next")
+				.param("fieldValue", "2025-04-09T04:00:00+09:00")
+				.param("id", postId.toString())
+				.param("size", "10")
+		);
+
+		// Then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.content").isArray())
+			.andExpect(jsonPath("$.data.content[0].fishingTripPostId").value(postId))
+			.andExpect(jsonPath("$.data.content[0].imageUrl").value("https://cdn.example.com/file.jpg"))
+			.andExpect(jsonPath("$.data.pageSize").value(10))
+			.andExpect(jsonPath("$.data.numberOfElements").value(1))
+			.andExpect(jsonPath("$.data.isFirst").value(true))
+			.andExpect(jsonPath("$.data.isLast").value(true));
 	}
 }

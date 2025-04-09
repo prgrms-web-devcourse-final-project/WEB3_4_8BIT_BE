@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -27,6 +28,7 @@ import com.backend.domain.member.repository.MemberRepository;
 import com.backend.domain.member.repository.MemberRepositoryImpl;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
+import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageQueryRepository;
 import com.backend.global.storage.repository.StorageRepository;
@@ -191,5 +193,49 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 		List<String> expectedUrls = savedFiles.stream().map(File::getUrl).toList();
 		assertThat(detail.fileUrlList()).containsExactlyElementsOf(expectedUrls);
+	}
+
+	@Test
+	@DisplayName("동출 게시글 스크롤 조회 [createdAt] [desc] [커서 조건 적용] - Success")
+	void t04() {
+		// given
+		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
+		FishPoint savedFishPoint = fishPointRepository.save(createRandomFishPoint());
+
+		List<FishingTripPost> savedPosts = new ArrayList<>(List.of(
+			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
+				.set("memberId", savedMember.getMemberId())
+				.set("fishingPointId", savedFishPoint.getFishPointId())
+				.set("fishingTripPostId", null)
+				.sample()),
+			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
+				.set("memberId", savedMember.getMemberId())
+				.set("fishingPointId", savedFishPoint.getFishPointId())
+				.set("fishingTripPostId", null)
+				.sample()),
+			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
+				.set("memberId", savedMember.getMemberId())
+				.set("fishingPointId", savedFishPoint.getFishPointId())
+				.set("fishingTripPostId", null)
+				.sample())
+		));
+
+		savedPosts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+		FishingTripPost cursorBase = savedPosts.get(0);
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			"desc", "createdAt", "next",
+			cursorBase.getCreatedAt().toString(),
+			cursorBase.getFishingTripPostId(),
+			10
+		);
+
+		// when
+		List<FishingTripPostResponse.DetailPageQueryDto> result =
+			fishingTripPostRepository.findScrollDetailPageDto(cursorRequest, null, null, null);
+
+		// then
+		assertThat(result).isNotEmpty();
+		assertThat(result.get(0).fishingTripPostId()).isNotEqualTo(cursorBase.getFishingTripPostId());
 	}
 }
