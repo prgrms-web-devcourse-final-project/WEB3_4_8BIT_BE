@@ -51,16 +51,9 @@ public class ShipResponse {
 		Boolean mealProvided,
 		Boolean parkingAvailable
 	) {
-	}
-
-	public record ShipAll(
-		Long shipId,
-		String shipName,
-		String departurePort
-	) {
 
 		@QueryProjection
-		public ShipAll {
+		public Detail {
 		}
 	}
 }

@@ -35,7 +35,7 @@ public class ShipRepositoryImpl implements ShipRepository {
 	}
 
 	@Override
-	public List<ShipResponse.ShipAll> findShipAll(final Long memberId) {
-		return shipQueryRepository.findShipAll(memberId);
+	public List<ShipResponse.Detail> findDetailAll(final Long memberId) {
+		return shipQueryRepository.findDetailAll(memberId);
 	}
 }

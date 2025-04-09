@@ -42,8 +42,8 @@ public interface ShipRepository {
 	 * 회원 ID로 등록된 선박 전체 조회 메서드
 	 *
 	 * @param memberId {@link Long}
-	 * @return {@link Long}
+	 * @return {@link List<ShipResponse.Detail>}
 	 * @implSpec 회원 ID로 등록된 선박 전체 조회 후 결과 값 반환
 	 */
-	List<ShipResponse.ShipAll> findShipAll(final Long memberId);
+	List<ShipResponse.Detail> findDetailAll(final Long memberId);
 }

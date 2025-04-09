@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.backend.domain.ship.dto.response.QShipResponse_ShipAll;
+import com.backend.domain.ship.dto.response.QShipResponse_Detail;
 import com.backend.domain.ship.dto.response.ShipResponse;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -25,9 +25,21 @@ public class ShipQueryRepository {
 			.where(ship.memberId.eq(memberId))
 			.fetchOne();
 	}
-	public List<ShipResponse.ShipAll> findShipAll(Long memberId) {
+	public List<ShipResponse.Detail> findDetailAll(final Long memberId) {
 		return jpaQueryFactory
-			.select(new QShipResponse_ShipAll(ship.shipId, ship.shipName, ship.departurePort))
+			.select(new QShipResponse_Detail(
+				ship.shipId,
+				ship.shipName,
+				ship.shipNumber,
+				ship.departurePort,
+				ship.restroomType,
+				ship.loungeArea,
+				ship.kitchenFacility,
+				ship.fishingChair,
+				ship.passengerInsurance,
+				ship.fishingGearRental,
+				ship.mealProvided,
+				ship.parkingAvailable))
 			.from(ship)
 			.where(ship.memberId.eq(memberId))
 			.fetch();

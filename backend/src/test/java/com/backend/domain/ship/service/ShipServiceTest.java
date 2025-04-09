@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.backend.domain.ship.dto.request.ShipRequest;
+import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
@@ -80,4 +83,20 @@ class ShipServiceTest extends BaseTest {
 			.hasMessage(ShipErrorCode.MAX_SHIP_COUNT_EXCEEDED.getMessage());
 	}
 
+	@Test
+	@DisplayName("회원 ID로 등록된 선박 전체 조회 [Service] - Success")
+	void t03() {
+		// Given
+		Long givenMemberId = 1L;
+		List<ShipResponse.Detail> givenShipAllList = fixtureMonkeyRecord.giveMeBuilder(ShipResponse.Detail.class)
+			.sampleList(10);
+
+		when(shipRepository.findDetailAll(givenMemberId)).thenReturn(givenShipAllList);
+
+		// When
+		List<ShipResponse.Detail> findShipAllList = shipService.getDetailAll(givenMemberId);
+
+		// Then
+		assertThat(findShipAllList).isEqualTo(givenShipAllList);
+	}
 }

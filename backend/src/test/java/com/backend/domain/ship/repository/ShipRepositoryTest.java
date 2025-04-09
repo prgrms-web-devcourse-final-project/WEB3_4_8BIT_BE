@@ -124,7 +124,7 @@ public class ShipRepositoryTest extends BaseTest {
 		shipJpaRepository.saveAll(givenShip2);
 
 		// When
-		List<ShipResponse.ShipAll> findShipAllList = shipRepository.findShipAll(givenMemberId);
+		List<ShipResponse.Detail> findShipAllList = shipRepository.findDetailAll(givenMemberId);
 
 		// Then
 		assertThat(findShipAllList).hasSize(savedShip1.size());
