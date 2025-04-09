@@ -21,6 +21,7 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.domain.reservation.dto.response.ReservationResponse;
 import com.backend.domain.reservation.entity.Reservation;
+import com.backend.domain.reservation.entity.ReservationStatus;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.config.QuerydslConfig;
@@ -362,6 +363,7 @@ public class ReservationRepositoryTest extends BaseTest {
 			.set("shipFishingPostId", givenShipFishingPostId)
 			.set("reservationDate", LocalDate.now())
 			.set("guestCount", 1)
+			.set("status", ReservationStatus.CANCELLED)
 			.sampleStream()
 			.limit(1)
 			.forEach(reservation ->
@@ -372,6 +374,7 @@ public class ReservationRepositoryTest extends BaseTest {
 			.set("shipFishingPostId", givenShipFishingPostId)
 			.set("reservationDate", LocalDate.now().plusDays(10))
 			.set("guestCount", 1)
+			.set("status", ReservationStatus.CANCELLED)
 			.sampleStream()
 			.limit(5)
 			.forEach(reservation ->
@@ -382,16 +385,16 @@ public class ReservationRepositoryTest extends BaseTest {
 			.set("shipFishingPostId", givenShipFishingPostId)
 			.set("reservationDate", LocalDate.now().minusDays(10))
 			.set("guestCount", 1)
+			.set("status", ReservationStatus.CANCELLED)
 			.sampleStream()
 			.limit(5)
 			.forEach(reservation ->
 				reservationRepository.save(reservation));
 
 		// When
-		List<Reservation> savedReservationList = reservationRepository
-			.findByShipFishingPostIdAndTodayAfter(givenShipFishingPostId, LocalDate.now());
+		Boolean isExists = reservationRepository.findByShipFishingPostIdAndTodayAfter(givenShipFishingPostId,
+			LocalDate.now());
 
-		// Then
-		assertThat(savedReservationList.size()).isEqualTo(6);
+		assertThat(isExists).isFalse();
 	}
 }

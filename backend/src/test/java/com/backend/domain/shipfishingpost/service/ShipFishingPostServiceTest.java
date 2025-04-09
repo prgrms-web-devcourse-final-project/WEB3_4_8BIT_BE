@@ -266,7 +266,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		when(shipFishingPostRepository.findById(any(Long.class)))
 			.thenReturn(Optional.ofNullable(givenShipFishingPost));
 		when(reservationRepository.findByShipFishingPostIdAndTodayAfter(any(Long.class), any(LocalDate.class)))
-			.thenReturn(List.of());
+			.thenReturn(false);
 		doNothing().when(s3StorageService).deleteFilesByIdList(any(Long.class), any(List.class));
 
 		// Then
@@ -342,7 +342,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		when(shipFishingPostRepository.findById(any(Long.class)))
 			.thenReturn(Optional.ofNullable(givenShipFishingPost));
 		when(reservationRepository.findByShipFishingPostIdAndTodayAfter(any(Long.class), any(LocalDate.class)))
-			.thenReturn(givenRemainReservation);
+			.thenReturn(true);
 
 		// Then
 		assertThatThrownBy(
