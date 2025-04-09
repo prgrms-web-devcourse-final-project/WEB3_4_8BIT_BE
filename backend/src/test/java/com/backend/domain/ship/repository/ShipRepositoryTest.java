@@ -84,6 +84,8 @@ public class ShipRepositoryTest extends BaseTest {
 		// Given
 		Long givenMemberId = 1L;
 
+		shipJpaRepository.deleteAll();
+
 		List<Ship> givenShip1 = arbitraryBuilder
 			.set("shipId", null)
 			.set("memberId", givenMemberId)
@@ -109,6 +111,8 @@ public class ShipRepositoryTest extends BaseTest {
 	void t04() {
 		// Given
 		Long givenMemberId = 1L;
+
+		shipJpaRepository.deleteAll();
 
 		List<Ship> givenShip1 = arbitraryBuilder
 			.set("shipId", null)
