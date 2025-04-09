@@ -86,7 +86,7 @@ public class ShipServiceImpl implements ShipService {
 
 	private void validMemberId(Long shipMemberId, Long memberId) {
 
-		if (shipMemberId.equals(memberId)) {
+		if (!shipMemberId.equals(memberId)) {
 			throw new ShipException(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR);
 		}
 	}
