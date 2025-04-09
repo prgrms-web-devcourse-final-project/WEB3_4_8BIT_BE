@@ -63,4 +63,12 @@ public interface FishPointService {
 	 * @return 동출 게시글 수가 많은 순으로 정렬된 인기 낚시 포인트 3개의 리스트
 	 */
 	List<Popularity> getPopularityFishPoints();
+
+	/**
+	 * 주어진 낚시 포인트 ID에 해당하는 상세 정보 조회
+	 *
+	 * @param fishPointId 조회할 낚시 포인트의 ID
+	 * @return 해당 낚시 포인트의 상세 정보를 담은 {@link Detail} 객체
+	 */
+	Detail getFishPointDetail(final Long fishPointId);
 }

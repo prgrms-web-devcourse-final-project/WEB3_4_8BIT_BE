@@ -57,6 +57,25 @@ public abstract class BaseTest {
 			.build();
 	}
 
+	protected FishPoint createRandomFishPoint(Long regionId, String fishPointName) {
+		String detailName = englishString.sample();
+		double longitude = randomDouble(126.0, 130.0);
+		double latitude = randomDouble(33.0, 39.0);
+
+		Point location = geometryFactory.createPoint(new Coordinate(longitude, latitude));
+		location.setSRID(4326);
+
+		return FishPoint.builder()
+			.fishPointName(fishPointName)
+			.fishPointDetailName(detailName)
+			.longitude(longitude)
+			.latitude(latitude)
+			.location(location)
+			.isBan(false)
+			.regionId(regionId)
+			.build();
+	}
+
 	private final Arbitrary<String> englishString = Arbitraries.strings()
 		.withCharRange('a', 'z')
 		.withCharRange('A', 'Z')

@@ -3,6 +3,7 @@ package com.backend.domain.fishpoint.repository;
 import static com.backend.domain.fishpoint.dto.response.FishPointResponse.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -55,5 +56,10 @@ public class FishPointRepositoryImpl implements FishPointRepository {
 	@Override
 	public List<Popularity> findPopularityFishPoints() {
 		return fishPointQueryRepository.findPopularityFishPoints();
+	}
+
+	@Override
+	public Optional<FishPoint> findByFishPointId(final Long fishPointId) {
+		return fishPointJpaRepository.findById(fishPointId);
 	}
 }
