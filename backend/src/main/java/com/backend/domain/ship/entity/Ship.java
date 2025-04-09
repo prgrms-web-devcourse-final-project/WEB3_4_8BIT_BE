@@ -46,7 +46,6 @@ public class Ship extends BaseEntity {
 	@Column(nullable = false)
 	private Integer passengerCapacity;
 
-	//TODO 추후 화장실 ENUM으로 변경
 	@Column(nullable = false, length = 15)
 	@Enumerated(EnumType.STRING)
 	@Builder.Default
@@ -72,4 +71,33 @@ public class Ship extends BaseEntity {
 
 	@Column(nullable = false)
 	private Boolean parkingAvailable;
+
+	public void updateShip(
+		final String shipName,
+		final String shipNumber,
+		final String departurePort,
+		final Integer passengerCapacity,
+		final RestroomType restroomType,
+		final Boolean loungeArea,
+		final Boolean kitchenFacility,
+		final Boolean fishingChair,
+		final Boolean passengerInsurance,
+		final Boolean fishingGearRental,
+		final Boolean mealProvided,
+		final Boolean parkingAvailable) {
+
+		this.shipName = shipName;
+		this.shipNumber = shipNumber;
+		this.departurePort = departurePort;
+		this.passengerCapacity = passengerCapacity;
+		this.restroomType = restroomType;
+		this.loungeArea = loungeArea;
+		this.kitchenFacility = kitchenFacility;
+		this.fishingChair = fishingChair;
+		this.passengerInsurance = passengerInsurance;
+		this.fishingGearRental = fishingGearRental;
+		this.mealProvided = mealProvided;
+		this.parkingAvailable = parkingAvailable;
+
+	}
 }
