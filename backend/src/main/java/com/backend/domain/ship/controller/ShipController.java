@@ -33,7 +33,7 @@ public class ShipController {
 	@Operation(summary = "선박 추가하기", description = "선박 추가시 사용하는 API")
 	@PostMapping
 	public ResponseEntity<GenericResponse<Void>> createShip(
-		@RequestBody @Valid final ShipRequest.Create requestDto,
+		@RequestBody @Valid final ShipRequest.Form requestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 

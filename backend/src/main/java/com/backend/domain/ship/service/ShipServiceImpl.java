@@ -24,7 +24,7 @@ public class ShipServiceImpl implements ShipService {
 	private static final Long MAX_SHIPS_PER_MEMBER = 5L;
 
 	@Override
-	public Long createShip(final Long memberId, final ShipRequest.Create requestDto) {
+	public Long createShip(final Long memberId, final ShipRequest.Form requestDto) {
 
 		Long countByMemberId = shipRepository.countByMemberId(memberId);
 
@@ -49,6 +49,11 @@ public class ShipServiceImpl implements ShipService {
 		log.debug("선박 전체 조회: {}", getShipAllList);
 
 		return getShipAllList;
+	}
+
+	@Override
+	public Long updateShip(Long shipId, Long memberId) {
+		return 0L;
 	}
 
 	private void validateMaxShipLimit(final Long countByMemberId) {

@@ -11,11 +11,11 @@ public interface ShipService {
 	 * 선박 저장 메서드
 	 *
 	 * @param memberId {@link Long}
-	 * @param requestDto {@link ShipRequest.Create}
+	 * @param requestDto {@link ShipRequest.Form}
 	 * @return {@link Long}
 	 * @implSpec 선박 정보 저장 메서드 입니다.
 	 */
-	Long createShip(final Long memberId, final ShipRequest.Create requestDto);
+	Long createShip(final Long memberId, final ShipRequest.Form requestDto);
 
 	/**
 	 * 로그인한 회원의 선박 전체 조회 메서드
@@ -25,4 +25,14 @@ public interface ShipService {
 	 * @implSpec 로그인한 회원의 선박 전체 조회 메서드 입니다.
 	 */
 	List<ShipResponse.Detail> getDetailAll(final Long memberId);
+
+	/**
+	 * 선박 수정 메소드
+	 *
+	 * @param shipId {@link Long}
+	 * @param memberId {@link Long}
+	 * @return {@link Long}
+	 * @implSpec 선박 수정 메서드 입니다.
+	 */
+	Long updateShip(final Long shipId, final Long memberId);
 }

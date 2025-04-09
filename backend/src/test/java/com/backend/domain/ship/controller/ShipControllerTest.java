@@ -52,8 +52,8 @@ class ShipControllerTest extends BaseTest {
 		.withCharRange('A', 'Z')
 		.ofMinLength(1).ofMaxLength(10);
 
-	private final ArbitraryBuilder<ShipRequest.Create> createArbitraryBuilder = fixtureMonkeyRecord
-		.giveMeBuilder(ShipRequest.Create.class)
+	private final ArbitraryBuilder<ShipRequest.Form> createArbitraryBuilder = fixtureMonkeyRecord
+		.giveMeBuilder(ShipRequest.Form.class)
 		.set("shipName", englishStringLength)
 		.set("shipNumber", englishStringLength)
 		.set("departurePort", englishStringLength)
@@ -65,7 +65,7 @@ class ShipControllerTest extends BaseTest {
 	void t01() throws Exception {
 		// Given
 		Long shipId = 1L;
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder.sample();
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder.sample();
 
 		when(shipService.createShip(1L, givenRequestDto)).thenReturn(shipId);
 		// When
@@ -87,7 +87,7 @@ class ShipControllerTest extends BaseTest {
 	void t02() throws Exception {
 		// Given
 		Long shipId = 1L;
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("shipName", "oiesfajoiejfioewafjoijwaoiefjwaoiefjiowjafiowjaofijwoaiefowaiefjoiwafjowaif")
 			.sample();
 
@@ -113,7 +113,7 @@ class ShipControllerTest extends BaseTest {
 	void t03() throws Exception {
 		// Given
 		Long shipId = 1L;
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("shipName", "")
 			.sample();
 
@@ -138,7 +138,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t04() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("shipNumber", "oiesfajoiejfioewafjoijwaoiefjwaoiefjiowjafiowjaofijwoaiefowaiefjoiwafjowaif")
 			.sample();
 		// When
@@ -161,7 +161,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t05() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("shipNumber", "")
 			.sample();
 		// When
@@ -184,7 +184,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t06() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("departurePort", "oiesfajoiejfioewafjoijwaoiefjwaoiefjiowjafiowjaofijwoaiefowaiefjoiwafjowaif")
 			.sample();
 		// When
@@ -207,7 +207,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t07() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("departurePort", "")
 			.sample();
 		// When
@@ -230,7 +230,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t08() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("passengerCapacity", 0)
 			.sample();
 		// When
@@ -253,7 +253,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t09() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("passengerCapacity", 101)
 			.sample();
 		// When
@@ -276,7 +276,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t10() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("passengerCapacity", null)
 			.sample();
 		// When
@@ -323,7 +323,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t12() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("loungeArea", null)
 			.sample();
 		// When
@@ -346,7 +346,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t13() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("kitchenFacility", null)
 			.sample();
 		// When
@@ -369,7 +369,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t14() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("fishingChair", null)
 			.sample();
 		// When
@@ -392,7 +392,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t15() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("passengerInsurance", null)
 			.sample();
 		// When
@@ -415,7 +415,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t16() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("fishingGearRental", null)
 			.sample();
 		// When
@@ -438,7 +438,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t17() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("mealProvided", null)
 			.sample();
 		// When
@@ -461,7 +461,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t18() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("parkingAvailable", null)
 			.sample();
 		// When
