@@ -37,6 +37,6 @@ jobs:
         working-directory: backend
 
       - name: Run Tests
-        run: ./gradlew test --no-daemon
-        #run:  ./gradlew test -i
+        #run: ./gradlew test --no-daemon
+        run:  ./gradlew test
         working-directory: backend
