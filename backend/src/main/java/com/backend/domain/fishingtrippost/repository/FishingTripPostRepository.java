@@ -1,9 +1,13 @@
 package com.backend.domain.fishingtrippost.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 public interface FishingTripPostRepository {
 
@@ -52,4 +56,26 @@ public interface FishingTripPostRepository {
 	 * @implSpec fishingTripPostId 데이터가 있는지 확인 후 결과 반한
 	 */
 	boolean existsById(final Long fishingTripPostId);
+
+	/**
+	 * 커서 기반으로 낚시 동행 게시글 목록을 조회합니다.
+	 *
+	 * <p>정렬 기준 및 방향, 커서 값에 따라 페이징된 게시글 목록을 반환하며,
+	 * 게시글 상태, 지역, 제목 키워드로 필터링이 가능합니다.</p>
+	 *
+	 * <p>이 메서드는 파일 ID 리스트를 포함한 DTO 형태로 반환되며,
+	 * 이후 서비스 계층에서 이미지 URL 매핑 등의 추가 작업이 수행됩니다.</p>
+	 *
+	 * @param cursorRequestDto 커서 기반 페이지네이션 요청 정보 (정렬 기준, 방향, 커서 값 등)
+	 * @param status 게시글 상태 필터 (예: RECRUITING, COMPLETED), null일 경우 전체
+	 * @param regionId 지역 ID 필터, null일 경우 전체
+	 * @param keyword 제목 키워드 검색 필터, null 또는 빈 값일 경우 전체
+	 * @return 페이징 처리된 {@link FishingTripPostResponse.DetailPageQueryDto} 목록
+	 */
+	List<FishingTripPostResponse.DetailPageQueryDto> findScrollDetailPageDto(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus status,
+		final Long regionId,
+		final String keyword
+	);
 }
