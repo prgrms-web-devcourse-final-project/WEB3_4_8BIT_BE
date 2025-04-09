@@ -2,6 +2,7 @@ package com.backend.global.storage.repository;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import com.backend.global.storage.entity.File;
 
@@ -45,4 +46,16 @@ public interface StorageRepository {
 	 * @param fileList 삭제할 {@link File} 엔티티 리스트
 	 */
 	void deleteAll(final List<File> fileList);
+
+	/**
+	 * 파일 ID를 기반으로 해당 파일 정보를 조회합니다.
+	 *
+	 * <p>저장소에서 해당 ID에 매핑되는 {@link File} 엔티티를 조회하며,
+	 * 존재하지 않을 경우 빈 {@link Optional}을 반환합니다.</p>
+	 *
+	 * @param fileId 조회할 파일의 ID
+	 * @return 주어진 ID에 해당하는 {@link File}이 존재하면 {@link Optional}로 반환하고,
+	 *         없으면 {@link Optional#empty()}를 반환합니다.
+	 */
+	Optional<File> findById(final Long fileId);
 }
