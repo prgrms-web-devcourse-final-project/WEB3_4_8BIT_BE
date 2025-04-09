@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.fishpointsummary.entity.FishPointSummary;
 
@@ -19,11 +20,13 @@ public class FishPointSummaryRepositoryImpl implements FishPointSummaryRepositor
 	private final FishPointSummaryQueryRepository fishPointSummaryQueryRepository;
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<Basic> findTop4ByFishPointIdOrderByTotalCountDesc(final Long fishPointId) {
 		return fishPointSummaryQueryRepository.findTop4ByFishPointIdOrderByTotalCountDesc(fishPointId);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<FishPointSummary> findByFishPointIdInAndFishIdIn(
 		final Set<Long> fishPointIdList,
 		final Set<Long> fishIdList
@@ -32,6 +35,7 @@ public class FishPointSummaryRepositoryImpl implements FishPointSummaryRepositor
 	}
 
 	@Override
+	@Transactional
 	public void saveAll(final List<FishPointSummary> fishPointSummaryList) {
 		fishPointSummaryJpaRepository.saveAll(fishPointSummaryList);
 	}
