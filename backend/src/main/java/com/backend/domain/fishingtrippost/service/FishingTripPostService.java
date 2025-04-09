@@ -7,6 +7,8 @@ import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.notifier.FishingTripPostNotifier;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 public interface FishingTripPostService {
 
@@ -73,4 +75,35 @@ public interface FishingTripPostService {
 	 * @param fishingTripPostId 모집 완료로 변경할 게시글 ID
 	 */
 	void completeFishingTripPost(final Long memberId, final Long fishingTripPostId);
+
+
+	// ScrollResponse<FishingTripPostResponse.DetailPage> getDetailPage(
+	// 	final GlobalRequest.CursorRequest cursorRequestDto,
+	// 	final PostStatus status,
+	// 	final Long regionId,
+	// 	final String keyword
+	// );
+
+	/**
+	 * 커서 기반으로 낚시 동행 게시글 목록을 조회합니다.
+	 *
+	 * <p>게시글의 생성일(createdAt)과 ID를 커서 기준으로 하여 페이징 처리된 목록을 반환합니다.
+	 * 상태(postStatus), 지역(regionId), 키워드(subject) 필터링이 가능하며,
+	 * 각 게시글에 대해 대표 이미지 URL이 포함된 {@link FishingTripPostResponse.DetailPage}로 매핑됩니다.</p>
+	 *
+	 * <p>이미지 URL은 파일 ID 리스트에서 첫 번째 ID를 기준으로 조회됩니다.
+	 * 존재하지 않을 경우 null이 할당됩니다.</p>
+	 *
+	 * @param cursorRequestDto 커서 기반 페이지네이션 요청 정보 (정렬 기준, 방향, 커서 값 등)
+	 * @param status 게시글 상태 필터 (예: RECRUITING, COMPLETED), null일 경우 전체 조회
+	 * @param regionId 지역 ID 필터, null일 경우 전체 조회
+	 * @param keyword 제목 키워드 필터 (부분 일치 검색), null 또는 빈 값일 경우 전체 조회
+	 * @return 커서 기반 페이징된 {@link ScrollResponse} 객체로, 게시글 요약 정보 리스트를 포함합니다
+	 */
+	ScrollResponse<FishingTripPostResponse.DetailPage> getDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus status,
+		final Long regionId,
+		final String keyword
+	);
 }
