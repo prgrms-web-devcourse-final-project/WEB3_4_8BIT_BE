@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,7 @@ import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -47,6 +49,9 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
 public class ShipFishingPostRepositoryTest extends BaseTest {
+
+	@Autowired
+	private EntityManager em;
 
 	@Autowired
 	private ShipRepository shipRepository;
@@ -130,6 +135,12 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 			.set("isBan", true)
 			.set("remainCount", 2)
 			.sample());
+	}
+
+	@AfterEach
+	public void tearDown() {
+		em.flush();
+		em.clear();
 	}
 
 	@Test
@@ -402,7 +413,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 	@Test
 	@DisplayName("선상 낚시 게시글 삭제 [Repository] - Success")
-	void t08() {
+	void t09() {
 		// Given
 		ShipFishingPost givenShipFishingPost = arbitraryBuilder.set("shipFishingPostId", null).sample();
 

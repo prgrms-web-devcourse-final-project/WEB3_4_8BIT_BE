@@ -74,9 +74,9 @@ public class ReservationController {
 
 	@GetMapping("/captains")
 	@Operation(summary = "예약 내역 조회 (선장)", description = "선장이 예약 리스트를 조회 할 때 사용하는 API")
-	@Parameter(name = "shipId", description = "선상 낚시 게시글 ID", example = "1")
+	@Parameter(name = "shipFishingPostId", description = "선상 낚시 게시글 ID", example = "1")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReservationResponse.DetailWithName>>> getCaptainReservationList(
-		@RequestParam final Long shipFishingPostId,
+		@RequestParam(required = false) final Long shipFishingPostId,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {

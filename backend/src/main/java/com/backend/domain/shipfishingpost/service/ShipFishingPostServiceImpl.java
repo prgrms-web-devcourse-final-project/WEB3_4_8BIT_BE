@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.exception.FishErrorCode;
 import com.backend.domain.fish.exception.FishException;
@@ -82,9 +83,9 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 		List<String> fileUrlList = getFileUrlList(detailAll.detailShipFishingPost().fileIdList());
 
-		List<String> fishNameList = getFishNameList(detailAll.detailShipFishingPost().fishIdList());
+		List<FishResponse.Summary> fishInfoList = getFishNameList(detailAll.detailShipFishingPost().fishIdList());
 
-		return ShipFishingPostConverter.fromDetailWithFileUrlAndFishName(detailAll, fileUrlList, fishNameList);
+		return ShipFishingPostConverter.fromDetailWithFileUrlAndFishName(detailAll, fileUrlList, fishInfoList);
 	}
 
 	@Override
@@ -130,10 +131,8 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	 * @param fishIdList 어류 id 리스트
 	 * @return 어류 Name 리스트
 	 */
-	private List<String> getFishNameList(final List<Long> fishIdList) {
-		return fishRepository.findAllById(fishIdList).stream()
-			.map(Fish::getName)
-			.toList();
+	private List<FishResponse.Summary> getFishNameList(final List<Long> fishIdList) {
+		return fishRepository.findFishSummaryById(fishIdList);
 	}
 
 	/**
@@ -178,6 +177,9 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	private void verifyFishList(final List<Long> fishList) {
 
 		List<Fish> findFishList = fishRepository.findAllById(fishList);
+		log.debug("{}", findFishList.size());
+
+		log.debug("{}", findFishList);
 
 		if (findFishList.size() != fishList.size()) {
 			throw new FishException(FishErrorCode.FISH_NOT_FOUND);

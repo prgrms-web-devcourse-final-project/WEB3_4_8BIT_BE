@@ -83,7 +83,7 @@ public class ShipFishingPostRequest {
 		@Schema(description = "배 Id 값 (entity)", example = "10")
 		Long shipId,
 
-		@Schema(description = "이미지 URL 리스트", example = "[\"http://example.com/image1.jpg\", \"http://example.com/image2.jpg\"]")
+		@Schema(description = "이미지 Id 리스트", example = "[1, 2]")
 		List<Long> fileIdList,
 
 		@Size(max = 5, message = "잡을 어종 종류는 최대 5개입니다")
@@ -132,7 +132,7 @@ public class ShipFishingPostRequest {
 		@Schema(description = "게스트 수", example = "2")
 		Long guestCount,
 		@DateTimeFormat(pattern = "HH:mm")
-		@Schema(description = "이용 시간", example = "01:30")
+		@Schema(description = "이용 시간", example = "01:30", type = "string", format = "time")
 		LocalTime duration
 	) {
 	}

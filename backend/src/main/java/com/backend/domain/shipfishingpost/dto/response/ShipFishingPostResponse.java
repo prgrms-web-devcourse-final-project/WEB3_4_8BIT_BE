@@ -1,8 +1,10 @@
 package com.backend.domain.shipfishingpost.dto.response;
 
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.List;
 
+import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.ship.dto.response.ShipResponse;
 import com.querydsl.core.annotations.QueryProjection;
@@ -84,6 +86,7 @@ public class ShipFishingPostResponse {
 	 *   "durationTime": "02:30",
 	 *   "maxGuestCount": 10,
 	 *   "reviewEverRate": 4.7,
+	 *    detailFish,
 	 *    detailShip,
 	 *    detailMember,
 	 * }
@@ -93,11 +96,11 @@ public class ShipFishingPostResponse {
 	 * @param content 게시글 내용
 	 * @param price 프로그램 금액
 	 * @param fileUrlList 게시글 첨부 이미지 리스트
-	 * @param fishNameList 게시글 첨부 어종 리스트
 	 * @param startTime 프로그램 시작 시간
 	 * @param durationTime 프로그램 진행 시간
 	 * @param maxGuestCount 최대 인원 수
 	 * @param reviewEverRate 평점
+	 * @param detailFish
 	 * @param detailShip
 	 * @param detailMember
 	 */
@@ -108,11 +111,11 @@ public class ShipFishingPostResponse {
 		String content,
 		Long price,
 		List<String> fileUrlList,
-		List<String> fishNameList,
 		LocalTime startTime,
 		LocalTime durationTime,
 		Integer maxGuestCount,
 		Double reviewEverRate,
+		List<FishResponse.Summary> detailFish,
 		ShipResponse.Detail detailShip,
 		MemberResponse.ContactInfo detailMember
 	) {
@@ -148,7 +151,8 @@ public class ShipFishingPostResponse {
 		List<String> fileUrlList,
 		List<String> fishNameList,
 		Double reviewEverRate,
-		Long reviewCount
+		Long reviewCount,
+		ZonedDateTime createdAt
 		// Todo : 위시리스트 반영
 	) {
 		public static DetailScroll fromDetailScroll(
@@ -165,6 +169,7 @@ public class ShipFishingPostResponse {
 				.fishNameList(fishNameList)
 				.reviewEverRate(detail.reviewEverRate())
 				.reviewCount(detail.reviewCount())
+				.createdAt(detail.createdAt())
 				.build();
 		}
 	}
@@ -178,7 +183,8 @@ public class ShipFishingPostResponse {
 	 *   "fileIdList": [1, 2],
 	 *   "fishIdList": [1, 2],
 	 *   "reviewEverRate": 4.7,
-	 *   "reviewCount": 2
+	 *   "createdAt": ""
+	 *   "reviewCount": 2,
 	 * }
 	 *
 	 * @param shipFishingPostId - 게시글 id
@@ -188,6 +194,7 @@ public class ShipFishingPostResponse {
 	 * @param fileIdList - 사진 url 리스트
 	 * @param fishIdList - 어류 Name 리스트
 	 * @param reviewEverRate - 평점
+	 * @param createdAt - 생성 일자
 	 * @param reviewCount - 댓글 수
 	 */
 	@Builder
@@ -199,7 +206,12 @@ public class ShipFishingPostResponse {
 		List<Long> fileIdList,
 		List<Long> fishIdList,
 		Double reviewEverRate,
+		ZonedDateTime createdAt,
 		Long reviewCount
 	) {
+		public DetailQueryDto {
+			fileIdList = (fileIdList == null) ? List.of() : fileIdList;
+			fishIdList = (fishIdList == null) ? List.of() : fishIdList;
+		}
 	}
 }

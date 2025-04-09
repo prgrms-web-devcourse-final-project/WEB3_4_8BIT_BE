@@ -13,7 +13,7 @@ public class FishResponse {
 		String fileUrl,
 		List<Long> spawnSeasonList,
 		String spawnLocation
-		) {
+	) {
 
 		@QueryProjection
 		public Detail {
@@ -42,5 +42,14 @@ public class FishResponse {
 		@QueryProjection
 		public FishAll {
 		}
+	}
+
+	public record Summary(
+		Long fishId,
+		String name,
+		String fileUrl,
+		List<Long> spawnSeasonList,
+		String spawnLocation
+	) {
 	}
 }

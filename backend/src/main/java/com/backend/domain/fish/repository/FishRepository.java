@@ -57,7 +57,8 @@ public interface FishRepository {
 	 * @author Kim Dong O
 	 */
 	List<FishResponse.Popular> findPopular(final Integer size);
-  /**
+
+	/**
 	 * 현재 시간부터 1시간 전까지 물고기 도감에 추가된 잡은 횟수를 인기도로 설정하는 메소드
 	 *
 	 * @param hourlyFishCountSummaryList 물고기 count 집계 리스트
@@ -75,4 +76,13 @@ public interface FishRepository {
 	 * @author Kim Dong O
 	 */
 	List<FishResponse.FishAll> findFishAll();
+
+	/**
+	 * Id 리스트와 일치하는 물고기 정보 조회 메소드
+	 *
+	 * @param fishIdList 어류 ID 리스트
+	 * @return {@link List<FishResponse.Summary>}
+	 * @implSpec 물고기 ID 에 따른 요약 정보 목록 반환
+	 */
+	List<FishResponse.Summary> findFishSummaryById(final List<Long> fishIdList);
 }

@@ -1,6 +1,7 @@
 package com.backend.domain.reservationdate.converter;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +66,8 @@ public class ReservationDateConverter {
 			.shipFishingPostId(shipFishingPostId)
 			.reservationDate(reservationDate)
 			.isBan(isBan)
+			.createdAt(ZonedDateTime.now())
+			.modifiedAt(ZonedDateTime.now())
 			.build();
 	}
 

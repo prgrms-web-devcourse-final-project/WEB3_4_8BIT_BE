@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,7 @@ import com.backend.domain.reservationdate.entity.ReservationDateId;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.util.BaseTest;
 
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -31,12 +33,23 @@ import lombok.extern.slf4j.Slf4j;
 public class ReservationDateRepositoryTest extends BaseTest {
 
 	@Autowired
+	private EntityManager em;
+
+	@Autowired
 	private ReservationDateRepository reservationDateRepository;
+
+	@AfterEach
+	public void tearDown() {
+		em.flush();
+		em.clear();
+	}
 
 	@Test
 	@DisplayName("예약 일자 리스트 저장 [BulkQuery Insert & findAll] [Repository] - Success")
 	void t01() {
 		// Given
+		em.clear();
+
 		List<ReservationDate> givenResrvationList = new ArrayList<>();
 
 		for (long i = 0; i < 100; i++) {

@@ -223,7 +223,6 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 		when(shipFishingPostRepository.findDetailAllById(shipFishingPostId)).thenReturn(Optional.of(givenDetailAll));
 		when(storageRepository.findAllById(fileIdList)).thenReturn(givenFileList);
-		when(fishRepository.findAllById(fishIdList)).thenReturn(givenFishList);
 
 		// when
 		ShipFishingPostResponse.DetailWithFileUrlAndFishName responseDto =
@@ -232,7 +231,6 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		// then
 		assertThat(responseDto).isNotNull();
 		assertThat(responseDto.fileUrlList()).isEqualTo(List.of("http://url1.com", "http://url2.com"));
-		assertThat(responseDto.fishNameList()).isEqualTo(List.of("test1", "test2"));
 	}
 
 	@Test
