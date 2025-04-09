@@ -40,7 +40,7 @@ public interface ShipFishingPostRepository {
 	/**
 	 * 선상 낚시 게시글 목록 조회 메서드
 	 *
-	 * @param requestDto {@link ShipFishingPostRequest.Search}
+	 * @param requestDto       {@link ShipFishingPostRequest.Search}
 	 * @param cursorRequestDto {@link GlobalRequest.CursorRequest}
 	 * @return {@link ScrollResponse<ShipFishingPostResponse.DetailScroll>}
 	 * @implSpec 선상 낚시 게시글 검색 조건을 입력받아 필터링된 게시글 값들을 반환한다.
@@ -56,4 +56,23 @@ public interface ShipFishingPostRepository {
 	 * @implSpec 선상 낚시 게시글을 삭제합니다.
 	 */
 	void deleteById(final Long shipFishingPostId);
+
+	/**
+	 * 선상 낚시 게시글 여부 조회 메소드
+	 *r
+	 * @param shipFishingPostId {@link Long}
+	 * @return {@link Boolean} 데이터가 있다면 true, 없으면 false
+	 * @implSpec shipFishingPostId로 데이터가 있는지 확인 후 결과 반한
+	 */
+	boolean existsById(Long shipFishingPostId);
+
+	/**
+	 * 선상 낚시 게시글 좋아요 수 업데이트 메서드
+	 *
+	 * @param shipFishingPostId 선상 낚시 게시글 ID
+	 * @param likeCount         업데이트할 좋아요 수
+	 * @implSpec 해당 게시글의 좋아요 수를 갱신합니다.
+	 */
+	void updateLikeCount(Long shipFishingPostId, Long likeCount);
+
 }

@@ -150,6 +150,13 @@ public class ShipFishingPostQueryRepository {
 			hasNext);
 	}
 
+	public void updateLikeCount(Long postId, Long likeCount) {
+		jpaQueryFactory.update(shipFishingPost)
+			.set(shipFishingPost.likeCount, likeCount)
+			.where(shipFishingPost.shipFishingPostId.eq(postId))
+			.execute();
+	}
+
 	private List<ShipFishingPostResponse.DetailScroll> mapToDto(
 		final List<ShipFishingPostResponse.DetailQueryDto> detailQueryDtoList) {
 
@@ -324,10 +331,10 @@ public class ShipFishingPostQueryRepository {
 	/**
 	 * Where절에 들어가야하는 조건식을 만들어 반환하는 메소드 입니다.
 	 *
-	 * @param sortField             정렬 필드
-	 * @param sortFieldValueStr     정렬 필드 값
-	 * @param idValue               기본키 ID 값
-	 * @param order                 {@link Order}
+	 * @param sortField         정렬 필드
+	 * @param sortFieldValueStr 정렬 필드 값
+	 * @param idValue           기본키 ID 값
+	 * @param order             {@link Order}
 	 * @return
 	 */
 	private BooleanExpression getWhereBooleanExpression(
