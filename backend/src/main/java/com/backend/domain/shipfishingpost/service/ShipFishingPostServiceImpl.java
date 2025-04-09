@@ -11,7 +11,6 @@ import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.exception.FishErrorCode;
 import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fish.repository.FishRepository;
-import com.backend.domain.reservation.entity.Reservation;
 import com.backend.domain.reservation.repository.ReservationRepository;
 import com.backend.domain.reservationdate.converter.ReservationDateConverter;
 import com.backend.domain.reservationdate.entity.ReservationDate;
@@ -89,6 +88,7 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ScrollResponse<ShipFishingPostResponse.DetailScroll> getShipFishingPostScroll(
 		final ShipFishingPostRequest.Search searchDto,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
@@ -210,10 +210,10 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	 */
 	private void verifyReservationExist(final Long shipFishingPostId) {
 
-		List<Reservation> reservationList = reservationRepository
+		Boolean reservationExists = reservationRepository
 			.findByShipFishingPostIdAndTodayAfter(shipFishingPostId, LocalDate.now());
 
-		if (!reservationList.isEmpty()) {
+		if (reservationExists) {
 			throw new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_RESERVATION_EXIST);
 		}
 	}

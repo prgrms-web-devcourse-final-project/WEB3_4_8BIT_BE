@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 
 import com.backend.domain.reservation.dto.response.ReservationResponse;
 import com.backend.domain.reservation.entity.QReservation;
+import com.backend.domain.reservation.entity.ReservationStatus;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.QuerydslUtil;
@@ -130,6 +131,18 @@ public class ReservationQueryRepository {
 			detailWithNameList.size(),
 			cursorRequestDto.fieldValue() == null,
 			hasNext);
+	}
+
+	Boolean findReservationListByShipFishingPostIdWithReservationConfirmAfterToday(
+		final Long shipFishingPostId, final LocalDate today) {
+
+		return jpaQueryFactory
+			.selectOne()
+			.from(reservation)
+			.where(reservation.shipFishingPostId.eq(shipFishingPostId)
+				.and(reservation.reservationDate.goe(today))
+				.and(reservation.status.eq(ReservationStatus.CONFIRMED)))
+			.fetchFirst() != null;
 	}
 
 	private BooleanExpression shipFishingPostIdCondition(final Long shipFishingPostId) {

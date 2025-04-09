@@ -1,7 +1,6 @@
 package com.backend.domain.reservation.repository;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import com.backend.domain.reservation.dto.response.ReservationResponse;
@@ -43,9 +42,9 @@ public interface ReservationRepository {
 	 *
 	 * @param shipFishingPostId {@link Long}
 	 * @param today {@link LocalDate}
-	 * @return {@link List<Reservation>}
+	 * @return 오늘 이후 확정된 예약 여부 true, false
 	 */
-	List<Reservation> findByShipFishingPostIdAndTodayAfter(final Long shipFishingPostId, final LocalDate today);
+	Boolean findByShipFishingPostIdAndTodayAfter(final Long shipFishingPostId, final LocalDate today);
 
 	/**
 	 * 예약 기록 조회 메서드 입니다. (일반 유저)

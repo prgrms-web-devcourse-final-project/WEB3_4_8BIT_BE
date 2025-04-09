@@ -1,7 +1,6 @@
 package com.backend.domain.reservation.repository;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -39,13 +38,12 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 	}
 
 	@Override
-	public List<Reservation> findByShipFishingPostIdAndTodayAfter(
+	public Boolean findByShipFishingPostIdAndTodayAfter(
 		final Long shipFishingPostId,
 		final LocalDate today) {
 
-		return reservationJpaRepository.findByShipFishingPostIdAndReservationDateGreaterThanEqual(
-			shipFishingPostId,
-			today);
+		return reservationQueryRepository.findReservationListByShipFishingPostIdWithReservationConfirmAfterToday(
+			shipFishingPostId, today);
 	}
 
 	@Override
@@ -65,5 +63,4 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 		return reservationQueryRepository.findDetailWithNameByMemberIdAndShipFishingPostId(memberId, shipFishingPostId,
 			cursorRequestDto);
 	}
-
 }
