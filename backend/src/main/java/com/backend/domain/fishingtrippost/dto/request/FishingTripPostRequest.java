@@ -13,8 +13,12 @@ import lombok.Builder;
 public class FishingTripPostRequest {
 
 	/**
+	 * 동출 게시글 생성 요청 폼
+	 *
+	 * <p>사용자가 동출 게시글을 작성할 때 필요한 요청 정보입니다.</p>
+	 *
 	 * <pre>
-	 * {@code
+	 * 예시 요청 JSON:
 	 * {
 	 *   "subject": "낚시 같이 가실 분~",
 	 *   "content": "오전 출조 예정입니다. 초보도 환영!",
@@ -22,17 +26,19 @@ public class FishingTripPostRequest {
 	 *   "isShipFish": true,
 	 *   "fishingDate": "2025-05-01T15:00:00+09:00",
 	 *   "fishingPointId": 1,
+	 *   "regionId": 1,
 	 *   "fileIdList": [1, 2, 3]
 	 * }
-	 * }
 	 * </pre>
-	 * @param subject 게시글 제목 (필수, 최대 50자)
-	 * @param content 게시글 내용 (필수, 최대 800자)
+	 *
+	 * @param subject         게시글 제목 (필수, 최대 50자)
+	 * @param content         게시글 본문 내용 (필수, 최대 800자)
 	 * @param recruitmentCount 모집 인원 수 (필수, 1 이상)
-	 * @param isShipFish 선상 낚시 여부 (필수, true: 선상 / false: 갯바위)
-	 * @param fishingDate 출조 시간 (필수, HH:mm 형식)
-	 * @param fishingPointId 낚시 포인트 ID (필수)
-	 * @param fileIdList 이미지 Id List (선택)
+	 * @param isShipFish      선상 낚시 여부 (필수, true: 선상 / false: 갯바위)
+	 * @param fishingDate     낚시 출조 날짜 및 시간 (필수, ZonedDateTime)
+	 * @param fishingPointId  낚시 포인트 ID (필수)
+	 * @param regionId        지역 ID (필수, RegionType 매핑용)
+	 * @param fileIdList      첨부된 이미지 파일 ID 목록 (선택)
 	 */
 
 	@Builder
@@ -62,6 +68,10 @@ public class FishingTripPostRequest {
 		@NotNull(message = "낚시 포인트 번호는 필수 항목입니다.")
 		@Schema(description = "낚시 포인트 Id 값 (entity)", example = "1")
 		Long fishingPointId,
+
+		@NotNull(message = "지역 번호는 필수 항목입니다.")
+		@Schema(description = "지역 Id 값 (entity)", example = "1")
+		Long regionId,
 
 		@Schema(description = "이미지 URL Id 리스트", example = "[1, 2, 3]")
 		List<Long> fileIdList

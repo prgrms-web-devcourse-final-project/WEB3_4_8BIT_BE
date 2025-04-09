@@ -72,6 +72,9 @@ public class FishingTripPost extends BaseEntity {
 	@Column(nullable = false)
 	private Long memberId;
 
+	@Column(nullable = false)
+	private Long regionId;
+
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<Long> fileIdList;
 
