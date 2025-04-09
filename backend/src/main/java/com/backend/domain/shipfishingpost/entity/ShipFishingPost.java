@@ -87,6 +87,15 @@ public class ShipFishingPost extends BaseEntity {
 	@Builder.Default
 	private Double reviewEverRate = 0D;
 
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	@Builder.Default
+	private Long likeCount = 0L;
+
+	public void updateLikeCount(Long likeCount) {
+		this.likeCount = likeCount;
+	}
+
 	public void setDurationTime() {
 		long minutes = ChronoUnit.MINUTES.between(startTime, endTime);
 		durationTime = LocalTime.MIDNIGHT.plusMinutes(minutes);
