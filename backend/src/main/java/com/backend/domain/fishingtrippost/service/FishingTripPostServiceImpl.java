@@ -157,7 +157,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @param fileId 조회할 파일의 ID
 	 * @return 파일이 존재하면 해당 파일의 URL, 존재하지 않으면 {@code null}
 	 */
-	private String getImageUrlById(Long fileId) {
+	private String getImageUrlById(final Long fileId) {
 		return storageRepository.findById(fileId)
 			.map(File::getUrl)
 			.orElse(null);
