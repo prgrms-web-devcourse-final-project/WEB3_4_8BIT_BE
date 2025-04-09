@@ -40,7 +40,7 @@ public class ShipRepositoryImpl implements ShipRepository {
 	}
 
 	@Override
-	public void deleteByShipId(Long shipId) {
+	public void deleteByShipId(final Long shipId) {
 		shipJpaRepository.deleteById(shipId);
 	}
 }
