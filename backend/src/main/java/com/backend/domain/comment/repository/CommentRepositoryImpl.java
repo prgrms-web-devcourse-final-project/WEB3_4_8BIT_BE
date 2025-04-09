@@ -11,9 +11,20 @@ import lombok.RequiredArgsConstructor;
 public class CommentRepositoryImpl implements CommentRepository {
 
 	private final CommentJpaRepository commentJpaRepository;
+	private final CommentQueryRepository commentQueryRepository;
 
 	@Override
 	public Comment save(final Comment comment) {
 		return commentJpaRepository.save(comment);
+	}
+
+	@Override
+	public boolean existsByCommentId(Long commentId) {
+		return commentJpaRepository.existsById(commentId);
+	}
+
+	@Override
+	public void addChildCount(Long parentId) {
+		commentQueryRepository.addChildCount(parentId);
 	}
 }

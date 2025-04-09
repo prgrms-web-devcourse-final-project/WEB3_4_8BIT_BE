@@ -13,4 +13,24 @@ public interface CommentRepository {
 	 * @author Kim Dong O
 	 */
 	Comment save(final Comment comment);
+
+	/**
+	 * 댓글 ID로 데이터 존재 여부 확인하는 메소드
+	 *
+	 * @param commentId {@link Long}
+	 * @return {@link Boolean}
+	 * @implSpec 댓글 ID로 데이터 존재 여부 확인 후 결과 반환
+	 * @author Kim Dong O
+	 */
+	boolean existsByCommentId(Long commentId);
+
+	/**
+	 * 댓글에 자식 카운트 1개 추가하는 메소드
+	 *
+	 * @param parentId {@link Long}
+	 * @return {@link Boolean}
+	 * @implSpec 댓글 ID로 해당 데이터의 자식 카운트 1개 추가하여 업데이트
+	 * @author Kim Dong O
+	 */
+	void addChildCount(Long parentId);
 }
