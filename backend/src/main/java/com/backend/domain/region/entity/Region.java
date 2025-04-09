@@ -1,5 +1,6 @@
 package com.backend.domain.region.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -20,4 +21,10 @@ public class Region {
 
 	@Enumerated(EnumType.STRING)
 	private RegionType type;
+
+	@Column(nullable = false)
+	private double latitude;
+
+	@Column(nullable = false)
+	private double longitude;
 }

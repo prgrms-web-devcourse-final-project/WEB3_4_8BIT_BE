@@ -11,6 +11,8 @@ public class RegionConverter {
 		return Basic.builder()
 			.regionId(region.getRegionId())
 			.regionName(region.getType().getName())
+			.latitude(region.getLatitude())
+			.longitude(region.getLongitude())
 			.build();
 	}
 }
