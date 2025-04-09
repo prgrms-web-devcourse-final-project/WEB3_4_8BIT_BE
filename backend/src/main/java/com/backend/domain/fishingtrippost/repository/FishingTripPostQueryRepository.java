@@ -1,5 +1,10 @@
 package com.backend.domain.fishingtrippost.repository;
 
+import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
+import static com.backend.domain.fishpoint.entity.QFishPoint.*;
+import static com.backend.domain.member.entity.QMember.*;
+import static com.backend.domain.region.entity.QRegion.*;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -10,13 +15,6 @@ import org.springframework.util.StringUtils;
 
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
-
-import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
-import static com.backend.domain.member.entity.QMember.*;
-import static com.backend.domain.fishpoint.entity.QFishPoint.*;
-import static com.backend.domain.region.entity.QRegion.*;
-
-import com.backend.domain.fishingtrippost.dto.response.QFishingTripPostResponse_DetailPage;
 import com.backend.domain.fishingtrippost.dto.response.QFishingTripPostResponse_DetailPageQueryDto;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.util.QuerydslUtil;
@@ -97,6 +95,13 @@ public class FishingTripPostQueryRepository {
 			.orderBy(getOrderBy(cursorRequestDto))
 			.limit(cursorRequestDto.size() + 1)
 			.fetch();
+	}
+
+	public void updateLikeCount(Long postId, Long likeCount) {
+		jpaQueryFactory.update(fishingTripPost)
+			.set(fishingTripPost.likeCount, likeCount)
+			.where(fishingTripPost.fishingTripPostId.eq(postId))
+			.execute();
 	}
 
 	private BooleanExpression whereCondition(final Long regionId,

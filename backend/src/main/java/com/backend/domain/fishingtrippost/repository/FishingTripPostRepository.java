@@ -7,7 +7,6 @@ import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.global.dto.request.GlobalRequest;
-import com.backend.global.dto.response.ScrollResponse;
 
 public interface FishingTripPostRepository {
 
@@ -67,9 +66,9 @@ public interface FishingTripPostRepository {
 	 * 이후 서비스 계층에서 이미지 URL 매핑 등의 추가 작업이 수행됩니다.</p>
 	 *
 	 * @param cursorRequestDto 커서 기반 페이지네이션 요청 정보 (정렬 기준, 방향, 커서 값 등)
-	 * @param status 게시글 상태 필터 (예: RECRUITING, COMPLETED), null일 경우 전체
-	 * @param regionId 지역 ID 필터, null일 경우 전체
-	 * @param keyword 제목 키워드 검색 필터, null 또는 빈 값일 경우 전체
+	 * @param status           게시글 상태 필터 (예: RECRUITING, COMPLETED), null일 경우 전체
+	 * @param regionId         지역 ID 필터, null일 경우 전체
+	 * @param keyword          제목 키워드 검색 필터, null 또는 빈 값일 경우 전체
 	 * @return 페이징 처리된 {@link FishingTripPostResponse.DetailPageQueryDto} 목록
 	 */
 	List<FishingTripPostResponse.DetailPageQueryDto> findScrollDetailPageDto(
@@ -78,4 +77,14 @@ public interface FishingTripPostRepository {
 		final Long regionId,
 		final String keyword
 	);
+
+	/**
+	 * 동출 모집 게시글 좋아요 수 업데이트 메서드
+	 *
+	 * @param fishingTripPostId 동출 모집 게시글 ID
+	 * @param likeCount         업데이트할 좋아요 수
+	 * @implSpec 해당 게시글의 좋아요 수를 갱신합니다.
+	 */
+	void updateLikeCount(Long fishingTripPostId, Long likeCount);
+
 }

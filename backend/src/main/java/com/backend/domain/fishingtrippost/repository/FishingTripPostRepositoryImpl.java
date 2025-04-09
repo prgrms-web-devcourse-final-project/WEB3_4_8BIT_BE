@@ -9,7 +9,6 @@ import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.global.dto.request.GlobalRequest;
-import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -47,6 +46,11 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 		final Long regionId,
 		final String keyword) {
 		return fishingTripPostQueryRepository
-			.findScrollDetailPageDto(cursorRequestDto,status,regionId,keyword);
+			.findScrollDetailPageDto(cursorRequestDto, status, regionId, keyword);
+	}
+
+	@Override
+	public void updateLikeCount(final Long fishingTripPostId, final Long likeCount) {
+		fishingTripPostQueryRepository.updateLikeCount(fishingTripPostId, likeCount);
 	}
 }
