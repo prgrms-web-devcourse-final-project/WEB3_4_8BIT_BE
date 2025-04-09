@@ -45,7 +45,7 @@ public class FishPointSummary extends BaseEntity {
 	 *
 	 * @param count 추가할 물고기 수
 	 */
-	public void increaseTotalCount(int count) {
+	public void increaseTotalCount(final int count) {
 		this.totalCount += count;
 	}
 }

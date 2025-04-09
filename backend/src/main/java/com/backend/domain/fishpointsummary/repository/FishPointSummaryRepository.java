@@ -31,5 +31,5 @@ public interface FishPointSummaryRepository {
 	 *
 	 * @param fishPointSummaryList 저장할 {@link FishPointSummary} 리스트
 	 */
-	void saveAll(List<FishPointSummary> fishPointSummaryList);
+	void saveAll(final List<FishPointSummary> fishPointSummaryList);
 }

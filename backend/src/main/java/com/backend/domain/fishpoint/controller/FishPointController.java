@@ -106,7 +106,7 @@ public class FishPointController {
 
 	@GetMapping("/{fishPointId}")
 	@Operation(summary = "낚시 포인트 상세 조회", description = "낚시 포인트의 상세 정보를 조회하는 API")
-	public ResponseEntity<GenericResponse<Detail>> getFishPointDetail(@PathVariable Long fishPointId) {
+	public ResponseEntity<GenericResponse<Detail>> getFishPointDetail(@PathVariable final Long fishPointId) {
 		Detail fishPointDetail = fishPointService.getFishPointDetail(fishPointId);
 
 		return ResponseEntity.ok(GenericResponse.of(true, fishPointDetail));
