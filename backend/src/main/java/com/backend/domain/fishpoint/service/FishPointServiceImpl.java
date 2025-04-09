@@ -70,13 +70,16 @@ public class FishPointServiceImpl implements FishPointService {
 	@Override
 	@Transactional(readOnly = true)
 	public Detail getFishPointDetail(final Long fishPointId) {
-
-		FishPoint fishPoint = fishPointRepository.findByFishPointId(fishPointId).orElseThrow(
-			() -> new FishPointException(FishPointErrorCode.FISH_POINT_NOT_FOUND));
+		FishPoint fishPoint = getFishPoint(fishPointId);
 
 		List<FishPointSummaryResponse.Basic> fishPointSummaryList =
 			fishPointSummaryService.getFishPointSummaries(fishPointId);
 
 		return fromEntityAndSummary(fishPoint, fishPointSummaryList);
+	}
+
+	private FishPoint getFishPoint(final Long fishPointId) {
+		return fishPointRepository.findByFishPointId(fishPointId).orElseThrow(
+			() -> new FishPointException(FishPointErrorCode.FISH_POINT_NOT_FOUND));
 	}
 }
