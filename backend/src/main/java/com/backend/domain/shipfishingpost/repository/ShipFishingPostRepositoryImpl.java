@@ -50,4 +50,9 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 
 		shipFishingPostJpaRepository.deleteById(shipFishingPostId);
 	}
+
+	@Override
+	public boolean existsByShipId(Long shipId) {
+		return shipFishingPostJpaRepository.existsByShipId(shipId);
+	}
 }

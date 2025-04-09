@@ -12,6 +12,7 @@ import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.ship.repository.ShipRepository;
+import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ShipServiceImpl implements ShipService {
 
 	private final ShipRepository shipRepository;
+	private final ShipFishingPostRepository shipFishingPostRepository;
 	private static final Long MAX_SHIPS_PER_MEMBER = 5L;
 
 	@Override
@@ -60,13 +62,13 @@ public class ShipServiceImpl implements ShipService {
 		final ShipRequest.Form requestDto
 	) {
 
-		Ship findShip = getShip(shipId);
+		Ship getShip = getShip(shipId);
 
-		log.debug("선박 조회: {}", findShip);
+		log.debug("선박 조회: {}", getShip);
 
-		validMemberId(memberId, findShip.getMemberId());
+		validMemberId(getShip.getMemberId(), memberId);
 
-		findShip.updateShip(
+		getShip.updateShip(
 			requestDto.shipName(),
 			requestDto.shipNumber(),
 			requestDto.departurePort(),
@@ -81,17 +83,39 @@ public class ShipServiceImpl implements ShipService {
 			requestDto.parkingAvailable()
 		);
 
-		return findShip.getShipId();
+		return getShip.getShipId();
 	}
 
-	private void validMemberId(Long shipMemberId, Long memberId) {
+	@Override
+	public void deleteById(final Long shipId, final Long memberId) {
+		Ship getShip = getShip(shipId);
+		validMemberId(getShip.getMemberId(), memberId);
+
+		boolean getExistsShipFishingPost = getExistsShipFishingPost(getShip.getShipId());
+
+		validExistsShipFishingPost(getExistsShipFishingPost);
+
+		shipRepository.deleteByShipId(shipId);
+	}
+
+	private void validExistsShipFishingPost(final boolean getExistsShipFishingPost) {
+		if (getExistsShipFishingPost) {
+			throw new ShipException(ShipErrorCode.SHIP_IN_USE_BY_FISHING_POST);
+		}
+	}
+
+	private Boolean getExistsShipFishingPost(final Long shipId) {
+		return shipFishingPostRepository.existsByShipId(shipId);
+	}
+
+	private void validMemberId(final Long shipMemberId, final Long memberId) {
 
 		if (!shipMemberId.equals(memberId)) {
 			throw new ShipException(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR);
 		}
 	}
 
-	private Ship getShip(Long shipId) {
+	private Ship getShip(final Long shipId) {
 		return shipRepository.findById(shipId)
 			.orElseThrow(() -> new ShipException(ShipErrorCode.SHIP_NOT_FOUND));
 	}

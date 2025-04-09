@@ -36,4 +36,13 @@ public interface ShipService {
 	 * @implSpec 선박 수정 메서드 입니다.
 	 */
 	Long updateShip(final Long shipId, final Long memberId, final ShipRequest.Form requestDto);
+
+	/**
+	 * 선박 삭제 메소드
+	 *
+	 * @param shipId {@link Long}
+	 * @param memberId {@link Long}
+	 * @implSpec 선박 삭제 메서드 입니다.
+	 */
+	void deleteById(final Long shipId, final Long memberId);
 }
