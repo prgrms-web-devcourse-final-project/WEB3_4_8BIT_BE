@@ -60,6 +60,7 @@ public class FishingTripPostConverter {
 
 		return FishingTripPostResponse.DetailPage.builder()
 			.fishingTripPostId(detailPageQueryDto.fishingTripPostId())
+			.regionId(detailPageQueryDto.regionId())
 			.regionType(detailPageQueryDto.regionType())
 			.subject(detailPageQueryDto.subject())
 			.content(detailPageQueryDto.content())

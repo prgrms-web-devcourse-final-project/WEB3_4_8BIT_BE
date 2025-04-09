@@ -78,6 +78,7 @@ public class FishingTripPostQueryRepository {
 		return jpaQueryFactory
 			.select(new QFishingTripPostResponse_DetailPageQueryDto(
 				fishingTripPost.fishingTripPostId,
+				fishingTripPost.regionId,
 				region.type,
 				fishingTripPost.subject,
 				fishingTripPost.content,

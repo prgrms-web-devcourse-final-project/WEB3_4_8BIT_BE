@@ -42,10 +42,10 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 
 	@Override
 	public List<FishingTripPostResponse.DetailPageQueryDto> findScrollDetailPageDto(
-		GlobalRequest.CursorRequest cursorRequestDto,
-		PostStatus status,
-		Long regionId,
-		String keyword) {
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus status,
+		final Long regionId,
+		final String keyword) {
 		return fishingTripPostQueryRepository
 			.findScrollDetailPageDto(cursorRequestDto,status,regionId,keyword);
 	}

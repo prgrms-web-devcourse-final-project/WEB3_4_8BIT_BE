@@ -129,6 +129,7 @@ public class FishingTripPostResponse {
 	@Builder
 	public record DetailPage(
 		Long fishingTripPostId,
+		Long regionId,
 		RegionType regionType,
 		String subject,
 		String content,
@@ -155,6 +156,7 @@ public class FishingTripPostResponse {
 	 */
 	public record DetailPageQueryDto(
 		Long fishingTripPostId,
+		Long regionId,
 		RegionType regionType,
 		String subject,
 		String content,
