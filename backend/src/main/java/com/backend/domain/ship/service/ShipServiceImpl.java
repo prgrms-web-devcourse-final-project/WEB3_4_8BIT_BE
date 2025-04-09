@@ -3,6 +3,7 @@ package com.backend.domain.ship.service;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.ship.converter.ShipConverter;
 import com.backend.domain.ship.dto.request.ShipRequest;
@@ -52,8 +53,36 @@ public class ShipServiceImpl implements ShipService {
 	}
 
 	@Override
-	public Long updateShip(Long shipId, Long memberId) {
-		return 0L;
+	@Transactional
+	public Long updateShip(
+		final Long shipId,
+		final Long memberId,
+		final ShipRequest.Form requestDto
+	) {
+
+		Ship findShip = shipRepository.findById(shipId)
+			.orElseThrow(() -> new ShipException(ShipErrorCode.SHIP_NOT_FOUND));
+
+		if (!findShip.getMemberId().equals(memberId)) {
+			throw new ShipException(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR);
+		}
+
+		findShip.updateShip(
+			requestDto.shipName(),
+			requestDto.shipNumber(),
+			requestDto.departurePort(),
+			requestDto.passengerCapacity(),
+			requestDto.restroomType(),
+			requestDto.loungeArea(),
+			requestDto.kitchenFacility(),
+			requestDto.fishingChair(),
+			requestDto.passengerInsurance(),
+			requestDto.fishingGearRental(),
+			requestDto.mealProvided(),
+			requestDto.parkingAvailable()
+		);
+
+		return findShip.getShipId();
 	}
 
 	private void validateMaxShipLimit(final Long countByMemberId) {

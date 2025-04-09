@@ -31,8 +31,9 @@ public interface ShipService {
 	 *
 	 * @param shipId {@link Long}
 	 * @param memberId {@link Long}
+	 * @param requestDto {@link ShipRequest.Form}
 	 * @return {@link Long}
 	 * @implSpec 선박 수정 메서드 입니다.
 	 */
-	Long updateShip(final Long shipId, final Long memberId);
+	Long updateShip(final Long shipId, final Long memberId, final ShipRequest.Form requestDto);
 }

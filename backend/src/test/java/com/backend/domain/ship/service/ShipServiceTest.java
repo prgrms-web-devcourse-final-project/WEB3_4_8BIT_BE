@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import net.jqwik.api.Arbitraries;
+import net.jqwik.api.Arbitrary;
 
 import com.backend.domain.ship.dto.request.ShipRequest;
 import com.backend.domain.ship.dto.response.ShipResponse;
@@ -31,6 +35,17 @@ class ShipServiceTest extends BaseTest {
 
 	@InjectMocks
 	private ShipServiceImpl shipService;
+
+	private final Arbitrary<String> englishStringLength = Arbitraries.strings()
+		.withCharRange('a', 'z')
+		.withCharRange('A', 'Z')
+		.ofMinLength(1).ofMaxLength(10);
+
+	private final ArbitraryBuilder<Ship> shipArbitraryBuilder = fixtureMonkeyBuilder
+		.giveMeBuilder(Ship.class)
+		.set("shipName", englishStringLength)
+		.set("shipNumber", englishStringLength)
+		.set("departurePort", "부산항");
 
 	@Test
 	@DisplayName("선박 저장 [Service] - Success")
@@ -98,5 +113,26 @@ class ShipServiceTest extends BaseTest {
 
 		// Then
 		assertThat(findShipAllList).isEqualTo(givenShipAllList);
+	}
+
+	@Test
+	@DisplayName("선박 수정 [Service] - Success")
+	void t04() {
+		// Given
+		Long givenMemberId = 1L;
+
+		ShipRequest.Form givenForm = fixtureMonkeyRecord.giveMeBuilder(ShipRequest.Form.class).sample();
+
+		Ship givenShip = shipArbitraryBuilder
+			.set("memberId", givenMemberId)
+			.sample();
+
+		when(shipRepository.findById(givenShip.getShipId())).thenReturn(Optional.ofNullable(givenShip));
+
+		// When
+		Long updatedShipId = shipService.updateShip(givenShip.getShipId(), givenMemberId, givenForm);
+
+		// Then
+		assertThat(updatedShipId).isEqualTo(givenShip.getShipId());
 	}
 }
