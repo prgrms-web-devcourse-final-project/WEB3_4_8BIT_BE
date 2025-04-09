@@ -4,6 +4,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 import com.backend.domain.fishingtrippost.domain.PostStatus;
+import com.backend.domain.region.entity.RegionType;
 import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Builder;
@@ -112,6 +113,59 @@ public class FishingTripPostResponse {
 		@QueryProjection
 		public DetailQueryDto {
 
+		}
+	}
+
+	/**
+	 * 낚시 동행 게시글의 요약 정보를 클라이언트에 전달하기 위한 응답 DTO입니다.
+	 *
+	 * <p>사용자에게 보여줄 게시글의 제목, 내용, 출조일, 모집 인원 등의 정보를 포함하며,
+	 * 대표 이미지 URL도 함께 전달됩니다.</p>
+	 *
+	 * <p>정렬 및 필터링과 함께 스크롤 페이징 목록에 활용됩니다.</p>
+	 *
+	 */
+	//TODO 좋아요랑 댓글수도 추가해야함 추후에
+	@Builder
+	public record DetailPage(
+		Long fishingTripPostId,
+		RegionType regionType,
+		String subject,
+		String content,
+		ZonedDateTime fishingDate,
+		ZonedDateTime createdAt,
+		Integer recruitmentCount,
+		PostStatus postStatus,
+		String imageUrl
+	) {
+		@QueryProjection
+		public DetailPage {
+
+		}
+	}
+
+	/**
+	 * {@link DetailPage} 응답 생성을 위한 QueryDSL 중간 DTO입니다.
+	 *
+	 * <p>쿼리에서 필요한 게시글의 원본 필드 데이터를 추출하며, 이후 서비스 레이어에서
+	 * 대표 이미지 URL을 포함한 최종 응답 객체인 {@link DetailPage}로 변환됩니다.</p>
+	 *
+	 * <p>fileIdList를 통해 게시글에 첨부된 이미지들의 ID 목록을 제공하며,
+	 * 이를 기반으로 대표 이미지 URL을 매핑합니다.</p>
+	 */
+	public record DetailPageQueryDto(
+		Long fishingTripPostId,
+		RegionType regionType,
+		String subject,
+		String content,
+		ZonedDateTime fishingDate,
+		ZonedDateTime createdAt,
+		Integer recruitmentCount,
+		PostStatus postStatus,
+		List<Long> fileIdList
+	) {
+		@QueryProjection
+		public DetailPageQueryDto {
 		}
 	}
 }
