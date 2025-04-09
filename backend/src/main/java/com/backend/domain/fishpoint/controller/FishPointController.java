@@ -97,10 +97,18 @@ public class FishPointController {
 	}
 
 	@GetMapping("/popular")
-	@Operation(summary = "인기 낚시 포인트 조회", description = "동축 게시글 기준으로 인기 낚시 포인트를 조회하는 API")
+	@Operation(summary = "인기 낚시 포인트 조회", description = "동출 게시글 기준으로 인기 낚시 포인트를 조회하는 API")
 	public ResponseEntity<GenericResponse<List<Popularity>>> getPopularFishPoints() {
 		List<Popularity> fishPointList = fishPointService.getPopularityFishPoints();
 
 		return ResponseEntity.ok(GenericResponse.of(true, fishPointList));
+	}
+
+	@GetMapping("/{fishPointId}")
+	@Operation(summary = "낚시 포인트 상세 조회", description = "낚시 포인트의 상세 정보를 조회하는 API")
+	public ResponseEntity<GenericResponse<Detail>> getFishPointDetail(@PathVariable Long fishPointId) {
+		Detail fishPointDetail = fishPointService.getFishPointDetail(fishPointId);
+
+		return ResponseEntity.ok(GenericResponse.of(true, fishPointDetail));
 	}
 }

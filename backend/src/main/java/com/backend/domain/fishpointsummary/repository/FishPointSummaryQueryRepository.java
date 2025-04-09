@@ -31,8 +31,8 @@ public class FishPointSummaryQueryRepository {
 				fishPointSummary.totalCount
 			))
 			.from(fishPointSummary)
-			.innerJoin(fish).on(fishPointSummary.fishId.eq(fish.fishId))
-			.innerJoin(file).on(fishPointSummary.fileId.eq(file.fileId))
+			.leftJoin(fish).on(fishPointSummary.fishId.eq(fish.fishId))	// TODO 나중에 inner join 으로 수정
+			.leftJoin(file).on(fishPointSummary.fileId.eq(file.fileId))	// TODO 나중에 inner join 으로 수정
 			.where(fishPointSummary.fishPointId.eq(fishPointId))
 			.orderBy(fishPointSummary.totalCount.desc())
 			.limit(4)
