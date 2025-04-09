@@ -133,4 +133,27 @@ public class ShipRepositoryTest extends BaseTest {
 		// Then
 		assertThat(findShipAllList).hasSize(savedShip1.size());
 	}
+
+	@Test
+	@DisplayName("선박 삭제 [Repository] - Success")
+	void t05() {
+		// Given
+		Long givenMemberId = 2L;
+
+		shipJpaRepository.deleteAll();
+
+		Ship givenShip = arbitraryBuilder
+			.set("shipId", null)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		Ship savedShip = shipJpaRepository.save(givenShip);
+
+		// When
+		shipRepository.deleteByShipId(savedShip.getShipId());
+		Optional<Ship> findShip = shipRepository.findById(savedShip.getShipId());
+
+		// Then
+		assertThat(findShip).isEmpty();
+	}
 }
