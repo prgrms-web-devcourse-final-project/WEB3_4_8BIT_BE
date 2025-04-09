@@ -499,4 +499,25 @@ class ShipControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.size()").value(givenDetailList.size()));
 	}
+
+	@Test
+	@DisplayName("선박 저장 [Controller] - Success")
+	@WithMockCustomUser
+	void t20() throws Exception {
+		// Given
+		Long shipId = 1L;
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder.sample();
+
+		when(shipService.updateShip(shipId, 1L, givenRequestDto)).thenReturn(shipId);
+		// When
+
+		ResultActions resultActions = mockMvc.perform(patch("/api/v1/ship/{shipId}", shipId)
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(givenRequestDto)));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true));
+	}
 }
