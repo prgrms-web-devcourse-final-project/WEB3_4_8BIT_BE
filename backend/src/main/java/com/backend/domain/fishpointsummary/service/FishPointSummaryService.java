@@ -13,4 +13,9 @@ public interface FishPointSummaryService {
 	 * @return 해당 낚시 포인트와 연관된 어종의 요약 정보 리스트
 	 */
 	List<Basic> getFishPointSummaries(final Long fishPointId);
+
+	/**
+	 *	최근 1시간 동안의 데이터를 기반으로 낚시 포인트 요약 정보를 갱신
+	 */
+	void updateFishPointSummariesHourly();
 }
