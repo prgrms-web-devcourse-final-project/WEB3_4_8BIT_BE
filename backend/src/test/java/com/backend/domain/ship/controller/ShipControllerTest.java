@@ -24,6 +24,8 @@ import net.jqwik.api.Arbitrary;
 import com.backend.domain.ship.domain.RestroomType;
 import com.backend.domain.ship.dto.request.ShipRequest;
 import com.backend.domain.ship.dto.response.ShipResponse;
+import com.backend.domain.ship.exception.ShipErrorCode;
+import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.ship.service.ShipService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
@@ -501,7 +503,7 @@ class ShipControllerTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("선박 저장 [Controller] - Success")
+	@DisplayName("선박 수정 [Controller] - Success")
 	@WithMockCustomUser
 	void t20() throws Exception {
 		// Given
@@ -509,8 +511,8 @@ class ShipControllerTest extends BaseTest {
 		ShipRequest.Form givenRequestDto = createArbitraryBuilder.sample();
 
 		when(shipService.updateShip(shipId, 1L, givenRequestDto)).thenReturn(shipId);
-		// When
 
+		// When
 		ResultActions resultActions = mockMvc.perform(patch("/api/v1/ship/{shipId}", shipId)
 			.contentType(MediaType.APPLICATION_JSON)
 			.content(objectMapper.writeValueAsString(givenRequestDto)));
@@ -519,5 +521,70 @@ class ShipControllerTest extends BaseTest {
 		resultActions
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true));
+	}
+
+	@Test
+	@DisplayName("선박 삭제 [Controller] - Success")
+	@WithMockCustomUser
+	void t21() throws Exception {
+		// Given
+		Long shipId = 1L;
+
+		doNothing().when(shipService).deleteById(shipId, 1L);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(delete("/api/v1/ship/{shipId}", shipId)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true));
+	}
+
+	@Test
+	@DisplayName("선박 삭제 [Not Author] [Controller] - Fail")
+	@WithMockCustomUser
+	void t22() throws Exception {
+		// Given
+		Long shipId = 1L;
+
+		// 선박 삭제 시 권한 오류를 발생시키는 경우
+		doThrow(new ShipException(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR))
+			.when(shipService).deleteById(shipId, 1L);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(delete("/api/v1/ship/{shipId}", shipId)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// Then
+		resultActions
+			.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.code").value(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR.getCode()))
+			.andExpect(jsonPath("$.message").value(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR.getMessage()));
+	}
+
+	@Test
+	@DisplayName("선박 삭제 [In Use By Fishing Post] [Controller] - Fail")
+	@WithMockCustomUser
+	void t23() throws Exception {
+		// Given
+		Long shipId = 1L;
+
+		// 선박 삭제 시 권한 오류를 발생시키는 경우
+		doThrow(new ShipException(ShipErrorCode.SHIP_IN_USE_BY_FISHING_POST))
+			.when(shipService).deleteById(shipId, 1L);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(delete("/api/v1/ship/{shipId}", shipId)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.code").value(ShipErrorCode.SHIP_IN_USE_BY_FISHING_POST.getCode()))
+			.andExpect(jsonPath("$.message").value(ShipErrorCode.SHIP_IN_USE_BY_FISHING_POST.getMessage()));
 	}
 }
