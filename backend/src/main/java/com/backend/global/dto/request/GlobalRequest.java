@@ -72,7 +72,7 @@ public class GlobalRequest {
 		String sort,
 		@Schema(description = "이전, 이후 [prev, next] (default next)", example = "next")
 		String type,
-		@Schema(description = "정렬 필드 값 [이전이면 처음 값, 이후면 마지막 값]", example = "2025-04-05")
+		@Schema(description = "정렬 필드 값 [이전이면 처음 값, 이후면 마지막 값]", example = "2024-07-16T13:09:08.663442+08:00")
 		String fieldValue,
 		@Schema(description = "정렬 필드 ID값 [이전이면 처음 값, 이후면 마지막 값]", example = "1")
 		Long id,
