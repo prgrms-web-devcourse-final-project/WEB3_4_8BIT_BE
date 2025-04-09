@@ -1,9 +1,12 @@
 package com.backend.domain.ship.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.backend.domain.ship.converter.ShipConverter;
 import com.backend.domain.ship.dto.request.ShipRequest;
+import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
@@ -38,7 +41,18 @@ public class ShipServiceImpl implements ShipService {
 		return savedShip.getShipId();
 	}
 
+	@Override
+	public List<ShipResponse.Detail> getDetailAll(final Long memberId) {
+
+		List<ShipResponse.Detail> getShipAllList = shipRepository.findDetailAll(memberId);
+
+		log.debug("선박 전체 조회: {}", getShipAllList);
+
+		return getShipAllList;
+	}
+
 	private void validateMaxShipLimit(final Long countByMemberId) {
+
 		if (countByMemberId > MAX_SHIPS_PER_MEMBER) {
 			throw new ShipException(ShipErrorCode.MAX_SHIP_COUNT_EXCEEDED);
 		}

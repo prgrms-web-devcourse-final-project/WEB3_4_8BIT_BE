@@ -4,6 +4,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,6 +23,7 @@ import net.jqwik.api.Arbitrary;
 
 import com.backend.domain.ship.domain.RestroomType;
 import com.backend.domain.ship.dto.request.ShipRequest;
+import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.ship.service.ShipService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
@@ -474,5 +477,26 @@ class ShipControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data[0].reason").value("주차 여부는 필수 항목입니다."))
 			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
 			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("선박 전체 조회 [Controller] - Success")
+	@WithMockCustomUser
+	void t19() throws Exception {
+		// Given
+		List<ShipResponse.Detail> givenDetailList = fixtureMonkeyRecord
+			.giveMeBuilder(ShipResponse.Detail.class)
+			.sampleList(10);
+
+		when(shipService.getDetailAll(1L)).thenReturn(givenDetailList);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(get("/api/v1/ship"));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.size()").value(givenDetailList.size()));
 	}
 }

@@ -1,7 +1,9 @@
 package com.backend.domain.ship.repository;
 
+import java.util.List;
 import java.util.Optional;
 
+import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.ship.entity.Ship;
 
 public interface ShipRepository {
@@ -35,4 +37,13 @@ public interface ShipRepository {
 	 * @author Kim Dong O
 	 */
 	Long countByMemberId(final Long memberId);
+
+	/**
+	 * 회원 ID로 등록된 선박 전체 조회 메서드
+	 *
+	 * @param memberId {@link Long}
+	 * @return {@link List<ShipResponse.Detail>}
+	 * @implSpec 회원 ID로 등록된 선박 전체 조회 후 결과 값 반환
+	 */
+	List<ShipResponse.Detail> findDetailAll(final Long memberId);
 }

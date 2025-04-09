@@ -1,6 +1,7 @@
 package com.backend.domain.ship.dto.response;
 
 import com.backend.domain.ship.domain.RestroomType;
+import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Builder;
 
@@ -50,5 +51,9 @@ public class ShipResponse {
 		Boolean mealProvided,
 		Boolean parkingAvailable
 	) {
+
+		@QueryProjection
+		public Detail {
+		}
 	}
 }

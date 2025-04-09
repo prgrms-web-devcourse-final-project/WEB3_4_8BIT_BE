@@ -1,15 +1,18 @@
 package com.backend.domain.ship.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.ship.dto.request.ShipRequest;
+import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.ship.service.ShipService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.response.GenericResponse;
@@ -37,5 +40,16 @@ public class ShipController {
 		Long savedShipId = shipService.createShip(user.getId(), requestDto);
 
 		return ResponseEntity.created(URI.create(savedShipId.toString())).body(GenericResponse.of(true));
+	}
+
+	@Operation(summary = "로그인한 회원 선박 전체 조회", description = "로그인한 회원의 선박을 전체 조회 할 때 사용하는 API")
+	@GetMapping
+	public ResponseEntity<GenericResponse<List<ShipResponse.Detail>>> getDetailAll(
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		List<ShipResponse.Detail> getShipAllList = shipService.getDetailAll(user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true, getShipAllList));
 	}
 }
