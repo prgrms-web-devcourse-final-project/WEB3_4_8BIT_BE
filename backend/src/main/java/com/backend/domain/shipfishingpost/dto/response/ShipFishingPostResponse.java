@@ -151,7 +151,8 @@ public class ShipFishingPostResponse {
 		List<String> fileUrlList,
 		List<String> fishNameList,
 		Double reviewEverRate,
-		Long reviewCount
+		Long reviewCount,
+		ZonedDateTime createdAt
 		// Todo : 위시리스트 반영
 	) {
 		public static DetailScroll fromDetailScroll(
@@ -168,6 +169,7 @@ public class ShipFishingPostResponse {
 				.fishNameList(fishNameList)
 				.reviewEverRate(detail.reviewEverRate())
 				.reviewCount(detail.reviewCount())
+				.createdAt(detail.createdAt())
 				.build();
 		}
 	}
