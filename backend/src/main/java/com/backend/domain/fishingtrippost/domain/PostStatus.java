@@ -21,11 +21,6 @@ public enum PostStatus {
 		this.displayName = displayName;
 	}
 
-	@JsonValue
-	public String getDisplayName() {
-		return displayName;
-	}
-
 	@JsonCreator
 	public static PostStatus from(String param) {
 		return Stream.of(PostStatus.values())

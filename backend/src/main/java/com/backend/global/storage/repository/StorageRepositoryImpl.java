@@ -2,6 +2,7 @@ package com.backend.global.storage.repository;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
@@ -39,5 +40,10 @@ public class StorageRepositoryImpl implements StorageRepository {
 	@Override
 	public void deleteAll(final List<File> fileList) {
 		storageJpaRepository.deleteAll(fileList);
+	}
+
+	@Override
+	public Optional<File> findById(final Long fileId) {
+		return storageJpaRepository.findById(fileId);
 	}
 }

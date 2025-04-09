@@ -21,6 +21,8 @@ import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageRepository;
@@ -48,7 +50,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		// 멤버, 낚시 포인트 존재 검증
 		validMemberAndFishPoint(memberId, requestDto);
 
-		FishingTripPost fishingTripPost = FishingTripPostConverter.fromFishingTripPostCreate(memberId, requestDto);
+		FishingTripPost fishingTripPost = FishingTripPostConverter.fromCreate(memberId, requestDto);
 
 		return fishingTripPostRepository.save(fishingTripPost).getFishingTripPostId();
 	}
@@ -118,6 +120,47 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 		fishingTripPost.setPostStatus(PostStatus.COMPLETED);
 		fishingTripPostNotifier.notifyMailIfCompleted(fishingTripPost);
+	}
+
+	@Override
+	public ScrollResponse<FishingTripPostResponse.DetailPage> getDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus status,
+		final Long regionId,
+		final String keyword) {
+		List<FishingTripPostResponse.DetailPageQueryDto> detailPageDto = fishingTripPostRepository.findScrollDetailPageDto(
+			cursorRequestDto, status, regionId, keyword);
+
+		boolean isLast = detailPageDto.size() <= cursorRequestDto.size();
+		if (!isLast)
+			detailPageDto.remove(detailPageDto.size() - 1);
+
+		List<FishingTripPostResponse.DetailPage> result = detailPageDto.stream()
+			.map(dto -> FishingTripPostConverter.toDetailPage(dto, this::getImageUrlById))
+			.toList();
+
+		return ScrollResponse.from(
+			result,
+			cursorRequestDto.size(),
+			result.size(),
+			cursorRequestDto.fieldValue() == null,
+			isLast
+		);
+	}
+
+	/**
+	 * 파일 ID를 통해 해당 파일의 이미지 URL을 조회합니다.
+	 *
+	 * <p> 파일을 조회하고, 존재할 경우 해당 파일의 URL을 반환합니다.
+	 * 파일이 존재하지 않으면 {@code null}을 반환합니다.</p>
+	 *
+	 * @param fileId 조회할 파일의 ID
+	 * @return 파일이 존재하면 해당 파일의 URL, 존재하지 않으면 {@code null}
+	 */
+	private String getImageUrlById(final Long fileId) {
+		return storageRepository.findById(fileId)
+			.map(File::getUrl)
+			.orElse(null);
 	}
 
 	/**

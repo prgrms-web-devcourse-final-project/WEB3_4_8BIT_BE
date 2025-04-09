@@ -29,6 +29,8 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.StorageService;
@@ -278,12 +280,39 @@ class FishingTripPostServiceTest extends BaseTest {
 		);
 
 		List<File> mockFiles = List.of(
-			File.builder().fileId(101L).fileName("f1.jpg").originalFileName("o1.jpg")
-				.contentType("image/jpeg").fileSize(12345L).url(fileUrls.get(0)).domain("test").createdById(1L).uploaded(true).build(),
-			File.builder().fileId(102L).fileName("f2.jpg").originalFileName("o2.jpg")
-				.contentType("image/jpeg").fileSize(12345L).url(fileUrls.get(1)).domain("test").createdById(1L).uploaded(true).build(),
-			File.builder().fileId(103L).fileName("f3.jpg").originalFileName("o3.jpg")
-				.contentType("image/jpeg").fileSize(12345L).url(fileUrls.get(2)).domain("test").createdById(1L).uploaded(true).build()
+			File.builder()
+				.fileId(101L)
+				.fileName("f1.jpg")
+				.originalFileName("o1.jpg")
+				.contentType("image/jpeg")
+				.fileSize(12345L)
+				.url(fileUrls.get(0))
+				.domain("test")
+				.createdById(1L)
+				.uploaded(true)
+				.build(),
+			File.builder()
+				.fileId(102L)
+				.fileName("f2.jpg")
+				.originalFileName("o2.jpg")
+				.contentType("image/jpeg")
+				.fileSize(12345L)
+				.url(fileUrls.get(1))
+				.domain("test")
+				.createdById(1L)
+				.uploaded(true)
+				.build(),
+			File.builder()
+				.fileId(103L)
+				.fileName("f3.jpg")
+				.originalFileName("o3.jpg")
+				.contentType("image/jpeg")
+				.fileSize(12345L)
+				.url(fileUrls.get(2))
+				.domain("test")
+				.createdById(1L)
+				.uploaded(true)
+				.build()
 		);
 
 		when(fishingTripPostRepository.findDetailQueryDtoById(postId)).thenReturn(Optional.of(queryDto));
@@ -310,7 +339,6 @@ class FishingTripPostServiceTest extends BaseTest {
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verify(storageRepository).findAllById(fileIds);
 	}
-
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
@@ -371,5 +399,110 @@ class FishingTripPostServiceTest extends BaseTest {
 			.hasMessage(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage());
 
 		verify(fishingTripPostNotifier, never()).notifyMailIfCompleted(any());
+	}
+
+	@Test
+	@DisplayName("동출 게시글 스크롤 조회 [createdAt] [desc] [첫 페이지] [Service] - Success")
+	void t11() {
+		// Given
+		Long postId = 1L;
+		Long fileId = 101L;
+
+		FishingTripPostResponse.DetailPageQueryDto queryDto =
+			new FishingTripPostResponse.DetailPageQueryDto(
+				postId,
+				1L,
+				null,
+				"테스트 제목",
+				"테스트 내용",
+				ZonedDateTime.parse("2025-06-10T08:00:00+09:00"),
+				ZonedDateTime.parse("2025-04-09T04:00:00+09:00"),
+				5,
+				PostStatus.RECRUITING,
+				List.of(fileId)
+			);
+
+		when(fishingTripPostRepository.findScrollDetailPageDto(any(), isNull(), isNull(), isNull()))
+			.thenReturn(List.of(queryDto));
+
+		when(storageRepository.findById(fileId)).thenReturn(
+			Optional.of(File.builder()
+				.fileId(fileId)
+				.url("https://cdn.example.com/file.jpg")
+				.uploaded(true)
+				.build())
+		);
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			"desc", "createdAt", "next", null, null, 10
+		);
+
+		// When
+		ScrollResponse<FishingTripPostResponse.DetailPage> result =
+			fishingTripPostService.getDetailPage(cursorRequest, null, null, null);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result.content()).hasSize(1);
+
+		FishingTripPostResponse.DetailPage dto = result.content().get(0);
+		assertThat(dto.fishingTripPostId()).isEqualTo(postId);
+		assertThat(dto.imageUrl()).isEqualTo("https://cdn.example.com/file.jpg");
+
+		assertThat(result.isFirst()).isTrue();
+		assertThat(result.isLast()).isTrue();
+	}
+
+	@Test
+	@DisplayName("동출 게시글 스크롤 조회 [createdAt] [desc] [다음 페이지] [Service] - Success")
+	void t12() {
+		// Given
+		Long postId = 1L;
+		Long fileId = 101L;
+
+		FishingTripPostResponse.DetailPageQueryDto queryDto =
+			new FishingTripPostResponse.DetailPageQueryDto(
+				postId,
+				1L,
+				null,
+				"테스트 제목",
+				"테스트 내용",
+				ZonedDateTime.parse("2025-06-10T08:00:00+09:00"),
+				ZonedDateTime.parse("2025-04-09T04:00:00+09:00"),
+				5,
+				PostStatus.RECRUITING,
+				List.of(fileId)
+			);
+
+		when(fishingTripPostRepository.findScrollDetailPageDto(any(), isNull(), isNull(), isNull()))
+			.thenReturn(List.of(queryDto));
+
+		when(storageRepository.findById(fileId)).thenReturn(
+			Optional.of(File.builder()
+				.fileId(fileId)
+				.url("https://cdn.example.com/file.jpg")
+				.uploaded(true)
+				.build())
+		);
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			"desc", "createdAt", "next",
+			"2025-04-09T04:00:00+09:00", postId, 10
+		);
+
+		// When
+		ScrollResponse<FishingTripPostResponse.DetailPage> result =
+			fishingTripPostService.getDetailPage(cursorRequest, null, null, null);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result.content()).hasSize(1);
+
+		FishingTripPostResponse.DetailPage dto = result.content().get(0);
+		assertThat(dto.fishingTripPostId()).isEqualTo(postId);
+		assertThat(dto.imageUrl()).isEqualTo("https://cdn.example.com/file.jpg");
+
+		assertThat(result.isFirst()).isFalse();
+		assertThat(result.isLast()).isTrue();
 	}
 }

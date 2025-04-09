@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.service.FishingTripPostService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
+import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.GenericResponse;
+import com.backend.global.dto.response.ScrollResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -86,4 +89,20 @@ public class FishingTripPostController {
 		return ResponseEntity.ok(GenericResponse.of(true));
 	}
 
+	@GetMapping("/scroll")
+	@Operation(summary = "동출 모집 게시글 스크롤 조회", description = "커서 기반으로 동출 모집 게시글 목록을 조회하는 API")
+	@Parameter(name = "regionId", description = "지역 ID", example = "2")
+	@Parameter(name = "keyword", description = "제목 키워드 검색", example = "해적")
+	@Parameter(name = "status", description = "게시글 상태 (예: RECRUITING, COMPLETED)", example = "RECRUITING")
+	public ResponseEntity<GenericResponse<ScrollResponse<FishingTripPostResponse.DetailPage>>> getFishingTripPostPages(
+		@Valid final GlobalRequest.CursorRequest cursorRequest,
+		@RequestParam(required = false) final PostStatus status,
+		@RequestParam(required = false) final Long regionId,
+		@RequestParam(required = false) final String keyword
+	) {
+		ScrollResponse<FishingTripPostResponse.DetailPage> response =
+			fishingTripPostService.getDetailPage(cursorRequest, status, regionId, keyword);
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
 }

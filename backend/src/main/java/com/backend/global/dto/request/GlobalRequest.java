@@ -51,15 +51,15 @@ public class GlobalRequest {
 
 	/**
 	 * {
-	 *     "order": "createdAt",
-	 *     "sort": "asc",
+	 *     "order": "asc",
+	 *     "sort": "createdAt",
 	 *     "type": "next"
 	 *     "fieldValue": "2024-07-16T13:09:08.663442+08:00",
 	 *     "id": 130,
 	 *     "size": 3
 	 * }
-	 * @param order      정렬 필드
-	 * @param sort       정렬 기준 (ASC, DESC)
+	 * @param order      정렬 기준 (ASC, DESC)
+	 * @param sort       정렬 필드
 	 * @param type       이전인지 다음인지 (Next, Prev)
 	 * @param fieldValue 정렬 필드 Value
 	 * @param id         Id
