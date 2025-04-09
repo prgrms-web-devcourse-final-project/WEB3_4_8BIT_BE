@@ -280,12 +280,39 @@ class FishingTripPostServiceTest extends BaseTest {
 		);
 
 		List<File> mockFiles = List.of(
-			File.builder().fileId(101L).fileName("f1.jpg").originalFileName("o1.jpg")
-				.contentType("image/jpeg").fileSize(12345L).url(fileUrls.get(0)).domain("test").createdById(1L).uploaded(true).build(),
-			File.builder().fileId(102L).fileName("f2.jpg").originalFileName("o2.jpg")
-				.contentType("image/jpeg").fileSize(12345L).url(fileUrls.get(1)).domain("test").createdById(1L).uploaded(true).build(),
-			File.builder().fileId(103L).fileName("f3.jpg").originalFileName("o3.jpg")
-				.contentType("image/jpeg").fileSize(12345L).url(fileUrls.get(2)).domain("test").createdById(1L).uploaded(true).build()
+			File.builder()
+				.fileId(101L)
+				.fileName("f1.jpg")
+				.originalFileName("o1.jpg")
+				.contentType("image/jpeg")
+				.fileSize(12345L)
+				.url(fileUrls.get(0))
+				.domain("test")
+				.createdById(1L)
+				.uploaded(true)
+				.build(),
+			File.builder()
+				.fileId(102L)
+				.fileName("f2.jpg")
+				.originalFileName("o2.jpg")
+				.contentType("image/jpeg")
+				.fileSize(12345L)
+				.url(fileUrls.get(1))
+				.domain("test")
+				.createdById(1L)
+				.uploaded(true)
+				.build(),
+			File.builder()
+				.fileId(103L)
+				.fileName("f3.jpg")
+				.originalFileName("o3.jpg")
+				.contentType("image/jpeg")
+				.fileSize(12345L)
+				.url(fileUrls.get(2))
+				.domain("test")
+				.createdById(1L)
+				.uploaded(true)
+				.build()
 		);
 
 		when(fishingTripPostRepository.findDetailQueryDtoById(postId)).thenReturn(Optional.of(queryDto));
@@ -312,7 +339,6 @@ class FishingTripPostServiceTest extends BaseTest {
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verify(storageRepository).findAllById(fileIds);
 	}
-
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
@@ -385,7 +411,8 @@ class FishingTripPostServiceTest extends BaseTest {
 		FishingTripPostResponse.DetailPageQueryDto queryDto =
 			new FishingTripPostResponse.DetailPageQueryDto(
 				postId,
-				null, // regionType
+				1L,
+				null,
 				"테스트 제목",
 				"테스트 내용",
 				ZonedDateTime.parse("2025-06-10T08:00:00+09:00"),
@@ -436,6 +463,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		FishingTripPostResponse.DetailPageQueryDto queryDto =
 			new FishingTripPostResponse.DetailPageQueryDto(
 				postId,
+				1L,
 				null,
 				"테스트 제목",
 				"테스트 내용",
@@ -477,7 +505,4 @@ class FishingTripPostServiceTest extends BaseTest {
 		assertThat(result.isFirst()).isFalse();
 		assertThat(result.isLast()).isTrue();
 	}
-
-
-
 }
