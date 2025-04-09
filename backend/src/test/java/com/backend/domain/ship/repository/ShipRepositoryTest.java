@@ -17,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 
+import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.util.BaseTest;
@@ -83,6 +84,8 @@ public class ShipRepositoryTest extends BaseTest {
 		// Given
 		Long givenMemberId = 1L;
 
+		shipJpaRepository.deleteAll();
+
 		List<Ship> givenShip1 = arbitraryBuilder
 			.set("shipId", null)
 			.set("memberId", givenMemberId)
@@ -101,5 +104,33 @@ public class ShipRepositoryTest extends BaseTest {
 
 		// Then
 		assertThat(countByMemberId).isEqualTo(savedShip1.size());
+	}
+
+	@Test
+	@DisplayName("회원 ID로 등록된 선박 조회 [Repository] - Success")
+	void t04() {
+		// Given
+		Long givenMemberId = 1L;
+
+		shipJpaRepository.deleteAll();
+
+		List<Ship> givenShip1 = arbitraryBuilder
+			.set("shipId", null)
+			.set("memberId", givenMemberId)
+			.sampleList(5);
+
+		List<Ship> givenShip2 = arbitraryBuilder
+			.set("shipId", null)
+			.set("memberId", 2L)
+			.sampleList(7);
+
+		List<Ship> savedShip1 = shipJpaRepository.saveAll(givenShip1);
+		shipJpaRepository.saveAll(givenShip2);
+
+		// When
+		List<ShipResponse.Detail> findShipAllList = shipRepository.findDetailAll(givenMemberId);
+
+		// Then
+		assertThat(findShipAllList).hasSize(savedShip1.size());
 	}
 }
