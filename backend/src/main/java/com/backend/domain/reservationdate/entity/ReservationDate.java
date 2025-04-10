@@ -53,4 +53,8 @@ public class ReservationDate extends BaseEntity {
 	public void remainPlus(final Integer guestCount) {
 		this.remainCount += guestCount;
 	}
+
+	public void updateBan() {
+		this.isBan = !this.isBan;
+	}
 }

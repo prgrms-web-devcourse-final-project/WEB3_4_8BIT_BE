@@ -3,6 +3,7 @@ package com.backend.domain.shipfishingpost.repository;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -433,4 +434,82 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		assertThat(findShipFishingPost.isPresent()).isFalse();
 	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 마이페이지 조회 [Repository] - Success")
+	void t10() {
+		// Given
+		Long givenMemberId = 1L;
+
+		for (int i = 1; i <= 15; i++) {
+			ShipFishingPost post = arbitraryBuilder.set("shipFishingPostId", null)
+				.set("memberId", givenMemberId)
+				.set("subject", "TestSubject " + i)
+				.set("content", "TestContent " + i)
+				.set("fishIdList", List.of())
+				.set("fileIdList", List.of())
+				.set("price", 10000L * i)
+				.set("shipId", i * 100L)
+				.set("reviewEverRate", 0.3D * i)
+				.set("maxGuestCount", i)
+				.sample();
+
+			shipFishingPostRepository.save(post);
+		}
+
+		List<ShipFishingPostResponse.MyPagePostList> findResponseDto = shipFishingPostRepository
+			.findMyPagePostList(givenMemberId);
+
+		assertThat(findResponseDto).isNotNull();
+		assertThat(findResponseDto.size()).isEqualTo(15);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 평점 업데이트 [Repository] - Success")
+	void t11() {
+		Long givenMemberId = 1L;
+
+		ShipFishingPost post = arbitraryBuilder.set("shipFishingPostId", null)
+			.set("memberId", givenMemberId)
+			.set("subject", "TestSubject")
+			.set("content", "TestContent")
+			.set("fishIdList", List.of())
+			.set("fileIdList", List.of())
+			.set("price", 10000L)
+			.set("shipId", 100L)
+			.set("reviewEverRate", 0.0D)
+			.set("maxGuestCount", 10)
+			.sample();
+
+		ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(post);
+
+		assertThat(savedShipFishingPost.getReviewEverRate()).isEqualTo(0.0D);
+
+		Review givenReview = fixtureMonkeyBuilder.giveMeBuilder(Review.class)
+			.set("reviewId", null)
+			.set("shipFishingPostId", savedShipFishingPost.getShipFishingPostId())
+			.set("rating", 5)
+			.set("content", "Test Content")
+			.sample();
+
+		reviewRepository.save(givenReview);
+
+		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime lastRun = ZonedDateTime.now().minusDays(1);
+
+		shipFishingPostRepository.updateReviewEverRate(now, lastRun);
+
+		em.flush();
+		em.clear();
+
+		Optional<ShipFishingPost> findOptionalShipFishingPost = shipFishingPostRepository.findById(
+			savedShipFishingPost.getShipFishingPostId());
+
+		assertThat(findOptionalShipFishingPost.isPresent()).isTrue();
+
+		ShipFishingPost findShipFishingPost = findOptionalShipFishingPost.get();
+
+		assertThat(findShipFishingPost.getReviewEverRate()).isEqualTo(5.0D);
+	}
+
 }

@@ -12,6 +12,7 @@ import com.backend.domain.review.entity.Review;
 import com.backend.domain.review.exception.ReviewErrorCode;
 import com.backend.domain.review.exception.ReviewException;
 import com.backend.domain.review.repository.ReviewRepository;
+import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 
@@ -24,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ReviewServiceImpl implements ReviewService {
 
 	private final ReviewRepository reviewRepository;
+	private final ShipFishingPostRepository shipFishingPostRepository;
 
 	@Override
 	@Transactional
@@ -43,9 +45,11 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Slice<ReviewWithMemberResponse> getReviewListByPostId(final Long memberId, final Long postId, final Pageable pageable) {
+	public Slice<ReviewWithMemberResponse> getReviewListByPostId(final Long memberId, final Long postId,
+		final Pageable pageable) {
 
-		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(memberId, postId, pageable);
+		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByPostId(memberId, postId,
+			pageable);
 
 		logReviewList("게시글", postId, reviewList);
 		return reviewList;
@@ -55,7 +59,8 @@ public class ReviewServiceImpl implements ReviewService {
 	@Transactional(readOnly = true)
 	public Slice<ReviewWithMemberResponse> getReviewListByMemberId(final Long memberId, final Pageable pageable) {
 
-		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByMemberId(memberId, pageable);
+		Slice<ReviewWithMemberResponse> reviewList = reviewRepository.findReviewsWithMemberByMemberId(memberId,
+			pageable);
 
 		logReviewList("회원", memberId, reviewList);
 		return reviewList;
@@ -96,6 +101,9 @@ public class ReviewServiceImpl implements ReviewService {
 		validateReviewOwner(review, memberId);
 
 		reviewRepository.delete(review);
+
+		shipFishingPostRepository.updateReviewEverRateByDelete(review.getShipFishingPostId());
+
 		log.debug("리뷰가 삭제되었습니다. reviewId={}, 삭제한 회원 ID={}", reviewId, memberId);
 	}
 
@@ -111,7 +119,7 @@ public class ReviewServiceImpl implements ReviewService {
 	}
 
 	private void validateDuplicate(final Long reservationId) {
-		if(reviewRepository.existsByReservationId(reservationId)) {
+		if (reviewRepository.existsByReservationId(reservationId)) {
 			throw new ReviewException(ReviewErrorCode.DUPLICATE_REVIEW);
 		}
 	}

@@ -1,13 +1,13 @@
 package com.backend.domain.reservation.repository;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.reservation.dto.response.ReservationResponse;
 import com.backend.domain.reservation.entity.Reservation;
+import com.backend.domain.reservation.entity.ReservationStatus;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 
@@ -33,19 +33,24 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 	}
 
 	@Override
+	public Long getReservationCount(final Long memberId) {
+
+		return reservationJpaRepository.countByMemberIdAndStatus(memberId, ReservationStatus.CONFIRMED);
+	}
+
+	@Override
 	public Optional<ReservationResponse.DetailWithMember> findDetailWithMemberById(final Long reservationId) {
 
 		return reservationQueryRepository.findDetailWithMemberNameById(reservationId);
 	}
 
 	@Override
-	public List<Reservation> findByShipFishingPostIdAndTodayAfter(
+	public Boolean findByShipFishingPostIdAndTodayAfter(
 		final Long shipFishingPostId,
 		final LocalDate today) {
 
-		return reservationJpaRepository.findByShipFishingPostIdAndReservationDateGreaterThanEqual(
-			shipFishingPostId,
-			today);
+		return reservationQueryRepository.findReservationListByShipFishingPostIdWithReservationConfirmAfterToday(
+			shipFishingPostId, today);
 	}
 
 	@Override
@@ -57,13 +62,36 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 	}
 
 	@Override
-	public ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberIdAndShipFishingPostId(
+	public ScrollResponse<ReservationResponse.DetailReservationList> findDetailReservationListByMemberId(
 		final Long memberId,
-		final Long shipFishingPostId,
+		final Boolean afterToday,
+		final Boolean isConfirm,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
-		return reservationQueryRepository.findDetailWithNameByMemberIdAndShipFishingPostId(memberId, shipFishingPostId,
+		return reservationQueryRepository.findDetailReservationListByMemberId(
+			memberId,
+			afterToday,
+			isConfirm,
 			cursorRequestDto);
 	}
 
+	@Override
+	public ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberIdAndShipFishingPostId(
+		final Long memberId,
+		final Long shipFishingPostId,
+		final Boolean afterToday,
+		final GlobalRequest.CursorRequest cursorRequestDto) {
+
+		return reservationQueryRepository.findDetailWithNameByMemberIdAndShipFishingPostId(
+			memberId,
+			shipFishingPostId,
+			afterToday,
+			cursorRequestDto);
+	}
+
+	@Override
+	public ReservationResponse.DashBoard findDashBoardByMemberId(final Long memberId, final Integer limitDays) {
+
+		return reservationQueryRepository.findDashBoardByMemberId(memberId, limitDays);
+	}
 }

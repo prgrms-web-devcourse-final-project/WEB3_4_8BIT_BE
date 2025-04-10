@@ -226,4 +226,55 @@ public class ReservationDateRepositoryTest extends BaseTest {
 		assertThat(findReservationDateList.isEmpty()).isTrue();
 	}
 
+	@Test
+	@DisplayName("선상 낚시 게시글 예약 일자 업데이트 [잔여 인원 증가] [Repository] - Success")
+	void t08() {
+		ReservationDate givenReservationDate = fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
+			.set("shipFishingPostId", 1L)
+			.set("reservationDate", LocalDate.now().plusDays(1))
+			.set("remainCount", 10)
+			.set("isBan", false)
+			.sample();
+
+		reservationDateRepository.save(givenReservationDate);
+
+		reservationDateRepository.updateRemainCountWithPlus(
+			givenReservationDate.getShipFishingPostId(), 7, LocalDate.now());
+
+		em.flush();
+		em.clear();
+
+		Optional<ReservationDate> findOptionalReservationDate = reservationDateRepository
+			.findByIdWithPessimistic(givenReservationDate.getShipFishingPostId(),
+				givenReservationDate.getReservationDate());
+
+		assertThat(findOptionalReservationDate.isPresent()).isTrue();
+		assertThat(findOptionalReservationDate.get().getRemainCount()).isEqualTo(17);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 예약 일자 업데이트 [잔여 인원 감소] [Repository] - Success")
+	void t09() {
+		ReservationDate givenReservationDate = fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
+			.set("shipFishingPostId", 1L)
+			.set("reservationDate", LocalDate.now().plusDays(1))
+			.set("remainCount", 10)
+			.set("isBan", false)
+			.sample();
+
+		reservationDateRepository.save(givenReservationDate);
+
+		reservationDateRepository.updateRemainCountWithMinus(
+			givenReservationDate.getShipFishingPostId(), -7, LocalDate.now());
+
+		em.flush();
+		em.clear();
+
+		Optional<ReservationDate> findOptionalReservationDate = reservationDateRepository
+			.findByIdWithPessimistic(givenReservationDate.getShipFishingPostId(),
+				givenReservationDate.getReservationDate());
+
+		assertThat(findOptionalReservationDate.isPresent()).isTrue();
+		assertThat(findOptionalReservationDate.get().getRemainCount()).isEqualTo(3);
+	}
 }

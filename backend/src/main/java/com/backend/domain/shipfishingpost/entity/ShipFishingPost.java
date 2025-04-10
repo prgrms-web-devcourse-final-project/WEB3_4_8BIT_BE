@@ -100,4 +100,24 @@ public class ShipFishingPost extends BaseEntity {
 		long minutes = ChronoUnit.MINUTES.between(startTime, endTime);
 		durationTime = LocalTime.MIDNIGHT.plusMinutes(minutes);
 	}
+
+	public void updateShipFishingPost(
+		final String subject,
+		final String content,
+		final Long price,
+		final LocalTime startTime,
+		final LocalTime endTime,
+		final Integer maxGuestCount,
+		final List<Long> fileIdList,
+		final List<Long> fishIdList
+	) {
+		this.subject = subject;
+		this.content = content;
+		this.price = price;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.maxGuestCount = maxGuestCount;
+		this.fileIdList = fileIdList;
+		this.fishIdList = fishIdList;
+	}
 }

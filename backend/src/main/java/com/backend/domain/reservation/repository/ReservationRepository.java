@@ -1,7 +1,6 @@
 package com.backend.domain.reservation.repository;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 import com.backend.domain.reservation.dto.response.ReservationResponse;
@@ -30,6 +29,15 @@ public interface ReservationRepository {
 	Optional<Reservation> findById(final Long reservationId);
 
 	/**
+	 * 유저의 예약 내역 횟수를 조회합니다.
+	 *
+	 * @param memberId 유저 ID
+	 * @return 유저 예약 내역 횟수
+	 * @implSpec 유저의 확정된 예약 내역 횟수를 반환합니다.
+	 */
+	Long getReservationCount(final Long memberId);
+
+	/**
 	 * 예약 상세정보를 조회하는 메서드입니다.
 	 *
 	 * @param reservationId {@link Long}
@@ -43,9 +51,9 @@ public interface ReservationRepository {
 	 *
 	 * @param shipFishingPostId {@link Long}
 	 * @param today {@link LocalDate}
-	 * @return {@link List<Reservation>}
+	 * @return 오늘 이후 확정된 예약 여부 true, false
 	 */
-	List<Reservation> findByShipFishingPostIdAndTodayAfter(final Long shipFishingPostId, final LocalDate today);
+	Boolean findByShipFishingPostIdAndTodayAfter(final Long shipFishingPostId, final LocalDate today);
 
 	/**
 	 * 예약 기록 조회 메서드 입니다. (일반 유저)
@@ -60,6 +68,20 @@ public interface ReservationRepository {
 		final GlobalRequest.CursorRequest cursorRequestDto);
 
 	/**
+	 * 예약 기록 조회 메서드 입니다. (일반 유저)
+	 *
+	 * @param memberId {@link Long}
+	 * @param cursorRequestDto {@link GlobalRequest.CursorRequest}
+	 * @return {@link ScrollResponse<ReservationResponse.DetailReservationList>}
+	 * @implSpec 로그인 된 유저 id를 기반으로 예약 기록들을 조회하고 반환합니다.
+	 */
+	ScrollResponse<ReservationResponse.DetailReservationList> findDetailReservationListByMemberId(
+		final Long memberId,
+		final Boolean afterToday,
+		final Boolean isConfirm,
+		final GlobalRequest.CursorRequest cursorRequestDto);
+
+	/**
 	 * 예약 기록 조회 메서드 입니다. (선장)
 	 *
 	 * @param memberId {@link Long}
@@ -71,5 +93,16 @@ public interface ReservationRepository {
 	ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberIdAndShipFishingPostId(
 		final Long memberId,
 		final Long shipFishingPostId,
+		final Boolean afterToday,
 		final GlobalRequest.CursorRequest cursorRequestDto);
+
+	/**
+	 * 선장 마이페이지의 대시보드 내용을 조회하는 메서드
+	 *
+	 * @param memberId 유저 id
+	 * @param limitDays 다가오는 날짜 제한
+	 * @return {@link ReservationResponse.DashBoard} 다가오는 예약횟수, 오늘 예약 횟수, 작성한 게시글 수
+	 * @implSpec 제한 날짜를 입력받아 오늘 예약횟수와 다가오는 예약 횟수, 작성한 게시글 수를 반환합니다.
+	 */
+	ReservationResponse.DashBoard findDashBoardByMemberId(final Long memberId, final Integer limitDays);
 }

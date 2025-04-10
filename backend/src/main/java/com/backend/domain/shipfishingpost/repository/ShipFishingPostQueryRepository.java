@@ -34,18 +34,22 @@ import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.util.QuerydslUtil;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.StringTemplate;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ShipFishingPostQueryRepository {
@@ -102,6 +106,33 @@ public class ShipFishingPostQueryRepository {
 		return Optional.ofNullable(detailAll);
 	}
 
+	public List<ShipFishingPostResponse.MyPagePostList> findDetailMyPageListByMemberId(final Long memberId) {
+
+		List<ShipFishingPostResponse.DetailQueryDto> detailList = jpaQueryFactory
+			.select(Projections.constructor(
+				ShipFishingPostResponse.DetailQueryDto.class,
+				shipFishingPost.shipFishingPostId,
+				shipFishingPost.subject,
+				shipFishingPost.location,
+				shipFishingPost.price,
+				shipFishingPost.fileIdList,
+				shipFishingPost.fishIdList,
+				shipFishingPost.reviewEverRate,
+				shipFishingPost.createdAt,
+				JPAExpressions
+					.select(review.count())
+					.from(review)
+					.where(review.shipFishingPostId.eq(shipFishingPost.shipFishingPostId))
+			))
+			.distinct()
+			.from(shipFishingPost)
+			.where(shipFishingPost.memberId.eq(memberId))
+			.orderBy(shipFishingPost.createdAt.desc())
+			.fetch();
+
+		return mapToMyPagePostList(detailList);
+	}
+
 	public ScrollResponse<ShipFishingPostResponse.DetailScroll> findDetailScrollBySearch(
 		final ShipFishingPostRequest.Search requestDto,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
@@ -140,7 +171,7 @@ public class ShipFishingPostQueryRepository {
 			detailList.remove(detailList.size() - 1);
 		}
 
-		List<ShipFishingPostResponse.DetailScroll> content = mapToDto(detailList);
+		List<ShipFishingPostResponse.DetailScroll> content = mapToDetailScroll(detailList);
 
 		return ScrollResponse.from(
 			content,
@@ -150,14 +181,111 @@ public class ShipFishingPostQueryRepository {
 			hasNext);
 	}
 
-	public void updateLikeCount(final Long postId, final Long likeCount) {
+	public void updateReviewEverRate(final ZonedDateTime now, final ZonedDateTime lastRun) {
+
+		// 현재 생성 & 수정된 이력이 있는 리뷰만 반영됨. 삭제는 리뷰 삭제시 직접 반영하거나 soft delete 를 적용한 후 반영해야 함
+		List<Long> changedIdList = jpaQueryFactory
+			.selectDistinct(review.shipFishingPostId)
+			.from(review)
+			.where(review.modifiedAt.between(lastRun, now))
+			.fetch();
+
+		log.debug("리뷰 변경 감지 {}", changedIdList);
+
+		if (changedIdList.isEmpty()) {
+			log.debug(" 리뷰가 증감된 게시글 없음");
+
+			return;
+		}
+
+		NumberExpression<Double> avgExp = review.rating.avg();
+
+		List<Tuple> rateList = jpaQueryFactory
+			.select(review.shipFishingPostId, avgExp)
+			.from(review)
+			.where(review.shipFishingPostId.in(changedIdList))
+			.groupBy(review.shipFishingPostId)
+			.fetch();
+
+		rateList.forEach(tuple -> {
+			Long shipFishingPostId = tuple.get(review.shipFishingPostId);
+			Double avg = tuple.get(avgExp);
+
+			jpaQueryFactory.update(shipFishingPost)
+				.set(shipFishingPost.reviewEverRate, avg)
+				.where(shipFishingPost.shipFishingPostId.eq(shipFishingPostId))
+				.execute();
+		});
+
+		// 리뷰개수가 한개 이상으로 집계된 id 리스트
+		Set<Long> updated = rateList.stream()
+			.map(t -> t.get(review.shipFishingPostId))
+			.collect(Collectors.toSet());
+
+		// 리뷰가 0개라서 집계되지 않은 id 리스트
+		List<Long> zeroIdList = changedIdList.stream()
+			.filter(id -> !updated.contains(id))
+			.toList();
+
+		if (!zeroIdList.isEmpty()) {
+			jpaQueryFactory.update(shipFishingPost)
+				.set(shipFishingPost.reviewEverRate, 0.0)
+				.where(shipFishingPost.shipFishingPostId.in(zeroIdList))
+				.execute();
+		}
+	}
+
+	public void updateReviewEverRateByDeleteReview(final Long shipFishingPostId) {
+
+		Double avg = jpaQueryFactory
+			.select(review.rating.avg())
+			.from(review)
+			.where(review.shipFishingPostId.eq(shipFishingPostId))
+			.fetchOne();
+
+		double newAvg = avg != null ? avg : 0.0;
+
 		jpaQueryFactory.update(shipFishingPost)
-			.set(shipFishingPost.likeCount, likeCount)
-			.where(shipFishingPost.shipFishingPostId.eq(postId))
+			.set(shipFishingPost.reviewEverRate, newAvg)
+			.where(shipFishingPost.shipFishingPostId.eq(shipFishingPostId))
 			.execute();
 	}
 
-	private List<ShipFishingPostResponse.DetailScroll> mapToDto(
+	private List<ShipFishingPostResponse.MyPagePostList> mapToMyPagePostList(
+		final List<ShipFishingPostResponse.DetailQueryDto> detailQueryDtoList
+	) {
+		Set<Long> fileIdList = detailQueryDtoList.stream()
+			.flatMap(dto -> {
+				List<Long> ids = dto.fileIdList();
+				return (ids == null ? List.<Long>of() : ids).stream();
+			})
+			.collect(Collectors.toSet());
+
+		Map<Long, String> fileUrlMap = jpaQueryFactory
+			.select(file.fileId, file.url)
+			.from(file)
+			.where(file.fileId.in(fileIdList))
+			.fetch()
+			.stream()
+			.collect(Collectors.toMap(
+				tuple -> tuple.get(file.fileId),
+				tuple -> tuple.get(file.url)
+			));
+
+		return detailQueryDtoList.stream()
+			.map(dto -> {
+				List<String> fileUrls = Stream.ofNullable(dto.fileIdList())
+					.flatMap(Collection::stream)
+					.map(fileUrlMap::get)
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList());
+
+				return ShipFishingPostResponse.MyPagePostList.fromMyPagePostList(dto, fileUrls);
+			})
+			.collect(Collectors.toList());
+	}
+
+	private List<ShipFishingPostResponse.DetailScroll> mapToDetailScroll(
 		final List<ShipFishingPostResponse.DetailQueryDto> detailQueryDtoList) {
 
 		Set<Long> fileIdList = detailQueryDtoList.stream()
@@ -214,6 +342,13 @@ public class ShipFishingPostQueryRepository {
 			.collect(Collectors.toList());
 	}
 
+	public void updateLikeCount(final Long postId, final Long likeCount) {
+		jpaQueryFactory.update(shipFishingPost)
+			.set(shipFishingPost.likeCount, likeCount)
+			.where(shipFishingPost.shipFishingPostId.eq(postId))
+			.execute();
+	}
+
 	private BooleanExpression buildConditions(
 		final ShipFishingPostRequest.Search requestDto,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
@@ -264,7 +399,8 @@ public class ShipFishingPostQueryRepository {
 	}
 
 	private BooleanExpression locationCondition(final String location) {
-		return (location != null && !location.isEmpty()) ? shipFishingPost.location.containsIgnoreCase(location) : null;
+		return (location != null && !location.isEmpty()) ? shipFishingPost.location.containsIgnoreCase(location) :
+			null;
 	}
 
 	private BooleanExpression durationTimeCondition(final LocalTime duration) {

@@ -37,6 +37,9 @@ public class ReservationServiceImpl implements ReservationService {
 	@Transactional
 	public ReservationResponse.Detail createReservation(final ReservationRequest.Reserve requestDto,
 		final Long memberId) {
+
+		verifyTodayAfterDate(requestDto.reservationDate());
+
 		// 선상 낚시 게시글 정보 조회
 		ShipFishingPost shipFishingPost = getShipFishingPostEntity(requestDto.shipFishingPostId());
 
@@ -71,6 +74,12 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	public Long getReservationCount(final Long memberId) {
+
+		return reservationRepository.getReservationCount(memberId);
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	public ScrollResponse<ReservationResponse.DetailWithName> getUserReservationList(final Long memberId,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
@@ -79,12 +88,30 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
-	@Transactional(readOnly = true)
-	public ScrollResponse<ReservationResponse.DetailWithName> getCaptainReservationList(final Long shipFishingPostId,
-		final Long memberId, final GlobalRequest.CursorRequest cursorRequestDto) {
+	public ScrollResponse<ReservationResponse.DetailReservationList> getUserReservationListWithImage(
+		final Long memberId,
+		final Boolean afterToday,
+		final Boolean isConfirm,
+		final GlobalRequest.CursorRequest cursorRequestDto) {
 
 		return reservationRepository
-			.findDetailWithNameByMemberIdAndShipFishingPostId(memberId, shipFishingPostId, cursorRequestDto);
+			.findDetailReservationListByMemberId(memberId, afterToday, isConfirm, cursorRequestDto);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ScrollResponse<ReservationResponse.DetailWithName> getCaptainReservationList(final Long shipFishingPostId,
+		final Long memberId, final Boolean afterToday, final GlobalRequest.CursorRequest cursorRequestDto) {
+
+		return reservationRepository
+			.findDetailWithNameByMemberIdAndShipFishingPostId(memberId, shipFishingPostId, afterToday,
+				cursorRequestDto);
+	}
+
+	@Override
+	public ReservationResponse.DashBoard getDashBoard(final Long memberId, final Integer limitDays) {
+
+		return reservationRepository.findDashBoardByMemberId(memberId, limitDays);
 	}
 
 	@Override
@@ -93,6 +120,8 @@ public class ReservationServiceImpl implements ReservationService {
 
 		Reservation reservation = getReservationEntity(reservationId);
 
+		verifyTodayAfterDate(reservation.getReservationDate());
+
 		verifyAuthorization(reservation.getShipFishingPostId(), reservation.getMemberId(), memberId);
 
 		reservation.updateCanceled();
@@ -100,6 +129,41 @@ public class ReservationServiceImpl implements ReservationService {
 		// 예약 취소 적용
 		updateReservationDateWithRemainCount(reservation.getShipFishingPostId(), reservation.getReservationDate(),
 			reservation.getGuestCount(), true);
+	}
+
+	/**
+	 * 선상 낚시 예약 Entity 를 반환합니다.
+	 *
+	 * @param reservationId {@link Long}
+	 * @return {@link Reservation}
+	 */
+	private Reservation getReservationEntity(final Long reservationId) {
+		return reservationRepository.findById(reservationId)
+			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+	}
+
+	/**
+	 * 선상 낚시 게시글 Entity 를 반환합니다.
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @return {@link ShipFishingPost}
+	 */
+	private ShipFishingPost getShipFishingPostEntity(final Long shipFishingPostId) {
+
+		return shipFishingPostRepository.findById(shipFishingPostId)
+			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
+	}
+
+	/**
+	 * 오늘포함 이전 예약 신청, 수정 불가 검증 메서드
+	 *
+	 * @param reservationDate 예약 날짜
+	 */
+	void verifyTodayAfterDate(final LocalDate reservationDate) {
+
+		if (!reservationDate.isAfter(LocalDate.now())) {
+			throw new ReservationException(ReservationErrorCode.NOT_AVAILABLE_DATE_RESERVATION);
+		}
 	}
 
 	/**
@@ -119,33 +183,6 @@ public class ReservationServiceImpl implements ReservationService {
 
 		if (!serverTotalPrice.equals(inputTotalPrice)) {
 			throw new ReservationException(ReservationErrorCode.WRONG_PRICE_VALUE);
-		}
-	}
-
-	/**
-	 * 예약 일자 조회, 예약 가능하면 예약 일자 정보 남은 인원 업데이트 메서드입니다.
-	 *
-	 * @param shipFishingPostId {@link Long}
-	 * @param reservationDate {@link LocalDate}
-	 * @param guestCount {@link Long}
-	 * @param type {@link Boolean}
-	 */
-	private void updateReservationDateWithRemainCount(
-		final Long shipFishingPostId,
-		final LocalDate reservationDate,
-		final Integer guestCount,
-		final Boolean type) {
-
-		ReservationDate findReservationDate = reservationDateRepository
-			.findByIdWithPessimistic(shipFishingPostId, reservationDate)
-			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-
-		if (type) {
-			findReservationDate.remainPlus(guestCount);
-		} else {
-			verifyReservationDate(findReservationDate, guestCount);
-
-			findReservationDate.remainMinus(guestCount);
 		}
 	}
 
@@ -187,26 +224,29 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	/**
-	 * 선상 낚시 예약 Entity 를 반환합니다.
-	 *
-	 * @param reservationId {@link Long}
-	 * @return {@link Reservation}
-	 */
-	private Reservation getReservationEntity(final Long reservationId) {
-		return reservationRepository.findById(reservationId)
-			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-	}
-
-	/**
-	 * 선상 낚시 게시글 Entity 를 반환합니다.
+	 * 예약 일자 조회, 예약 가능하면 예약 일자 정보 남은 인원 업데이트 메서드입니다.
 	 *
 	 * @param shipFishingPostId {@link Long}
-	 * @return {@link ShipFishingPost}
+	 * @param reservationDate {@link LocalDate}
+	 * @param guestCount {@link Long}
+	 * @param type {@link Boolean}
 	 */
-	private ShipFishingPost getShipFishingPostEntity(final Long shipFishingPostId) {
+	private void updateReservationDateWithRemainCount(
+		final Long shipFishingPostId,
+		final LocalDate reservationDate,
+		final Integer guestCount,
+		final Boolean type) {
 
-		return shipFishingPostRepository.findById(shipFishingPostId)
-			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
+		ReservationDate findReservationDate = reservationDateRepository
+			.findByIdWithPessimistic(shipFishingPostId, reservationDate)
+			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+		if (type) {
+			findReservationDate.remainPlus(guestCount);
+		} else {
+			verifyReservationDate(findReservationDate, guestCount);
+
+			findReservationDate.remainMinus(guestCount);
+		}
 	}
-
 }

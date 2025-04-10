@@ -8,6 +8,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.reservation.exception.ReservationErrorCode;
+import com.backend.domain.reservation.exception.ReservationException;
 import com.backend.domain.reservationdate.converter.ReservationDateConverter;
 import com.backend.domain.reservationdate.dto.response.ReservationDateResponse;
 import com.backend.domain.reservationdate.entity.ReservationDate;
@@ -35,6 +37,8 @@ public class ReservationDateServiceImpl implements ReservationDateService {
 		final Long shipFishingPostId,
 		final LocalDate reservationDate) {
 
+		verifyTodayAfterDate(reservationDate);
+
 		ShipFishingPost shipFishingPost = getShipFishingPostEntity(shipFishingPostId);
 
 		ReservationDate reservationDateEntity = getReservationDateOrSave(
@@ -55,6 +59,23 @@ public class ReservationDateServiceImpl implements ReservationDateService {
 			.findUnAvailableDatesByStartDateBetweenEndDate(shipFishingPostId, date.get(0), date.get(1));
 
 		return ReservationDateConverter.fromUnAvailableDateList(unAvailableDateList);
+	}
+
+	@Override
+	@Transactional
+	public void updateReservationDate(final Long shipFishingPostId, final LocalDate reservationDate,
+		final Long memberId) {
+
+		verifyTodayAfterDate(reservationDate);
+
+		ShipFishingPost shipFishingPost = getShipFishingPostEntity(shipFishingPostId);
+
+		verifyPostOwnership(shipFishingPost.getMemberId(), memberId);
+
+		ReservationDate reservation = getReservationDateOrSave(shipFishingPostId, reservationDate,
+			shipFishingPost.getMaxGuestCount());
+
+		reservation.updateBan();
 	}
 
 	@Async
@@ -117,5 +138,30 @@ public class ReservationDateServiceImpl implements ReservationDateService {
 		LocalDate lastDay = reservationDate.with(TemporalAdjusters.lastDayOfMonth());
 
 		return List.of(firstDay, lastDay);
+	}
+
+	/**
+	 * 이전 예약 조회, 수정 불가 검증 메서드
+	 *
+	 * @param reservationDate 예약 날짜
+	 */
+	private void verifyTodayAfterDate(final LocalDate reservationDate) {
+
+		if (reservationDate.isBefore(LocalDate.now())) {
+			throw new ReservationException(ReservationErrorCode.NOT_AVAILABLE_DATE_RESERVATION);
+		}
+	}
+
+	/**
+	 * 게시글의 소유자 여부 검증 메서드
+	 *
+	 * @param postOwnerId {@link Long}
+	 * @param memberId {@link Long}
+	 */
+	private void verifyPostOwnership(final Long postOwnerId, final Long memberId) {
+
+		if (!postOwnerId.equals(memberId)) {
+			throw new ShipFishingPostException(ShipFishingPostErrorCode.NOT_AUTHORITY_POSTS);
+		}
 	}
 }

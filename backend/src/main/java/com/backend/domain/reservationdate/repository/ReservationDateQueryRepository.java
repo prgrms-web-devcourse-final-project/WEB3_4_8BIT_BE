@@ -11,6 +11,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.reservationdate.entity.ReservationDate;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -71,6 +74,27 @@ public class ReservationDateQueryRepository {
 		return Optional.ofNullable(reservation);
 	}
 
+	public void plusRemainCount(final Long shipFishingPostId, final Integer updateCount, final LocalDate today) {
+
+		jpaQueryFactory.update(reservationDate1)
+			.set(reservationDate1.remainCount, reservationDate1.remainCount.add(updateCount))
+			.where(afterTodayAndIsBanFalse(shipFishingPostId, today))
+			.execute();
+	}
+
+	public void minusRemainCount(final Long shipFishingPostId, final Integer updateCount, final LocalDate today) {
+
+		NumberExpression<Integer> adjusted = new CaseBuilder()
+			.when(reservationDate1.remainCount.add(updateCount).gt(0))
+			.then(reservationDate1.remainCount.add(updateCount))
+			.otherwise(0);
+
+		jpaQueryFactory.update(reservationDate1)
+			.set(reservationDate1.remainCount, adjusted)
+			.where(afterTodayAndIsBanFalse(shipFishingPostId, today))
+			.execute();
+	}
+
 	public void deleteByShipFishingPostId(final Long shipFishingPostId) {
 
 		jpaQueryFactory.delete(reservationDate1)
@@ -86,5 +110,13 @@ public class ReservationDateQueryRepository {
 					.notIn(JPAExpressions.select(shipFishingPost.shipFishingPostId).from(shipFishingPost))
 			)
 			.execute();
+	}
+
+	private BooleanExpression afterTodayAndIsBanFalse(
+		final Long shipFishingPostId,
+		final LocalDate today) {
+		return reservationDate1.shipFishingPostId.eq(shipFishingPostId)
+			.and(reservationDate1.reservationDate.goe(today))
+			.and(reservationDate1.isBan.eq(false));
 	}
 }

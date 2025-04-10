@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "예약 정보 API")
@@ -59,15 +60,29 @@ public class ReservationController {
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
 
+	@GetMapping("/count")
+	@Operation(summary = "예약 내역 횟수 조회", description = "유저가 선상 낚시 예약 횟수를 조회 할 때 사용하는 API")
+	public ResponseEntity<GenericResponse<Long>> getReservationCount(
+		@AuthenticationPrincipal final CustomOAuth2User user) {
+
+		Long response = reservationService.getReservationCount(user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
+
 	@GetMapping("/members")
 	@Operation(summary = "예약 내역 조회 (유저)", description = "유저가 본인이 예약한 내역을 조회 할 때 사용하는 API")
-	public ResponseEntity<GenericResponse<ScrollResponse<ReservationResponse.DetailWithName>>> getUserReservationList(
+	@Parameter(name = "afterToday", description = "오늘 이후 예약인지, 이전 예약인지 여부", example = "true")
+	@Parameter(name = "isConfirm", description = "확정된 예약인지, 취소된 예약인지 여부", example = "true")
+	public ResponseEntity<GenericResponse<ScrollResponse<ReservationResponse.DetailReservationList>>> getUserReservationList(
+		@RequestParam final Boolean afterToday,
+		@RequestParam final Boolean isConfirm,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		ScrollResponse<ReservationResponse.DetailWithName> response = reservationService
-			.getUserReservationList(user.getId(), cursorRequestDto);
+		ScrollResponse<ReservationResponse.DetailReservationList> response = reservationService
+			.getUserReservationListWithImage(user.getId(), afterToday, isConfirm, cursorRequestDto);
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
@@ -75,14 +90,28 @@ public class ReservationController {
 	@GetMapping("/captains")
 	@Operation(summary = "예약 내역 조회 (선장)", description = "선장이 예약 리스트를 조회 할 때 사용하는 API")
 	@Parameter(name = "shipFishingPostId", description = "선상 낚시 게시글 ID", example = "1")
+	@Parameter(name = "afterToday", description = "오늘 이후 예약인지, 이전 예약인지 여부", example = "true")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReservationResponse.DetailWithName>>> getCaptainReservationList(
 		@RequestParam(required = false) final Long shipFishingPostId,
+		@RequestParam final Boolean afterToday,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
 		ScrollResponse<ReservationResponse.DetailWithName> response = reservationService
-			.getCaptainReservationList(shipFishingPostId, user.getId(), cursorRequestDto);
+			.getCaptainReservationList(shipFishingPostId, user.getId(), afterToday, cursorRequestDto);
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
+
+	@GetMapping("/dashboard")
+	@Operation(summary = "선장 마이페이지 대시보드", description = "선장의 마이페이지에서 대시보드 내용을(새 예약 신청, 다가오는 예약, 작성한 게시글 수) 조회 할 때 사용하는 API")
+	public ResponseEntity<GenericResponse<ReservationResponse.DashBoard>> getReservationDashBoard(
+		@RequestParam(value = "limitDays", required = false, defaultValue = "5") @Min(1) final Integer limitDays,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		ReservationResponse.DashBoard response = reservationService.getDashBoard(user.getId(), limitDays);
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}

@@ -26,8 +26,8 @@ import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
 import com.backend.domain.review.entity.Review;
 import com.backend.domain.review.exception.ReviewErrorCode;
 import com.backend.domain.review.exception.ReviewException;
-
 import com.backend.domain.review.repository.ReviewRepository;
+import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
@@ -38,13 +38,16 @@ public class ReviewServiceTest extends BaseTest {
 	@Mock
 	private ReviewRepository reviewRepository;
 
+	@Mock
+	private ShipFishingPostRepository shipFishingPostRepository;
+
 	@InjectMocks
 	private ReviewServiceImpl reviewServiceImpl;
 
 	@Test
 	@DisplayName("리뷰 저장 [Service] - Success")
 	void t01() {
-	    //given
+		//given
 		Long givenMemberId = 1L;
 		Long givenReservationId = 1L;
 		ReviewRequest.Create givenRequest = fixtureMonkeyValidation.giveMeOne(ReviewRequest.Create.class);
@@ -58,7 +61,7 @@ public class ReviewServiceTest extends BaseTest {
 		//when
 		Long savedReviewId = reviewServiceImpl.save(givenMemberId, givenReservationId, givenRequest);
 
-	    //then
+		//then
 		verify(reviewRepository).existsByReservationId(givenReservationId);
 		verify(reviewRepository).save(any(Review.class));
 		assertThat(savedReviewId).isEqualTo(1L);
@@ -93,10 +96,12 @@ public class ReviewServiceTest extends BaseTest {
 		List<ReviewWithMemberResponse> reviewList = fixtureMonkeyValidation.giveMe(ReviewWithMemberResponse.class, 2);
 		Page<ReviewWithMemberResponse> givenPage = new PageImpl<>(reviewList, pageable, reviewList.size());
 
-		given(reviewRepository.findReviewsWithMemberByPostId(givenMemberId, givenPostId, pageable)).willReturn(givenPage);
+		given(reviewRepository.findReviewsWithMemberByPostId(givenMemberId, givenPostId, pageable)).willReturn(
+			givenPage);
 
 		// when
-		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(givenMemberId, givenPostId, pageable);
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(givenMemberId, givenPostId,
+			pageable);
 
 		// then
 		assertThat(result).hasSize(2);
@@ -112,10 +117,12 @@ public class ReviewServiceTest extends BaseTest {
 		Pageable pageable = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "createdAt"));
 		Page<ReviewWithMemberResponse> emptyPage = Page.empty(pageable);
 
-		given(reviewRepository.findReviewsWithMemberByPostId(givenMemberId, givenPostId, pageable)).willReturn(emptyPage);
+		given(reviewRepository.findReviewsWithMemberByPostId(givenMemberId, givenPostId, pageable)).willReturn(
+			emptyPage);
 
 		// when
-		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(givenMemberId, givenPostId, pageable);
+		Slice<ReviewWithMemberResponse> result = reviewServiceImpl.getReviewListByPostId(givenMemberId, givenPostId,
+			pageable);
 
 		// then
 		assertThat(result).isEmpty();
@@ -311,6 +318,8 @@ public class ReviewServiceTest extends BaseTest {
 
 		// then
 		verify(reviewRepository).findById(givenReviewId);
+		verify(shipFishingPostRepository)
+			.updateReviewEverRateByDelete(givenReview.getShipFishingPostId());
 		verify(reviewRepository).delete(givenReview);
 	}
 

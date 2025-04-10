@@ -1,7 +1,9 @@
 package com.backend.domain.reservation.dto.response;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
+import java.util.List;
 
 import com.backend.domain.reservation.entity.ReservationStatus;
 
@@ -125,5 +127,91 @@ public class ReservationResponse {
 		ZonedDateTime createdAt,
 		ZonedDateTime modifiedAt
 	) {
+	}
+
+	@Builder
+	public record DetailQueryDto(
+		Long reservationId,
+		Long shipFishingPostId,
+		String reservationNumber,
+		String subject,
+		LocalDate reservationDate,
+		LocalTime startTime,
+		String location,
+		Integer guestCount,
+		Long totalPrice,
+		ReservationStatus reservationStatus,
+		List<Long> fileIdList,
+		ZonedDateTime createdAt
+	) {
+		public DetailQueryDto {
+			fileIdList = (fileIdList == null) ? List.of() : fileIdList;
+		}
+	}
+
+	@Builder
+	public record DetailReservationList(
+		Long reservationId,
+		Long shipFishingPostId,
+		String reservationNumber,
+		String subject,
+		LocalDate reservationDate,
+		LocalTime startTime,
+		String location,
+		Integer guestCount,
+		Long totalPrice,
+		ReservationStatus reservationStatus,
+		List<String> fileUrlList,
+		ZonedDateTime createdAt
+	) {
+		public static DetailReservationList fromDetailReservationList(
+			final ReservationResponse.DetailQueryDto detail,
+			final List<String> fileUrlList
+		) {
+			return DetailReservationList.builder()
+				.reservationId(detail.reservationId())
+				.shipFishingPostId(detail.shipFishingPostId())
+				.reservationNumber(detail.reservationNumber())
+				.subject(detail.subject())
+				.reservationDate(detail.reservationDate())
+				.startTime(detail.startTime())
+				.location(detail.location())
+				.guestCount(detail.guestCount())
+				.totalPrice(detail.totalPrice())
+				.reservationStatus(detail.reservationStatus())
+				.fileUrlList(fileUrlList)
+				.createdAt(detail.createdAt())
+				.build();
+		}
+	}
+
+	/**
+	 * {
+	 *     "todayReservationCount": 5,
+	 *     "recentReservationCount": 8,
+	 *     "writtenPostCount": 3
+	 * }
+	 *
+	 * @param todayReservationCount 오늘 예약 횟수
+	 * @param recentReservationCount 다가오는 예약 횟수
+	 * @param writtenPostCount 작성한 게시글 수
+	 */
+	@Builder
+	public record DashBoard(
+		Long todayReservationCount,
+		Long recentReservationCount,
+		Long writtenPostCount
+	) {
+		public static DashBoard fromDashBoard(
+			final Long todayReservationCount,
+			final Long recentReservationCount,
+			final Long writtenPostCount) {
+
+			return DashBoard.builder()
+				.todayReservationCount(todayReservationCount)
+				.recentReservationCount(recentReservationCount)
+				.writtenPostCount(writtenPostCount)
+				.build();
+		}
 	}
 }
