@@ -139,4 +139,22 @@ public class FishingTripPostController {
 		fishingTripPostService.delete(user.getId(), fishingTripPostId);
 		return ResponseEntity.ok(GenericResponse.of(true));
 	}
+
+	@GetMapping("/my-participate")
+	@Operation(
+		summary = "내가 신청한 동출 모집글 스크롤 조회",
+		description = "로그인한 사용자가 신청한 동출 모집글을 상태 기준으로 조회하는 API"
+	)
+	@Parameter(name = "status", required = true, description = "게시글 상태 ", example = "RECRUITING")
+	public ResponseEntity<GenericResponse<ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage>>> getMyParticipatedFishingTripPosts(
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@Valid final GlobalRequest.CursorRequest cursorRequest,
+		@RequestParam final PostStatus status
+	) {
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> responseDto =
+			fishingTripPostService.findMyFishingTripPostDetailPage(cursorRequest, user.getId(), status);
+
+		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
+	}
+
 }
