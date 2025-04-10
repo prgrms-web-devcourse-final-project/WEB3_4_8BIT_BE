@@ -5,6 +5,9 @@ import java.util.List;
 
 import com.backend.domain.chat.message.entity.MessageType;
 
+import lombok.Builder;
+
+@Builder
 public record MessageResponse(
 	String messageId,
 	Long roomId,
