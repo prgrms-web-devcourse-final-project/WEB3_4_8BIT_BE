@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "예약 일자 정보 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/reservation_dates")
+@RequestMapping("/api/v1/reservation-dates")
 public class ReservationDateController {
 
 	private final ReservationDateService reservationDateService;
