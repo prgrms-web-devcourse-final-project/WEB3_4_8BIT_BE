@@ -97,4 +97,42 @@ public class FishingTripPostConverter {
 			.participants(participants)
 			.build();
 	}
+
+	/**
+	 * 게시글 상세 정보를 응답 객체로 변환하는 메서드입니다.
+	 *
+	 * <p>QueryDSL에서 조회된 {@link FishingTripPostResponse.DetailQueryDto}와 첨부 이미지 URL 목록, 좋아요 수,
+	 * 현재 사용자의 좋아요 여부를 받아 최종 응답 DTO인 {@link FishingTripPostResponse.Detail}을 생성합니다.</p>
+	 *
+	 * @param detailQueryDto 게시글의 상세 정보를 담은 DTO
+	 * @param fileUrlList 게시글에 첨부된 이미지 파일의 URL 리스트
+	 * @param likeCount 게시글에 대한 총 좋아요 수
+	 * @param isLiked 현재 로그인한 사용자가 해당 게시글에 좋아요를 눌렀는지 여부
+	 * @return 게시글 상세 응답 DTO
+	 */
+	public static FishingTripPostResponse.Detail toDetail(
+		final FishingTripPostResponse.DetailQueryDto detailQueryDto,
+		final List<String> fileUrlList,
+		final Long likeCount,
+		final boolean isLiked
+	) {
+		return FishingTripPostResponse.Detail.builder()
+			.fishingTripPostId(detailQueryDto.fishingTripPostId())
+			.name(detailQueryDto.name())
+			.subject(detailQueryDto.subject())
+			.content(detailQueryDto.content())
+			.currentCount(detailQueryDto.currentCount())
+			.recruitmentCount(detailQueryDto.recruitmentCount())
+			.createDate(detailQueryDto.createDate())
+			.fishingDate(detailQueryDto.fishingDate())
+			.fishPointDetailName(detailQueryDto.fishPointDetailName())
+			.fishPointName(detailQueryDto.fishPointName())
+			.longitude(detailQueryDto.longitude())
+			.latitude(detailQueryDto.latitude())
+			.fileUrlList(fileUrlList)
+			.postStatus(detailQueryDto.postStatus())
+			.likeCount(likeCount)
+			.isLiked(isLiked)
+			.build();
+	}
 }
