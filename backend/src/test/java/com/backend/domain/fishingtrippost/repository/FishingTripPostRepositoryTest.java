@@ -222,16 +222,19 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
+				.set("createdAt", ZonedDateTime.now().minusSeconds(2))
 				.set("fishingTripPostId", null)
 				.sample()),
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
+				.set("createdAt", ZonedDateTime.now().minusSeconds(1))
 				.set("fishingTripPostId", null)
 				.sample()),
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
+				.set("createdAt", ZonedDateTime.now())
 				.set("fishingTripPostId", null)
 				.sample())
 		));
