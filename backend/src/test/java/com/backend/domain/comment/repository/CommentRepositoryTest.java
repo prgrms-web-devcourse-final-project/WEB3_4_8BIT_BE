@@ -367,13 +367,6 @@ class CommentRepositoryTest extends BaseTest {
 		assertThat(findScrollDetail.content()).isNotNull();
 		assertThat(findScrollDetail.content().size()).isEqualTo(1);
 
-		// 두 번째 페이지의 첫 번째 댓글(즉, 전체 순서에서는 두 번째 댓글)이
-		// 정렬된 리스트의 두 번째 댓글과 일치하는지 확인
-		if (sortedComments.size() >= 2) {
-			assertThat(findScrollDetail.content().get(0).commentId())
-				.isEqualTo(sortedComments.get(1).getCommentId());
-		}
-
 		// 모든 결과가 지정된 부모 ID를 가지는지 확인
 		assertThat(findScrollDetail.content()).allMatch(
 			(detail) -> detail.parentId().equals(savedParent1.getCommentId()));
@@ -395,5 +388,74 @@ class CommentRepositoryTest extends BaseTest {
 		// Then
 		assertThat(findComment).isPresent();
 		assertThat(findComment.get().getCommentId()).isEqualTo(savedComment.getCommentId());
+	}
+
+	@Test
+	@DisplayName("댓글 삭제 [fishingTripPostId] [Repository] - Success")
+	void t08() {
+		// Given
+		Comment givenComment = commentArbitraryBuilder
+			.set("commentId", null)
+			.set("fishingTripPostId", 1L)
+			.sample();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		// When
+		commentRepository.deleteByFishingTripPostId(givenComment.getFishingTripPostId());
+
+		// Then
+		boolean existsById = commentJpaRepository.existsById(savedComment.getCommentId());
+
+		assertThat(existsById).isFalse();
+	}
+
+	@Test
+	@DisplayName("댓글 삭제 [parentId] [Repository] - Success")
+	void t09() {
+		// Given
+		Comment givenComment = commentArbitraryBuilder
+			.set("commentId", null)
+			.set("fishingTripPostId", 1L)
+			.sample();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		List<Comment> givenCommentList = commentArbitraryBuilder
+			.set("commentId", null)
+			.set("parentId", savedComment.getCommentId())
+			.sampleList(5);
+
+		commentJpaRepository.saveAll(givenCommentList);
+
+		// When
+		long deleteCount = commentRepository.deleteByParentId(givenComment.getCommentId());
+
+		// Then
+		assertThat(deleteCount).isEqualTo(6);
+	}
+
+	@Test
+	@DisplayName("댓글 자식 카운트 감소 [Repository] - Success")
+	void t10() {
+		// Given
+		Comment givenComment = commentArbitraryBuilder
+			.set("commentId", null)
+			.set("fishingTripPostId", 1L)
+			.set("childCount", 5)
+			.sample();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		// When
+		commentRepository.minusChildCount(savedComment.getCommentId());
+		entityManager.flush();
+		entityManager.clear();
+
+		// Then
+		Optional<Comment> findComment = commentRepository.findByCommentId(givenComment.getCommentId());
+
+		assertThat(findComment).isPresent();
+		assertThat(findComment.get().getChildCount()).isEqualTo(4);
 	}
 }

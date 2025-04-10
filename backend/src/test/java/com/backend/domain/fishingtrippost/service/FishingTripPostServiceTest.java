@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.backend.domain.chat.room.entity.TargetType;
 import com.backend.domain.chat.room.service.RoomService;
+import com.backend.domain.comment.repository.CommentRepository;
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
@@ -71,6 +72,9 @@ class FishingTripPostServiceTest extends BaseTest {
 
 	@Mock
 	private RoomService roomService;
+
+	@Mock
+	private CommentRepository commentRepository;
 
 	private final ArbitraryBuilder<FishingTripPostRequest.Form> createRequestBuilder =
 		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Form.class);

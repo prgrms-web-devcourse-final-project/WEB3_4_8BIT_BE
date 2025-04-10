@@ -474,4 +474,33 @@ class CommentControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
 			.andExpect(jsonPath("$.success").value(false));
 	}
+
+	@Test
+	@DisplayName("댓글 삭제 [Controller] - Success")
+	@WithMockCustomUser
+	void t14() throws Exception {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		doNothing().when(commentService).deleteComment(
+			givenMemberId,
+			givenCommentId,
+			givenFishingTripPostId
+		);
+
+		// When
+		ResultActions resultActions = mockMvc
+			.perform(delete(
+				"/api/v1/fishing-trip-post/{fishingTripPostId}/comment/{commentId}",
+				givenCommentId,
+				givenCommentId));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.success").value(true));
+	}
 }

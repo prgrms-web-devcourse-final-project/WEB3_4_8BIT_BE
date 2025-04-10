@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -82,6 +83,20 @@ public class CommentController {
 	) {
 
 		commentService.updateComment(fishingTripPostId, commentId, user.getId(), requestDto);
+
+		return ResponseEntity.ok(GenericResponse.of(true));
+	}
+
+	@Operation(summary = "댓글 삭제", description = "댓글 삭제시 사용하는 API (자식 댓글도 함께 삭제)")
+	@DeleteMapping("/{fishingTripPostId}/comment/{commentId}")
+	public ResponseEntity<GenericResponse<Void>> deleteComment(
+		@Parameter(description = "댓글이 달려있는 동출 게시글 ID", example = "1")
+		@PathVariable final Long fishingTripPostId,
+		@Parameter(description = "삭제할 댓글 ID", example = "1")
+		@PathVariable final Long commentId,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+		commentService.deleteComment(fishingTripPostId, commentId, user.getId());
 
 		return ResponseEntity.ok(GenericResponse.of(true));
 	}
