@@ -74,6 +74,12 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	public Long getReservationCount(final Long memberId) {
+
+		return reservationRepository.getReservationCount(memberId);
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	public ScrollResponse<ReservationResponse.DetailWithName> getUserReservationList(final Long memberId,
 		final GlobalRequest.CursorRequest cursorRequestDto) {

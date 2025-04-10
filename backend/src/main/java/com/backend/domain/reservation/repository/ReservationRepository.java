@@ -29,6 +29,15 @@ public interface ReservationRepository {
 	Optional<Reservation> findById(final Long reservationId);
 
 	/**
+	 * 유저의 예약 내역 횟수를 조회합니다.
+	 *
+	 * @param memberId 유저 ID
+	 * @return 유저 예약 내역 횟수
+	 * @implSpec 유저의 확정된 예약 내역 횟수를 반환합니다.
+	 */
+	Long getReservationCount(final Long memberId);
+
+	/**
 	 * 예약 상세정보를 조회하는 메서드입니다.
 	 *
 	 * @param reservationId {@link Long}

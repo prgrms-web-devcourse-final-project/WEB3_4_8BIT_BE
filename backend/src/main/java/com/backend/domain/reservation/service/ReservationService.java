@@ -30,6 +30,15 @@ public interface ReservationService {
 	ReservationResponse.DetailWithMember getReservation(final Long reservationId, final Long memberId);
 
 	/**
+	 * 유저의 예약 내역 횟수를 조회합니다.
+	 *
+	 * @param memberId 유저 ID
+	 * @return 유저 예약 내역 횟수
+	 * @implSpec 유저의 확정된 예약 내역 횟수를 반환합니다.
+	 */
+	Long getReservationCount(final Long memberId);
+
+	/**
 	 * 유저가 예약한 내역을 조회하는 메서드
 	 *
 	 * @param memberId {@link Long}

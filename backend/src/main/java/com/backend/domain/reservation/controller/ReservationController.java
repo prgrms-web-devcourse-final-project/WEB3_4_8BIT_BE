@@ -59,6 +59,16 @@ public class ReservationController {
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
 
+	@GetMapping("/count")
+	@Operation(summary = "예약 내역 횟수 조회", description = "유저가 선상 낚시 예약 횟수를 조회 할 때 사용하는 API")
+	public ResponseEntity<GenericResponse<Long>> getReservationCount(
+		@AuthenticationPrincipal final CustomOAuth2User user) {
+
+		Long response = reservationService.getReservationCount(user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
+
 	@GetMapping("/members")
 	@Operation(summary = "예약 내역 조회 (유저)", description = "유저가 본인이 예약한 내역을 조회 할 때 사용하는 API")
 	@Parameter(name = "afterToday", description = "오늘 이후 예약인지, 이전 예약인지 여부", example = "true")

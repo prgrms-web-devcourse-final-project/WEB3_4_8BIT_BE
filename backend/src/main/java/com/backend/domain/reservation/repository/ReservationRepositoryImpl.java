@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import com.backend.domain.reservation.dto.response.ReservationResponse;
 import com.backend.domain.reservation.entity.Reservation;
+import com.backend.domain.reservation.entity.ReservationStatus;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 
@@ -29,6 +30,12 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 	public Optional<Reservation> findById(final Long reservationId) {
 
 		return reservationJpaRepository.findById(reservationId);
+	}
+
+	@Override
+	public Long getReservationCount(final Long memberId) {
+
+		return reservationJpaRepository.countByMemberIdAndStatus(memberId, ReservationStatus.CONFIRMED);
 	}
 
 	@Override
