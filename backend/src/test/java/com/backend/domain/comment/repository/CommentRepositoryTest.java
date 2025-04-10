@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -76,31 +77,38 @@ class CommentRepositoryTest extends BaseTest {
 		.set("content", englishStringLength);
 
 	@BeforeEach
-	void setUp() {
-		List<File> givenFileList = fixtureMonkeyBuilder
-			.giveMeBuilder(File.class)
-			.set("fileId", null)
-			.sampleList(10);
+void setUp() {
+    List<File> givenFileList = fixtureMonkeyBuilder
+        .giveMeBuilder(File.class)
+        .set("fileId", null)
+        .sampleList(10);
 
-		savedfileList = storageJpaRepository.saveAll(givenFileList);
+    savedfileList = storageJpaRepository.saveAll(givenFileList);
 
-		List<Member> memberList = new ArrayList<>();
+    List<Member> memberList = new ArrayList<>();
 
-		for (File file : savedfileList) {
-			memberList.add(
-				fixtureMonkeyBuilder.giveMeBuilder(Member.class)
-					.set("memberId", null)
-					.set("email", englishStringLength)
-					.set("phone", englishStringLength)
-					.set("nickname", englishStringLength)
-					.set("name", englishStringLength)
-					.set("description", englishStringLength)
-					.set("fileId", file.getFileId())
-					.sample()
-			);
-		}
+    for (int i = 0; i < savedfileList.size(); i++) {
+		File file = savedfileList.get(i);
+        memberList.add(
+            fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+                .set("memberId", null)
+                .set("email", "unique_email_" + i + "@test.com")
+                .set("phone", "phone_" + i)
+                .set("nickname", "nickname_" + i)
+                .set("name", englishStringLength)
+                .set("description", englishStringLength)
+                .set("fileId", file.getFileId())
+                .sample()
+        );
+    }
 
-		savedMemberList = memberJpaRepository.saveAll(memberList);
+    savedMemberList = memberJpaRepository.saveAll(memberList);
+}
+
+	@AfterEach
+	void afterEach() {
+		memberJpaRepository.deleteAll();
+		commentJpaRepository.deleteAll();
 	}
 
 	@Test
