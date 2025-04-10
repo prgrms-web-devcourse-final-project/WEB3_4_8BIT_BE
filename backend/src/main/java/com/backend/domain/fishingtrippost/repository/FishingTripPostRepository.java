@@ -110,6 +110,7 @@ public interface FishingTripPostRepository {
 		final Long fishingTripPostId
 	);
   
+	/**
 	 * 동출 모집 게시글 좋아요 수 업데이트 메서드
 	 *
 	 * @param fishingTripPostId 동출 모집 게시글 ID
