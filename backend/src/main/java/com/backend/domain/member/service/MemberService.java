@@ -44,5 +44,5 @@ public interface MemberService {
 	 * @param memberId 프로필 이미지를 가져올 회원 ID
 	 * @return	회원의 프로필 이미지 URL
 	 */
-	String getMemberFileUrl(final Long memberId);
+	MemberResponse.ChatProfile getChatProfile(final Long memberId);
 }
