@@ -85,6 +85,29 @@ public class CommentServiceImpl implements CommentService {
 		getComment.setContent(requestDto.content());
 	}
 
+	@Override
+	@Transactional
+	public void deleteComment(
+		final Long memberId,
+		final Long commentId,
+		final Long fishingTripPostId
+	) {
+		Comment getComment = getComment(commentId);
+
+		validMemberIdAndFishingTripPostId(memberId, fishingTripPostId, getComment);
+
+		minusChildCount(getComment);
+
+		// TODO 추후 게시글에 댓글 카운트 증감하는 로직 구현해야함
+		long deleteCount = commentRepository.deleteByParentId(commentId);
+	}
+
+	private void minusChildCount(final Comment getComment) {
+		if (getComment.getParentId() != null) {
+			commentRepository.minusChildCount(getComment.getParentId());
+		}
+	}
+
 	private void validMemberIdAndFishingTripPostId(
 		final Long memberId,
 		final Long fishingTripPostId,

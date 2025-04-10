@@ -47,7 +47,6 @@ public interface CommentService {
 	 * @param commentId         {@link Long}
 	 * @param fishingTripPostId {@link Long}
 	 * @param requestDto        {@link CommentRequest.Update}
-	 * @return {@link ScrollResponse<CommentResponse.Detail>}
 	 * @implSpec 작성자인지, 요청한 commentId, fishingTripPostId가 유효한지 검증 후 수정
 	 * @author Kim Dong O
 	 */
@@ -56,5 +55,20 @@ public interface CommentService {
 		final Long commentId,
 		final Long fishingTripPostId,
 		final CommentRequest.Update requestDto
+	);
+
+	/**
+	 * 댓글 삭제 메소드
+	 *
+	 * @param memberId          {@link Long}
+	 * @param commentId         {@link Long}
+	 * @param fishingTripPostId {@link Long}
+	 * @implSpec 작성자인지, 요청한 commentId, fishingTripPostId가 유효한지 검증 후 댓글 삭제 & 자식 댓글 삭제 함께 수행
+	 * @author Kim Dong O
+	 */
+	void deleteComment(
+		final Long memberId,
+		final Long commentId,
+		final Long fishingTripPostId
 	);
 }
