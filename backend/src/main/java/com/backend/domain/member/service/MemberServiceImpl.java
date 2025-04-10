@@ -1,5 +1,7 @@
 package com.backend.domain.member.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +11,7 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
+import com.backend.global.storage.service.StorageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberServiceImpl implements MemberService {
 
 	private final MemberRepository memberRepository;
+	private final StorageService storageService;
 
 	@Override
 	@Transactional
@@ -51,6 +55,12 @@ public class MemberServiceImpl implements MemberService {
 		log.debug("회원 정보를 수정하였습니다. 닉네임 :{}", member.getNickname());
 
 		return member.getMemberId();
+	}
+
+	@Override
+	public String getMemberFileUrl(final Long memberId) {
+		Long fileId = getMemberById(memberId).getFileId();
+		return storageService.getFileUrlsByIdList(List.of(fileId)).stream().findFirst().orElse(null);
 	}
 
 	/**
