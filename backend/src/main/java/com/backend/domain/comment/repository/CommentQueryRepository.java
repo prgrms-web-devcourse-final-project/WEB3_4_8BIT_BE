@@ -64,6 +64,7 @@ public class CommentQueryRepository {
 			.select(new QCommentResponse_Detail(
 				comment.commentId,
 				comment.content,
+				member.nickname,
 				comment.memberId.eq(memberId),
 				file.url,
 				comment.createdAt,
@@ -105,7 +106,7 @@ public class CommentQueryRepository {
 
 		// 입력값 유효성 검사
 		if ((!StringUtils.hasText(cursorRequestDto.fieldValue()) && cursorRequestDto.id() == null) && requestDto.parentId() == null) {
-			return baseBooleanExpression;
+			return baseBooleanExpression.and(comment.parentId.isNull());
 		} else if ((!StringUtils.hasText(cursorRequestDto.fieldValue()) && cursorRequestDto.id() == null) && requestDto.parentId() != null){
 			return baseBooleanExpression.and(comment.parentId.eq(requestDto.parentId()));
 		}

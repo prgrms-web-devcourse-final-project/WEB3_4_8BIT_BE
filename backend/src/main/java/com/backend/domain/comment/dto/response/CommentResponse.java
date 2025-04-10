@@ -10,6 +10,7 @@ public class CommentResponse {
 	public record Detail(
 		Long commentId,
 		String content,
+		String nickname,
 		boolean isAuthor,
 		String authorProfileImg,
 		ZonedDateTime createdAt,
