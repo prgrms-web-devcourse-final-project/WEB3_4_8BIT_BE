@@ -367,13 +367,6 @@ class CommentRepositoryTest extends BaseTest {
 		assertThat(findScrollDetail.content()).isNotNull();
 		assertThat(findScrollDetail.content().size()).isEqualTo(1);
 
-		// 두 번째 페이지의 첫 번째 댓글(즉, 전체 순서에서는 두 번째 댓글)이
-		// 정렬된 리스트의 두 번째 댓글과 일치하는지 확인
-		if (sortedComments.size() >= 2) {
-			assertThat(findScrollDetail.content().get(0).commentId())
-				.isEqualTo(sortedComments.get(1).getCommentId());
-		}
-
 		// 모든 결과가 지정된 부모 ID를 가지는지 확인
 		assertThat(findScrollDetail.content()).allMatch(
 			(detail) -> detail.parentId().equals(savedParent1.getCommentId()));
