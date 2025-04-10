@@ -71,6 +71,9 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 	@Autowired
 	private ShipFishingPostRepository shipFishingPostRepository;
 
+	@Autowired
+	private ShipFishingPostJpaRepository shipFishingPostJpaRepository;
+
 	private final ArbitraryBuilder<ShipFishingPost> arbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(
 		ShipFishingPost.class).set("subject", "1555");
 
@@ -142,6 +145,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 	public void tearDown() {
 		em.flush();
 		em.clear();
+		shipFishingPostJpaRepository.deleteAll();
 	}
 
 	@Test
