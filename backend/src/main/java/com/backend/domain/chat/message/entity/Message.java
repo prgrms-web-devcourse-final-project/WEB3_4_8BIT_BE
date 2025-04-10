@@ -27,10 +27,10 @@ public class Message {
 	@Field("room_id")
 	private Long roomId;
 
-	@Field("member_id")
+	@Field("sender_id")
 	private Long senderId;
 
-	@Field("member_nickname")
+	@Field("sender_nickname")
 	private String senderNickname;
 
 	@Field("content")

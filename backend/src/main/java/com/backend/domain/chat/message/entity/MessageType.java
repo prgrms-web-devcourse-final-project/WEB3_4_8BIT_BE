@@ -1,6 +1,6 @@
 package com.backend.domain.chat.message.entity;
 
 public enum MessageType {
-	TEXT,
+	TALK,
 	IMAGE
 }
