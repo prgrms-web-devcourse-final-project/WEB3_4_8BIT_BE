@@ -166,11 +166,12 @@ public class ReservationServiceTest extends BaseTest {
 
 		// When
 		when(reservationRepository.findDetailWithNameByMemberIdAndShipFishingPostId(any(Long.class), any(Long.class),
+			eq(true),
 			eq(givenCursorRequestDto))).thenReturn(givenScrollResponse);
 
 		// Then
 		ScrollResponse<ReservationResponse.DetailWithName> findScrollResponse = reservationServiceImpl
-			.getCaptainReservationList(1L, 1L, givenCursorRequestDto);
+			.getCaptainReservationList(1L, 1L, true, givenCursorRequestDto);
 
 		assertThat(givenScrollResponse.content().size()).isEqualTo(findScrollResponse.content().size());
 	}
