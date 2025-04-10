@@ -118,4 +118,12 @@ public interface FishingTripPostRepository {
 	 * @implSpec 해당 게시글의 좋아요 수를 갱신합니다.
 	 */
 	void updateLikeCount(final Long fishingTripPostId, final Long likeCount);
+
+	/**
+	 * 동출 게시글을 삭제하는 메서드입니다.
+	 * <p>해당 게시글 객체를 인자로 받아 삭제를 수행합니다.</p>
+	 *
+	 * @param fishingTripPost 삭제할 동출 게시글 엔티티
+	 */
+	void delete(final FishingTripPost fishingTripPost);
 }

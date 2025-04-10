@@ -4,6 +4,7 @@ import java.net.URI;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -123,5 +124,19 @@ public class FishingTripPostController {
 			fishingTripPostService.getFishingTripPostParticipationDetail(memberId, fishingTripPostId);
 
 		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
+	}
+
+	@DeleteMapping("/{fishingTripPostId}")
+	@Operation(
+		summary = "동출 모집 게시글 삭제",
+		description = "로그인한 사용자가 자신이 작성한 동출 모집 게시글을 삭제하는 API"
+	)
+	@Parameter(name = "fishingTripPostId", required = true, description = "삭제할 동출 모집 게시글 ID", example = "1")
+	public ResponseEntity<GenericResponse<Void>> deleteFishingTripPost(
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@PathVariable final Long fishingTripPostId
+	) {
+		fishingTripPostService.delete(user.getId(), fishingTripPostId);
+		return ResponseEntity.ok(GenericResponse.of(true));
 	}
 }
