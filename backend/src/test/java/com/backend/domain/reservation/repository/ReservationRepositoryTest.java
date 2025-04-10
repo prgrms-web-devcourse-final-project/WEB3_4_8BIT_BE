@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -719,7 +720,7 @@ public class ReservationRepositoryTest extends BaseTest {
 	@Test
 	@DisplayName("유저별 예약 횟수 조회 [Repository] - Success")
 	void t11() {
-		// Givenz
+		// Given
 		Long givenMemberId = 1L;
 
 		for (int i = 1; i <= 4; i++) {
@@ -749,6 +750,72 @@ public class ReservationRepositoryTest extends BaseTest {
 		Long reservationCount = reservationRepository.getReservationCount(givenMemberId);
 
 		assertThat(reservationCount).isEqualTo(4);
+	}
+
+	@Test
+	@DisplayName("선장 대시 보드 조회 [Repository] - Success")
+	void t12() {
+		// Given
+		Long givenMemberId = 1L;
+		int givenLimitDays = 5;
+
+		List<Long> shipFishingPostIdList = new ArrayList<>();
+
+		for (int i = 1; i <= 3; i++) {
+			ShipFishingPost post = fixtureMonkeyBuilder
+				.giveMeBuilder(ShipFishingPost.class)
+				.set("shipFishingPostId", null)
+				.set("memberId", givenMemberId)
+				.set("subject", "TestSubject")
+				.set("content", "TestContent")
+				.set("fishIdList", List.of())
+				.set("fileIdList", List.of())
+				.set("price", 10000L)
+				.set("shipId", 100L * i)
+				.set("reviewEverRate", 0.0D)
+				.set("maxGuestCount", 100)
+				.sample();
+
+			shipFishingPostIdList.add(shipFishingPostRepository.save(post).getShipFishingPostId());
+		}
+
+		for (int i = 1; i <= 4; i++) {
+			Reservation givenReservation = fixtureMonkeyBuilder
+				.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("shipFishingPostId", shipFishingPostIdList.get(0))
+				.set("memberId", givenMemberId)
+				.set("guestCount", 2)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("status", ReservationStatus.CONFIRMED)
+				.set("createdAt", ZonedDateTime.now().minusDays(2L * i))
+				.sample();
+
+			reservationRepository.save(givenReservation);
+		}
+
+		for (int i = 1; i <= 3; i++) {
+			Reservation givenReservation = fixtureMonkeyBuilder
+				.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("shipFishingPostId", shipFishingPostIdList.get(0))
+				.set("memberId", givenMemberId)
+				.set("guestCount", 2)
+				.set("reservationDate", LocalDate.now().plusDays(i * 6L))
+				.set("status", ReservationStatus.CONFIRMED)
+				.set("createdAt", ZonedDateTime.now())
+				.sample();
+
+			reservationRepository.save(givenReservation);
+		}
+
+		// Then
+		ReservationResponse.DashBoard findResponseDto = reservationRepository.findDashBoardByMemberId(givenMemberId,
+			givenLimitDays);
+
+		assertThat(findResponseDto.todayReservationCount()).isEqualTo(7);
+		assertThat(findResponseDto.recentReservationCount()).isEqualTo(4);
+		assertThat(findResponseDto.writtenPostCount()).isEqualTo(3);
 	}
 
 }
