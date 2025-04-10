@@ -468,4 +468,60 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.isFirst").value(true))
 			.andExpect(jsonPath("$.data.isLast").value(true));
 	}
+
+	@Test
+	@WithMockCustomUser
+	@DisplayName("동출 게시글 참여자 정보 조회 [Controller] - Success")
+	void t16() throws Exception {
+		// Given
+		Long postId = 1L;
+		Long memberId = 1L;
+
+		FishingTripPostResponse.FishingTripPostParticipationDetail responseDto =
+			new FishingTripPostResponse.FishingTripPostParticipationDetail(
+				postId,
+				5,
+				2,
+				PostStatus.RECRUITING,
+				true,
+				false,
+				99L, // postOwnerId
+				"루피", // ownerNickname
+				"https://cdn.example.com/루피.jpg", // ownerProfileImageUrl
+				List.of(
+					new FishingTripPostResponse.ParticipantDetail(10L, "참가자1", "https://cdn.example.com/참가자1.jpg"),
+					new FishingTripPostResponse.ParticipantDetail(11L, "참가자2", "https://cdn.example.com/참가자2.jpg")
+				)
+			);
+
+		when(fishingTripPostService.getFishingTripPostParticipationDetail(eq(memberId), eq(postId)))
+			.thenReturn(responseDto);
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/v1/fishing-trip-post/participation")
+				.param("fishingTripPostId", postId.toString())
+				.accept(MediaType.APPLICATION_JSON)
+		);
+
+		// Then
+		result
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.fishingTripPostId").value(postId))
+			.andExpect(jsonPath("$.data.recruitmentCount").value(5))
+			.andExpect(jsonPath("$.data.currentCount").value(2))
+			.andExpect(jsonPath("$.data.postStatus").value("RECRUITING"))
+			.andExpect(jsonPath("$.data.isApplicant").value(true))
+			.andExpect(jsonPath("$.data.isCurrentUserOwner").value(false))
+			.andExpect(jsonPath("$.data.postOwnerId").value(99))
+			.andExpect(jsonPath("$.data.ownerNickname").value("루피"))
+			.andExpect(jsonPath("$.data.ownerProfileImageUrl").value("https://cdn.example.com/루피.jpg"))
+			.andExpect(jsonPath("$.data.participants[0].nickname").value("참가자1"))
+			.andExpect(jsonPath("$.data.participants[0].profileImageUrl").value("https://cdn.example.com/참가자1.jpg"))
+			.andExpect(jsonPath("$.data.participants[1].nickname").value("참가자2"))
+			.andExpect(jsonPath("$.data.participants[1].profileImageUrl").value("https://cdn.example.com/참가자2.jpg"));
+	}
+
+
 }
