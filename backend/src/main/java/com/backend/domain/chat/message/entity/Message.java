@@ -37,7 +37,7 @@ public class Message {
 	private String content;
 
 	@Field("file_ids")
-	private List<String> fileIds;
+	private List<Long> fileIds;
 
 	@Field("file_urls")
 	private List<String> fileUrls;
