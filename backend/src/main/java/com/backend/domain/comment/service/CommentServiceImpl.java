@@ -54,6 +54,7 @@ public class CommentServiceImpl implements CommentService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ScrollResponse<CommentResponse.Detail> getDetailList(
 		final Long fishingTripPostId,
 		final Long memberId,
@@ -67,6 +68,40 @@ public class CommentServiceImpl implements CommentService {
 		log.debug("댓글 조회: {}", getDetailList);
 
 		return getDetailList;
+	}
+
+	@Override
+	@Transactional
+	public void updateComment(
+		final Long memberId,
+		final Long commentId,
+		final Long fishingTripPostId,
+		final CommentRequest.Update requestDto
+	) {
+		Comment getComment = getComment(commentId);
+
+		validMemberIdAndFishingTripPostId(memberId, fishingTripPostId, getComment);
+
+		getComment.setContent(requestDto.content());
+	}
+
+	private void validMemberIdAndFishingTripPostId(
+		final Long memberId,
+		final Long fishingTripPostId,
+		final Comment getComment
+	) {
+		if (!getComment.getMemberId().equals(memberId)) {
+			throw new CommentExpection(CommentErrorCode.COMMENT_UNAUTHORIZED_AUTHOR);
+		}
+
+		if (!getComment.getFishingTripPostId().equals(fishingTripPostId)) {
+			throw new CommentExpection(CommentErrorCode.FISHING_TRIP_ID_NOT_VALID);
+		}
+	}
+
+	private Comment getComment(final Long commentId) {
+		return commentRepository.findByCommentId(commentId)
+			.orElseThrow(() -> new CommentExpection(CommentErrorCode.COMMENT_NOT_FOUND));
 	}
 
 	private void validParentId(final boolean existsByParentId) {

@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -67,5 +68,21 @@ public class CommentController {
 		);
 
 		return ResponseEntity.ok(GenericResponse.of(true, getDetailList));
+	}
+
+	@Operation(summary = "댓글 수정", description = "댓글 수정시 사용하는 API")
+	@PatchMapping("/{fishingTripPostId}/comment/{commentId}")
+	public ResponseEntity<GenericResponse<Void>> udpateComment(
+		@Parameter(description = "댓글이 달려있는 동출 게시글 ID", example = "1")
+		@PathVariable final Long fishingTripPostId,
+		@Parameter(description = "수정할 댓글 ID", example = "1")
+		@PathVariable final Long commentId,
+		@RequestBody @Valid final CommentRequest.Update requestDto,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		commentService.updateComment(fishingTripPostId, commentId, user.getId(), requestDto);
+
+		return ResponseEntity.ok(GenericResponse.of(true));
 	}
 }

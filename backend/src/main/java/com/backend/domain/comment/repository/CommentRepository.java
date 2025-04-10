@@ -1,5 +1,7 @@
 package com.backend.domain.comment.repository;
 
+import java.util.Optional;
+
 import com.backend.domain.comment.dto.request.CommentRequest;
 import com.backend.domain.comment.dto.response.CommentResponse;
 import com.backend.domain.comment.entity.Comment;
@@ -55,4 +57,14 @@ public interface CommentRepository {
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final CommentRequest.Search requestDto
 	);
+
+	/**
+	 * 댓글 ID 조회 메소드
+	 *
+	 * @param commentId {@link Long}
+	 * @return {@link Optional<Comment>}
+	 * @implSpec 댓글 ID 조회 후 결과 값 반환
+	 * @author Kim Dong O
+	 */
+	Optional<Comment> findByCommentId(final Long commentId);
 }
