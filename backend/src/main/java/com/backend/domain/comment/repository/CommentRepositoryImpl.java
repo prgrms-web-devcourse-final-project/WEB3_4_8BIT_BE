@@ -53,4 +53,19 @@ public class CommentRepositoryImpl implements CommentRepository {
 	public Optional<Comment> findByCommentId(final Long commentId) {
 		return commentJpaRepository.findById(commentId);
 	}
+
+	@Override
+	public void deleteById(final Long commentId) {
+		commentQueryRepository.deleteById(commentId);
+	}
+
+	@Override
+	public void deleteByFishingTripPostId(final Long fishingTripPostId) {
+		commentQueryRepository.deleteByFishingTripPostId(fishingTripPostId);
+	}
+
+	@Override
+	public void deleteByParentId(final Long parentId) {
+		commentQueryRepository.deleteByParentId(parentId);
+	}
 }

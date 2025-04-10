@@ -67,4 +67,31 @@ public interface CommentRepository {
 	 * @author Kim Dong O
 	 */
 	Optional<Comment> findByCommentId(final Long commentId);
+
+	/**
+	 * 댓글 ID로 삭제 메소드
+	 *
+	 * @param commentId {@link Long}
+	 * @implSpec 댓글 ID에 해당하는 데이터 삭제
+	 * @author Kim Dong O
+	 */
+	void deleteById(final Long commentId);
+
+	/**
+	 * 동출 게시글 ID로 삭제 메소드
+	 *
+	 * @param fishingTripPostId {@link Long}
+	 * @implSpec 동출 게시글 ID에 해당하는 데이터 삭제
+	 * @author Kim Dong O
+	 */
+	void deleteByFishingTripPostId(final Long fishingTripPostId);
+
+	/**
+	 * 부모 ID로 삭제 메소드
+	 *
+	 * @param parentId {@link Long}
+	 * @implSpec 부모 ID에 해당하는 데이터 삭제
+	 * @author Kim Dong O
+	 */
+	void deleteByParentId(final Long parentId);
 }

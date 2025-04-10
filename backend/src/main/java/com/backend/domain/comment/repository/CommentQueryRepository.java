@@ -21,6 +21,7 @@ import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.util.QuerydslUtil;
+import com.querydsl.core.QueryFactory;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -44,6 +45,7 @@ public class CommentQueryRepository {
 	//fishId와 memberId가 일치하는 데이터를 가져오는 조건식 생성 함수
 	private static final Function<Long, BooleanExpression> BOOLEAN_EXPRESSION_FUNCTION =
 		comment.fishingTripPostId::eq;
+	private final QueryFactory queryFactory;
 
 	public void addChildCount(final Long parentId) {
 		// 원자적 연산으로 동시성 문제 방지
@@ -170,5 +172,26 @@ public class CommentQueryRepository {
 			new OrderSpecifier<>(queryOrder, sortField),
 			new OrderSpecifier<>(Order.ASC, comment.commentId)
 		};
+	}
+
+	public void deleteById(final Long commentId) {
+		jpaQueryFactory
+			.delete(comment)
+			.where(comment.commentId.eq(commentId))
+			.execute();
+	}
+
+	public void deleteByFishingTripPostId(final Long fishingTripPostId) {
+		jpaQueryFactory
+			.delete(comment)
+			.where(comment.fishingTripPostId.eq(fishingTripPostId))
+			.execute();
+	}
+
+	public void deleteByParentId(final Long parentId) {
+		jpaQueryFactory
+			.delete(comment)
+			.where(comment.parentId.eq(parentId).or(comment.commentId.eq(parentId)))
+			.execute();
 	}
 }
