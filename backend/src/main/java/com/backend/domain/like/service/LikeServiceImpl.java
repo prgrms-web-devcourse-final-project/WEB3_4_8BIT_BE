@@ -30,6 +30,9 @@ public class LikeServiceImpl implements LikeService {
 	@Override
 	@Transactional
 	public void toggleLike(final Long memberId, final LikeRequest requestDto) {
+		// 캐시가 없다면 DB 데이터로 초기화
+		likeCacheService.initializeLikeCache(requestDto.targetType(), requestDto.targetId());
+
 		likeRepository.findByMemberIdAndTargetTypeAndTargetId(
 			memberId,
 			requestDto.targetType(),
@@ -59,8 +62,11 @@ public class LikeServiceImpl implements LikeService {
 	 */
 	private void softDeleteLike(final Long memberId, final LikeRequest requestDto) {
 		likeRepository.deleteByMemberIdAndTargetTypeAndTargetId(
-			memberId, requestDto.targetType(), requestDto.targetId()
+			memberId,
+			requestDto.targetType(),
+			requestDto.targetId()
 		);
+
 		likeCacheService.updateLikeCountCache(
 			requestDto.targetType(), requestDto.targetId(), false
 		);
@@ -74,10 +80,15 @@ public class LikeServiceImpl implements LikeService {
 	 */
 	private void restoreDeletedLike(final Long memberId, final LikeRequest requestDto) {
 		likeRepository.restoreByMemberIdAndTargetTypeAndTargetId(
-			memberId, requestDto.targetType(), requestDto.targetId()
+			memberId,
+			requestDto.targetType(),
+			requestDto.targetId()
 		);
+
 		likeCacheService.updateLikeCountCache(
-			requestDto.targetType(), requestDto.targetId(), true
+			requestDto.targetType(),
+			requestDto.targetId(),
+			true
 		);
 	}
 
@@ -89,8 +100,11 @@ public class LikeServiceImpl implements LikeService {
 	 */
 	private void createNewLike(final Long memberId, final LikeRequest requestDto) {
 		likeRepository.save(LikeConverter.fromMemberAndLikeRequestCreate(memberId, requestDto));
+
 		likeCacheService.updateLikeCountCache(
-			requestDto.targetType(), requestDto.targetId(), true
+			requestDto.targetType(),
+			requestDto.targetId(),
+			true
 		);
 	}
 }
