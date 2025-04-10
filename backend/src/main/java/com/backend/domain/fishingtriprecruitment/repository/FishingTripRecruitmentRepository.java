@@ -60,5 +60,13 @@ public interface FishingTripRecruitmentRepository {
 	 *           AND {@code recruitmentStatus = 'APPROVED'} 조건으로 쿼리하여,
 	 *           {@code memberId} 컬럼만 조회합니다.
 	 */
-	List<Long> findMemberIdListByPostId(Long fishingTripPostId);
+	List<Long> findMemberIdListByPostId(final Long fishingTripPostId);
+
+	/**
+	 * 특정 동출 게시글 ID에 해당하는 모든 동출 신청 데이터를 삭제하는 메서드입니다.
+	 * <p>벌크 쿼리를 사용하여 성능 저하 없이 삭제를 처리합니다.</p>
+	 *
+	 * @param fishingTripPostId 삭제할 동출 게시글의 ID
+	 */
+	void deleteAllByPostId(final Long fishingTripPostId);
 }

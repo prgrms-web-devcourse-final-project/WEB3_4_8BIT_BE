@@ -43,4 +43,9 @@ public class FishingTripRecruitmentRepositoryImpl implements FishingTripRecruitm
 	public List<Long> findMemberIdListByPostId(final Long fishingTripPostId) {
 		return fishingTripRecruitmentQueryRepository.findMemberIdListByPostId(fishingTripPostId);
 	}
+
+	@Override
+	public void deleteAllByPostId(final Long fishingTripPostId) {
+		fishingTripRecruitmentQueryRepository.deleteAllByPostId(fishingTripPostId);
+	}
 }

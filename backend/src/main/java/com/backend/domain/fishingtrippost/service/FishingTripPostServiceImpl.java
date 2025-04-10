@@ -16,6 +16,7 @@ import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.notifier.FishingTripPostNotifier;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
+import com.backend.domain.fishingtriprecruitment.repository.FishingTripRecruitmentRepository;
 import com.backend.domain.fishpoint.exception.FishPointErrorCode;
 import com.backend.domain.fishpoint.exception.FishPointException;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
@@ -46,7 +47,9 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final StorageRepository storageRepository;
 	private final FishingTripPostNotifier fishingTripPostNotifier;
 	private final LikeRepository likeRepository;
+	private final FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
 	private final RoomService roomService;
+
 	private static final LikeTargetType TARGET_TYPE = LikeTargetType.FISHING_TRIP_POST;
 
 	@Override
@@ -173,6 +176,17 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		List<FishingTripPostResponse.ParticipantDetail> participants = fishingTripPostRepository.findApprovedParticipants(
 			fishingTripPostId);
 		return FishingTripPostConverter.toParticipationDetail(participantDetailDto, participants);
+	}
+
+	@Override
+	@Transactional
+	public void delete(final Long memberId, final Long fishingTripPostId) {
+
+		FishingTripPost fishingTripPost = getFishingTripPostById(fishingTripPostId);
+		validAuthor(fishingTripPost,memberId);
+
+		fishingTripRecruitmentRepository.deleteAllByPostId(fishingTripPostId);
+		fishingTripPostRepository.delete(fishingTripPost);
 	}
 
 	/**

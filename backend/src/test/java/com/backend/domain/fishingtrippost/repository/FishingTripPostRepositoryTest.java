@@ -2,6 +2,7 @@ package com.backend.domain.fishingtrippost.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.backend.domain.fishingtrippost.converter.FishingTripPostConverter;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
@@ -43,6 +45,8 @@ import com.backend.global.storage.repository.StorageQueryRepository;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.repository.StorageRepositoryImpl;
 import com.backend.global.util.BaseTest;
+
+import jakarta.persistence.EntityManager;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
@@ -77,6 +81,15 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 	@Autowired
 	private FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
+
+	@Autowired
+	private FishingTripPostJpaRepository fishingTripPostJpaRepository;
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
+
+	@Autowired
+	private EntityManager em;
 
 	final ArbitraryBuilder<FishingTripPost> fishingTripPostArbitraryBuilder = fixtureMonkeyBuilder
 		.giveMeBuilder(FishingTripPost.class)
@@ -219,31 +232,36 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
 		FishPoint savedFishPoint = fishPointRepository.save(createRandomFishPoint());
 
-		ZonedDateTime baseTime = ZonedDateTime.now();
+		List<FishingTripPost> givenPosts = fishingTripPostArbitraryBuilder
+			.set("memberId", savedMember.getMemberId())
+			.set("fishingPointId", savedFishPoint.getFishPointId())
+			.set("fishingTripPostId", null)
+			.sampleList(3);
 
-		List<FishingTripPost> savedPosts = new ArrayList<>(List.of(
-			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
-				.set("memberId", savedMember.getMemberId())
-				.set("fishingPointId", savedFishPoint.getFishPointId())
-				.set("createdAt", baseTime.minusSeconds(2))
-				.set("fishingTripPostId", null)
-				.sample()),
-			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
-				.set("memberId", savedMember.getMemberId())
-				.set("fishingPointId", savedFishPoint.getFishPointId())
-				.set("createdAt", baseTime.minusSeconds(1))
-				.set("fishingTripPostId", null)
-				.sample()),
-			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
-				.set("memberId", savedMember.getMemberId())
-				.set("fishingPointId", savedFishPoint.getFishPointId())
-				.set("createdAt", baseTime)
-				.set("fishingTripPostId", null)
-				.sample())
-		));
+		fishingTripPostJpaRepository.saveAll(givenPosts);
 
-		savedPosts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
-		FishingTripPost cursorBase = savedPosts.get(0);
+		ZonedDateTime baseTime = ZonedDateTime.of(2025, 4, 10, 12, 0, 0, 0, ZoneId.of("Asia/Seoul"));
+		List<ZonedDateTime> createdTimes = List.of(
+			baseTime.minusHours(2),
+			baseTime.minusHours(1),
+			baseTime
+		);
+
+		for (int i = 0; i < givenPosts.size(); i++) {
+			jdbcTemplate.update(
+				"UPDATE fishing_trip_posts SET created_at = ? WHERE fishing_trip_post_id = ?",
+				Timestamp.valueOf(createdTimes.get(i).toLocalDateTime()),
+				givenPosts.get(i).getFishingTripPostId()
+			);
+		}
+
+		em.flush();
+		em.clear();
+
+		// ✅ 여기서 DB에서 다시 가져와야 정확한 createdAt 기준 적용됨
+		List<FishingTripPost> refreshedPosts = fishingTripPostJpaRepository.findAll();
+		refreshedPosts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+		FishingTripPost cursorBase = refreshedPosts.get(0);
 
 		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
 			"desc", "createdAt", "next",
@@ -412,4 +430,26 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		);
 	}
 
+	@Test
+	@DisplayName("동출 게시글 삭제 [Repository] - Success")
+	void t07() {
+		// given
+		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
+		FishPoint savedFishPoint = fishPointRepository.save(createRandomFishPoint());
+
+		FishingTripPost givenPost = fishingTripPostArbitraryBuilder
+			.set("fishingTripPostId", null)
+			.set("memberId", savedMember.getMemberId())
+			.set("fishPointId", savedFishPoint.getFishPointId())
+			.sample();
+
+		FishingTripPost savedPost = fishingTripPostRepository.save(givenPost);
+
+		// when
+		fishingTripPostRepository.delete(savedPost);
+		Optional<FishingTripPost> deleted = fishingTripPostRepository.findById(savedPost.getFishingTripPostId());
+
+		// then
+		assertThat(deleted).isEmpty();
+	}
 }

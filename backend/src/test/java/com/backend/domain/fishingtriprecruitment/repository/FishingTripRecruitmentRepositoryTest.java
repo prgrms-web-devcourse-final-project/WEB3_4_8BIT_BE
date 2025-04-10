@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.LongStream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -32,6 +33,8 @@ import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
+import jakarta.persistence.EntityManager;
+
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
 @DataJpaTest
@@ -55,6 +58,12 @@ class FishingTripRecruitmentRepositoryTest extends BaseTest {
 
 	@Autowired
 	private MemberRepository memberRepository;
+
+	@Autowired
+	private FishingTripRecruitmentJpaRepository fishingTripRecruitmentJpaRepository;
+
+	@Autowired
+	private EntityManager em;
 
 	final ArbitraryBuilder<FishingTripRecruitment> fishingTripRecruitmentArbitraryBuilder = fixtureMonkeyBuilder
 		.giveMeBuilder(FishingTripRecruitment.class)
@@ -177,5 +186,41 @@ class FishingTripRecruitmentRepositoryTest extends BaseTest {
 		List<Long> expectedIds = members.stream().map(Member::getMemberId).toList();
 		assertThat(result).hasSize(3);
 		assertThat(result).containsExactlyInAnyOrderElementsOf(expectedIds);
+	}
+
+	@Test
+	@DisplayName("게시글 ID로 모든 동출 신청 삭제 [Repository] - Success")
+	void t04() {
+		// given
+		FishingTripPost post = fishingTripPostRepository.save(fishingTripPostArbitraryBuilder.sample());
+
+		List<Member> members = LongStream.rangeClosed(1, 3)
+			.mapToObj(i -> memberRepository.save(
+				memberArbitraryBuilder
+					.set("nickname", "신청자" + i)
+					.set("email", "applicant" + i + "@example.com")
+					.set("phone", "010-0000-000" + i)
+					.sample()))
+			.toList();
+
+		List<FishingTripRecruitment> recruitments = members.stream()
+			.map(member -> fishingTripRecruitmentArbitraryBuilder
+				.set("fishingTripPostId", post.getFishingTripPostId())
+				.set("memberId", member.getMemberId())
+				.sample())
+			.toList();
+
+		recruitments.forEach(fishingTripRecruitmentRepository::save);
+
+		// when
+		fishingTripRecruitmentRepository.deleteAllByPostId(post.getFishingTripPostId());
+
+		// 👉 flush + clear 꼭 해줘야 벌크 반영됨
+		em.flush();
+		em.clear();
+
+		// then
+		List<FishingTripRecruitment> remaining = fishingTripRecruitmentJpaRepository.findAll();
+		assertThat(remaining).isEmpty();
 	}
 }

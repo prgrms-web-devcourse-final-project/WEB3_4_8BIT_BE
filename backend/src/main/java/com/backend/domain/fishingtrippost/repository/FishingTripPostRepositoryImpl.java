@@ -55,6 +55,11 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	}
 
 	@Override
+	public void delete(final FishingTripPost fishingTripPost) {
+		fishingTripPostJpaRepository.delete(fishingTripPost);
+	}
+
+	@Override
 	public FishingTripPostResponse.ParticipantDetailDto findParticipantDetailDto(
 		final Long fishingTripPostId,
 		final Long memberId) {

@@ -126,4 +126,14 @@ public interface FishingTripPostService {
 		final Long memberId,
 		final Long fishingTripPostId
 	);
+
+	/**
+	 * 동출 게시글을 삭제하는 메서드입니다.
+	 * <p>게시글 작성자인지 검증 후, 관련된 모든 동출 신청 데이터와 게시글 자체를 삭제합니다.</p>
+	 *
+	 * @param memberId 요청을 수행하는 로그인한 회원의 ID
+	 * @param fishingTripPostId 삭제할 동출 게시글의 ID
+	 * @throws FishingTripPostException 작성자가 아닌 경우 예외 발생
+	 */
+	void delete(final Long memberId,final Long fishingTripPostId);
 }
