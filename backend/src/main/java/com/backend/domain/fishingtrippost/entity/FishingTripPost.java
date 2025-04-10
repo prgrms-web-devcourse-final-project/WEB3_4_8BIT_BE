@@ -31,7 +31,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "fishing_trip_posts",
 	indexes = {
 		@Index(name = "idx_fishing_trip_post_01", columnList = "memberId"),
-		@Index(name = "idx_fishing_trip_post_02", columnList = "fishingPointId")
+		@Index(name = "idx_fishing_trip_post_02", columnList = "fishingPointId"),
+		@Index(name = "idx_fishing_trip_post_createdAt_id", columnList = "createdAt, fishingTripPostId"),
+		@Index(name = "idx_fishing_trip_post_region", columnList = "regionId")
 	}
 )
 @Entity
