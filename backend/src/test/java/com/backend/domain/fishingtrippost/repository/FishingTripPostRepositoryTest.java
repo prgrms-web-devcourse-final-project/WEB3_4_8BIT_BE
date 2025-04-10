@@ -256,7 +256,9 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 		// then
 		assertThat(result).isNotEmpty();
-		assertThat(result.get(0).fishingTripPostId()).isNotEqualTo(cursorBase.getFishingTripPostId());
+		assertThat(result)
+			.extracting(FishingTripPostResponse.DetailPageQueryDto::fishingTripPostId)
+			.doesNotContain(cursorBase.getFishingTripPostId());
 	}
 
 	@Test
