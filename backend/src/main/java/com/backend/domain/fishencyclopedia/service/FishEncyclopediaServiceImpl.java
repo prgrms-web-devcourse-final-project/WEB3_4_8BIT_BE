@@ -99,6 +99,12 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		return fishEncyclopediaRepository.findDetailPageByAllByMemberId(memberId);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public Long getDistinctFishCountByMemberId(final Long memberId) {
+		return fishEncyclopediaRepository.countDistinctFishIdByMemberId(memberId);
+	}
+
 	/**
 	 * Fish가 존재하는지 검증하는 메소드 입니다.
 	 *

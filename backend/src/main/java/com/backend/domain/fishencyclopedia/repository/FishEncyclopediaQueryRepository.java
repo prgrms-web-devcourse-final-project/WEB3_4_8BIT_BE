@@ -267,5 +267,15 @@ public class FishEncyclopediaQueryRepository {
 			new OrderSpecifier<>(Order.ASC, fishEncyclopedia.fishEncyclopediaId)
 		};
 	}
+
+	public Long countDistinctFishIdByMemberId(final Long memberId) {
+		Long count = jpaQueryFactory
+			.select(fishEncyclopedia.fishId.countDistinct())
+			.from(fishEncyclopedia)
+			.where(fishEncyclopedia.memberId.eq(memberId))
+			.fetchOne();
+
+		return count != null ? count : 0L;
+	}
 }
 

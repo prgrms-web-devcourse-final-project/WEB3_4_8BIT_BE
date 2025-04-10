@@ -67,4 +67,14 @@ public interface FishEncyclopediaRepository {
 	 * @implSpec 1시간 내 도감에 추가된 물고기 데이터를 낚시 포인트 기준으로 그룹핑하여 조회
 	 */
 	List<Tuple> findFishPointHourlyFishCountSummary();
+
+
+	/**
+	 * 특정 회원이 어류도감에 등록한 어종(Fish)의 개수를 조회
+	 *
+	 * @param memberId {@link Long}
+	 * @return 등록된 어종의 개수
+	 * @implSpec 중복되지 않는 fishId 기준으로 회원이 도감에 등록한 어종의 개수를 반환
+	 */
+	Long countDistinctFishIdByMemberId(final Long memberId);
 }

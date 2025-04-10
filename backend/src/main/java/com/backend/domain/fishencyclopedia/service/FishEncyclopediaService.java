@@ -36,7 +36,7 @@ public interface FishEncyclopediaService {
 		final Long memberId
 	);
 
-		/**
+	/**
 	 * 물고기 도감 전체 조회 메소드
 	 *
 	 * @param memberId {@link Long}
@@ -47,4 +47,12 @@ public interface FishEncyclopediaService {
 	List<FishEncyclopediaResponse.DetailPage> getDetailPageList(
 		final Long memberId
 	);
+
+	/**
+	 * 회원이 등록한 고유 어종 개수 조회
+	 *
+	 * @param memberId {@link Long}
+	 * @return 고유 어종 개수
+	 */
+	Long getDistinctFishCountByMemberId(final Long memberId);
 }
