@@ -6,6 +6,7 @@ import java.util.Optional;
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
+import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.global.dto.request.GlobalRequest;
 
 public interface FishingTripPostRepository {
@@ -79,6 +80,36 @@ public interface FishingTripPostRepository {
 	);
 
 	/**
+	 * 주어진 게시글 ID와 사용자 ID를 기준으로 낚시 동행 게시글의 참여 관련 상세 정보를 조회합니다.
+	 *
+	 * <p>이 메서드는 게시글의 모집 현황, 작성자 정보, 로그인한 사용자가
+	 * 참여자인지 또는 작성자인지를 포함하는 정보를 반환합니다.</p>
+	 *
+	 * <p>로그인하지 않은 사용자인 경우 {@code memberId}는 {@code null}로 전달되며,
+	 * 이 경우 isApplicant, isWriter는 {@code false}로 처리됩니다.</p>
+	 *
+	 * @param fishingTripPostId 참여 정보를 조회할 게시글 ID (필수)
+	 * @param memberId 로그인한 사용자 ID (nullable)
+	 * @return 게시글 참여 관련 상세 정보 DTO
+	 */
+	FishingTripPostResponse.ParticipantDetailDto findParticipantDetailDto(
+		final Long fishingTripPostId,
+		final Long memberId
+	);
+
+	/**
+	 * 특정 동출 모집 게시글에 승인된 참여자 목록을 조회합니다.
+	 *
+	 * <p>이 메서드는 모집 상태가 {@link RecruitmentStatus#APPROVED}인 참여자만 조회하며,
+	 * 참여자의 ID, 닉네임, 프로필 이미지 URL 정보를 포함합니다.</p>
+	 *
+	 * @param fishingTripPostId 참여자 목록을 조회할 대상 게시글 ID
+	 * @return 승인된 참여자들의 기본 정보 리스트
+	 */
+	List<FishingTripPostResponse.ParticipantDetail> findApprovedParticipants(
+		final Long fishingTripPostId
+	);
+  
 	 * 동출 모집 게시글 좋아요 수 업데이트 메서드
 	 *
 	 * @param fishingTripPostId 동출 모집 게시글 ID
@@ -86,5 +117,4 @@ public interface FishingTripPostRepository {
 	 * @implSpec 해당 게시글의 좋아요 수를 갱신합니다.
 	 */
 	void updateLikeCount(final Long fishingTripPostId, final Long likeCount);
-
 }

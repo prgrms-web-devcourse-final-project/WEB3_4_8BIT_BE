@@ -119,11 +119,34 @@ public class FishingTripPostResponse {
 	/**
 	 * 낚시 동행 게시글의 요약 정보를 클라이언트에 전달하기 위한 응답 DTO입니다.
 	 *
-	 * <p>사용자에게 보여줄 게시글의 제목, 내용, 출조일, 모집 인원 등의 정보를 포함하며,
-	 * 대표 이미지 URL도 함께 전달됩니다.</p>
+	 * <p>스크롤 페이징 목록, 정렬, 필터링 등에서 사용되며, 게시글의 핵심 정보와 대표 이미지 URL을 제공합니다.</p>
 	 *
-	 * <p>정렬 및 필터링과 함께 스크롤 페이징 목록에 활용됩니다.</p>
+	 * <p>예시 JSON 응답 형태:</p>
+	 * <pre>{@code
+	 * {
+	 *   "fishingTripPostId": 12,
+	 *   "regionId": 3,
+	 *   "regionType": "JEOLLANAM_DO",
+	 *   "subject": "여수 갈치 낚시 모집",
+	 *   "content": "갈치 좋아하는 분 모여요~",
+	 *   "fishingDate": "2025-05-10T06:00:00+09:00",
+	 *   "createdAt": "2025-04-01T11:45:00+09:00",
+	 *   "recruitmentCount": 4,
+	 *   "postStatus": "RECRUITING",
+	 *   "imageUrl": "https://cdn.example.com/대표이미지.jpg"
+	 * }
+	 * }</pre>
 	 *
+	 * @param fishingTripPostId 게시글 ID
+	 * @param regionId 지역 ID
+	 * @param regionType 지역 구분 enum
+	 * @param subject 게시글 제목
+	 * @param content 게시글 내용 요약
+	 * @param fishingDate 출조 예정일
+	 * @param createdAt 게시글 생성일
+	 * @param recruitmentCount 모집 정원
+	 * @param postStatus 게시글 상태
+	 * @param imageUrl 대표 이미지 URL
 	 */
 	//TODO 좋아요랑 댓글수도 추가해야함 추후에
 	@Builder
@@ -170,4 +193,110 @@ public class FishingTripPostResponse {
 		public DetailPageQueryDto {
 		}
 	}
+
+	/**
+	 * 낚시 동행 게시글 참여 상세 정보를 담는 응답 DTO입니다.
+	 *
+	 * <p>게시글의 참여 현황, 로그인 유저의 신청/작성자 여부, 작성자 정보 및 참여자 목록을 포함합니다.</p>
+	 *
+	 * <p>예시 JSON 응답 형태:</p>
+	 * <pre>{@code
+	 * {
+	 *   "fishingTripPostId": 12,
+	 *   "recruitmentCount": 6,
+	 *   "currentCount": 3,
+	 *   "postStatus": "RECRUITING",
+	 *   "isApplicant": true,
+	 *   "postOwnerId": 5,
+	 *   "ownerNickname": "김동현",
+	 *   "ownerProfileImageUrl": "https://cdn.example.com/profile.jpg",
+	 *   "isCurrentUserOwner": false,
+	 *   "participants": [
+	 *     {
+	 *       "memberId": 1,
+	 *       "nickname": "강동현",
+	 *       "profileImageUrl": "https://cdn.example.com/user1.jpg"
+	 *     },
+	 *     ...
+	 *   ]
+	 * }
+	 * }</pre>
+	 *
+	 * @param fishingTripPostId 게시글 ID
+	 * @param recruitmentCount 총 모집 인원
+	 * @param currentCount 현재 승인된 참여자 수
+	 * @param postStatus 게시글 상태 (RECRUITING, COMPLETED 등)
+	 * @param isApplicant 현재 로그인한 사용자가 참여자인지 여부
+	 * @param postOwnerId 게시글 작성자 ID
+	 * @param ownerNickname 작성자 닉네임
+	 * @param ownerProfileImageUrl 작성자 프로필 이미지 URL
+	 * @param isCurrentUserOwner 현재 로그인 유저가 작성자인지 여부
+	 * @param participants 승인된 참여자 리스트
+	 */
+
+	@Builder
+	public record FishingTripPostParticipationDetail(
+		Long fishingTripPostId,
+		Integer recruitmentCount,
+		Integer currentCount,
+		PostStatus postStatus,
+		boolean isApplicant,
+		boolean isCurrentUserOwner,
+		Long postOwnerId,
+		String ownerNickname,
+		String ownerProfileImageUrl,
+		List<ParticipantDetail> participants
+	) {
+		@QueryProjection
+		public FishingTripPostParticipationDetail {
+
+		}
+	}
+
+	public record ParticipantDetailDto(
+		Long fishingTripPostId,
+		Integer recruitmentCount,
+		Integer currentCount,
+		PostStatus postStatus,
+		boolean isApplicant,
+		boolean isCurrentUserOwner,
+		Long postOwnerId,
+		String ownerNickname,
+		String ownerProfileImageUrl
+	) {
+		@QueryProjection
+		public ParticipantDetailDto {
+		}
+	}
+
+	/**
+	 * 게시글 참여자 정보 DTO입니다.
+	 *
+	 * <p>게시글에 승인된 참여 멤버의 기본 프로필 정보를 제공합니다.</p>
+	 *
+	 * <p>예시 JSON 응답 형태:</p>
+	 * <pre>{@code
+	 * {
+	 *   "memberId": 7,
+	 *   "nickname": "이동현",
+	 *   "profileImageUrl": "https://cdn.example.com/profile7.jpg"
+	 * }
+	 * }</pre>
+	 *
+	 * @param memberId 참여자 ID
+	 * @param nickname 참여자 닉네임
+	 * @param profileImageUrl 참여자 프로필 이미지 URL
+	 */
+
+	public record ParticipantDetail(
+		Long memberId,
+		String nickname,
+		String profileImageUrl
+	) {
+		@QueryProjection
+		public ParticipantDetail {
+
+		}
+	}
+
 }

@@ -76,7 +76,6 @@ public interface FishingTripPostService {
 	 */
 	void completeFishingTripPost(final Long memberId, final Long fishingTripPostId);
 
-
 	// ScrollResponse<FishingTripPostResponse.DetailPage> getDetailPage(
 	// 	final GlobalRequest.CursorRequest cursorRequestDto,
 	// 	final PostStatus status,
@@ -105,5 +104,29 @@ public interface FishingTripPostService {
 		final PostStatus status,
 		final Long regionId,
 		final String keyword
+	);
+
+	/**
+	 * 낚시 동출 게시글에 대한 참여 상세 정보를 조회하는 서비스 메서드입니다.
+	 *
+	 * <p>요청한 게시글에 대해 아래 정보를 포함한 응답을 생성합니다:</p>
+	 * <ul>
+	 *     <li>게시글의 모집 인원, 현재 참여자 수, 상태</li>
+	 *     <li>현재 로그인한 사용자가 참여자인지 여부</li>
+	 *     <li>현재 로그인한 사용자가 게시글 작성자인지 여부</li>
+	 *     <li>작성자 정보 (ID, 닉네임, 프로필 이미지)</li>
+	 *     <li>참여자 목록</li>
+	 * </ul>
+	 *
+	 * <p>로그인하지 않은 사용자가 요청한 경우에도 기본 정보 및 참여자 목록은 반환되며,
+	 * `isApplicant`, `isCurrentUserOwner` 필드는 false로 처리됩니다.</p>
+	 *
+	 * @param memberId 로그인한 사용자 ID (비로그인 시 null)
+	 * @param fishingTripPostId 상세 정보를 조회할 낚시 동출 게시글 ID
+	 * @return {@link FishingTripPostResponse.FishingTripPostParticipationDetail} 참여 상세 정보 DTO
+	 */
+	FishingTripPostResponse.FishingTripPostParticipationDetail getFishingTripPostParticipationDetail(
+		final Long memberId,
+		final Long fishingTripPostId
 	);
 }

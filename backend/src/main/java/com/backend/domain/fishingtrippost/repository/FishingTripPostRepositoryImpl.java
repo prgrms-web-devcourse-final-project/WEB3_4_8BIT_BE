@@ -53,4 +53,18 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	public void updateLikeCount(final Long fishingTripPostId, final Long likeCount) {
 		fishingTripPostQueryRepository.updateLikeCount(fishingTripPostId, likeCount);
 	}
+
+	@Override
+	public FishingTripPostResponse.ParticipantDetailDto findParticipantDetailDto(
+		final Long fishingTripPostId,
+		final Long memberId) {
+		return fishingTripPostQueryRepository.findParticipantDetailDto(fishingTripPostId, memberId);
+	}
+
+	@Override
+	public List<FishingTripPostResponse.ParticipantDetail> findApprovedParticipants(
+		final Long fishingTripPostId) {
+		return fishingTripPostQueryRepository.findApprovedParticipants(fishingTripPostId);
+	}
+
 }

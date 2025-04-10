@@ -505,4 +505,57 @@ class FishingTripPostServiceTest extends BaseTest {
 		assertThat(result.isFirst()).isFalse();
 		assertThat(result.isLast()).isTrue();
 	}
+
+	@Test
+	@DisplayName("동출 게시글 참여 상세 정보 조회 [Service] - Success")
+	void t13() {
+		// Given
+		Long memberId = 1L;
+		Long postId = 100L;
+		Long postOwnerId = 1L;
+		Long participantId = 2L;
+
+		FishingTripPostResponse.ParticipantDetailDto dto =
+			new FishingTripPostResponse.ParticipantDetailDto(
+				postId,
+				5,
+				1, // 현재 인원
+				PostStatus.RECRUITING,
+				false,
+				true,
+				postOwnerId,
+				"루피",
+				"https://cdn.example.com/루피.jpg"
+			);
+
+		List<FishingTripPostResponse.ParticipantDetail> participants = List.of(
+			new FishingTripPostResponse.ParticipantDetail(
+				participantId, "참가자1", "https://cdn.example.com/참가자1.jpg")
+		);
+
+		when(fishingTripPostRepository.findParticipantDetailDto(postId, memberId)).thenReturn(dto);
+		when(fishingTripPostRepository.findApprovedParticipants(postId)).thenReturn(participants);
+
+		// When
+		FishingTripPostResponse.FishingTripPostParticipationDetail result =
+			fishingTripPostService.getFishingTripPostParticipationDetail(memberId, postId);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result.fishingTripPostId()).isEqualTo(postId);
+		assertThat(result.ownerNickname()).isEqualTo("루피");
+		assertThat(result.ownerProfileImageUrl()).isEqualTo("https://cdn.example.com/루피.jpg");
+		assertThat(result.recruitmentCount()).isEqualTo(5);
+		assertThat(result.currentCount()).isEqualTo(1);
+		assertThat(result.postStatus()).isEqualTo(PostStatus.RECRUITING);
+		assertThat(result.isCurrentUserOwner()).isTrue();
+		assertThat(result.isApplicant()).isFalse();
+
+		assertThat(result.participants()).hasSize(1);
+		assertThat(result.participants().get(0).nickname()).isEqualTo("참가자1");
+		assertThat(result.participants().get(0).profileImageUrl()).isEqualTo("https://cdn.example.com/참가자1.jpg");
+
+		verify(fishingTripPostRepository).findParticipantDetailDto(postId, memberId);
+		verify(fishingTripPostRepository).findApprovedParticipants(postId);
+	}
 }

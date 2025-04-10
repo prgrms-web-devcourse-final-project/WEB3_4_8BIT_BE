@@ -7,6 +7,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -17,11 +18,18 @@ import org.springframework.context.annotation.Import;
 
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
+import com.backend.domain.fishingtriprecruitment.domain.FishingLevel;
+import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
+import com.backend.domain.fishingtriprecruitment.entity.FishingTripRecruitment;
+import com.backend.domain.fishingtriprecruitment.repository.FishingTripRecruitmentQueryRepository;
+import com.backend.domain.fishingtriprecruitment.repository.FishingTripRecruitmentRepository;
+import com.backend.domain.fishingtriprecruitment.repository.FishingTripRecruitmentRepositoryImpl;
 import com.backend.domain.fishpoint.entity.FishPoint;
 import com.backend.domain.fishpoint.repository.FishPointQueryRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.fishpoint.repository.FishPointRepositoryImpl;
 import com.backend.domain.member.domain.MemberRole;
+import com.backend.domain.member.domain.Provider;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.repository.MemberQueryRepository;
 import com.backend.domain.member.repository.MemberRepository;
@@ -48,6 +56,8 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 	FishingTripPostQueryRepository.class,
 	StorageRepositoryImpl.class,
 	StorageQueryRepository.class,
+	FishingTripRecruitmentRepositoryImpl.class,
+	FishingTripRecruitmentQueryRepository.class,
 	QuerydslConfig.class,
 })
 class FishingTripPostRepositoryTest extends BaseTest {
@@ -63,6 +73,9 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 	@Autowired
 	private StorageRepository storageRepository;
+
+	@Autowired
+	private FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
 
 	final ArbitraryBuilder<FishingTripPost> fishingTripPostArbitraryBuilder = fixtureMonkeyBuilder
 		.giveMeBuilder(FishingTripPost.class)
@@ -82,7 +95,10 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		.set("name", "테스트")
 		.set("email", "test@example.com")
 		.set("phone", "010-1111-2222")
-		.set("role", MemberRole.USER);
+		.set("role", MemberRole.USER)
+		.set("provider", Provider.KAKAO)
+		.set("providerId", "12345678")
+		.set("isAddInfo", false);
 
 	@Test
 	@DisplayName("동출 게시글 저장 [Repository] - Success")
@@ -206,16 +222,19 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
+				.set("createdAt", ZonedDateTime.now().minusSeconds(2))
 				.set("fishingTripPostId", null)
 				.sample()),
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
+				.set("createdAt", ZonedDateTime.now().minusSeconds(1))
 				.set("fishingTripPostId", null)
 				.sample()),
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
+				.set("createdAt", ZonedDateTime.now())
 				.set("fishingTripPostId", null)
 				.sample())
 		));
@@ -238,4 +257,154 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		assertThat(result).isNotEmpty();
 		assertThat(result.get(0).fishingTripPostId()).isNotEqualTo(cursorBase.getFishingTripPostId());
 	}
+
+	@Test
+	@DisplayName("동출 게시글 참여 상세 DTO 조회 [Repository] - Success")
+	void t05() {
+		//given
+		Member writer = memberRepository.save(
+			memberArbitraryBuilder.sample()
+		);
+
+		File writerFile = storageRepository.save(
+			File.builder()
+				.fileName("profile.jpg")
+				.originalFileName("profile.jpg")
+				.contentType("image/jpeg")
+				.fileSize(10000L)
+				.url("https://cdn.example.com/profile.jpg")
+				.domain("profile")
+				.createdById(writer.getMemberId())
+				.uploaded(true)
+				.build()
+		);
+
+		writer = memberRepository.save(
+			Member.builder()
+				.memberId(writer.getMemberId())
+				.nickname(writer.getNickname())
+				.name(writer.getName())
+				.email(writer.getEmail())
+				.phone(writer.getPhone())
+				.role(writer.getRole())
+				.provider(writer.getProvider())
+				.providerId(writer.getProviderId())
+				.description(writer.getDescription())
+				.isAddInfo(writer.getIsAddInfo())
+				.fileId(writerFile.getFileId())
+				.build()
+		);
+
+		FishPoint fishPoint = fishPointRepository.save(createRandomFishPoint());
+
+		FishingTripPost post = fishingTripPostRepository.save(
+			fishingTripPostArbitraryBuilder
+				.set("memberId", writer.getMemberId())
+				.set("fishPointId", fishPoint.getFishPointId())
+				.sample()
+		);
+
+		//when
+		FishingTripPostResponse.ParticipantDetailDto dto =
+			fishingTripPostRepository.findParticipantDetailDto(post.getFishingTripPostId(), writer.getMemberId());
+
+		// then
+		assertThat(dto).isNotNull();
+		assertThat(dto.fishingTripPostId()).isEqualTo(post.getFishingTripPostId());
+		assertThat(dto.postOwnerId()).isEqualTo(writer.getMemberId());
+		assertThat(dto.ownerNickname()).isEqualTo(writer.getNickname());
+		assertThat(dto.ownerProfileImageUrl()).isEqualTo(writerFile.getUrl());
+		assertThat(dto.isCurrentUserOwner()).isTrue();
+		assertThat(dto.isApplicant()).isFalse();
+	}
+
+	@Test
+	@DisplayName("동출 게시글 승인된 참여자 목록 조회 [Repository] - Success")
+	void t06() {
+		// given
+		Member writer = memberRepository.save(
+			memberArbitraryBuilder
+				.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8))
+				.set("email", UUID.randomUUID().toString().substring(0, 8) + "@example.com")
+				.set("providerId", UUID.randomUUID().toString())
+				.sample()
+		);
+
+		FishPoint fishPoint = fishPointRepository.save(createRandomFishPoint());
+
+		FishingTripPost post = fishingTripPostRepository.save(
+			fishingTripPostArbitraryBuilder
+				.set("memberId", writer.getMemberId())
+				.set("fishPointId", fishPoint.getFishPointId())
+				.sample()
+		);
+
+		List<Member> participants = List.of(
+			memberRepository.save(memberArbitraryBuilder
+				.set("nickname", "참가자1")
+				.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8))
+				.set("email", UUID.randomUUID().toString().substring(0, 8) + "@example.com")
+				.set("providerId", UUID.randomUUID().toString())
+				.sample()),
+			memberRepository.save(memberArbitraryBuilder
+				.set("nickname", "참가자2")
+				.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8))
+				.set("email", UUID.randomUUID().toString().substring(0, 8) + "@example.com")
+				.set("providerId", UUID.randomUUID().toString())
+				.sample())
+		);
+
+		for (Member participant : participants) {
+			File file = storageRepository.save(
+				File.builder()
+					.fileName("profile.jpg")
+					.originalFileName("original.jpg")
+					.contentType("image/jpeg")
+					.fileSize(10000L)
+					.url("https://cdn.example.com/" + participant.getNickname() + ".jpg")
+					.domain("profile")
+					.createdById(participant.getMemberId())
+					.uploaded(true)
+					.build()
+			);
+
+			participant = memberRepository.save(
+				Member.builder()
+					.memberId(participant.getMemberId())
+					.nickname(participant.getNickname())
+					.name(participant.getName())
+					.email(participant.getEmail())
+					.phone(participant.getPhone())
+					.role(participant.getRole())
+					.provider(participant.getProvider())
+					.providerId(participant.getProviderId())
+					.isAddInfo(participant.getIsAddInfo())
+					.fileId(file.getFileId())
+					.build()
+			);
+
+			fishingTripRecruitmentRepository.save(
+				FishingTripRecruitment.builder()
+					.fishingTripPostId(post.getFishingTripPostId())
+					.memberId(participant.getMemberId())
+					.introduction("테스트 소개입니다.")
+					.fishingLevel(FishingLevel.BEGINNER)
+					.recruitmentStatus(RecruitmentStatus.APPROVED)
+					.build()
+			);
+		}
+
+		// when
+		List<FishingTripPostResponse.ParticipantDetail> result =
+			fishingTripPostRepository.findApprovedParticipants(post.getFishingTripPostId());
+
+		// then
+		assertThat(result).hasSize(2);
+		assertThat(result).extracting("nickname")
+			.containsExactlyInAnyOrder("참가자1", "참가자2");
+		assertThat(result).allSatisfy(detail ->
+			assertThat(detail.profileImageUrl()).startsWith("https://cdn.example.com/")
+		);
+	}
+
 }

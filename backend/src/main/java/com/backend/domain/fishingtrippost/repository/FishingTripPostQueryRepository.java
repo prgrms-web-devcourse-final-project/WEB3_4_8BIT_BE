@@ -15,7 +15,17 @@ import org.springframework.util.StringUtils;
 
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
+
+import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
+import static com.backend.domain.fishingtriprecruitment.entity.QFishingTripRecruitment.*;
+import static com.backend.domain.member.entity.QMember.*;
+import static com.backend.domain.fishpoint.entity.QFishPoint.*;
+import static com.backend.domain.region.entity.QRegion.*;
+import static com.backend.global.storage.entity.QFile.*;
+
+import com.backend.domain.fishingtrippost.dto.response.QFishingTripPostResponse_DetailPage;
 import com.backend.domain.fishingtrippost.dto.response.QFishingTripPostResponse_DetailPageQueryDto;
+import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.util.QuerydslUtil;
 import com.querydsl.core.types.Order;
@@ -24,6 +34,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -138,18 +149,13 @@ public class FishingTripPostQueryRepository {
 	private static BooleanExpression getBooleanExpressionByCreatedAt(
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 		ZonedDateTime value = ZonedDateTime.parse(cursorRequestDto.fieldValue());
-		boolean isNext = "next".equalsIgnoreCase(cursorRequestDto.type());
-		boolean isAsc = "asc".equalsIgnoreCase(cursorRequestDto.order());
+		Order order = QuerydslUtil.getOrder(cursorRequestDto);
 
-		if ((isAsc && isNext) || (!isAsc && !isNext)) {
-			return fishingTripPost.createdAt.gt(value)
-				.or(fishingTripPost.createdAt.eq(value)
-					.and(fishingTripPost.fishingTripPostId.gt(cursorRequestDto.id())));
-		} else {
-			return fishingTripPost.createdAt.lt(value)
-				.or(fishingTripPost.createdAt.eq(value)
-					.and(fishingTripPost.fishingTripPostId.lt(cursorRequestDto.id())));
-		}
+		return QuerydslUtil.createFieldPredicate(
+			fishingTripPost.fishingTripPostId, cursorRequestDto.id(),
+			fishingTripPost.createdAt, value,
+			order
+		);
 	}
 
 	private OrderSpecifier<?>[] getOrderBy(final GlobalRequest.CursorRequest cursorRequestDto) {
@@ -159,5 +165,68 @@ public class FishingTripPostQueryRepository {
 			new OrderSpecifier<>(direction, fishingTripPost.createdAt),
 			new OrderSpecifier<>(direction, fishingTripPost.fishingTripPostId)
 		};
+	}
+
+	public FishingTripPostResponse.ParticipantDetailDto findParticipantDetailDto(
+		final Long fishingTripPostId,
+		final Long memberId) {
+		return jpaQueryFactory
+			.select(Projections.constructor(
+				FishingTripPostResponse.ParticipantDetailDto.class,
+				fishingTripPost.fishingTripPostId,
+				fishingTripPost.recruitmentCount,
+				fishingTripPost.currentCount,
+				fishingTripPost.postStatus,
+				Expressions.asBoolean(isParticipant(memberId)),
+				Expressions.asBoolean(isWriterExpression(memberId)),
+				member.memberId,
+				member.nickname,
+				file.url
+			))
+			.from(fishingTripPost)
+			.leftJoin(member).on(fishingTripPost.memberId.eq(member.memberId))
+			.leftJoin(file).on(member.fileId.eq(file.fileId))
+			.where(fishingTripPost.fishingTripPostId.eq(fishingTripPostId))
+			.fetchOne();
+	}
+
+	private static BooleanExpression isWriterExpression(final Long memberId) {
+		if (memberId == null) {
+			return Expressions.FALSE.isTrue();
+		}
+		return fishingTripPost.memberId.eq(memberId);
+	}
+
+
+	private static BooleanExpression isParticipant(final Long memberId) {
+		if (memberId == null) {
+			return Expressions.FALSE.isTrue(); // 로그인 안 했으면 false
+		}
+		return JPAExpressions
+			.selectOne()
+			.from(fishingTripRecruitment)
+			.where(fishingTripRecruitment.fishingTripPostId.eq(fishingTripPost.fishingTripPostId)
+				.and(fishingTripRecruitment.memberId.eq(memberId))
+				.and(fishingTripRecruitment.recruitmentStatus.eq(RecruitmentStatus.APPROVED)))
+			.exists();
+	}
+
+	public List<FishingTripPostResponse.ParticipantDetail> findApprovedParticipants(
+		final Long fishingTripPostId) {
+		return jpaQueryFactory
+			.select(Projections.constructor(
+				FishingTripPostResponse.ParticipantDetail.class,
+				member.memberId,
+				member.nickname,
+				file.url
+			))
+			.from(fishingTripRecruitment)
+			.join(member).on(fishingTripRecruitment.memberId.eq(member.memberId))
+			.leftJoin(file).on(member.fileId.eq(file.fileId))
+			.where(
+				fishingTripRecruitment.fishingTripPostId.eq(fishingTripPostId),
+				fishingTripRecruitment.recruitmentStatus.eq(RecruitmentStatus.APPROVED)
+			)
+			.fetch();
 	}
 }
