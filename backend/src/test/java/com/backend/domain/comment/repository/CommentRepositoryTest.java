@@ -396,4 +396,72 @@ class CommentRepositoryTest extends BaseTest {
 		assertThat(findComment).isPresent();
 		assertThat(findComment.get().getCommentId()).isEqualTo(savedComment.getCommentId());
 	}
+
+	@Test
+	@DisplayName("댓글 삭제 [commentId] [Repository] - Success")
+	void t08() {
+		// Given
+		Comment givenComment = commentArbitraryBuilder
+			.set("commentId", null)
+			.sample();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		// When
+		commentRepository.deleteById(savedComment.getCommentId());
+
+		// Then
+		boolean existsById = commentJpaRepository.existsById(savedComment.getCommentId());
+
+		assertThat(existsById).isFalse();
+	}
+
+	@Test
+	@DisplayName("댓글 삭제 [fishingTripPostId] [Repository] - Success")
+	void t09() {
+		// Given
+		Comment givenComment = commentArbitraryBuilder
+			.set("commentId", null)
+			.set("fishingTripPostId", 1L)
+			.sample();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		// When
+		commentRepository.deleteByFishingTripPostId(givenComment.getFishingTripPostId());
+
+		// Then
+		boolean existsById = commentJpaRepository.existsById(savedComment.getCommentId());
+
+		assertThat(existsById).isFalse();
+	}
+
+	@Test
+	@DisplayName("댓글 삭제 [parentId] [Repository] - Success")
+	void t10() {
+		// Given
+		Comment givenComment = commentArbitraryBuilder
+			.set("commentId", null)
+			.set("fishingTripPostId", 1L)
+			.sample();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		List<Comment> givenCommentList = commentArbitraryBuilder
+			.set("commentId", null)
+			.set("parentId", savedComment.getCommentId())
+			.sampleList(5);
+
+		commentJpaRepository.saveAll(givenCommentList);
+
+		// When
+		commentRepository.deleteByParentId(givenComment.getCommentId());
+		entityManager.flush();
+		entityManager.clear();
+
+		// Then
+		List<Comment> findAll = commentJpaRepository.findAll();
+
+		assertThat(findAll).hasSize(0);
+	}
 }
