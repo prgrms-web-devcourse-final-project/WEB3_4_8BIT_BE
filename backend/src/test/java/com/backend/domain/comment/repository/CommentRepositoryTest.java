@@ -171,7 +171,7 @@ void setUp() {
 
 	@Test
 	@DisplayName("댓글 전체 조회 [부모 X] [Repository] - Success")
-	public void t04() {
+	void t04() {
 		// Given
 		List<Comment> givenCommentList = new ArrayList<>();
 
@@ -220,7 +220,7 @@ void setUp() {
 
 	@Test
 	@DisplayName("댓글 전체 조회 [부모 O] [Repository] - Success")
-	public void t05() {
+	void t05() {
 		// Given
 		List<Comment> givenCommentList = new ArrayList<>();
 
@@ -280,7 +280,7 @@ void setUp() {
 
 	@Test
 	@DisplayName("댓글 전체 조회 [부모 O] [Size = 1] [Page = 2] [Repository] - Success")
-	public void t06() {
+	void t06() {
 		// Given
 		List<Comment> givenCommentList = new ArrayList<>();
 
@@ -344,5 +344,23 @@ void setUp() {
 		assertThat(findScrollDetail.content().get(0).commentId())
 			.isEqualTo(sortedFishEncyclopediaList.get(1).getCommentId());
 		assertThat(findScrollDetail.content()).allMatch((detail) -> detail.parentId().equals(1L));
+	}
+
+	@Test
+	@DisplayName("댓글 조회 [Repository] - Success")
+	void t07() {
+		// Given
+		Comment givenComment = commentArbitraryBuilder
+			.set("commentId", null)
+			.sample();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		// When
+		Optional<Comment> findComment = commentRepository.findByCommentId(savedComment.getCommentId());
+
+		// Then
+		assertThat(findComment).isPresent();
+		assertThat(findComment.get().getCommentId()).isEqualTo(savedComment.getCommentId());
 	}
 }
