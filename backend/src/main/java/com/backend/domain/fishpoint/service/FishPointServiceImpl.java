@@ -1,5 +1,6 @@
 package com.backend.domain.fishpoint.service;
 
+import static com.backend.domain.fishpoint.converter.FishPointConverter.*;
 import static com.backend.domain.fishpoint.dto.response.FishPointResponse.*;
 
 import java.util.List;
@@ -7,7 +8,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.fishpoint.entity.FishPoint;
+import com.backend.domain.fishpoint.exception.FishPointErrorCode;
+import com.backend.domain.fishpoint.exception.FishPointException;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
+import com.backend.domain.fishpointsummary.dto.response.FishPointSummaryResponse;
+import com.backend.domain.fishpointsummary.service.FishPointSummaryService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FishPointServiceImpl implements FishPointService {
 
 	private final FishPointRepository fishPointRepository;
+	private final FishPointSummaryService fishPointSummaryService;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -58,5 +65,21 @@ public class FishPointServiceImpl implements FishPointService {
 	@Transactional(readOnly = true)
 	public List<Popularity> getPopularityFishPoints() {
 		return fishPointRepository.findPopularityFishPoints();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public Detail getFishPointDetail(final Long fishPointId) {
+		FishPoint fishPoint = getFishPoint(fishPointId);
+
+		List<FishPointSummaryResponse.Basic> fishPointSummaryList =
+			fishPointSummaryService.getFishPointSummaries(fishPointId);
+
+		return fromEntityAndSummary(fishPoint, fishPointSummaryList);
+	}
+
+	private FishPoint getFishPoint(final Long fishPointId) {
+		return fishPointRepository.findByFishPointId(fishPointId).orElseThrow(
+			() -> new FishPointException(FishPointErrorCode.FISH_POINT_NOT_FOUND));
 	}
 }

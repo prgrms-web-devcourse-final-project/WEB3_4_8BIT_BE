@@ -1,5 +1,10 @@
 package com.backend.domain.fishingtrippost.repository;
 
+import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
+import static com.backend.domain.fishpoint.entity.QFishPoint.*;
+import static com.backend.domain.member.entity.QMember.*;
+import static com.backend.domain.region.entity.QRegion.*;
+
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
@@ -101,6 +106,13 @@ public class FishingTripPostQueryRepository {
 			.orderBy(getOrderBy(cursorRequestDto))
 			.limit(cursorRequestDto.size() + 1)
 			.fetch();
+	}
+
+	public void updateLikeCount(final Long postId, final Long likeCount) {
+		jpaQueryFactory.update(fishingTripPost)
+			.set(fishingTripPost.likeCount, likeCount)
+			.where(fishingTripPost.fishingTripPostId.eq(postId))
+			.execute();
 	}
 
 	private BooleanExpression whereCondition(final Long regionId,

@@ -228,6 +228,24 @@ public class FishEncyclopediaQueryRepository {
 			.fetch();
 	}
 
+	public List<Tuple> findFishPointHourlyFishCountSummary() {
+		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime oneHourAgo = now.minusHours(1);
+
+		log.debug("검색 시간 조건: {} ~ {}", oneHourAgo, now);
+
+		return jpaQueryFactory
+			.select(
+				fishEncyclopedia.fishPointId,
+				fishEncyclopedia.fishId,
+				fishEncyclopedia.count.sum()
+			)
+			.from(fishEncyclopedia)
+			.where(fishEncyclopedia.createdAt.between(oneHourAgo, now))
+			.groupBy(fishEncyclopedia.fishPointId, fishEncyclopedia.fishId)
+			.fetch();
+	}
+
 	/**
 	 * 정렬할 필드와 정렬 방식을 OrderSpecifier로 반환합니다.
 	 *

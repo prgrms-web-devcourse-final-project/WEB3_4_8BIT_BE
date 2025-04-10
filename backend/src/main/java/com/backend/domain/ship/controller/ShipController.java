@@ -5,7 +5,10 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,6 +21,7 @@ import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.response.GenericResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +37,7 @@ public class ShipController {
 	@Operation(summary = "선박 추가하기", description = "선박 추가시 사용하는 API")
 	@PostMapping
 	public ResponseEntity<GenericResponse<Void>> createShip(
-		@RequestBody @Valid final ShipRequest.Create requestDto,
+		@RequestBody @Valid final ShipRequest.Form requestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
@@ -51,5 +55,32 @@ public class ShipController {
 		List<ShipResponse.Detail> getShipAllList = shipService.getDetailAll(user.getId());
 
 		return ResponseEntity.ok(GenericResponse.of(true, getShipAllList));
+	}
+
+	@Operation(summary = "선박 수정하기", description = "선박 수정할 때 사용하는 API")
+	@Parameter(name = "shipId", required = true, description = "수정할 선박 ID", example = "1")
+	@PatchMapping("/{shipId}")
+	public ResponseEntity<GenericResponse<Long>> updateShip(
+		@PathVariable final Long shipId,
+		@RequestBody @Valid final ShipRequest.Form requestDto,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		Long updatedShipId = shipService.updateShip(shipId, user.getId(), requestDto);
+
+		return ResponseEntity.ok(GenericResponse.of(true, updatedShipId));
+	}
+
+	@Operation(summary = "선박 삭제하기", description = "선박 삭제할 때 사용하는 API")
+	@Parameter(name = "shipId", required = true, description = "삭제할 선박 ID", example = "1")
+	@DeleteMapping("/{shipId}")
+	public ResponseEntity<GenericResponse<Void>> deleteShip(
+		@PathVariable final Long shipId,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		shipService.deleteById(shipId, user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true));
 	}
 }

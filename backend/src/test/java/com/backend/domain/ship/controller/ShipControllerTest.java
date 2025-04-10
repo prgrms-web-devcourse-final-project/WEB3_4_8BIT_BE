@@ -24,6 +24,8 @@ import net.jqwik.api.Arbitrary;
 import com.backend.domain.ship.domain.RestroomType;
 import com.backend.domain.ship.dto.request.ShipRequest;
 import com.backend.domain.ship.dto.response.ShipResponse;
+import com.backend.domain.ship.exception.ShipErrorCode;
+import com.backend.domain.ship.exception.ShipException;
 import com.backend.domain.ship.service.ShipService;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
@@ -52,8 +54,8 @@ class ShipControllerTest extends BaseTest {
 		.withCharRange('A', 'Z')
 		.ofMinLength(1).ofMaxLength(10);
 
-	private final ArbitraryBuilder<ShipRequest.Create> createArbitraryBuilder = fixtureMonkeyRecord
-		.giveMeBuilder(ShipRequest.Create.class)
+	private final ArbitraryBuilder<ShipRequest.Form> createArbitraryBuilder = fixtureMonkeyRecord
+		.giveMeBuilder(ShipRequest.Form.class)
 		.set("shipName", englishStringLength)
 		.set("shipNumber", englishStringLength)
 		.set("departurePort", englishStringLength)
@@ -65,7 +67,7 @@ class ShipControllerTest extends BaseTest {
 	void t01() throws Exception {
 		// Given
 		Long shipId = 1L;
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder.sample();
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder.sample();
 
 		when(shipService.createShip(1L, givenRequestDto)).thenReturn(shipId);
 		// When
@@ -87,7 +89,7 @@ class ShipControllerTest extends BaseTest {
 	void t02() throws Exception {
 		// Given
 		Long shipId = 1L;
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("shipName", "oiesfajoiejfioewafjoijwaoiefjwaoiefjiowjafiowjaofijwoaiefowaiefjoiwafjowaif")
 			.sample();
 
@@ -113,7 +115,7 @@ class ShipControllerTest extends BaseTest {
 	void t03() throws Exception {
 		// Given
 		Long shipId = 1L;
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("shipName", "")
 			.sample();
 
@@ -138,7 +140,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t04() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("shipNumber", "oiesfajoiejfioewafjoijwaoiefjwaoiefjiowjafiowjaofijwoaiefowaiefjoiwafjowaif")
 			.sample();
 		// When
@@ -161,7 +163,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t05() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("shipNumber", "")
 			.sample();
 		// When
@@ -184,7 +186,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t06() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("departurePort", "oiesfajoiejfioewafjoijwaoiefjwaoiefjiowjafiowjaofijwoaiefowaiefjoiwafjowaif")
 			.sample();
 		// When
@@ -207,7 +209,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t07() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("departurePort", "")
 			.sample();
 		// When
@@ -230,7 +232,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t08() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("passengerCapacity", 0)
 			.sample();
 		// When
@@ -253,7 +255,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t09() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("passengerCapacity", 101)
 			.sample();
 		// When
@@ -276,7 +278,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t10() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("passengerCapacity", null)
 			.sample();
 		// When
@@ -323,7 +325,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t12() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("loungeArea", null)
 			.sample();
 		// When
@@ -346,7 +348,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t13() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("kitchenFacility", null)
 			.sample();
 		// When
@@ -369,7 +371,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t14() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("fishingChair", null)
 			.sample();
 		// When
@@ -392,7 +394,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t15() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("passengerInsurance", null)
 			.sample();
 		// When
@@ -415,7 +417,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t16() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("fishingGearRental", null)
 			.sample();
 		// When
@@ -438,7 +440,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t17() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("mealProvided", null)
 			.sample();
 		// When
@@ -461,7 +463,7 @@ class ShipControllerTest extends BaseTest {
 	@WithMockCustomUser
 	void t18() throws Exception {
 		// Given
-		ShipRequest.Create givenRequestDto = createArbitraryBuilder
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder
 			.set("parkingAvailable", null)
 			.sample();
 		// When
@@ -498,5 +500,91 @@ class ShipControllerTest extends BaseTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.size()").value(givenDetailList.size()));
+	}
+
+	@Test
+	@DisplayName("선박 수정 [Controller] - Success")
+	@WithMockCustomUser
+	void t20() throws Exception {
+		// Given
+		Long shipId = 1L;
+		ShipRequest.Form givenRequestDto = createArbitraryBuilder.sample();
+
+		when(shipService.updateShip(shipId, 1L, givenRequestDto)).thenReturn(shipId);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(patch("/api/v1/ship/{shipId}", shipId)
+			.contentType(MediaType.APPLICATION_JSON)
+			.content(objectMapper.writeValueAsString(givenRequestDto)));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true));
+	}
+
+	@Test
+	@DisplayName("선박 삭제 [Controller] - Success")
+	@WithMockCustomUser
+	void t21() throws Exception {
+		// Given
+		Long shipId = 1L;
+
+		doNothing().when(shipService).deleteById(shipId, 1L);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(delete("/api/v1/ship/{shipId}", shipId)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true));
+	}
+
+	@Test
+	@DisplayName("선박 삭제 [Not Author] [Controller] - Fail")
+	@WithMockCustomUser
+	void t22() throws Exception {
+		// Given
+		Long shipId = 1L;
+
+		// 선박 삭제 시 권한 오류를 발생시키는 경우
+		doThrow(new ShipException(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR))
+			.when(shipService).deleteById(shipId, 1L);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(delete("/api/v1/ship/{shipId}", shipId)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// Then
+		resultActions
+			.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.code").value(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR.getCode()))
+			.andExpect(jsonPath("$.message").value(ShipErrorCode.SHIP_UNAUTHORIZED_AUTHOR.getMessage()));
+	}
+
+	@Test
+	@DisplayName("선박 삭제 [In Use By Fishing Post] [Controller] - Fail")
+	@WithMockCustomUser
+	void t23() throws Exception {
+		// Given
+		Long shipId = 1L;
+
+		// 선박 삭제 시 권한 오류를 발생시키는 경우
+		doThrow(new ShipException(ShipErrorCode.SHIP_IN_USE_BY_FISHING_POST))
+			.when(shipService).deleteById(shipId, 1L);
+
+		// When
+		ResultActions resultActions = mockMvc.perform(delete("/api/v1/ship/{shipId}", shipId)
+			.contentType(MediaType.APPLICATION_JSON));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.success").value(false))
+			.andExpect(jsonPath("$.code").value(ShipErrorCode.SHIP_IN_USE_BY_FISHING_POST.getCode()))
+			.andExpect(jsonPath("$.message").value(ShipErrorCode.SHIP_IN_USE_BY_FISHING_POST.getMessage()));
 	}
 }

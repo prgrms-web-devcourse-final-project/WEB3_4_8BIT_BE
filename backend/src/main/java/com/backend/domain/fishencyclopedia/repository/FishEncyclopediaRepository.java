@@ -58,4 +58,13 @@ public interface FishEncyclopediaRepository {
 	 * 조회하여 {@link List<Tuple>}로 반환
 	 */
 	List<Tuple> findHourlyFishCountSummary();
+
+	/**
+	 * 현재 시각 기준, 1시간 전부터 지금까지 낚시 포인트별로 도감에 추가된 물고기 수를 조회합니다.
+	 * <p>첫 번째: fishPointId, 두 번째: fishId, 세 번째: count</p>
+	 *
+	 * @return {@link List<Tuple>}
+	 * @implSpec 1시간 내 도감에 추가된 물고기 데이터를 낚시 포인트 기준으로 그룹핑하여 조회
+	 */
+	List<Tuple> findFishPointHourlyFishCountSummary();
 }

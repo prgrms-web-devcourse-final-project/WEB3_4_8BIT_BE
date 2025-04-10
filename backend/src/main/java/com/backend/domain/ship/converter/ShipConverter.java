@@ -6,7 +6,7 @@ import com.backend.domain.ship.entity.Ship;
 
 public class ShipConverter {
 
-	public static Ship fromCreate(final Long memberId, final ShipRequest.Create requestDto) {
+	public static Ship fromCreate(final Long memberId, final ShipRequest.Form requestDto) {
 		return Ship.builder()
 			.shipName(requestDto.shipName())
 			.shipNumber(requestDto.shipNumber())

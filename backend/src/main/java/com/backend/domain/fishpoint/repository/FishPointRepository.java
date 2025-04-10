@@ -3,6 +3,7 @@ package com.backend.domain.fishpoint.repository;
 import static com.backend.domain.fishpoint.dto.response.FishPointResponse.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.backend.domain.fishpoint.entity.FishPoint;
 
@@ -80,4 +81,12 @@ public interface FishPointRepository {
 	 * @return 인기 순으로 정렬된 낚시 포인트 3개의 리스트
 	 */
 	List<Popularity> findPopularityFishPoints();
+
+	/**
+	 * 주어진 낚시 포인트 ID에 해당하는 낚시 포인트 엔티티 조회
+	 *
+	 * @param fishPointId 조회할 낚시 포인트의 ID
+	 * @return 해당 ID에 대응하는 {@link FishPoint} 객체, 없을 경우 {@link Optional#empty()}
+	 */
+	Optional<FishPoint> findByFishPointId(final Long fishPointId);
 }

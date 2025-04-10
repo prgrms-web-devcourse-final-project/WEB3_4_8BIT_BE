@@ -51,4 +51,9 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 	public List<Tuple> findHourlyFishCountSummary() {
 		return fishEncyclopediaQueryRepository.findHourlyFishCountSummary();
 	}
+
+	@Override
+	public List<Tuple> findFishPointHourlyFishCountSummary() {
+		return fishEncyclopediaQueryRepository.findFishPointHourlyFishCountSummary();
+	}
 }
