@@ -153,7 +153,9 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 	@DisplayName("선상 낚시 게시글 저장 [Repository] - Success")
 	void t01() {
 		// Given
-		ShipFishingPost givenShipFishingPost = arbitraryBuilder.set("shipFishingPostId", null).sample();
+		ShipFishingPost givenShipFishingPost = arbitraryBuilder
+			.set("shipFishingPostId", null)
+			.set("shipId", 100L).sample();
 
 		// When
 		ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenShipFishingPost);

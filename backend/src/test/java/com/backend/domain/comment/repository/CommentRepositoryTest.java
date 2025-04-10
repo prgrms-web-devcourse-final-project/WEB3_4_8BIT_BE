@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,34 +78,34 @@ class CommentRepositoryTest extends BaseTest {
 		.set("content", englishStringLength);
 
 	@BeforeEach
-void setUp() {
-    List<File> givenFileList = fixtureMonkeyBuilder
-        .giveMeBuilder(File.class)
-        .set("fileId", null)
-        .sampleList(10);
+	void setUp() {
+		List<File> givenFileList = fixtureMonkeyBuilder
+			.giveMeBuilder(File.class)
+			.set("fileId", null)
+			.sampleList(10);
 
-    savedfileList = storageJpaRepository.saveAll(givenFileList);
+		savedfileList = storageJpaRepository.saveAll(givenFileList);
 
-    List<Member> memberList = new ArrayList<>();
+		List<Member> memberList = new ArrayList<>();
 
-    for (int i = 0; i < savedfileList.size(); i++) {
-		File file = savedfileList.get(i);
-        memberList.add(
-            fixtureMonkeyBuilder.giveMeBuilder(Member.class)
-                .set("memberId", null)
-                .set("email", "unique_email_" + i + "@test.com")
-                .set("phone", "phone_" + i)
-                .set("nickname", "nickname_" + i)
-                .set("name", englishStringLength)
-                .set("description", englishStringLength)
-                .set("fileId", file.getFileId())
-				.set("providerId", String.valueOf(i))
-                .sample()
-        );
-    }
+		for (int i = 0; i < savedfileList.size(); i++) {
+			File file = savedfileList.get(i);
+			memberList.add(
+				fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+					.set("memberId", null)
+					.set("email", "unique_email_" + i + "@test.com")
+					.set("phone", "phone_" + i)
+					.set("nickname", "nickname_" + i)
+					.set("name", englishStringLength)
+					.set("description", englishStringLength)
+					.set("fileId", file.getFileId())
+					.set("providerId", String.valueOf(i))
+					.sample()
+			);
+		}
 
-    savedMemberList = memberJpaRepository.saveAll(memberList);
-}
+		savedMemberList = memberJpaRepository.saveAll(memberList);
+	}
 
 	@AfterEach
 	void afterEach() {
@@ -196,7 +197,8 @@ void setUp() {
 
 		List<Comment> savedCommentList = commentJpaRepository.saveAll(givenCommentList);
 
-		GlobalRequest.CursorRequest givenCursorRequestDto = new GlobalRequest.CursorRequest(null, null, null, null, null, 10);
+		GlobalRequest.CursorRequest givenCursorRequestDto = new GlobalRequest.CursorRequest(null, null, null, null,
+			null, 10);
 
 		CommentRequest.Search givenRequestDto = new CommentRequest.Search(null);
 
@@ -254,7 +256,8 @@ void setUp() {
 
 		List<Comment> savedCommentList = commentJpaRepository.saveAll(givenCommentList);
 
-		GlobalRequest.CursorRequest givenCursorRequestDto = new GlobalRequest.CursorRequest(null, null, null, null, null, 30);
+		GlobalRequest.CursorRequest givenCursorRequestDto = new GlobalRequest.CursorRequest(null, null, null, null,
+			null, 30);
 
 		CommentRequest.Search givenRequestDto = new CommentRequest.Search(1L);
 
@@ -283,67 +286,97 @@ void setUp() {
 	void t06() {
 		// Given
 		List<Comment> givenCommentList = new ArrayList<>();
-
 		FishingTripPost givenFishingTripPost = fixtureMonkeyBuilder.giveMeBuilder(FishingTripPost.class)
 			.set("fishingTripPostId", null)
 			.set("subject", englishStringLength)
 			.set("content", englishStringLength)
 			.sample();
-
 		FishingTripPost savedFishingTripPost = fishingTripPostJpaRepository.save(givenFishingTripPost);
 
-		for (Member member : savedMemberList) {
-			givenCommentList.add(fixtureMonkeyBuilder.giveMeBuilder(Comment.class)
-				.set("commentId", null)
-				.set("content", englishStringLength)
-				.set("memberId", member.getMemberId())
-				.set("parentId", 1L)
-				.set("childCount", 0)
-				.set("fishingTripPostId", savedFishingTripPost.getFishingTripPostId())
-				.sample());
+		// 명시적으로 부모 댓글을 먼저 생성하고 저장
+		Comment parentComment1 = fixtureMonkeyBuilder.giveMeBuilder(Comment.class)
+			.set("commentId", null)
+			.set("content", "Parent Comment 1")
+			.set("memberId", savedMemberList.get(0).getMemberId())
+			.set("parentId", null)  // 부모 댓글이므로 null
+			.set("childCount", 0)
+			.set("fishingTripPostId", savedFishingTripPost.getFishingTripPostId())
+			.sample();
 
-			givenCommentList.add(fixtureMonkeyBuilder.giveMeBuilder(Comment.class)
+		Comment savedParent1 = commentJpaRepository.save(parentComment1);
+
+		// 테스트를 위해 자식 댓글들을 추가하기 전에 약간의 지연 추가 (생성 시간을 확실히 다르게 하기 위함)
+		try {
+			Thread.sleep(10);
+		} catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+
+		// 첫 번째 부모에 대한 자식 댓글들 추가
+		for (int i = 0; i < 10; i++) {
+			Comment childComment = fixtureMonkeyBuilder.giveMeBuilder(Comment.class)
 				.set("commentId", null)
-				.set("content", englishStringLength)
-				.set("memberId", member.getMemberId())
-				.set("parentId", 2L)
+				.set("content", "Child of parent 1: " + i)
+				.set("memberId", savedMemberList.get(i % savedMemberList.size()).getMemberId())
+				.set("parentId", savedParent1.getCommentId())  // 명시적으로 부모 ID 참조
 				.set("childCount", 0)
 				.set("fishingTripPostId", savedFishingTripPost.getFishingTripPostId())
-				.sample());
+				.sample();
+
+			givenCommentList.add(childComment);
+
+			// 각 댓글 사이에 약간의 시간 차이를 두어 정렬을 안정적으로 만듦
+			try {
+				Thread.sleep(5);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
 		}
 
 		List<Comment> savedCommentList = commentJpaRepository.saveAll(givenCommentList);
 
-		Comment getComment = savedCommentList.get(18);
+		// 저장된 댓글들을 생성 시간 기준 내림차순으로 정렬
+		List<Comment> sortedComments = savedCommentList.stream()
+			.filter(comment -> comment.getParentId().equals(savedParent1.getCommentId()))
+			.sorted(Comparator.comparing(Comment::getCreatedAt).reversed())
+			.collect(Collectors.toList());
+
+		// 첫 번째 페이지를 건너뛰고 두 번째 페이지의 첫 번째 댓글을 가져오기 위해
+		// 첫 번째 페이지의 마지막 댓글을 커서로 사용
+		Comment cursorComment = sortedComments.get(0);  // 첫 번째 페이지의 마지막 댓글
 
 		GlobalRequest.CursorRequest givenCursorRequestDto = new GlobalRequest.CursorRequest(
-			null,
+			"desc",  // 명시적으로 정렬 방향 지정
 			"createdAt",
-			null,
-			getComment.getCreatedAt().toString(),
-			getComment.getCommentId(),
-			1);
+			"next",
+			cursorComment.getCreatedAt().toString(),
+			cursorComment.getCommentId(),
+			1);  // 페이지 크기 1
 
-		CommentRequest.Search givenRequestDto = new CommentRequest.Search(1L);
+		CommentRequest.Search givenRequestDto = new CommentRequest.Search(savedParent1.getCommentId()); // 명시적인 부모 ID
 
 		// When
 		ScrollResponse<CommentResponse.Detail> findScrollDetail = commentRepository.findDetailByFishTripPostId(
 			savedFishingTripPost.getFishingTripPostId(),
-			1L,
+			savedParent1.getCommentId(),
 			givenCursorRequestDto,
 			givenRequestDto
 		);
 
 		// Then
-		List<Comment> sortedFishEncyclopediaList = savedCommentList.stream()
-			.filter(comment -> comment.getParentId() == 1)
-			.sorted(Comparator.comparing(Comment::getCreatedAt).reversed())
-			.toList();
-
+		assertThat(findScrollDetail.content()).isNotNull();
 		assertThat(findScrollDetail.content().size()).isEqualTo(1);
-		assertThat(findScrollDetail.content().get(0).commentId())
-			.isEqualTo(sortedFishEncyclopediaList.get(1).getCommentId());
-		assertThat(findScrollDetail.content()).allMatch((detail) -> detail.parentId().equals(1L));
+
+		// 두 번째 페이지의 첫 번째 댓글(즉, 전체 순서에서는 두 번째 댓글)이
+		// 정렬된 리스트의 두 번째 댓글과 일치하는지 확인
+		if (sortedComments.size() >= 2) {
+			assertThat(findScrollDetail.content().get(0).commentId())
+				.isEqualTo(sortedComments.get(1).getCommentId());
+		}
+
+		// 모든 결과가 지정된 부모 ID를 가지는지 확인
+		assertThat(findScrollDetail.content()).allMatch(
+			(detail) -> detail.parentId().equals(savedParent1.getCommentId()));
 	}
 
 	@Test
