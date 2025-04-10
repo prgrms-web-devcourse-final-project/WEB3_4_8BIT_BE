@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import com.backend.domain.fishingtrippost.converter.FishingTripPostConverter;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtriprecruitment.domain.FishingLevel;
@@ -191,8 +192,8 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			.map(File::getUrl)
 			.toList();
 
-		FishingTripPostResponse.Detail detail = FishingTripPostResponse.Detail.fromDetailQueryDtoAndFileUrlList(
-			detailDto, fileUrlList);
+		FishingTripPostResponse.Detail detail = FishingTripPostConverter.toDetail(
+			detailDto, fileUrlList, 0L, false);
 
 		// then
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());

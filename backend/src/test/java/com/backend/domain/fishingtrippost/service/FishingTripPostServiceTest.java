@@ -25,6 +25,8 @@ import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 import com.backend.domain.fishpoint.exception.FishPointErrorCode;
 import com.backend.domain.fishpoint.exception.FishPointException;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
+import com.backend.domain.like.domain.LikeTargetType;
+import com.backend.domain.like.repository.LikeRepository;
 import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
@@ -61,6 +63,9 @@ class FishingTripPostServiceTest extends BaseTest {
 
 	@Mock
 	private FishingTripPostNotifier fishingTripPostNotifier;
+
+	@Mock
+	private LikeRepository likeRepository;
 
 	private final ArbitraryBuilder<FishingTripPostRequest.Form> createRequestBuilder =
 		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Form.class);
@@ -255,6 +260,7 @@ class FishingTripPostServiceTest extends BaseTest {
 	void t07() {
 		// Given
 		Long postId = 1L;
+		Long memberId = 1L; // 로그인된 사용자 ID
 		List<Long> fileIds = List.of(101L, 102L, 103L);
 		List<String> fileUrls = List.of(
 			"https://cdn.example.com/1.jpg",
@@ -280,46 +286,18 @@ class FishingTripPostServiceTest extends BaseTest {
 		);
 
 		List<File> mockFiles = List.of(
-			File.builder()
-				.fileId(101L)
-				.fileName("f1.jpg")
-				.originalFileName("o1.jpg")
-				.contentType("image/jpeg")
-				.fileSize(12345L)
-				.url(fileUrls.get(0))
-				.domain("test")
-				.createdById(1L)
-				.uploaded(true)
-				.build(),
-			File.builder()
-				.fileId(102L)
-				.fileName("f2.jpg")
-				.originalFileName("o2.jpg")
-				.contentType("image/jpeg")
-				.fileSize(12345L)
-				.url(fileUrls.get(1))
-				.domain("test")
-				.createdById(1L)
-				.uploaded(true)
-				.build(),
-			File.builder()
-				.fileId(103L)
-				.fileName("f3.jpg")
-				.originalFileName("o3.jpg")
-				.contentType("image/jpeg")
-				.fileSize(12345L)
-				.url(fileUrls.get(2))
-				.domain("test")
-				.createdById(1L)
-				.uploaded(true)
-				.build()
+			File.builder().fileId(101L).url(fileUrls.get(0)).uploaded(true).build(),
+			File.builder().fileId(102L).url(fileUrls.get(1)).uploaded(true).build(),
+			File.builder().fileId(103L).url(fileUrls.get(2)).uploaded(true).build()
 		);
 
 		when(fishingTripPostRepository.findDetailQueryDtoById(postId)).thenReturn(Optional.of(queryDto));
 		when(storageRepository.findAllById(fileIds)).thenReturn(mockFiles);
+		when(likeRepository.countByTargetTypeAndTargetId(LikeTargetType.FISHING_TRIP_POST, postId)).thenReturn(3L);
+		when(likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST, postId)).thenReturn(true);
 
 		// When
-		FishingTripPostResponse.Detail actual = fishingTripPostService.getFishingTripPostDetail(postId);
+		FishingTripPostResponse.Detail actual = fishingTripPostService.getFishingTripPostDetail(memberId, postId);
 
 		// Then
 		assertThat(actual.fishingTripPostId()).isEqualTo(postId);
@@ -335,26 +313,34 @@ class FishingTripPostServiceTest extends BaseTest {
 		assertThat(actual.longitude()).isEqualTo(128.12345);
 		assertThat(actual.latitude()).isEqualTo(37.12345);
 		assertThat(actual.fileUrlList()).containsExactlyElementsOf(fileUrls);
+		assertThat(actual.likeCount()).isEqualTo(3L);
+		assertThat(actual.isLiked()).isTrue();
 
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verify(storageRepository).findAllById(fileIds);
+		verify(likeRepository).countByTargetTypeAndTargetId(LikeTargetType.FISHING_TRIP_POST, postId);
+		verify(likeRepository).existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST, postId);
 	}
+
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
 	void t08() {
 		// Given
 		Long postId = 999L;
+		Long memberId = null;
+
 		when(fishingTripPostRepository.findDetailQueryDtoById(postId)).thenReturn(Optional.empty());
 
 		// When & Then
-		assertThatThrownBy(() -> fishingTripPostService.getFishingTripPostDetail(postId))
+		assertThatThrownBy(() -> fishingTripPostService.getFishingTripPostDetail(memberId, postId))
 			.isInstanceOf(FishingTripPostException.class)
 			.hasMessage(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND.getMessage());
 
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verifyNoInteractions(storageRepository); // 파일 조회는 호출되지 않아야 함
 	}
+
 
 	@Test
 	@DisplayName("동출 게시글 모집 완료 처리 [작성자 본인일 경우] - Success")
