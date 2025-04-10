@@ -110,6 +110,8 @@ void setUp() {
 	void afterEach() {
 		memberJpaRepository.deleteAll();
 		commentJpaRepository.deleteAll();
+		entityManager.flush();
+		entityManager.clear();
 	}
 
 	@Test

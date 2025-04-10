@@ -144,9 +144,9 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 	@AfterEach
 	public void tearDown() {
+		shipFishingPostJpaRepository.deleteAll();
 		em.flush();
 		em.clear();
-		shipFishingPostJpaRepository.deleteAll();
 	}
 
 	@Test
