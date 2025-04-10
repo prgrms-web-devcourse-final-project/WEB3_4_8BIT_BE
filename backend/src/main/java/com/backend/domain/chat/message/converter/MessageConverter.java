@@ -8,10 +8,16 @@ import com.backend.domain.chat.message.entity.Message;
 
 public class MessageConverter {
 
-	public static Message toEntity(final MessageRequest request, final List<String> fileUrls){
+	public static Message toEntity(
+		final Long senderId,
+		final String nickname,
+		final MessageRequest request,
+		final List<String> fileUrls
+	){
 		return Message.builder()
 			.roomId(request.roomId())
-			.senderNickname(request.senderNickname())
+			.senderId(senderId)
+			.senderNickname(nickname)
 			.content(request.content())
 			.fileIds(request.fileIds())
 			.fileUrls(fileUrls)
