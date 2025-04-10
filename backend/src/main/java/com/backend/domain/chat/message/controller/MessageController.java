@@ -23,8 +23,8 @@ public class MessageController {
 
 	@MessageMapping("/chat/send")
 	public void sendMessage(
-		@Payload MessageRequest requestDto,
-		@Header("simpSessionAttributes") Map<String, Object> sessionAttributes
+		@Payload final MessageRequest requestDto,
+		@Header("simpSessionAttributes") final Map<String, Object> sessionAttributes
 	) {
 		// TODO 나중에 메세지 저장을 비동기 처리할 수 있으면 처리
 		Long senderId = (Long) sessionAttributes.get("senderId");
