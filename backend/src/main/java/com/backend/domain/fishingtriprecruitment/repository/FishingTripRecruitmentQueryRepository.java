@@ -78,4 +78,10 @@ public class FishingTripRecruitmentQueryRepository {
 			)
 			.fetch();
 	}
+
+	public void deleteAllByPostId(final Long fishingTripPostId) {
+		jpaQueryFactory.delete(fishingTripRecruitment)
+			.where(fishingTripRecruitment.fishingTripPostId.eq(fishingTripPostId))
+			.execute();
+	}
 }
