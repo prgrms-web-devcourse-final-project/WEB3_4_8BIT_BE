@@ -70,7 +70,7 @@ public class LikeCacheService {
 	 * @param type     좋아요 대상 타입 (예: SHIP_FISHING_POST, FISHING_TRIP_POST)
 	 * @param targetId 좋아요 대상 ID
 	 */
-	public void initializeLikeCache(LikeTargetType type, Long targetId) {
+	public void initializeLikeCache(final LikeTargetType type, final Long targetId) {
 		String key = buildKey(type, targetId);
 		if (!redisUtil.hasKey(key)) {
 			Long count = likeRepository.countByTargetTypeAndTargetId(type, targetId);

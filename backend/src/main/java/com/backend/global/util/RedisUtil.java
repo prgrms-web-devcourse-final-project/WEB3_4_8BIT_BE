@@ -94,7 +94,7 @@ public class RedisUtil {
 	 * @param key   Redis 키
 	 * @param value 키에 넣을 값
 	 */
-	public void setValue(String key, String value) {
+	public void setValue(final String key, final String value) {
 		redisTemplate.opsForValue().set(key, value);
 	}
 
