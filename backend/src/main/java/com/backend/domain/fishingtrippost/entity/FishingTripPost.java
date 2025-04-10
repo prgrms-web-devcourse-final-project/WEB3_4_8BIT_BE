@@ -41,7 +41,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @ToString
-
 public class FishingTripPost extends BaseEntity {
 
 	@Id
@@ -86,6 +85,21 @@ public class FishingTripPost extends BaseEntity {
 	@ColumnDefault("0")
 	@Builder.Default
 	private Long likeCount = 0L;
+
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	@Builder.Default
+	private Long commentCount = 0L;
+
+	public void plusCommentCount() {
+		this.commentCount++;
+	}
+
+	public void minusCommentCount(final Long deleteCount) {
+		if (this.commentCount > 0) {
+			this.commentCount -= deleteCount;
+		}
+	}
 
 	public void updateLikeCount(final Long likeCount) {
 		this.likeCount = likeCount;
