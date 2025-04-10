@@ -79,7 +79,7 @@ public class FishPointSummaryServiceImpl implements FishPointSummaryService {
 	 * @param tupleList 낚시 기록 요약 데이터
 	 * @return Pair(포인트 ID Set, 어종 ID Set)
 	 */
-	private Pair<Set<Long>, Set<Long>> extractFishPointAndFishIds(List<Tuple> tupleList) {
+	private Pair<Set<Long>, Set<Long>> extractFishPointAndFishIds(final List<Tuple> tupleList) {
 		Set<Long> fishPointIdSet = new HashSet<>();
 		Set<Long> fishIdSet = new HashSet<>();
 
@@ -96,7 +96,7 @@ public class FishPointSummaryServiceImpl implements FishPointSummaryService {
 	 * @param pair Pair(포인트 ID Set, 어종 ID Set)
 	 * @return (fishPointId, fishId) → FishPointSummary Map
 	 */
-	private Map<Pair<Long, Long>, FishPointSummary> getExistingSummaryMap(Pair<Set<Long>, Set<Long>> pair) {
+	private Map<Pair<Long, Long>, FishPointSummary> getExistingSummaryMap(final Pair<Set<Long>, Set<Long>> pair) {
 		List<FishPointSummary> existingSummaries = fishPointSummaryRepository.findByFishPointIdInAndFishIdIn(
 			pair.getFirst(),
 			pair.getSecond()
@@ -115,7 +115,7 @@ public class FishPointSummaryServiceImpl implements FishPointSummaryService {
 	 * @param fishIdSet 어종 ID Set
 	 * @return fishId → Fish Map
 	 */
-	private Map<Long, Fish> getFishMap(Set<Long> fishIdSet) {
+	private Map<Long, Fish> getFishMap(final Set<Long> fishIdSet) {
 		return fishRepository.findAllById(new ArrayList<>(fishIdSet))
 			.stream()
 			.collect(Collectors.toMap(Fish::getFishId, Function.identity()));
@@ -130,9 +130,11 @@ public class FishPointSummaryServiceImpl implements FishPointSummaryService {
 	 * @param fishMap 어종 ID 기준 Fish Map
 	 * @return 생성되거나 업데이트된 FishPointSummary 리스트
 	 */
-	private List<FishPointSummary> buildUpdatedSummaries(List<Tuple> tupleList,
-		Map<Pair<Long, Long>, FishPointSummary> summaryMap,
-		Map<Long, Fish> fishMap) {
+	private List<FishPointSummary> buildUpdatedSummaries(
+		final List<Tuple> tupleList,
+		final Map<Pair<Long, Long>, FishPointSummary> summaryMap,
+		final Map<Long, Fish> fishMap
+	) {
 
 		List<FishPointSummary> result = new ArrayList<>();
 
@@ -168,7 +170,7 @@ public class FishPointSummaryServiceImpl implements FishPointSummaryService {
 	 *
 	 * @param summaries 저장할 FishPointSummary 리스트
 	 */
-	private void saveSummaries(List<FishPointSummary> summaries) {
+	private void saveSummaries(final List<FishPointSummary> summaries) {
 		fishPointSummaryRepository.saveAll(summaries);
 	}
 }

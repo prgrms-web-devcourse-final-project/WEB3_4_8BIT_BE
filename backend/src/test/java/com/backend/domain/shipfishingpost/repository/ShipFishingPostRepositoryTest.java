@@ -113,6 +113,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 				.set("price", 10000L * i)
 				.set("reviewEverRate", 0.3D * i)
 				.set("maxGuestCount", i)
+				.set("likeCount", 0L)
 				.sample();
 
 			givenPostList.add(shipFishingPostRepository.save(post));

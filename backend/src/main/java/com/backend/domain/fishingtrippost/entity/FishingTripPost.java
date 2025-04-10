@@ -3,6 +3,7 @@ package com.backend.domain.fishingtrippost.entity;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -21,6 +22,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -78,8 +80,17 @@ public class FishingTripPost extends BaseEntity {
 	@JdbcTypeCode(SqlTypes.JSON)
 	private List<Long> fileIdList;
 
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	@Builder.Default
+	private Long likeCount = 0L;
+
+	public void updateLikeCount(final Long likeCount) {
+		this.likeCount = likeCount;
+	}
+
 	// 현재 인원 증가 로직
-	public void increaseCurrentCount(int count) {
+	public void increaseCurrentCount(final int count) {
 		if (this.currentCount + count > this.recruitmentCount) {
 			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_OVER_RECRUITMENT);
 		}
@@ -105,7 +116,7 @@ public class FishingTripPost extends BaseEntity {
 		this.fileIdList = fileIdList;
 	}
 
-	public void setPostStatus(PostStatus postStatus) {
+	public void setPostStatus(final PostStatus postStatus) {
 		this.postStatus = postStatus;
 	}
 }
