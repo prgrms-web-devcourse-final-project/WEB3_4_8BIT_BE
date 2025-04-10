@@ -77,4 +77,46 @@ public class RedisUtil {
 
 		return result;
 	}
+
+	/**
+	 * 지정된 key가 Redis에 존재하면 삭제한다.
+	 *
+	 * @param key 삭제할 Redis key
+	 */
+	public void deleteKeyIfExists(final String key) {
+		if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+			redisTemplate.delete(key);
+		}
+	}
+
+	/**
+	 * 해당 키가 Redis 존재 여부 확인
+	 *
+	 * @param key Redis 키
+	 * @return 존재하면 true, 없으면 false
+	 */
+	public boolean hasKey(final String key) {
+		return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+	}
+
+	/**
+	 * Redis 해당 키값 value 반환
+	 *
+	 * @param key Redis 키
+	 * @return Long 값
+	 */
+	public Long getLongValue(final String key) {
+		String value = redisTemplate.opsForValue().get(key);
+		return value != null ? Long.parseLong(value) : null;
+	}
+
+	/**
+	 * Redis 해당 키값 value 세팅
+	 *
+	 * @param key Redis 키
+	 * @param value 키에 넣을 값
+	 */
+	public void setValue(String key, String value) {
+		redisTemplate.opsForValue().set(key, value);
+	}
 }
