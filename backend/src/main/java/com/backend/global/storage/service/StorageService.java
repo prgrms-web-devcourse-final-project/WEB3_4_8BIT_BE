@@ -40,4 +40,12 @@ public interface StorageService {
 	 * @param fileIdList 삭제할 파일 ID 목록
 	 */
 	void deleteFilesByIdList(final Long memberId, final List<Long> fileIdList);
+
+	/**
+	 * 주어진 파일 ID 목록에 해당하는 파일들의 URL을 조회합니다.
+	 *
+	 * @param fileIdList   조회할 파일 ID 목록
+	 * @return	해당 파일 ID들에 대응하는 파일 URL 목록
+	 */
+	List<String> getFileUrlsByIdList(final List<Long> fileIdList);
 }

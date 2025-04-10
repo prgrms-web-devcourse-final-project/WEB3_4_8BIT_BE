@@ -165,6 +165,12 @@ public class S3StorageService implements StorageService {
 		log.debug("파일 {}개 삭제 완료", fileList.size());
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public List<String> getFileUrlsByIdList(final List<Long> fileIdList) {
+		return storageRepository.findAllById(fileIdList).stream().map(File::getUrl).toList();
+	}
+
 	/**
 	 * 파일 타입(MIME type) 검증
 	 *
