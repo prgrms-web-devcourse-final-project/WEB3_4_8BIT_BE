@@ -246,4 +246,19 @@ class FishEncyclopediaServiceTest extends BaseTest {
 		assertThat(detailPageList).isEqualTo(givenDetailPageList);
 	}
 
+	@Test
+	@DisplayName("내가 등록한 어종 수 조회 [Service] - Success")
+	void t07() {
+		// Given
+		Long givenFishCount = 7L;
+		Member givenMember = fixtureMonkeyBuilder.giveMeOne(Member.class);
+		when(fishEncyclopediaRepository.countDistinctFishIdByMemberId(givenMember.getMemberId())).thenReturn(givenFishCount);
+
+		// When
+		Long result = fishEncyclopediasService.getDistinctFishCountByMemberId(givenMember.getMemberId());
+
+		// Then
+		assertThat(result).isEqualTo(givenFishCount);
+	}
+
 }

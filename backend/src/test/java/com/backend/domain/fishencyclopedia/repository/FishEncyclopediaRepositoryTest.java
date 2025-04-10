@@ -117,6 +117,15 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 			.set("memberId", 2L)
 			.sampleList(10);
 
+		List<FishEncyclopedia> fishEncyclopediasList3 = fixtureMonkeyBuilder
+			.giveMeBuilder(FishEncyclopedia.class)
+			.set("fishEncyclopediaId", null)
+			.set("fishId", savedFishList.get(2).getFishId())
+			.set("fishPointId", savedFishPointList.get(0).getFishPointId())
+			.set("count", 5)
+			.set("memberId", givenMember.getMemberId())
+			.sampleList(10);
+
 		List<CatchMaxLength> catchMaxLengthList = IntStream.range(0, 20)
 			.mapToObj(
 				(i) -> fixtureMonkeyBuilder.giveMeBuilder(CatchMaxLength.class)
@@ -128,6 +137,7 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 
 		savedFishEncyclopediasList = fishEncyclopediaJpaRepository.saveAll(fishEncyclopediasList1);
 		fishEncyclopediaJpaRepository.saveAll(fishEncyclopediasList2);
+		fishEncyclopediaJpaRepository.saveAll(fishEncyclopediasList3);
 		savedCatchMaxLengthList = catchMaxLengthJpaRepository.saveAll(catchMaxLengthList);
 	}
 
@@ -335,6 +345,19 @@ class FishEncyclopediaRepositoryTest extends BaseTest {
 
 		// Then
 		assertThat(findHourlyFishCountSummaryList).isEmpty();
+	}
+
+	@Test
+	@DisplayName("내가 등록한 어종 수 조회 [Repository] - Success")
+	void t11() {
+		// Given
+		Long memberId = givenMember.getMemberId();
+
+		// When
+		Long distinctFishCount = fishEncyclopediaRepository.countDistinctFishIdByMemberId(memberId);
+
+		// Then
+		assertThat(distinctFishCount).isEqualTo(2L);
 	}
 
 	// 유틸리티 메서드
