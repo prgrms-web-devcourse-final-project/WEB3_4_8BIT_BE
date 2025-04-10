@@ -95,4 +95,14 @@ public interface ReservationRepository {
 		final Long shipFishingPostId,
 		final Boolean afterToday,
 		final GlobalRequest.CursorRequest cursorRequestDto);
+
+	/**
+	 * 선장 마이페이지의 대시보드 내용을 조회하는 메서드
+	 *
+	 * @param memberId 유저 id
+	 * @param limitDays 다가오는 날짜 제한
+	 * @return {@link ReservationResponse.DashBoard} 다가오는 예약횟수, 오늘 예약 횟수, 작성한 게시글 수
+	 * @implSpec 제한 날짜를 입력받아 오늘 예약횟수와 다가오는 예약 횟수, 작성한 게시글 수를 반환합니다.
+	 */
+	ReservationResponse.DashBoard findDashBoardByMemberId(final Long memberId, final Integer limitDays);
 }

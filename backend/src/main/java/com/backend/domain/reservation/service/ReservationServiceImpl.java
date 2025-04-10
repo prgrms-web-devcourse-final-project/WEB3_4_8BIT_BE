@@ -109,6 +109,12 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	public ReservationResponse.DashBoard getDashBoard(final Long memberId, final Integer limitDays) {
+
+		return reservationRepository.findDashBoardByMemberId(memberId, limitDays);
+	}
+
+	@Override
 	@Transactional
 	public void updateReservation(final Long reservationId, final Long memberId) {
 

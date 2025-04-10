@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "예약 정보 API")
@@ -99,6 +100,18 @@ public class ReservationController {
 
 		ScrollResponse<ReservationResponse.DetailWithName> response = reservationService
 			.getCaptainReservationList(shipFishingPostId, user.getId(), afterToday, cursorRequestDto);
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
+
+	@GetMapping("/dashboard")
+	@Operation(summary = "선장 마이페이지 대시보드", description = "선장의 마이페이지에서 대시보드 내용을(새 예약 신청, 다가오는 예약, 작성한 게시글 수) 조회 할 때 사용하는 API")
+	public ResponseEntity<GenericResponse<ReservationResponse.DashBoard>> getReservationDashBoard(
+		@RequestParam(value = "limitDays", required = false, defaultValue = "5") @Min(1) final Integer limitDays,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		ReservationResponse.DashBoard response = reservationService.getDashBoard(user.getId(), limitDays);
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}

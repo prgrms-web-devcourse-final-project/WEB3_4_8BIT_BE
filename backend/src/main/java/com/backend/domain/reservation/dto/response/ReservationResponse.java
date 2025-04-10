@@ -184,4 +184,34 @@ public class ReservationResponse {
 				.build();
 		}
 	}
+
+	/**
+	 * {
+	 *     "todayReservationCount": 5,
+	 *     "recentReservationCount": 8,
+	 *     "writtenPostCount": 3
+	 * }
+	 *
+	 * @param todayReservationCount 오늘 예약 횟수
+	 * @param recentReservationCount 다가오는 예약 횟수
+	 * @param writtenPostCount 작성한 게시글 수
+	 */
+	@Builder
+	public record DashBoard(
+		Long todayReservationCount,
+		Long recentReservationCount,
+		Long writtenPostCount
+	) {
+		public static DashBoard fromDashBoard(
+			final Long todayReservationCount,
+			final Long recentReservationCount,
+			final Long writtenPostCount) {
+
+			return DashBoard.builder()
+				.todayReservationCount(todayReservationCount)
+				.recentReservationCount(recentReservationCount)
+				.writtenPostCount(writtenPostCount)
+				.build();
+		}
+	}
 }

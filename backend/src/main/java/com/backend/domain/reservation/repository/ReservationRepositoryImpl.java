@@ -88,4 +88,10 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 			afterToday,
 			cursorRequestDto);
 	}
+
+	@Override
+	public ReservationResponse.DashBoard findDashBoardByMemberId(final Long memberId, final Integer limitDays) {
+
+		return reservationQueryRepository.findDashBoardByMemberId(memberId, limitDays);
+	}
 }

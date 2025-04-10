@@ -6,6 +6,8 @@ import static com.backend.domain.shipfishingpost.entity.QShipFishingPost.*;
 import static com.backend.global.storage.entity.QFile.*;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -216,6 +218,39 @@ public class ReservationQueryRepository {
 			.fetchFirst() != null;
 	}
 
+	ReservationResponse.DashBoard findDashBoardByMemberId(final Long memberId, final Integer limitDays) {
+
+		Long todayReservationCount = jpaQueryFactory.select(reservation.count())
+			.from(reservation)
+			.leftJoin(shipFishingPost)
+			.on(shipFishingPost.shipFishingPostId.eq(reservation.shipFishingPostId))
+			.where(ExpressionUtils.allOf(
+				shipFishingPost.memberId.eq(memberId),
+				statusCondition(true),
+				todayZonedDateTimeCondition()
+			))
+			.fetchOne();
+
+		Long recentReservationCount = jpaQueryFactory.select(reservation.count())
+			.from(reservation)
+			.leftJoin(shipFishingPost)
+			.on(shipFishingPost.shipFishingPostId.eq(reservation.shipFishingPostId))
+			.where(ExpressionUtils.allOf(
+				shipFishingPost.memberId.eq(memberId),
+				statusCondition(true),
+				betweenLocalDateCondition(limitDays)
+			))
+			.fetchOne();
+
+		Long writtenPostCount = jpaQueryFactory.select(shipFishingPost.count())
+			.from(shipFishingPost)
+			.where(shipFishingPost.memberId.eq(memberId))
+			.fetchOne();
+
+		return ReservationResponse.DashBoard
+			.fromDashBoard(todayReservationCount, recentReservationCount, writtenPostCount);
+	}
+
 	private List<ReservationResponse.DetailReservationList> mapToDetailReservationList(
 		final List<ReservationResponse.DetailQueryDto> detailQueryDtoList
 	) {
@@ -276,6 +311,18 @@ public class ReservationQueryRepository {
 
 	private BooleanExpression shipFishingPostIdCondition(final Long shipFishingPostId) {
 		return shipFishingPostId != null ? reservation.shipFishingPostId.eq(shipFishingPostId) : null;
+	}
+
+	private BooleanExpression betweenLocalDateCondition(final Integer limitDays) {
+		return reservation.reservationDate.between(LocalDate.now(), LocalDate.now().plusDays(limitDays));
+	}
+
+	private BooleanExpression todayZonedDateTimeCondition() {
+		LocalDate today = LocalDate.now();
+		ZonedDateTime startOfToday = today.atStartOfDay(ZoneId.systemDefault());
+		ZonedDateTime startOfTomorrow = today.plusDays(1).atStartOfDay(ZoneId.systemDefault());
+
+		return reservation.createdAt.between(startOfToday, startOfTomorrow);
 	}
 
 	private BooleanExpression getCursorCondition(final GlobalRequest.CursorRequest cursorRequestDto) {
