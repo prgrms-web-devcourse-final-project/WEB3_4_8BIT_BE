@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.util.List;
 import java.util.Optional;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import com.backend.domain.ship.entity.Ship;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.util.BaseTest;
 
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -37,6 +39,9 @@ public class ShipRepositoryTest extends BaseTest {
 	@Autowired
 	private ShipJpaRepository shipJpaRepository;
 
+	@Autowired
+	private EntityManager entityManager;
+
 	private final Arbitrary<String> englishStringLength = Arbitraries.strings()
 		.withCharRange('a', 'z')
 		.withCharRange('A', 'Z')
@@ -47,6 +52,13 @@ public class ShipRepositoryTest extends BaseTest {
 		.set("shipName", englishStringLength)
 		.set("shipNumber", englishStringLength)
 		.set("departurePort", "부산항");
+
+	@AfterEach
+	void tearDown() {
+		shipJpaRepository.deleteAll();
+		entityManager.flush();
+		entityManager.clear();
+	}
 
 	@Test
 	@DisplayName("선박 정보 저장 [Repository] - Success")

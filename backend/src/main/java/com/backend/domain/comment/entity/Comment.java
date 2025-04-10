@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,7 +16,10 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "comments")
+@Table(name = "comments", indexes = {
+	@Index(name = "idx_comments_01", columnList = "comment_id, fishing_trip_post_id, created_at"),
+	@Index(name = "idx_comments_02", columnList = "comment_id, fishing_trip_post_id, parent_id, created_at")
+})
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
