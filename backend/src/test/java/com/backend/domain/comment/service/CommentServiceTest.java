@@ -3,6 +3,8 @@ package com.backend.domain.comment.service;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +16,7 @@ import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 
 import com.backend.domain.comment.dto.request.CommentRequest;
+import com.backend.domain.comment.dto.response.CommentResponse;
 import com.backend.domain.comment.entity.Comment;
 import com.backend.domain.comment.exception.CommentErrorCode;
 import com.backend.domain.comment.exception.CommentExpection;
@@ -21,6 +24,8 @@ import com.backend.domain.comment.repository.CommentRepository;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -143,5 +148,53 @@ class CommentServiceTest extends BaseTest {
 		assertThatThrownBy(() -> commentService.createComment(givenFishingTripPostId, givenMemberId, givenRequestDto))
 			.isExactlyInstanceOf(CommentExpection.class)
 			.hasMessage(CommentErrorCode.PARENT_NOT_FOUND.getMessage());
+	}
+
+	@Test
+	@DisplayName("댓글 조회 [Service] - Fail")
+	void t05() {
+		// Given
+		Long givenFishingTripPostId = 1L;
+		Long givenMemberId = 1L;
+
+		GlobalRequest.CursorRequest givenCursorRequestDto = new GlobalRequest.CursorRequest(
+			null,
+			null,
+			null,
+			null,
+			null,
+			10
+		);
+
+		CommentRequest.Search givenRequestDto = new CommentRequest.Search(null);
+
+		List<CommentResponse.Detail> givenDetailList = fixtureMonkeyRecord
+			.giveMeBuilder(CommentResponse.Detail.class)
+			.set("parentId", null)
+			.sampleList(10);
+
+		ScrollResponse<CommentResponse.Detail> givenScrollResponse = fixtureMonkeyRecord
+			.giveMeBuilder(ScrollResponse.class)
+			.set("content", givenDetailList)
+			.sample();
+
+		when(
+			commentRepository.findDetailByFishTripPostId(
+				givenFishingTripPostId,
+				givenMemberId,
+				givenCursorRequestDto,
+				givenRequestDto)
+		).thenReturn(givenScrollResponse);
+
+		// When
+		ScrollResponse<CommentResponse.Detail> getDetailList = commentService.getDetailList(
+			givenFishingTripPostId,
+			givenMemberId,
+			givenCursorRequestDto,
+			givenRequestDto
+		);
+
+		// Then
+		assertThat(getDetailList.content()).isEqualTo(givenDetailList);
 	}
 }

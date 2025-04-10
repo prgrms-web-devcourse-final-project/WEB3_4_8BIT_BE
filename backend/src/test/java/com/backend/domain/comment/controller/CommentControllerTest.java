@@ -3,6 +3,8 @@ package com.backend.domain.comment.controller;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,12 +22,15 @@ import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 
 import com.backend.domain.comment.dto.request.CommentRequest;
+import com.backend.domain.comment.dto.response.CommentResponse;
 import com.backend.domain.comment.exception.CommentErrorCode;
 import com.backend.domain.comment.exception.CommentExpection;
 import com.backend.domain.comment.service.CommentService;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.util.BaseTest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -224,5 +229,57 @@ class CommentControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.code").value(CommentErrorCode.PARENT_NOT_FOUND.getCode()))
 			.andExpect(jsonPath("$.message").value(CommentErrorCode.PARENT_NOT_FOUND.getMessage()))
 			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("댓글 조회 [Controller] - Success")
+	@WithMockCustomUser
+	void t08() throws Exception {
+		// Given
+		Long givenFishingTripPostId = 1L;
+		Long givenMemberId = 1L;
+
+		GlobalRequest.CursorRequest givenCursorRequestDto = new GlobalRequest.CursorRequest(
+			null,
+			null,
+			null,
+			null,
+			null,
+			10
+		);
+
+		CommentRequest.Search givenRequestDto = new CommentRequest.Search(null);
+
+		List<CommentResponse.Detail> givenDetailList = fixtureMonkeyRecord
+			.giveMeBuilder(CommentResponse.Detail.class)
+			.set("parentId", null)
+			.sampleList(10);
+
+		ScrollResponse<CommentResponse.Detail> givenScrollResponse = fixtureMonkeyRecord
+			.giveMeBuilder(ScrollResponse.class)
+			.set("content", givenDetailList)
+			.sample();
+
+		when(
+			commentService.getDetailList(
+				givenFishingTripPostId,
+				givenMemberId,
+				givenCursorRequestDto,
+				givenRequestDto)
+		).thenReturn(givenScrollResponse);
+
+		// When
+		ResultActions resultActions = mockMvc
+			.perform(MockMvcRequestBuilders.get(
+					"/api/v1/fishing-trip-post/{fishingTripPostId}/comment",
+					givenFishingTripPostId)
+				.contentType(MediaType.APPLICATION_JSON));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.content.size()").value(10));
 	}
 }

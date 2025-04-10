@@ -24,6 +24,19 @@ public class CommentRequest {
 		@Schema(description = "부모 댓글 ID", example = "1")
 		Long parentId
 	) {
+	}
 
+	/**
+     * {@code
+	 * {
+	 *   "parentId": 1
+	 * }
+	 *}
+	 * @param parentId 부모 ID (Null 허용)
+	 */
+	public record Search(
+		@Schema(description = "부모 댓글 ID", example = "1")
+		Long parentId
+	) {
 	}
 }
