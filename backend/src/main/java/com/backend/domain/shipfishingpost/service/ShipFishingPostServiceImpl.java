@@ -74,6 +74,12 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	}
 
 	@Override
+	public List<ShipFishingPostResponse.MyPagePostList> getMyPageShipFishingPostList(final Long memberId) {
+
+		return shipFishingPostRepository.findMyPagePostList(memberId);
+	}
+
+	@Override
 	@Transactional(readOnly = true)
 	public ShipFishingPostResponse.DetailWithFileUrlAndFishName getShipFishingPostAll(final Long shipFishingPostId) {
 
@@ -98,6 +104,37 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 	@Override
 	@Transactional
+	public Long updateShipFishingPost(final Long shipFishingPostId, final ShipFishingPostRequest.Update requestDto,
+		final Long memberId) {
+
+		ShipFishingPost shipFishingPost = getShipFishingPostEntity(shipFishingPostId);
+
+		verifyPostOwnership(shipFishingPost.getMemberId(), memberId);
+
+		updateFileIdList(shipFishingPost.getFileIdList(), requestDto.fileIdList(), memberId);
+
+		verifyShipOwnership(shipFishingPost.getShipId(), memberId, requestDto.maxGuestCount());
+
+		updateReservationDate(shipFishingPostId, requestDto.maxGuestCount(), shipFishingPost.getMaxGuestCount());
+
+		shipFishingPost.updateShipFishingPost(
+			requestDto.subject(),
+			requestDto.content(),
+			requestDto.price(),
+			requestDto.startTime(),
+			requestDto.endTime(),
+			requestDto.maxGuestCount(),
+			requestDto.fileIdList(),
+			requestDto.fishIdList()
+		);
+
+		shipFishingPost.setDurationTime();
+
+		return shipFishingPost.getShipFishingPostId();
+	}
+
+	@Override
+	@Transactional
 	public void deleteShipFishingPost(final Long shipFishingPostId, final Long memberId) {
 
 		ShipFishingPost shipFishingPost = getShipFishingPostEntity(shipFishingPostId);
@@ -111,6 +148,18 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 		reservationDateService.deleteReservationDateList(shipFishingPostId);
 
 		s3StorageService.deleteFilesByIdList(memberId, shipFishingPost.getFileIdList());
+	}
+
+	/**
+	 * 선상 낚시 게시글 Entity 를 반환합니다.
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @return {@link ShipFishingPost}
+	 */
+	private ShipFishingPost getShipFishingPostEntity(final Long shipFishingPostId) {
+
+		return shipFishingPostRepository.findById(shipFishingPostId)
+			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
 	}
 
 	/**
@@ -187,6 +236,21 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	}
 
 	/**
+	 * 삭제할 게시글의 남은 예약 내역 검증
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 */
+	private void verifyReservationExist(final Long shipFishingPostId) {
+
+		Boolean reservationExists = reservationRepository
+			.findByShipFishingPostIdAndTodayAfter(shipFishingPostId, LocalDate.now());
+
+		if (reservationExists) {
+			throw new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_RESERVATION_EXIST);
+		}
+	}
+
+	/**
 	 * 예약 불가 날짜 저장 메서드
 	 *
 	 * @param requestDto {@link ShipFishingPostRequest.Create}
@@ -204,29 +268,44 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	}
 
 	/**
-	 * 삭제할 게시글의 남은 예약 내역 검증
+	 * 게시글 정원 변경으로 인한 예약 일자 정원 업데이트 메서드
 	 *
-	 * @param shipFishingPostId {@link Long}
+	 * @param shipFishingPostId 게시글 id
+	 * @param updateGuestCount 업데이트한 정원
+	 * @param oldGuestCount 기존 정원
 	 */
-	private void verifyReservationExist(final Long shipFishingPostId) {
+	private void updateReservationDate(
+		final Long shipFishingPostId,
+		final Integer updateGuestCount,
+		final Integer oldGuestCount) {
 
-		Boolean reservationExists = reservationRepository
-			.findByShipFishingPostIdAndTodayAfter(shipFishingPostId, LocalDate.now());
+		int updateCount = updateGuestCount - oldGuestCount;
 
-		if (reservationExists) {
-			throw new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_RESERVATION_EXIST);
+		if (updateCount > 0) {
+			reservationDateRepository.updateRemainCountWithPlus(shipFishingPostId, updateCount, LocalDate.now());
+		} else if (updateCount < 0) {
+			reservationDateRepository.updateRemainCountWithMinus(shipFishingPostId, updateCount, LocalDate.now());
 		}
 	}
 
 	/**
-	 * 선상 낚시 게시글 Entity 를 반환합니다.
+	 * 이미지 업데이트 메서드
 	 *
-	 * @param shipFishingPostId {@link Long}
-	 * @return {@link ShipFishingPost}
+	 * @param updateFileIdList 업데이트 된 이미지 목록
+	 * @param oldFileIdList 기존 게시글 이미지 목록
+	 * @param memberId 유저 고유 id
 	 */
-	private ShipFishingPost getShipFishingPostEntity(final Long shipFishingPostId) {
+	private void updateFileIdList(
+		final List<Long> updateFileIdList,
+		final List<Long> oldFileIdList,
+		final Long memberId) {
 
-		return shipFishingPostRepository.findById(shipFishingPostId)
-			.orElseThrow(() -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND));
+		List<Long> deleteFileIdList = oldFileIdList.stream()
+			.filter(id -> !updateFileIdList.contains(id))
+			.toList();
+
+		if (!deleteFileIdList.isEmpty()) {
+			s3StorageService.deleteFilesByIdList(memberId, deleteFileIdList);
+		}
 	}
 }

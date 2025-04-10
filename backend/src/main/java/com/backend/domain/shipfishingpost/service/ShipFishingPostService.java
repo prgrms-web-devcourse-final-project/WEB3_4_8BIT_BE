@@ -1,5 +1,7 @@
 package com.backend.domain.shipfishingpost.service;
 
+import java.util.List;
+
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.global.dto.request.GlobalRequest;
@@ -16,6 +18,16 @@ public interface ShipFishingPostService {
 	 * @author swjoon
 	 */
 	Long createShipFishingPost(final ShipFishingPostRequest.Create requestDto, final Long memberId);
+
+	/**
+	 * 내가 작성한 게시글 목록 조회 메서드
+	 *
+	 * @param memberId 유저 id
+	 * @return {@link List<ShipFishingPostResponse.MyPagePostList>}
+	 * @implSpec 본인이 작성한 선상 낚시 게시글 목록을 조회한다.
+	 * @author swjoon
+	 */
+	List<ShipFishingPostResponse.MyPagePostList> getMyPageShipFishingPostList(final Long memberId);
 
 	/**
 	 * 선상 낚시 게시글 상세 조회 메서드 (게시글, 멤버, 선박 정보 포함)
@@ -39,6 +51,21 @@ public interface ShipFishingPostService {
 	ScrollResponse<ShipFishingPostResponse.DetailScroll> getShipFishingPostScroll(
 		final ShipFishingPostRequest.Search searchDto,
 		final GlobalRequest.CursorRequest cursorRequestDto);
+
+	/**
+	 * 선상 낚시 게시글 업데이트 메서드
+	 *
+	 * @param shipFishingPostId 선상 낚시 게시글
+	 * @param requestDto 업데이트 내용
+	 * @param memberId 로그인 유저 정보
+	 * @return 업데이트한 선상낚시 게시글 Id
+	 * @implSpec 선상낚시 게시글 id 와 업데이트 내용을 받아 검증 후 업데이트를 진행합니다.
+	 * @author swjoon
+	 */
+	Long updateShipFishingPost(
+		final Long shipFishingPostId,
+		final ShipFishingPostRequest.Update requestDto,
+		final Long memberId);
 
 	/**
 	 * 선상 낚시 게시글 삭제 메서드

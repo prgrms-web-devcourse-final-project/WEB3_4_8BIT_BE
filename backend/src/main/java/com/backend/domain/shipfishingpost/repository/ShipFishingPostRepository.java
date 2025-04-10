@@ -1,5 +1,7 @@
 package com.backend.domain.shipfishingpost.repository;
 
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
@@ -38,6 +40,15 @@ public interface ShipFishingPostRepository {
 	Optional<ShipFishingPostResponse.DetailAll> findDetailAllById(final Long shipFishingPostId);
 
 	/**
+	 * 유저가 작성한 게시글 목록 조회
+	 *
+	 * @param memberId 유저 id
+	 * @return {@link List<ShipFishingPostResponse.MyPagePostList>}
+	 * @implSpec 유저가 작성한 게시글 목록을 조회하고 반환한다.
+	 */
+	List<ShipFishingPostResponse.MyPagePostList> findMyPagePostList(final Long memberId);
+
+	/**
 	 * 선상 낚시 게시글 목록 조회 메서드
 	 *
 	 * @param requestDto       {@link ShipFishingPostRequest.Search}
@@ -56,6 +67,23 @@ public interface ShipFishingPostRepository {
 	 * @implSpec 선상 낚시 게시글을 삭제합니다.
 	 */
 	void deleteById(final Long shipFishingPostId);
+
+	/**
+	 * 선상 낚시 평점 업데이트 메서드
+	 *
+	 * @param now 현재 시간
+	 * @param lastRun 스케쥴러 마지막 작업 시간
+	 * @implSpec 선상 낚시 게시글의 평균 평점을 업데이트 합니다.
+	 */
+	void updateReviewEverRate(final ZonedDateTime now, final ZonedDateTime lastRun);
+
+	/**
+	 * 삭제시 평점 업데이트 메서드
+	 *
+	 * @param shipFishingPostId 게시글 id
+	 * @implSpec 리뷰를 삭제시 게시글의 평균 평점을 재 계산하여 업데이트 합니다.
+	 */
+	void updateReviewEverRateByDelete(final Long shipFishingPostId);
 
 	/**
 	 * 선상 낚시 게시글 여부 조회 메소드

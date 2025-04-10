@@ -214,4 +214,51 @@ public class ShipFishingPostResponse {
 			fishIdList = (fishIdList == null) ? List.of() : fishIdList;
 		}
 	}
+
+	/**
+	 *{
+	 *   "shipFishingPostId": 1,
+	 *   "subject": "게시글 제목",
+	 *   "location": "서울",
+	 *   "price": 80000,
+	 *   "fileUrlList": ["http://example.com/image1.jpg", "http://example.com/image2.jpg"],
+	 *   "reviewEverRate": 4.7,
+	 *   "reviewCount": 2
+	 * }
+	 *
+	 * @param shipFishingPostId - 게시글 id
+	 * @param subject - 게시글 제목
+	 * @param location - 지역
+	 * @param price - 금액
+	 * @param fileUrlList - 사진 url 리스트
+	 * @param reviewEverRate - 평점
+	 * @param reviewCount - 댓글 수
+	 */
+	@Builder
+	public record MyPagePostList(
+		Long shipFishingPostId,
+		String subject,
+		String location,
+		Long price,
+		List<String> fileUrlList,
+		Double reviewEverRate,
+		Long reviewCount,
+		ZonedDateTime createdAt
+	) {
+		public static MyPagePostList fromMyPagePostList(
+			final ShipFishingPostResponse.DetailQueryDto detail,
+			final List<String> fileUrlList) {
+
+			return MyPagePostList.builder()
+				.shipFishingPostId(detail.shipFishingPostId())
+				.subject(detail.subject())
+				.location(detail.location())
+				.price(detail.price())
+				.fileUrlList(fileUrlList)
+				.reviewEverRate(detail.reviewEverRate())
+				.reviewCount(detail.reviewCount())
+				.createdAt(detail.createdAt())
+				.build();
+		}
+	}
 }
