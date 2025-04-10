@@ -1,9 +1,11 @@
 package com.backend.domain.fishingtrippost.repository;
 
 import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
+import static com.backend.domain.fishingtriprecruitment.entity.QFishingTripRecruitment.*;
 import static com.backend.domain.fishpoint.entity.QFishPoint.*;
 import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.domain.region.entity.QRegion.*;
+import static com.backend.global.storage.entity.QFile.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
@@ -15,15 +17,6 @@ import org.springframework.util.StringUtils;
 
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
-
-import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
-import static com.backend.domain.fishingtriprecruitment.entity.QFishingTripRecruitment.*;
-import static com.backend.domain.member.entity.QMember.*;
-import static com.backend.domain.fishpoint.entity.QFishPoint.*;
-import static com.backend.domain.region.entity.QRegion.*;
-import static com.backend.global.storage.entity.QFile.*;
-
-import com.backend.domain.fishingtrippost.dto.response.QFishingTripPostResponse_DetailPage;
 import com.backend.domain.fishingtrippost.dto.response.QFishingTripPostResponse_DetailPageQueryDto;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.global.dto.request.GlobalRequest;
@@ -108,11 +101,11 @@ public class FishingTripPostQueryRepository {
 			.fetch();
 	}
 
-	public void updateLikeCount(final Long postId, final Long likeCount) {
-		jpaQueryFactory.update(fishingTripPost)
+	public boolean updateLikeCount(final Long postId, final Long likeCount) {
+		return jpaQueryFactory.update(fishingTripPost)
 			.set(fishingTripPost.likeCount, likeCount)
 			.where(fishingTripPost.fishingTripPostId.eq(postId))
-			.execute();
+			.execute() > 0;
 	}
 
 	private BooleanExpression whereCondition(final Long regionId,
@@ -196,7 +189,6 @@ public class FishingTripPostQueryRepository {
 		}
 		return fishingTripPost.memberId.eq(memberId);
 	}
-
 
 	private static BooleanExpression isParticipant(final Long memberId) {
 		if (memberId == null) {
