@@ -78,4 +78,14 @@ public class FishEncyclopediaController {
 
 		return ResponseEntity.ok(GenericResponse.of(true, detailPageList));
 	}
+
+	@GetMapping("/my-count")
+	@Operation(summary = "사용자가 등록한 어종 수 조회", description = "사용자가 도감에 등록한 어종 개수를 조회하는 API")
+	public ResponseEntity<GenericResponse<Long>> getDetail(
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+		Long fishCount = fishEncyclopediaService.getDistinctFishCountByMemberId(user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true, fishCount));
+	}
 }

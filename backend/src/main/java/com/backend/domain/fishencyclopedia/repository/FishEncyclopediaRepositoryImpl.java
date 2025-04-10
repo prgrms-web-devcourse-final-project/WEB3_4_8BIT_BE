@@ -56,4 +56,9 @@ public class FishEncyclopediaRepositoryImpl implements FishEncyclopediaRepositor
 	public List<Tuple> findFishPointHourlyFishCountSummary() {
 		return fishEncyclopediaQueryRepository.findFishPointHourlyFishCountSummary();
 	}
+
+	@Override
+	public Long countDistinctFishIdByMemberId(final Long memberId) {
+		return fishEncyclopediaQueryRepository.countDistinctFishIdByMemberId(memberId);
+	}
 }

@@ -274,4 +274,21 @@ public class FishEncyclopediaControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.size()").value(givenDetailPageList.size()));
 	}
+
+	@Test
+	@WithMockCustomUser
+	@DisplayName("내가 등록한 어종 수 조회 [Controller] - Success")
+	void t09() throws Exception {
+		// Given
+		Long givenFishCount = 5L;
+		when(fishEncyclopediaService.getDistinctFishCountByMemberId(1L)).thenReturn(givenFishCount);
+
+		// When
+		ResultActions result = mockMvc.perform(get("/api/v1/fishes/my-count"));
+
+		// Then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data").value(givenFishCount));
+	}
 }
