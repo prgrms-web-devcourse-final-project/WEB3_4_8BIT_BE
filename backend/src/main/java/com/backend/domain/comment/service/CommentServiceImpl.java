@@ -85,7 +85,11 @@ public class CommentServiceImpl implements CommentService {
 		getComment.setContent(requestDto.content());
 	}
 
-	private void validMemberIdAndFishingTripPostId(Long memberId, Long fishingTripPostId, Comment getComment) {
+	private void validMemberIdAndFishingTripPostId(
+		final Long memberId,
+		final Long fishingTripPostId,
+		final Comment getComment
+	) {
 		if (!getComment.getMemberId().equals(memberId)) {
 			throw new CommentExpection(CommentErrorCode.COMMENT_UNAUTHORIZED_AUTHOR);
 		}
@@ -95,7 +99,7 @@ public class CommentServiceImpl implements CommentService {
 		}
 	}
 
-	private Comment getComment(Long commentId) {
+	private Comment getComment(final Long commentId) {
 		return commentRepository.findByCommentId(commentId)
 			.orElseThrow(() -> new CommentExpection(CommentErrorCode.COMMENT_NOT_FOUND));
 	}
