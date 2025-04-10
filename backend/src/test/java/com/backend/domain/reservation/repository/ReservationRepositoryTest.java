@@ -715,4 +715,40 @@ public class ReservationRepositoryTest extends BaseTest {
 		// Then
 		assertThat(page1.content().size()).isEqualTo(7);
 	}
+
+	@Test
+	@DisplayName("유저별 예약 횟수 조회 [Repository] - Success")
+	void t11() {
+		// Givenz
+		Long givenMemberId = 1L;
+
+		for (int i = 1; i <= 4; i++) {
+			Reservation givenReservation = fixtureMonkeyBuilder
+				.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("shipFishingPostId", (long)i)
+				.set("memberId", givenMemberId)
+				.set("status", ReservationStatus.CONFIRMED)
+				.sample();
+
+			reservationRepository.save(givenReservation);
+		}
+
+		for (int i = 5; i <= 6; i++) {
+			Reservation givenReservation = fixtureMonkeyBuilder
+				.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("shipFishingPostId", (long)i)
+				.set("memberId", givenMemberId)
+				.set("status", ReservationStatus.CANCELLED)
+				.sample();
+
+			reservationRepository.save(givenReservation);
+		}
+
+		Long reservationCount = reservationRepository.getReservationCount(givenMemberId);
+
+		assertThat(reservationCount).isEqualTo(4);
+	}
+
 }
