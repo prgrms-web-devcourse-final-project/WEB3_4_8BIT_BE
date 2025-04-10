@@ -123,6 +123,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ScrollResponse<FishingTripPostResponse.DetailPage> getDetailPage(
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final PostStatus status,
@@ -146,6 +147,18 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 			cursorRequestDto.fieldValue() == null,
 			isLast
 		);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public FishingTripPostResponse.FishingTripPostParticipationDetail getFishingTripPostParticipationDetail(
+		final Long memberId, final Long fishingTripPostId) {
+
+		FishingTripPostResponse.ParticipantDetailDto participantDetailDto = fishingTripPostRepository.findParticipantDetailDto(
+			fishingTripPostId, memberId);
+		List<FishingTripPostResponse.ParticipantDetail> participants = fishingTripPostRepository.findApprovedParticipants(
+			fishingTripPostId);
+		return FishingTripPostConverter.toParticipationDetail(participantDetailDto, participants);
 	}
 
 	/**

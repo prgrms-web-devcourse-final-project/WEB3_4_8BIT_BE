@@ -105,4 +105,21 @@ public class FishingTripPostController {
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
+
+	@GetMapping("/participation")
+	@Operation(
+		summary = "동출 모집 게시글 참여자 정보 조회",
+		description = "해당 게시글에 대해 현재 로그인한 사용자의 신청 여부, 작성자 여부, 참여자 목록을 포함한 정보를 조회하는 api"
+	)
+	@Parameter(name = "fishingTripPostId", required = true, description = "조회할 동출 모집 게시글 ID", example = "1")
+	public ResponseEntity<GenericResponse<FishingTripPostResponse.FishingTripPostParticipationDetail>> getParticipationDetail(
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@RequestParam final Long fishingTripPostId
+	) {
+		Long memberId = user != null ? user.getId() : null;
+		FishingTripPostResponse.FishingTripPostParticipationDetail response =
+			fishingTripPostService.getFishingTripPostParticipationDetail(memberId, fishingTripPostId);
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
 }
