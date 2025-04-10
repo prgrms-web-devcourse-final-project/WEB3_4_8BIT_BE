@@ -19,12 +19,12 @@ public class CommentRepositoryImpl implements CommentRepository {
 	}
 
 	@Override
-	public boolean existsByCommentId(Long commentId) {
+	public boolean existsByCommentId(final Long commentId) {
 		return commentJpaRepository.existsById(commentId);
 	}
 
 	@Override
-	public void addChildCount(Long parentId) {
+	public void addChildCount(final Long parentId) {
 		commentQueryRepository.addChildCount(parentId);
 	}
 }
