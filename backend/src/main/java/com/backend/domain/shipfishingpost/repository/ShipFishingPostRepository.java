@@ -75,4 +75,12 @@ public interface ShipFishingPostRepository {
 	 */
 	void updateLikeCount(final Long shipFishingPostId, final Long likeCount);
 
+  /**
+	 * 선박 ID 기준 선상 낚시 게시글 존재 여부 확인하는 메소드
+	 *
+	 * @param shipId {@link Long}
+	 * @return {@link Boolean}
+	 * @implSpec 선박 ID 기준 선상 낚시 게시글 존재 여부 결과 값 반환
+	 */
+	boolean existsByShipId(final Long shipId);
 }

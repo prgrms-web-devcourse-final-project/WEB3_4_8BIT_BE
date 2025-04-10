@@ -15,7 +15,7 @@ public class ShipException extends GlobalException {
 		this.errorCode = errorCode;
 	}
 
-	public ShipException(Throwable cause, ErrorCode errorCode) {
+	public ShipException(final Throwable cause, final ErrorCode errorCode) {
 		super(cause, errorCode);
 		this.errorCode = errorCode;
 	}

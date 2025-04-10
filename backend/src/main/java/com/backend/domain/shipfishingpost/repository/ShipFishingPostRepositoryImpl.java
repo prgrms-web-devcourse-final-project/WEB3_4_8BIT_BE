@@ -58,5 +58,10 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 	@Override
 	public void updateLikeCount(final Long shipFishingPostId, final Long likeCount) {
 		shipFishingPostQueryRepository.updateLikeCount(shipFishingPostId, likeCount);
+  }
+  
+  @Override
+	public boolean existsByShipId(final Long shipId) {
+		return shipFishingPostJpaRepository.existsByShipId(shipId);
 	}
 }

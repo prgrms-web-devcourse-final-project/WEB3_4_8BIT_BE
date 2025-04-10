@@ -6,4 +6,5 @@ import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 
 public interface ShipFishingPostJpaRepository extends JpaRepository<ShipFishingPost, Long> {
 
+	boolean existsByShipId(final Long shipId);
 }

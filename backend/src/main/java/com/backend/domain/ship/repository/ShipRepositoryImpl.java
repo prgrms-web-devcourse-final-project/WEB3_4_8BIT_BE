@@ -38,4 +38,9 @@ public class ShipRepositoryImpl implements ShipRepository {
 	public List<ShipResponse.Detail> findDetailAll(final Long memberId) {
 		return shipQueryRepository.findDetailAll(memberId);
 	}
+
+	@Override
+	public void deleteByShipId(final Long shipId) {
+		shipJpaRepository.deleteById(shipId);
+	}
 }
