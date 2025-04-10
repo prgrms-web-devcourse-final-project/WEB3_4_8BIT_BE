@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.chat.room.entity.TargetType;
+import com.backend.domain.chat.room.service.RoomService;
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
@@ -67,6 +69,9 @@ class FishingTripPostServiceTest extends BaseTest {
 	@Mock
 	private LikeRepository likeRepository;
 
+	@Mock
+	private RoomService roomService;
+
 	private final ArbitraryBuilder<FishingTripPostRequest.Form> createRequestBuilder =
 		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Form.class);
 
@@ -110,6 +115,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		verify(memberRepository).existsById(givenMember.getMemberId());
 		verify(fishPointRepository).existsById(givenRequestDto.fishingPointId());
 		verify(fishingTripPostRepository).save(any(FishingTripPost.class));
+		verify(roomService).createRoom(savedId, TargetType.FISHING_TRIP_POST);
 	}
 
 	@Test
