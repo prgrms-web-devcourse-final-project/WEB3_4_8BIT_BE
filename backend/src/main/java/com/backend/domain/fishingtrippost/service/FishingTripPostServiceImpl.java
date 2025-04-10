@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.chat.room.entity.TargetType;
 import com.backend.domain.chat.room.service.RoomService;
+import com.backend.domain.comment.repository.CommentRepository;
 import com.backend.domain.fishingtrippost.converter.FishingTripPostConverter;
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
@@ -49,6 +50,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final LikeRepository likeRepository;
 	private final FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
 	private final RoomService roomService;
+	private final CommentRepository commentRepository;
 
 	private static final LikeTargetType TARGET_TYPE = LikeTargetType.FISHING_TRIP_POST;
 
@@ -187,6 +189,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 		fishingTripRecruitmentRepository.deleteAllByPostId(fishingTripPostId);
 		fishingTripPostRepository.delete(fishingTripPost);
+		commentRepository.deleteByFishingTripPostId(fishingTripPostId);
 	}
 
 	/**
