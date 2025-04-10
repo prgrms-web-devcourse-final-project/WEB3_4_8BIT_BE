@@ -1,5 +1,7 @@
 package com.backend.domain.comment.repository;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.comment.dto.request.CommentRequest;
@@ -45,5 +47,10 @@ public class CommentRepositoryImpl implements CommentRepository {
 			cursorRequestDto,
 			requestDto
 		);
+	}
+
+	@Override
+	public Optional<Comment> findByCommentId(Long commentId) {
+		return commentJpaRepository.findById(commentId);
 	}
 }
