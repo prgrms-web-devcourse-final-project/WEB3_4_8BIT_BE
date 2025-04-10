@@ -43,7 +43,7 @@ public class Message {
 	private List<String> fileUrls;
 
 	@Field("type")
-	private String type;
+	private MessageType type;
 
 	@Field("disabled")
 	private Boolean disabled;
