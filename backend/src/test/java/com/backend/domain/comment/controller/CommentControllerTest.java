@@ -1,6 +1,7 @@
 package com.backend.domain.comment.controller;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import java.util.List;
@@ -281,5 +282,196 @@ class CommentControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.timestamp").exists())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.content.size()").value(10));
+	}
+
+	@Test
+	@DisplayName("댓글 수정 [Controller] - Success")
+	@WithMockCustomUser
+	void t09() throws Exception {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		CommentRequest.Update givenRequestDto = fixtureMonkeyValidation.giveMeOne(CommentRequest.Update.class);
+
+		doNothing().when(commentService).updateComment(
+			givenMemberId,
+			givenCommentId,
+			givenFishingTripPostId,
+			givenRequestDto
+		);
+
+		// When
+		ResultActions resultActions = mockMvc
+			.perform(patch(
+				"/api/v1/fishing-trip-post/{fishingTripPostId}/comment/{commentId}",
+				givenCommentId,
+				givenCommentId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(givenRequestDto)));
+
+		// Then
+		resultActions
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.success").value(true));
+	}
+
+	@Test
+	@DisplayName("댓글 수정 [Comment Not Found] [Controller] - Fail")
+	@WithMockCustomUser
+	void t10() throws Exception {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		CommentRequest.Update givenRequestDto = fixtureMonkeyValidation.giveMeOne(CommentRequest.Update.class);
+
+		doThrow(new CommentExpection(CommentErrorCode.COMMENT_NOT_FOUND))
+			.when(commentService)
+			.updateComment(
+				givenMemberId,
+				givenCommentId,
+				givenFishingTripPostId,
+				givenRequestDto
+			);
+
+		// When
+		ResultActions resultActions = mockMvc
+			.perform(patch(
+				"/api/v1/fishing-trip-post/{fishingTripPostId}/comment/{commentId}",
+				givenCommentId,
+				givenCommentId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(givenRequestDto)));
+
+		// Then
+		resultActions
+			.andExpect(status().isNotFound())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(CommentErrorCode.COMMENT_NOT_FOUND.getCode()))
+			.andExpect(jsonPath("$.message").value(CommentErrorCode.COMMENT_NOT_FOUND.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("댓글 수정 [Comment Unauthorized Author] [Controller] - Fail")
+	@WithMockCustomUser
+	void t11() throws Exception {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		CommentRequest.Update givenRequestDto = fixtureMonkeyValidation.giveMeOne(CommentRequest.Update.class);
+
+		doThrow(new CommentExpection(CommentErrorCode.COMMENT_UNAUTHORIZED_AUTHOR))
+			.when(commentService)
+			.updateComment(
+				givenMemberId,
+				givenCommentId,
+				givenFishingTripPostId,
+				givenRequestDto
+			);
+
+		// When
+		ResultActions resultActions = mockMvc
+			.perform(patch(
+				"/api/v1/fishing-trip-post/{fishingTripPostId}/comment/{commentId}",
+				givenCommentId,
+				givenCommentId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(givenRequestDto)));
+
+		// Then
+		resultActions
+			.andExpect(status().isForbidden())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(CommentErrorCode.COMMENT_UNAUTHORIZED_AUTHOR.getCode()))
+			.andExpect(jsonPath("$.message").value(CommentErrorCode.COMMENT_UNAUTHORIZED_AUTHOR.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("댓글 수정 [Fishing Trip Id Not Valid] [Controller] - Fail")
+	@WithMockCustomUser
+	void t12() throws Exception {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		CommentRequest.Update givenRequestDto = fixtureMonkeyValidation.giveMeOne(CommentRequest.Update.class);
+
+		doThrow(new CommentExpection(CommentErrorCode.FISHING_TRIP_ID_NOT_VALID))
+			.when(commentService)
+			.updateComment(
+				givenMemberId,
+				givenCommentId,
+				givenFishingTripPostId,
+				givenRequestDto
+			);
+
+		// When
+		ResultActions resultActions = mockMvc
+			.perform(patch(
+				"/api/v1/fishing-trip-post/{fishingTripPostId}/comment/{commentId}",
+				givenCommentId,
+				givenCommentId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(givenRequestDto)));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(CommentErrorCode.FISHING_TRIP_ID_NOT_VALID.getCode()))
+			.andExpect(jsonPath("$.message").value(CommentErrorCode.FISHING_TRIP_ID_NOT_VALID.getMessage()))
+			.andExpect(jsonPath("$.success").value(false));
+	}
+
+	@Test
+	@DisplayName("댓글 수정 [Content Not Blank] [Controller] - Fail")
+	@WithMockCustomUser
+	void t13() throws Exception {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		CommentRequest.Update givenRequestDto = fixtureMonkeyRecord
+			.giveMeBuilder(CommentRequest.Update.class)
+			.set("content", null)
+			.sample();
+
+		doThrow(new CommentExpection(CommentErrorCode.FISHING_TRIP_ID_NOT_VALID))
+			.when(commentService)
+			.updateComment(
+				givenMemberId,
+				givenCommentId,
+				givenFishingTripPostId,
+				givenRequestDto
+			);
+
+		// When
+		ResultActions resultActions = mockMvc
+			.perform(patch(
+				"/api/v1/fishing-trip-post/{fishingTripPostId}/comment/{commentId}",
+				givenCommentId,
+				givenCommentId)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(givenRequestDto)));
+
+		// Then
+		resultActions
+			.andExpect(status().isBadRequest())
+			.andExpect(jsonPath("$.timestamp").exists())
+			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
+			.andExpect(jsonPath("$.data[0].field").value("content"))
+			.andExpect(jsonPath("$.data[0].reason").value("내용은 필수 항목입니다."))
+			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
+			.andExpect(jsonPath("$.success").value(false));
 	}
 }
