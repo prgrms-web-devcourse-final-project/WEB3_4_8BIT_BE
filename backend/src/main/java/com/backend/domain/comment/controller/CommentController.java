@@ -47,10 +47,10 @@ public class CommentController {
 		return ResponseEntity.created(URI.create(saveCommentId.toString())).body(GenericResponse.of(true));
 	}
 
-	@Operation(summary = "댓글 조하기", description = "댓글 조회시 사용하는 API")
+	@Operation(summary = "댓글 조회", description = "댓글 조회시 사용하는 API")
 	@GetMapping("/{fishingTripPostId}/comment")
 	public ResponseEntity<GenericResponse<ScrollResponse<CommentResponse.Detail>>> getDetailList(
-		@Parameter(description = "댓글을 달 동출 게시글 ID", example = "1")
+		@Parameter(description = "댓글을 조회할 동출 게시글 ID", example = "1")
 		@PathVariable final Long fishingTripPostId,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
 		final CommentRequest.Search requestDto,
