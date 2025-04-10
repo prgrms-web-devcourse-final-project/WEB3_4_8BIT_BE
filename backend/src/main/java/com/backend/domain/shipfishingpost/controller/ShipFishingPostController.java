@@ -1,12 +1,16 @@
 package com.backend.domain.shipfishingpost.controller;
 
 import java.net.URI;
+import java.util.List;
 
-import org.springframework.data.domain.Slice;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 
 @Tag(name = "선상 낚시 게시글 API")
 @RestController
-@RequestMapping("/api/v1/ship-posts")
+@RequestMapping("/api/v1/ship-fishing-posts")
 @RequiredArgsConstructor
 public class ShipFishingPostController {
 
@@ -37,38 +41,79 @@ public class ShipFishingPostController {
 
 	@PostMapping
 	@Operation(summary = "선상 낚시 게시글 생성", description = "유저가 새로운 선상 낚시 게시글을 생성할 때 사용하는 API")
-	public ResponseEntity<GenericResponse<Void>> createShipFishPost(
+	public ResponseEntity<GenericResponse<Void>> createShipFishingPost(
 		@RequestBody @Valid final ShipFishingPostRequest.Create requestDto,
-		@AuthenticationPrincipal final CustomOAuth2User userDetails
+		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		Long shipFishingPostId = shipFishingPostService.saveShipFishingPost(requestDto, userDetails.getId());
+		Long shipFishingPostId = shipFishingPostService.createShipFishingPost(requestDto, user.getId());
 
 		return ResponseEntity.created(URI.create(shipFishingPostId.toString())).body(GenericResponse.of(true));
+	}
+
+	@GetMapping("/mypage")
+	@Operation(summary = "마이페이지 선상 낚시 게시글 목록", description = "유저가 본인이 작성한 선상 낚시 게시글을 조회할 때 사용하는 API")
+	public ResponseEntity<GenericResponse<List<ShipFishingPostResponse.MyPagePostList>>> getMyPageShipFishingPostList(
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		List<ShipFishingPostResponse.MyPagePostList> response = shipFishingPostService
+			.getMyPageShipFishingPostList(user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
 
 	@GetMapping("/{id}")
 	@Operation(summary = "선상 낚시 게시글 상세 조회", description = "유저가 선상 낚시 게시글을 상세 조회할 때 사용하는 API")
 	@Parameter(name = "id", required = true, description = "조회할 선상 낚시 게시글 ID", example = "1")
-	public ResponseEntity<GenericResponse<ShipFishingPostResponse.DetailAll>> getShipFishPost(
-		@PathVariable("id") final Long shipFishPostsId
+	public ResponseEntity<GenericResponse<ShipFishingPostResponse.DetailWithFileUrlAndFishName>> getShipFishingPost(
+		@PathVariable("id") final Long shipFishingPostId
 	) {
 
-		ShipFishingPostResponse.DetailAll response = shipFishingPostService.getShipFishingPostAll(shipFishPostsId);
+		ShipFishingPostResponse.DetailWithFileUrlAndFishName response = shipFishingPostService
+			.getShipFishingPostAll(shipFishingPostId);
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
 
 	@GetMapping
-	@Operation(summary = "선상 낚시 게시글 조회", description = "유저가 선상 낚시 게시글을 조회할 때 사용하는 API")
-	public ResponseEntity<GenericResponse<ScrollResponse<ShipFishingPostResponse.DetailPage>>> getShipFishPostList(
-		@ModelAttribute final ShipFishingPostRequest.Search requestDto,
-		@Valid final GlobalRequest.PageRequest pageRequestDto
+	@Operation(summary = "선상 낚시 게시글 검색 및 조회", description = "유저가 선상 낚시 게시글을 조회할 때 사용하는 API")
+	public ResponseEntity<GenericResponse<ScrollResponse<ShipFishingPostResponse.DetailScroll>>> getShipFishingPostList(
+		@ParameterObject @ModelAttribute final ShipFishingPostRequest.Search requestDto,
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto
 	) {
 
-		Slice<ShipFishingPostResponse.DetailPage> response = shipFishingPostService
-			.getShipFishingPostPage(requestDto, pageRequestDto);
+		ScrollResponse<ShipFishingPostResponse.DetailScroll> response = shipFishingPostService
+			.getShipFishingPostScroll(requestDto, cursorRequestDto);
 
-		return ResponseEntity.ok(GenericResponse.of(true, ScrollResponse.from(response)));
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
+
+	@PatchMapping("/{id}")
+	@Operation(summary = "선상 낚시 게시글 수정", description = "유저가 선상 낚시 게시글을 수정할 때 사용하는 API")
+	@Parameter(name = "id", required = true, description = "수정할 선상 낚시 게시글 ID", example = "1")
+	public ResponseEntity<GenericResponse<Long>> updateShipFishingPost(
+		@PathVariable("id") final Long shipFishingPostId,
+		@RequestBody @Valid final ShipFishingPostRequest.Update requestDto,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		Long responseShipFishingPostId = shipFishingPostService
+			.updateShipFishingPost(shipFishingPostId, requestDto, user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true, responseShipFishingPostId));
+	}
+
+	@DeleteMapping("/{id}")
+	@Operation(summary = "선상 낚시 게시글 삭제", description = "유저가 선상 낚시 게시글을 삭제할 때 사용하는 API")
+	@Parameter(name = "id", required = true, description = "삭제할 선상 낚시 게시글 ID", example = "1")
+	public ResponseEntity<GenericResponse<Void>> deleteShipFishingPost(
+		@PathVariable("id") final Long shipFishingPostId,
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		shipFishingPostService.deleteShipFishingPost(shipFishingPostId, user.getId());
+
+		return ResponseEntity.status(HttpStatus.OK).body(GenericResponse.of(true));
 	}
 }

@@ -1,6 +1,5 @@
 package com.backend.domain.auth.controller;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,19 +24,11 @@ public class AuthController {
 
 	private final AuthService authService;
 
-	@PostMapping("/refresh")
-	@Operation(summary = "AccessToken 재발급하기", description = "AccessToken 만료시 재발급해주는 API")
-	public ResponseEntity<GenericResponse<Void>> refreshToken(HttpServletRequest request,
-		HttpServletResponse response) {
-		authService.refreshAccessToken(request, response);
-		return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.of(true));
-	}
-
 	@PostMapping("/logout")
 	@Operation(summary = "로그아웃하기", description = "로그아웃시 쿠키 삭제 및 블랙리스트 처리 API")
-	public ResponseEntity<GenericResponse<Void>> logout(HttpServletRequest request,
-		HttpServletResponse response) {
+	public ResponseEntity<GenericResponse<Void>> logout(final HttpServletRequest request,
+		final HttpServletResponse response) {
 		authService.logout(request, response);
-		return ResponseEntity.status(HttpStatus.CREATED).body(GenericResponse.of(true));
+		return ResponseEntity.ok(GenericResponse.of(true));
 	}
 }

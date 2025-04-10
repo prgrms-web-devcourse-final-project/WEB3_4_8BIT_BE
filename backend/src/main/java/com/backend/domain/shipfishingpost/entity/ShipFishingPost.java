@@ -15,22 +15,25 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "ship_fish_posts")
+@Table(name = "ship_fishing_posts", indexes = {
+	@Index(name = "idx_ship_fishing_posts_01", columnList = "shipFishingPostId, price"),
+	@Index(name = "idx_ship_fishing_posts_02", columnList = "shipFishingPostId, durationTime"),
+	@Index(name = "idx_ship_fishing_posts_03", columnList = "shipFishingPostId, reviewEverRate")
+})
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @SuperBuilder
 @ToString
-@EqualsAndHashCode(callSuper = false)
 public class ShipFishingPost extends BaseEntity {
 
 	@Id
@@ -47,7 +50,7 @@ public class ShipFishingPost extends BaseEntity {
 	private String content;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	private List<String> imageList;
+	private List<Long> fileIdList;
 
 	@Column(nullable = false)
 	private Long price;
@@ -65,11 +68,11 @@ public class ShipFishingPost extends BaseEntity {
 	private LocalTime durationTime;
 
 	@Column(nullable = false)
-	private Long maxGuestCount;
+	private Integer maxGuestCount;
 
 	@JdbcTypeCode(SqlTypes.JSON)
 	@Column(nullable = false)
-	private List<Long> fishList;
+	private List<Long> fishIdList;
 
 	@Column(nullable = false, unique = true)
 	private Long shipId;
@@ -84,8 +87,37 @@ public class ShipFishingPost extends BaseEntity {
 	@Builder.Default
 	private Double reviewEverRate = 0D;
 
+	@Column(nullable = false)
+	@ColumnDefault("0")
+	@Builder.Default
+	private Long likeCount = 0L;
+
+	public void updateLikeCount(final Long likeCount) {
+		this.likeCount = likeCount;
+	}
+
 	public void setDurationTime() {
 		long minutes = ChronoUnit.MINUTES.between(startTime, endTime);
 		durationTime = LocalTime.MIDNIGHT.plusMinutes(minutes);
+	}
+
+	public void updateShipFishingPost(
+		final String subject,
+		final String content,
+		final Long price,
+		final LocalTime startTime,
+		final LocalTime endTime,
+		final Integer maxGuestCount,
+		final List<Long> fileIdList,
+		final List<Long> fishIdList
+	) {
+		this.subject = subject;
+		this.content = content;
+		this.price = price;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.maxGuestCount = maxGuestCount;
+		this.fileIdList = fileIdList;
+		this.fishIdList = fishIdList;
 	}
 }

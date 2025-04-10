@@ -5,18 +5,14 @@ import com.backend.domain.member.domain.Provider;
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -28,9 +24,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @ToString
-@EqualsAndHashCode(callSuper = false)
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name = "member_type")
 public class Member extends BaseEntity {
 
 	@Id
@@ -60,9 +53,9 @@ public class Member extends BaseEntity {
 	@Column(nullable = false, unique = true)
 	private String providerId;
 
-	private String profileImg;
+	private Long fileId;
 
-	@Column(columnDefinition = "TEXT")
+	@Column(columnDefinition = "TEXT", length = 500)
 	private String description;
 
 	@Column(nullable = false)
@@ -73,9 +66,9 @@ public class Member extends BaseEntity {
 		this.email = email;
 	}
 
-	public void updateMember(final String nickname, final String profileImg, final String description) {
+	public void updateMember(final String nickname, final Long fileId, final String description) {
 		this.nickname = nickname;
-		this.profileImg = profileImg;
+		this.fileId = fileId;
 		this.description = description;
 		if (!this.isAddInfo)
 			this.isAddInfo = true;

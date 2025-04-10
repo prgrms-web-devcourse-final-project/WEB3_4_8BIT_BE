@@ -1,21 +1,22 @@
 package com.backend.domain.reservation.exception;
 
-import org.springframework.http.HttpStatus;
+import com.backend.global.exception.ErrorCode;
+import com.backend.global.exception.GlobalException;
 
 import lombok.Getter;
 
 @Getter
-public class ReservationException extends RuntimeException {
+public class ReservationException extends GlobalException {
 
-	private final ReservationErrorCode reservationErrorCode;
+	private final ErrorCode errorCode;
 
-	public ReservationException(final ReservationErrorCode reservationErrorCode) {
-		super(reservationErrorCode.getMessage());
-		this.reservationErrorCode = reservationErrorCode;
+	public ReservationException(final ErrorCode errorCode) {
+		super(errorCode);
+		this.errorCode = errorCode;
 	}
 
-	public HttpStatus getStatus() {
-
-		return reservationErrorCode.getHttpStatus();
+	public ReservationException(Throwable cause, ErrorCode errorCode) {
+		super(cause, errorCode);
+		this.errorCode = errorCode;
 	}
 }

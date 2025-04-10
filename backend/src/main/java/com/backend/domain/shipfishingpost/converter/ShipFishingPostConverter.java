@@ -1,6 +1,10 @@
 package com.backend.domain.shipfishingpost.converter;
 
+import java.util.List;
+
+import com.backend.domain.fish.dto.FishResponse;
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
+import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 
 public class ShipFishingPostConverter {
@@ -12,7 +16,7 @@ public class ShipFishingPostConverter {
 	 * @param memberId {@link Long}
 	 * @return {@link ShipFishingPost}
 	 */
-	public static ShipFishingPost fromShipFishPostsRequestCreate(
+	public static ShipFishingPost fromShipFishingPostRequestCreate(
 		final ShipFishingPostRequest.Create requestDto,
 		final Long memberId) {
 
@@ -20,18 +24,39 @@ public class ShipFishingPostConverter {
 			.memberId(memberId)
 			.subject(requestDto.subject())
 			.content(requestDto.content())
-			.imageList(requestDto.images())
+			.fileIdList(requestDto.fileIdList())
 			.price(requestDto.price())
 			.location(requestDto.location())
 			.startTime(requestDto.startTime())
 			.endTime(requestDto.endTime())
 			.maxGuestCount(requestDto.maxGuestCount())
-			.fishList(requestDto.fishList())
+			.fishIdList(requestDto.fishIdList())
 			.shipId(requestDto.shipId())
 			.build();
 
 		shipFishingPost.setDurationTime();
 
 		return shipFishingPost;
+	}
+
+	public static ShipFishingPostResponse.DetailWithFileUrlAndFishName fromDetailWithFileUrlAndFishName(
+		final ShipFishingPostResponse.DetailAll detail,
+		final List<String> fileUrlList,
+		final List<FishResponse.Summary> fishInfoList) {
+
+		return ShipFishingPostResponse.DetailWithFileUrlAndFishName.builder()
+			.shipFishingPostId(detail.detailShipFishingPost().shipFishingPostId())
+			.subject(detail.detailShipFishingPost().subject())
+			.content(detail.detailShipFishingPost().content())
+			.price(detail.detailShipFishingPost().price())
+			.fileUrlList(fileUrlList)
+			.startTime(detail.detailShipFishingPost().startTime())
+			.durationTime(detail.detailShipFishingPost().durationTime())
+			.maxGuestCount(detail.detailShipFishingPost().maxGuestCount())
+			.reviewEverRate(detail.detailShipFishingPost().reviewEverRate())
+			.detailFish(fishInfoList)
+			.detailShip(detail.detailShip())
+			.detailMember(detail.detailMember())
+			.build();
 	}
 }

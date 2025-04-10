@@ -1,18 +1,21 @@
 package com.backend.domain.member.exception;
 
-import org.springframework.http.HttpStatus;
+import com.backend.global.exception.ErrorCode;
+import com.backend.global.exception.GlobalException;
+
 import lombok.Getter;
 
 @Getter
-public class MemberException extends RuntimeException {
-	private final MemberErrorCode memberErrorCode;
+public class MemberException extends GlobalException {
+	private final ErrorCode errorCode;
 
-	public MemberException(MemberErrorCode memberErrorCode) {
-		super(memberErrorCode.getMessage());
-		this.memberErrorCode = memberErrorCode;
+	public MemberException(ErrorCode errorCode) {
+		super(errorCode);
+		this.errorCode = errorCode;
 	}
 
-	public HttpStatus getStatus() {
-		return memberErrorCode.getHttpStatus();
+	public MemberException(Throwable cause, ErrorCode errorCode) {
+		super(cause, errorCode);
+		this.errorCode = errorCode;
 	}
 }

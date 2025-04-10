@@ -2,6 +2,9 @@ package com.backend.global.storage.exception;
 
 import org.springframework.http.HttpStatus;
 
+import com.backend.global.exception.ErrorCode;
+import com.backend.global.exception.GlobalException;
+
 import lombok.Getter;
 
 /**
@@ -14,17 +17,17 @@ import lombok.Getter;
  * @author vdvhk12
  */
 @Getter
-public class StorageException extends RuntimeException {
+public class StorageException extends GlobalException {
 
-	private final StorageErrorCode storageErrorCode;
+	private final ErrorCode errorCode;
 
 	/**
 	 * GlobalException 생성자 입니다.
-	 * @param storageErrorCode StorageErrorCode 값
+	 * @param errorCode StorageErrorCode 값
 	 */
-	public StorageException(StorageErrorCode storageErrorCode) {
-		super(storageErrorCode.getMessage());
-		this.storageErrorCode = storageErrorCode;
+	public StorageException(ErrorCode errorCode) {
+		super(errorCode);
+		this.errorCode = errorCode;
 	}
 
 	/**
@@ -32,6 +35,6 @@ public class StorageException extends RuntimeException {
 	 * @return {@link HttpStatus}
 	 */
 	public HttpStatus getStatus() {
-		return storageErrorCode.getHttpStatus();
+		return errorCode.getHttpStatus();
 	}
 }

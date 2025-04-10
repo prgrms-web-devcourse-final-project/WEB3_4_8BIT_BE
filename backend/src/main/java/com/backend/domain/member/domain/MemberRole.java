@@ -1,5 +1,5 @@
 package com.backend.domain.member.domain;
 
 public enum MemberRole {
-	USER, CAPTAIN, ADMIN
+	INACTIVE, USER, CAPTAIN, ADMIN
 }

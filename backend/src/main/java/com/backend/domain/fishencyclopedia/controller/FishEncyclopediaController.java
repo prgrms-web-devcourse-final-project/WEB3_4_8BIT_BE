@@ -1,8 +1,8 @@
 package com.backend.domain.fishencyclopedia.controller;
 
 import java.net.URI;
+import java.util.List;
 
-import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +18,7 @@ import com.backend.domain.fishencyclopedia.service.FishEncyclopediaService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.GenericResponse;
+import com.backend.global.dto.response.ScrollResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,16 +50,42 @@ public class FishEncyclopediaController {
 
 	@Operation(summary = "물고기 도감 상세 조회", description = "물고기 도감 상세 조회시 사용하는 API")
 	@GetMapping("/{fishId}/encyclopedias")
-	public ResponseEntity<GenericResponse<Slice<FishEncyclopediaResponse.Detail>>> getDetailList(
+	public ResponseEntity<GenericResponse<ScrollResponse<FishEncyclopediaResponse.Detail>>> getDetailList(
 		@Parameter(description = "조회할 물고기의 ID", example = "1")
 		@PathVariable final Long fishId,
-		@Valid final GlobalRequest.PageRequest pageRequestDto,
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		Slice<FishEncyclopediaResponse.Detail> detailList = fishEncyclopediaService.getDetailList(pageRequestDto, fishId,
-			user.getId());
+		ScrollResponse<FishEncyclopediaResponse.Detail> detailList = fishEncyclopediaService.getDetailList(
+			cursorRequestDto,
+			fishId,
+			user.getId()
+		);
 
 		return ResponseEntity.ok(GenericResponse.of(true, detailList));
+	}
+
+	@Operation(summary = "물고기 도감 전체 조회", description = "물고기 도감 전체 조회시 사용하는 API")
+	@GetMapping("/encyclopedias")
+	public ResponseEntity<GenericResponse<List<FishEncyclopediaResponse.DetailPage>>> getDetailPageList(
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+
+		List<FishEncyclopediaResponse.DetailPage> detailPageList = fishEncyclopediaService.getDetailPageList(
+			user.getId()
+		);
+
+		return ResponseEntity.ok(GenericResponse.of(true, detailPageList));
+	}
+
+	@GetMapping("/my-count")
+	@Operation(summary = "사용자가 등록한 어종 수 조회", description = "사용자가 도감에 등록한 어종 개수를 조회하는 API")
+	public ResponseEntity<GenericResponse<Long>> getDetail(
+		@AuthenticationPrincipal final CustomOAuth2User user
+	) {
+		Long fishCount = fishEncyclopediaService.getDistinctFishCountByMemberId(user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true, fishCount));
 	}
 }

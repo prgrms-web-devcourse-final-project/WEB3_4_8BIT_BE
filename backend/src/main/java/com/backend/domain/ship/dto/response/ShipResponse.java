@@ -1,5 +1,10 @@
 package com.backend.domain.ship.dto.response;
 
+import com.backend.domain.ship.domain.RestroomType;
+import com.querydsl.core.annotations.QueryProjection;
+
+import lombok.Builder;
+
 public class ShipResponse {
 
 	/**
@@ -8,7 +13,7 @@ public class ShipResponse {
 	 * 	 "shipName": "나로호",
 	 *   "shipNumber": "01234567890123",
 	 *   "departurePort": "부산",
-	 *   "publicRestroom": true,
+	 *   "restroomType": 공용,
 	 *   "loungeArea": false,
 	 *   "kitchenFacility": true,
 	 *   "fishingChair": false,
@@ -22,7 +27,7 @@ public class ShipResponse {
 	 * @param shipName 선박 이름
 	 * @param shipNumber 선박 번호
 	 * @param departurePort 선박 출항지
-	 * @param publicRestroom 공용 화장실 여부
+	 * @param restroomType 화장실 타입
 	 * @param loungeArea 휴게공간 여부
 	 * @param kitchenFacility 조리시설 여부
 	 * @param fishingChair 의제 제공 여부
@@ -31,12 +36,13 @@ public class ShipResponse {
 	 * @param mealProvided 식사 제공 여부
 	 * @param parkingAvailable 주차 시설 여부
 	 */
+	@Builder
 	public record Detail(
 		Long shipId,
 		String shipName,
 		String shipNumber,
 		String departurePort,
-		Boolean publicRestroom,
+		RestroomType restroomType,
 		Boolean loungeArea,
 		Boolean kitchenFacility,
 		Boolean fishingChair,
@@ -45,5 +51,9 @@ public class ShipResponse {
 		Boolean mealProvided,
 		Boolean parkingAvailable
 	) {
+
+		@QueryProjection
+		public Detail {
+		}
 	}
 }

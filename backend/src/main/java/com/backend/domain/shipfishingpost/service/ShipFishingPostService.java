@@ -1,10 +1,11 @@
 package com.backend.domain.shipfishingpost.service;
 
-import org.springframework.data.domain.Slice;
+import java.util.List;
 
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 public interface ShipFishingPostService {
 
@@ -16,17 +17,17 @@ public interface ShipFishingPostService {
 	 * @implSpec 선상 낚시 게시글 정보를 파라미터로 받고 저장한다.
 	 * @author swjoon
 	 */
-	Long saveShipFishingPost(final ShipFishingPostRequest.Create requestDto, final Long memberId);
+	Long createShipFishingPost(final ShipFishingPostRequest.Create requestDto, final Long memberId);
 
 	/**
-	 * 선상 낚시 게시글 상세 조회 메서드
+	 * 내가 작성한 게시글 목록 조회 메서드
 	 *
-	 * @param shipFishingPostId {@link Long}
-	 * @return {@link ShipFishingPostResponse.Detail}
-	 * @implSpec 선상 낚시 게시글 번호를 파라미터로 받고 조회한다.
+	 * @param memberId 유저 id
+	 * @return {@link List<ShipFishingPostResponse.MyPagePostList>}
+	 * @implSpec 본인이 작성한 선상 낚시 게시글 목록을 조회한다.
 	 * @author swjoon
 	 */
-	ShipFishingPostResponse.Detail getShipFishingPost(final Long shipFishingPostId);
+	List<ShipFishingPostResponse.MyPagePostList> getMyPageShipFishingPostList(final Long memberId);
 
 	/**
 	 * 선상 낚시 게시글 상세 조회 메서드 (게시글, 멤버, 선박 정보 포함)
@@ -36,9 +37,43 @@ public interface ShipFishingPostService {
 	 * @implSpec 선상 낚시 게시글 번호를 파라미터로 받고 조회한다.
 	 * @author swjoon
 	 */
-	ShipFishingPostResponse.DetailAll getShipFishingPostAll(final Long shipFishingPostId);
+	ShipFishingPostResponse.DetailWithFileUrlAndFishName getShipFishingPostAll(final Long shipFishingPostId);
 
-	Slice<ShipFishingPostResponse.DetailPage> getShipFishingPostPage(final ShipFishingPostRequest.Search requestDto,
-		final GlobalRequest.PageRequest pageRequestDto);
+	/**
+	 * 선상 낚시 게시글 조회 메서드
+	 *
+	 * @param searchDto {@link ShipFishingPostRequest.Search}
+	 * @param cursorRequestDto {@link GlobalRequest.CursorRequest}
+	 * @return {@link ScrollResponse<ShipFishingPostResponse.DetailScroll>}
+	 * @implSpec 선상 낚시 게시글을 검색합니다.
+	 * @author swjoon
+	 */
+	ScrollResponse<ShipFishingPostResponse.DetailScroll> getShipFishingPostScroll(
+		final ShipFishingPostRequest.Search searchDto,
+		final GlobalRequest.CursorRequest cursorRequestDto);
 
+	/**
+	 * 선상 낚시 게시글 업데이트 메서드
+	 *
+	 * @param shipFishingPostId 선상 낚시 게시글
+	 * @param requestDto 업데이트 내용
+	 * @param memberId 로그인 유저 정보
+	 * @return 업데이트한 선상낚시 게시글 Id
+	 * @implSpec 선상낚시 게시글 id 와 업데이트 내용을 받아 검증 후 업데이트를 진행합니다.
+	 * @author swjoon
+	 */
+	Long updateShipFishingPost(
+		final Long shipFishingPostId,
+		final ShipFishingPostRequest.Update requestDto,
+		final Long memberId);
+
+	/**
+	 * 선상 낚시 게시글 삭제 메서드
+	 *
+	 * @param shipFishingPostId {@link Long}
+	 * @param memberId {@link Long}
+	 * @implSpec 입력된 선상 낚시 게시글의 예약 내역을 검증하고 삭제하는 메서드 입니다.
+	 * @author swjoon
+	 */
+	void deleteShipFishingPost(final Long shipFishingPostId, final Long memberId);
 }

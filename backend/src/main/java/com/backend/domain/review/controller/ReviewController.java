@@ -47,24 +47,31 @@ public class ReviewController {
 	@Operation(summary = "선상 낚시 리뷰 조회", description = "게시글 ID로 리뷰를 조회하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByPostId(
 		@PathVariable final Long postId,
-		@Valid final GlobalRequest.PageRequest pageRequest
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto
 	) {
-		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
-			reviewService.getReviewListByPostId(postId, pageRequest.toPageable()));
+		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewService.getReviewListByPostIdWithCursor(
+			postId,
+			user.getId(),
+			cursorRequestDto);
+
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(GenericResponse.of(true, scrollResponse));
+			.body(GenericResponse.of(true, reviewList));
 	}
 
 	@GetMapping("/members/reviews")
 	@Operation(summary = "내가 작성한 리뷰 조회", description = "회원 ID로 리뷰를 조회하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReviewWithMemberResponse>>> getReviewsByMemberId(
 		@AuthenticationPrincipal final CustomOAuth2User user,
-		@Valid final GlobalRequest.PageRequest pageRequest
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto
 	) {
-		ScrollResponse<ReviewWithMemberResponse> scrollResponse = ScrollResponse.from(
-			reviewService.getReviewListByMemberId(user.getId(), pageRequest.toPageable()));
+		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewService.getReviewListByMemberIdWithCursor(
+			user.getId(),
+			cursorRequestDto
+		);
+
 		return ResponseEntity.status(HttpStatus.OK)
-			.body(GenericResponse.of(true, scrollResponse));
+			.body(GenericResponse.of(true, reviewList));
 	}
 
 	@DeleteMapping("/reviews/{reviewId}")
@@ -73,6 +80,7 @@ public class ReviewController {
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 		reviewService.delete(user.getId(), reviewId);
+
 		return ResponseEntity.status(HttpStatus.OK).body(GenericResponse.of(true));
 	}
 }

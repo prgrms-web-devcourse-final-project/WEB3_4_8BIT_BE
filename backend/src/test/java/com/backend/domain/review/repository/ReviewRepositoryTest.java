@@ -24,6 +24,12 @@ import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepositoryImpl;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
+import com.backend.global.storage.entity.File;
+import com.backend.global.storage.repository.StorageQueryRepository;
+import com.backend.global.storage.repository.StorageRepository;
+import com.backend.global.storage.repository.StorageRepositoryImpl;
 import com.backend.global.util.BaseTest;
 
 import com.navercorp.fixturemonkey.ArbitraryBuilder;
@@ -32,10 +38,13 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 @Import({
 	JpaAuditingConfig.class,
 	ReviewRepositoryImpl.class,
+	ReviewQueryRepository.class,
 	MemberRepositoryImpl.class,
 	MemberQueryRepository.class,
 	ShipFishingPostRepositoryImpl.class,
 	ShipFishingPostQueryRepository.class,
+	StorageRepositoryImpl.class,
+	StorageQueryRepository.class,
 	QuerydslConfig.class})
 class ReviewRepositoryTest extends BaseTest {
 
@@ -48,6 +57,18 @@ class ReviewRepositoryTest extends BaseTest {
 	@Autowired
 	private ShipFishingPostRepository shipFishingPostRepository;
 
+	@Autowired
+	private StorageRepository storageRepository;
+
+	private static int memberCounter = 0;
+
+	private File getFileBuilder() {
+		return fixtureMonkeyBuilder
+			.giveMeBuilder(File.class)
+			.set("fileId", null)
+			.sample();
+	}
+
 	private ArbitraryBuilder<Review> getReviewBuilder() {
 		return fixtureMonkeyBuilder
 			.giveMeBuilder(Review.class)
@@ -55,13 +76,15 @@ class ReviewRepositoryTest extends BaseTest {
 	}
 
 	private Member saveTestMember() {
+		String suffix = String.format("%02d", memberCounter++);
+
 		return memberRepository.save(
 			fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 				.set("memberId", null)
-				.set("nickname", "강태공")
-				.set("name", "강태공")
-				.set("email", "test@gmail.com")
-				.set("phone", "010-1234-1234")
+				.set("nickname", "강태공" + suffix)
+				.set("name", "강태공" + suffix)
+				.set("email", "test" + suffix + "@gmail.com")
+				.set("phone", suffix)
 				.sample()
 		);
 	}
@@ -131,7 +154,7 @@ class ReviewRepositoryTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("게시글 ID로 리뷰 조회 [Repository] - Success")
+	@DisplayName("게시글 ID로 리뷰 오프셋 조회 [Repository] - Success")
 	void t04() {
 		// given
 		Member givenMember = saveTestMember();
@@ -142,7 +165,9 @@ class ReviewRepositoryTest extends BaseTest {
 
 		// when
 		Slice<ReviewWithMemberResponse> result = reviewRepository.findReviewsWithMemberByPostId(
-			givenPost.getShipFishingPostId(), pageable
+			givenMember.getMemberId(),
+			givenPost.getShipFishingPostId(),
+			pageable
 		);
 
 		// then
@@ -151,7 +176,7 @@ class ReviewRepositoryTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("작성자 ID로 리뷰 조회 [Repository] - Success")
+	@DisplayName("작성자 ID로 리뷰 오프셋 조회 [Repository] - Success")
 	void t05() {
 		// given
 		Member givenMember = saveTestMember();
@@ -171,8 +196,102 @@ class ReviewRepositoryTest extends BaseTest {
 	}
 
 	@Test
+	@DisplayName("게시글 ID로 리뷰 커서 조회 [Repository] - Success")
+	void t06() {
+		// given
+		Member givenMember = saveTestMember();
+		ShipFishingPost givenPost = saveTestPost();
+		saveTestReviews(givenMember, givenPost);
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			null,
+			null,
+			null,
+			null,
+			null,
+			3
+		);
+
+		// when
+		ScrollResponse<ReviewWithMemberResponse> result = reviewRepository.findReviewsByPostIdWithCursor(
+			givenPost.getShipFishingPostId(),
+			givenMember.getMemberId(),
+			cursorRequest
+		);
+
+		// then
+		assertThat(result).isNotNull();
+		assertThat(result.content()).isNotEmpty();
+		assertThat(result.content()).hasSize(2);
+		assertThat(result.content().get(0).isAuthor()).isTrue();
+	}
+
+	@Test
+	@DisplayName("게시글 ID로 리뷰 커서 조회 - 작성자가 아닌 경우 memberId는 null [Repository] - Success")
+	void t07() {
+		// given
+		Member givenAuthor = saveTestMember();
+		Member givenViewer = saveTestMember();
+		ShipFishingPost givenPost = saveTestPost();
+		saveTestReviews(givenAuthor, givenPost);
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			null, null, null, null, null, 3
+		);
+
+		// when
+		ScrollResponse<ReviewWithMemberResponse> result = reviewRepository.findReviewsByPostIdWithCursor(
+			givenPost.getShipFishingPostId(),
+			givenViewer.getMemberId(),
+			cursorRequest
+		);
+
+		// then
+		assertThat(result).isNotNull();
+		assertThat(result.content()).isNotEmpty();
+		assertThat(result.content()).hasSize(2);
+
+		// 모든 리뷰는 작성자가 아님
+		assertThat(result.content())
+			.allSatisfy(r -> {
+				assertThat(r.isAuthor()).isFalse();
+				assertThat(r.memberId()).isNull();
+			});
+	}
+
+	@Test
+	@DisplayName("회원 ID로 커서 기반 조회 [Repository] - Success")
+	void t08() {
+		// given
+		Member givenMember = saveTestMember();
+		ShipFishingPost givenPost = saveTestPost();
+		saveTestReviews(givenMember, givenPost);
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			null,
+			null,
+			null,
+			null,
+			null,
+			3
+		);
+
+		// when
+		ScrollResponse<ReviewWithMemberResponse> result = reviewRepository.findReviewsByMemberIdWithCursor(
+			givenMember.getMemberId(),
+			cursorRequest
+		);
+
+		// then
+		assertThat(result).isNotNull();
+		assertThat(result.content()).isNotEmpty();
+		assertThat(result.content()).hasSize(2);
+		assertThat(result.content().stream().allMatch(ReviewWithMemberResponse::isAuthor)).isTrue();
+	}
+
+	@Test
 	@DisplayName("리뷰 ID로 리뷰 조회 [Repository] - Success")
-	void t010() {
+	void t09() {
 		// given
 		Review givenReview = getReviewBuilder().set("reservationId", 1L).sample();
 		Review savedReview = reviewRepository.save(givenReview);
@@ -188,7 +307,7 @@ class ReviewRepositoryTest extends BaseTest {
 
 	@Test
 	@DisplayName("리뷰 삭제 [Repository] - Success")
-	void t011() {
+	void t10() {
 		// given
 		Review givenReview = getReviewBuilder().set("reservationId", 1L).sample();
 		Review savedReview = reviewRepository.save(givenReview);

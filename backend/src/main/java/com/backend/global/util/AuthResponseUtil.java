@@ -22,6 +22,7 @@ public class AuthResponseUtil {
 
 		response.addHeader("Set-Cookie", accessTokenCookie.toString());
 		writeJsonResponse(response, status, rsData, om);
+		response.sendRedirect("https://api.mikki.kr/swagger-ui/index.html");
 	}
 
 	/**

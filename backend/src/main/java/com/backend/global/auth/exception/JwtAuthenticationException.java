@@ -1,20 +1,22 @@
 package com.backend.global.auth.exception;
 
-import org.springframework.http.HttpStatus;
+import com.backend.global.exception.ErrorCode;
+import com.backend.global.exception.GlobalException;
 
 import lombok.Getter;
 
 @Getter
-public class JwtAuthenticationException extends RuntimeException {
+public class JwtAuthenticationException extends GlobalException {
 
-	private final JwtAuthenticationErrorCode jwtAuthenticationErrorCode;
+	private final ErrorCode errorCode;
 
-	public JwtAuthenticationException(JwtAuthenticationErrorCode jwtAuthenticationErrorCode) {
-		super(jwtAuthenticationErrorCode.getMessage());
-		this.jwtAuthenticationErrorCode = jwtAuthenticationErrorCode;
+	public JwtAuthenticationException(ErrorCode errorCode) {
+		super(errorCode);
+		this.errorCode = errorCode;
 	}
 
-	public HttpStatus getStatus() {
-		return jwtAuthenticationErrorCode.getHttpStatus();
+	public JwtAuthenticationException(Throwable cause, ErrorCode errorCode) {
+		super(cause, errorCode);
+		this.errorCode = errorCode;
 	}
 }

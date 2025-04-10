@@ -1,14 +1,16 @@
 package com.backend.domain.shipfishingpost.repository;
 
+import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -26,9 +28,9 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 	}
 
 	@Override
-	public Optional<ShipFishingPostResponse.Detail> findDetailById(final Long fishingPostId) {
+	public Optional<ShipFishingPost> findById(Long shipFishingPostId) {
 
-		return shipFishingPostQueryRepository.findDetailById(fishingPostId);
+		return shipFishingPostJpaRepository.findById(shipFishingPostId);
 	}
 
 	@Override
@@ -38,10 +40,51 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 	}
 
 	@Override
-	public Slice<ShipFishingPostResponse.DetailPage> findAllBySearchAndCondition(
-		final ShipFishingPostRequest.Search search,
-		final Pageable pageable) {
+	public List<ShipFishingPostResponse.MyPagePostList> findMyPagePostList(final Long memberId) {
 
-		return shipFishingPostQueryRepository.findDetailPage(search, pageable);
+		return shipFishingPostQueryRepository.findDetailMyPageListByMemberId(memberId);
+	}
+
+	@Override
+	public ScrollResponse<ShipFishingPostResponse.DetailScroll> findDetailScrollBySearch(
+		final ShipFishingPostRequest.Search requestDto,
+		final GlobalRequest.CursorRequest cursorRequestDto) {
+
+		return shipFishingPostQueryRepository.findDetailScrollBySearch(requestDto, cursorRequestDto);
+	}
+
+	@Override
+	public void deleteById(final Long shipFishingPostId) {
+
+		shipFishingPostJpaRepository.deleteById(shipFishingPostId);
+	}
+
+	@Override
+	public void updateReviewEverRate(final ZonedDateTime now, final ZonedDateTime lastRun) {
+
+		shipFishingPostQueryRepository.updateReviewEverRate(now, lastRun);
+	}
+
+	@Override
+	public void updateReviewEverRateByDelete(final Long shipFishingPostId) {
+
+		shipFishingPostQueryRepository.updateReviewEverRateByDeleteReview(shipFishingPostId);
+	}
+
+	@Override
+	public boolean existsById(final Long shipFishingPostId) {
+		return shipFishingPostJpaRepository.existsById(shipFishingPostId);
+	}
+
+	@Override
+	public void updateLikeCount(final Long shipFishingPostId, final Long likeCount) {
+
+		shipFishingPostQueryRepository.updateLikeCount(shipFishingPostId, likeCount);
+  }
+
+  @Override
+	public boolean existsByShipId(final Long shipId) {
+
+		return shipFishingPostJpaRepository.existsByShipId(shipId);
 	}
 }

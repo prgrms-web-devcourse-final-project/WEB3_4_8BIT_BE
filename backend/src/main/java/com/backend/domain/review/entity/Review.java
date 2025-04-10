@@ -12,27 +12,30 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
+@Table(
+	name = "reviews",
+	uniqueConstraints = {
+		@UniqueConstraint(columnNames = {"reservation_id"})
+	},
+	indexes = {
+		@Index(name = "idx_member_created_review", columnList = "memberId, createdAt, reviewId"),
+		@Index(name = "idx_post_created_review", columnList = "shipFishingPostId, createdAt, reviewId")
+	}
+)
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @SuperBuilder
 @ToString
-@EqualsAndHashCode(callSuper = false)
-@Table(
-	name = "reviews",
-	uniqueConstraints = {
-		@UniqueConstraint(columnNames = {"reservation_id"})
-	}
-)
 public class Review extends BaseEntity {
 
 	@Id
@@ -46,7 +49,7 @@ public class Review extends BaseEntity {
 	private String content;
 
 	@JdbcTypeCode(SqlTypes.JSON)
-	private List<String> imageList;
+	private List<Long> fileIdList;
 
 	@Column(nullable = false)
 	private Long memberId;

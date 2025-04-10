@@ -10,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -22,7 +21,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @ToString
-@EqualsAndHashCode(callSuper = false)
 public class CatchMaxLength extends BaseEntity {
 
 	@Id
@@ -39,8 +37,15 @@ public class CatchMaxLength extends BaseEntity {
 	@Builder.Default
 	private Integer bestLength = 0;
 
-	//TODO 추후 테스트 코드 작성해야함
+	@Column(nullable = false)
+	@Builder.Default
+	private Integer catchCount = 0;
+
 	public void setBestLength(final Integer bestLength) {
-		this.bestLength = this.bestLength > bestLength ? this.bestLength : bestLength;
+		this.bestLength = Math.max(this.bestLength, bestLength);
+	}
+
+	public void setCatchCount(final Integer catchCount) {
+		this.catchCount +=  catchCount;
 	}
 }

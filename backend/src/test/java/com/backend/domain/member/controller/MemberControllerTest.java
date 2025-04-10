@@ -48,7 +48,7 @@ public class MemberControllerTest extends BaseTest {
 		MemberRequest.Form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Form.class);
 		Long memberId = 1L;
 
-		when(memberService.saveAddInfo(eq(memberId), any())).thenReturn(memberId);
+		when(memberService.createAddInfo(eq(memberId), any())).thenReturn(memberId);
 
 		// When
 		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/members")
@@ -71,7 +71,7 @@ public class MemberControllerTest extends BaseTest {
 		MemberRequest.Form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Form.class);
 
 		doThrow(new MemberException(MemberErrorCode.MEMBER_NOT_FOUND))
-			.when(memberService).saveAddInfo(anyLong(), any());
+			.when(memberService).createAddInfo(anyLong(), any());
 
 		// When
 		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/members")
@@ -94,7 +94,7 @@ public class MemberControllerTest extends BaseTest {
 		MemberRequest.Form givenRequest = fixtureMonkeyValidation.giveMeOne(MemberRequest.Form.class);
 
 		doThrow(new MemberException(MemberErrorCode.ALREADY_ADDED_INFO))
-			.when(memberService).saveAddInfo(anyLong(), any());
+			.when(memberService).createAddInfo(anyLong(), any());
 
 		// When
 		ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/members")
@@ -116,7 +116,7 @@ public class MemberControllerTest extends BaseTest {
 		// Given
 		MemberRequest.Form invalidRequest = new MemberRequest.Form(
 			"",
-			"http://example.com/profile.jpg",
+			101L,
 			"자기소개입니다."
 		);
 
@@ -142,7 +142,7 @@ public class MemberControllerTest extends BaseTest {
 		// Given
 		MemberRequest.Form invalidRequest = new MemberRequest.Form(
 			"닉네임",
-			"http://example.com/profile.jpg",
+			101L,
 			""
 		);
 
@@ -169,7 +169,7 @@ public class MemberControllerTest extends BaseTest {
 		String tooLongNickname = "a".repeat(31);
 		MemberRequest.Form invalidRequest = new MemberRequest.Form(
 			tooLongNickname,
-			"http://example.com/profile.jpg",
+			101L,
 			"자기소개입니다."
 		);
 
@@ -200,7 +200,7 @@ public class MemberControllerTest extends BaseTest {
 			.name("홍길동")
 			.nickname("테스트닉")
 			.phone("010-1234-5678")
-			.profileImg("http://example.com/profile.jpg")
+			.fileUrl("http://example.com/profile.jpg")
 			.description("자기소개입니다.")
 			.build();
 
@@ -244,7 +244,7 @@ public class MemberControllerTest extends BaseTest {
 		// Given
 		MemberRequest.Form updateRequest = new MemberRequest.Form(
 			"변경된닉네임",
-			"http://example.com/new-profile.jpg",
+			101L,
 			"업데이트된 자기소개"
 		);
 		Long memberId = 1L;

@@ -2,12 +2,14 @@ package com.backend.global.auth.exception;
 
 import org.springframework.http.HttpStatus;
 
+import com.backend.global.exception.ErrorCode;
+
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum JwtAuthenticationErrorCode {
+public enum JwtAuthenticationErrorCode implements ErrorCode {
 
 	// JWT 관련 에러 코드
 	INVALID_TOKEN(HttpStatus.BAD_REQUEST, 1001, "유효하지 않은 토큰입니다."),
@@ -21,7 +23,7 @@ public enum JwtAuthenticationErrorCode {
 	;
 
 	private final HttpStatus httpStatus;
-	private final int code;
+	private final Integer code;
 	private final String message;
 
 }

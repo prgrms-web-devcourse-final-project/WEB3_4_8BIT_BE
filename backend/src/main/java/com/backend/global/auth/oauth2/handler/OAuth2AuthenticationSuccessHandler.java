@@ -44,6 +44,26 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 	@Value("${jwt.refresh-token-expire-time-seconds}")
 	private long refreshTokenValidityInSeconds;
 
+	//todo 로그인 실패시 토큰발행이 되지않도록 바꿔야함
+
+	/**
+	 * OAuth2 로그인 성공 시 실행되는 메서드
+	 *
+	 * AccessToken과 RefreshToken을 발급하고, 응답 쿠키 및 JSON 응답을 설정한다.
+	 * - AccessToken은 매 로그인 시 새로 발급하여 쿠키에 저장
+	 * - RefreshToken은 Redis에 저장하며, 기존 토큰이 있다면 TTL만 갱신
+	 *
+	 * 로그인한 사용자의 정보를 기반으로 JSON 응답 바디를 구성하여 반환한다.
+	 *
+	 * @param request  클라이언트의 HTTP 요청
+	 * @param response 서버가 반환할 HTTP 응답
+	 * @param authentication 인증된 사용자 정보를 담고 있는 객체
+	 * @throws IOException JSON 응답 처리 중 입출력 예외 발생 가능
+	 * @implSpec
+	 * - 사용자 인증이 성공하면 AccessToken을 생성해 쿠키에 저장
+	 * - RefreshToken은 Redis에 저장하거나 TTL만 갱신
+	 * - 로그인한 사용자의 상세 정보를 JSON 형태로 응답 본문에 포함시킴
+	 */
 	@Override
 	public void onAuthenticationSuccess(
 		HttpServletRequest request,
@@ -67,13 +87,14 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		String refreshTokenKey = "RT:" + userId;
 		String existingRefreshToken = redisTemplate.opsForValue().get(refreshTokenKey);
 
-		if (existingRefreshToken == null || jwtTokenProvider.isRefreshTokenExpired(existingRefreshToken)) {
+		if (existingRefreshToken == null) {
 			String refreshToken = jwtTokenProvider.createRefreshToken();
 			redisTemplate.opsForValue()
 				.set(refreshTokenKey, refreshToken, refreshTokenValidityInSeconds, TimeUnit.SECONDS);
-			log.debug("새로운 RefreshToken 저장 완료");
+			log.debug("RefreshToken 저장");
 		} else {
-			log.debug("기존 RefreshToken 유지됨");
+			redisTemplate.expire(refreshTokenKey, refreshTokenValidityInSeconds, TimeUnit.SECONDS);
+			log.debug("기존 RefreshToken TTL만 갱신");
 		}
 
 		Map<String, Object> loginResponse = getLoginResponse(member);
@@ -108,7 +129,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 			// 1. 추가정보 미입력 상태
 			loginResponse.put("id", member.getMemberId());
 			loginResponse.put("name", member.getName());
-			loginResponse.put("profileImg", member.getProfileImg());
+			loginResponse.put("profileImg", member.getFileId());
 			loginResponse.put("role", member.getRole().name());
 			loginResponse.put("provider", member.getProvider().name());
 			loginResponse.put("isAddInfo", false);
@@ -121,7 +142,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 				loginResponse.put("id", memberId);
 				loginResponse.put("name", member.getName());
 				loginResponse.put("nickname", member.getNickname());
-				loginResponse.put("profileImg", member.getProfileImg());
+				loginResponse.put("profileImg", member.getFileId());
 				loginResponse.put("role", member.getRole().name());
 				loginResponse.put("provider", member.getProvider().name());
 				loginResponse.put("isAddInfo", true);
@@ -132,7 +153,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 				loginResponse.put("id", memberId);
 				loginResponse.put("name", member.getName());
 				loginResponse.put("nickname", member.getNickname());
-				loginResponse.put("profileImg", member.getProfileImg());
+				loginResponse.put("profileImg", member.getFileId());
 				loginResponse.put("role", member.getRole().name());
 				loginResponse.put("provider", member.getProvider().name());
 				loginResponse.put("isAddInfo", true);

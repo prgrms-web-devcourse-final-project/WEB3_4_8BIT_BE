@@ -1,15 +1,18 @@
 package com.backend.domain.ship.entity;
 
+import com.backend.domain.ship.domain.RestroomType;
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -21,7 +24,6 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @ToString
-@EqualsAndHashCode(callSuper = false)
 public class Ship extends BaseEntity {
 
 	@Id
@@ -42,7 +44,12 @@ public class Ship extends BaseEntity {
 	private String departurePort;
 
 	@Column(nullable = false)
-	private Boolean publicRestroom;
+	private Integer passengerCapacity;
+
+	@Column(nullable = false, length = 15)
+	@Enumerated(EnumType.STRING)
+	@Builder.Default
+	private RestroomType restroomType = RestroomType.NONE;
 
 	@Column(nullable = false)
 	private Boolean loungeArea;
@@ -64,4 +71,33 @@ public class Ship extends BaseEntity {
 
 	@Column(nullable = false)
 	private Boolean parkingAvailable;
+
+	public void updateShip(
+		final String shipName,
+		final String shipNumber,
+		final String departurePort,
+		final Integer passengerCapacity,
+		final RestroomType restroomType,
+		final Boolean loungeArea,
+		final Boolean kitchenFacility,
+		final Boolean fishingChair,
+		final Boolean passengerInsurance,
+		final Boolean fishingGearRental,
+		final Boolean mealProvided,
+		final Boolean parkingAvailable) {
+
+		this.shipName = shipName;
+		this.shipNumber = shipNumber;
+		this.departurePort = departurePort;
+		this.passengerCapacity = passengerCapacity;
+		this.restroomType = restroomType;
+		this.loungeArea = loungeArea;
+		this.kitchenFacility = kitchenFacility;
+		this.fishingChair = fishingChair;
+		this.passengerInsurance = passengerInsurance;
+		this.fishingGearRental = fishingGearRental;
+		this.mealProvided = mealProvided;
+		this.parkingAvailable = parkingAvailable;
+
+	}
 }

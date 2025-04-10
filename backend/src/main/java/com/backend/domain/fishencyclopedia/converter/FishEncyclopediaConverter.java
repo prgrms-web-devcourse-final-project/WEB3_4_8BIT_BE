@@ -18,7 +18,7 @@ public class FishEncyclopediaConverter {
 	) {
 
 		return FishEncyclopedia.builder()
-			.fishEncyclopediaId(requestDto.fishId())
+			.fishId(requestDto.fishId())
 			.length(requestDto.length())
 			.count(requestDto.count())
 			.fishPointId(requestDto.fishPointId())
