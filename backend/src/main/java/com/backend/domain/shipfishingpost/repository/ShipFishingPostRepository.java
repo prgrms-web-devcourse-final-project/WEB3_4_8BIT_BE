@@ -64,7 +64,7 @@ public interface ShipFishingPostRepository {
 	 * @return {@link Boolean} 데이터가 있다면 true, 없으면 false
 	 * @implSpec shipFishingPostId로 데이터가 있는지 확인 후 결과 반한
 	 */
-	boolean existsById(Long shipFishingPostId);
+	boolean existsById(final Long shipFishingPostId);
 
 	/**
 	 * 선상 낚시 게시글 좋아요 수 업데이트 메서드
@@ -73,6 +73,6 @@ public interface ShipFishingPostRepository {
 	 * @param likeCount         업데이트할 좋아요 수
 	 * @implSpec 해당 게시글의 좋아요 수를 갱신합니다.
 	 */
-	void updateLikeCount(Long shipFishingPostId, Long likeCount);
+	void updateLikeCount(final Long shipFishingPostId, final Long likeCount);
 
 }
