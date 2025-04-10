@@ -232,6 +232,7 @@ class CommentControllerTest extends BaseTest {
 	}
 
 	@Test
+	@DisplayName("댓글 조회 [Controller] - Success")
 	@WithMockCustomUser
 	void t08() throws Exception {
 		// Given
