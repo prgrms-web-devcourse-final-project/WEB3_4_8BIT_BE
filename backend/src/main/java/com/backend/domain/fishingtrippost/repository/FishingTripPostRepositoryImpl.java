@@ -47,6 +47,20 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 		final Long regionId,
 		final String keyword) {
 		return fishingTripPostQueryRepository
-			.findScrollDetailPageDto(cursorRequestDto,status,regionId,keyword);
+			.findScrollDetailPageDto(cursorRequestDto, status, regionId, keyword);
 	}
+
+	@Override
+	public FishingTripPostResponse.ParticipantDetailDto findParticipantDetailDto(
+		final Long fishingTripPostId,
+		final Long memberId) {
+		return fishingTripPostQueryRepository.findParticipantDetailDto(fishingTripPostId, memberId);
+	}
+
+	@Override
+	public List<FishingTripPostResponse.ParticipantDetail> findApprovedParticipants(
+		final Long fishingTripPostId) {
+		return fishingTripPostQueryRepository.findApprovedParticipants(fishingTripPostId);
+	}
+
 }
