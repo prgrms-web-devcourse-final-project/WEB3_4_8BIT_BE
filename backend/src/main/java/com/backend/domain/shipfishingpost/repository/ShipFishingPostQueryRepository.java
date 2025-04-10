@@ -286,14 +286,6 @@ public class ShipFishingPostQueryRepository {
 	}
 
 	private List<ShipFishingPostResponse.DetailScroll> mapToDetailScroll(
-	public void updateLikeCount(final Long postId, final Long likeCount) {
-		jpaQueryFactory.update(shipFishingPost)
-			.set(shipFishingPost.likeCount, likeCount)
-			.where(shipFishingPost.shipFishingPostId.eq(postId))
-			.execute();
-	}
-
-	private List<ShipFishingPostResponse.DetailScroll> mapToDto(
 		final List<ShipFishingPostResponse.DetailQueryDto> detailQueryDtoList) {
 
 		Set<Long> fileIdList = detailQueryDtoList.stream()
@@ -348,6 +340,13 @@ public class ShipFishingPostQueryRepository {
 				return ShipFishingPostResponse.DetailScroll.fromDetailScroll(dto, fileUrls, fishNames);
 			})
 			.collect(Collectors.toList());
+	}
+
+	public void updateLikeCount(final Long postId, final Long likeCount) {
+		jpaQueryFactory.update(shipFishingPost)
+			.set(shipFishingPost.likeCount, likeCount)
+			.where(shipFishingPost.shipFishingPostId.eq(postId))
+			.execute();
 	}
 
 	private BooleanExpression buildConditions(
