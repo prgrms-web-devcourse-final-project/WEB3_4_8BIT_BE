@@ -219,23 +219,25 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
 		FishPoint savedFishPoint = fishPointRepository.save(createRandomFishPoint());
 
+		ZonedDateTime baseTime = ZonedDateTime.now();
+
 		List<FishingTripPost> savedPosts = new ArrayList<>(List.of(
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
-				.set("createdAt", ZonedDateTime.now().minusSeconds(2))
+				.set("createdAt", baseTime.minusSeconds(2))
 				.set("fishingTripPostId", null)
 				.sample()),
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
-				.set("createdAt", ZonedDateTime.now().minusSeconds(1))
+				.set("createdAt", baseTime.minusSeconds(1))
 				.set("fishingTripPostId", null)
 				.sample()),
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
-				.set("createdAt", ZonedDateTime.now())
+				.set("createdAt", baseTime)
 				.set("fishingTripPostId", null)
 				.sample())
 		));
