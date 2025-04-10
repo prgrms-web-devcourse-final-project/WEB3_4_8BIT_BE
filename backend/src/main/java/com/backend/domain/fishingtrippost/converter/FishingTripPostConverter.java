@@ -1,5 +1,6 @@
 package com.backend.domain.fishingtrippost.converter;
 
+import java.util.List;
 import java.util.function.Function;
 
 import com.backend.domain.fishingtrippost.domain.PostStatus;
@@ -69,6 +70,31 @@ public class FishingTripPostConverter {
 			.recruitmentCount(detailPageQueryDto.recruitmentCount())
 			.postStatus(detailPageQueryDto.postStatus())
 			.imageUrl(imageUrl)
+			.build();
+	}
+
+	/**
+	 * 게시글 참여 상세 정보를 응답 객체로 변환하는 정적 메서드입니다.
+	 *
+	 * @param dto         게시글 정보 및 로그인 사용자 상태를 담은 중간 DTO
+	 * @param participants 승인된 참여자 정보 리스트
+	 * @return {@link FishingTripPostResponse.FishingTripPostParticipationDetail} 완성된 응답 DTO
+	 */
+	public static FishingTripPostResponse.FishingTripPostParticipationDetail toParticipationDetail(
+		final FishingTripPostResponse.ParticipantDetailDto dto,
+		final List<FishingTripPostResponse.ParticipantDetail> participants
+	) {
+		return FishingTripPostResponse.FishingTripPostParticipationDetail.builder()
+			.fishingTripPostId(dto.fishingTripPostId())
+			.recruitmentCount(dto.recruitmentCount())
+			.currentCount(dto.currentCount())
+			.postStatus(dto.postStatus())
+			.isApplicant(dto.isApplicant())
+			.postOwnerId(dto.postOwnerId())
+			.ownerNickname(dto.ownerNickname())
+			.ownerProfileImageUrl(dto.ownerProfileImageUrl())
+			.isCurrentUserOwner(dto.isCurrentUserOwner())
+			.participants(participants)
 			.build();
 	}
 }
