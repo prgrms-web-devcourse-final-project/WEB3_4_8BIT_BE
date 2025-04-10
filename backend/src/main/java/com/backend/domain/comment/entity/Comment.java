@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
@@ -39,6 +40,7 @@ public class Comment extends BaseEntity {
 	@Column(nullable = false)
 	private Long fishingTripPostId;
 
+	@Setter
 	@Column(nullable = false, length = 100, columnDefinition = "TEXT")
 	private String content;
 
