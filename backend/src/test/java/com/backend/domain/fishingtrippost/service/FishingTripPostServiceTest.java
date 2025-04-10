@@ -292,7 +292,8 @@ class FishingTripPostServiceTest extends BaseTest {
 			128.12345,
 			37.12345,
 			fileIds,
-			PostStatus.RECRUITING
+			PostStatus.RECRUITING,
+			3L
 		);
 
 		List<File> mockFiles = List.of(
@@ -303,7 +304,6 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		when(fishingTripPostRepository.findDetailQueryDtoById(postId)).thenReturn(Optional.of(queryDto));
 		when(storageRepository.findAllById(fileIds)).thenReturn(mockFiles);
-		when(likeRepository.countByTargetTypeAndTargetId(LikeTargetType.FISHING_TRIP_POST, postId)).thenReturn(3L);
 		when(likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST, postId)).thenReturn(true);
 
 		// When
@@ -328,7 +328,6 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verify(storageRepository).findAllById(fileIds);
-		verify(likeRepository).countByTargetTypeAndTargetId(LikeTargetType.FISHING_TRIP_POST, postId);
 		verify(likeRepository).existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST, postId);
 	}
 

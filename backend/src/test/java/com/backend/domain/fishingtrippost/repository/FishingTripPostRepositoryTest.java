@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -206,7 +205,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			.toList();
 
 		FishingTripPostResponse.Detail detail = FishingTripPostConverter.toDetail(
-			detailDto, fileUrlList, 0L, false);
+			detailDto, fileUrlList,  false);
 
 		// then
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());
