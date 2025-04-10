@@ -35,6 +35,17 @@ public interface ReservationDateService {
 	);
 
 	/**
+	 * 예약 일자 예약 가능 여부를 수정 하는 메서드
+	 *
+	 * @param shipFishingPostId 게시글 id
+	 * @param reservationDate 예약 일자
+	 * @param memberId 유저 id
+	 * @implSpec 선택한 날짜의 예약 가능 여부를 수정 합니다.
+	 * @author swjoon
+	 */
+	void updateReservationDate(final Long shipFishingPostId, final LocalDate reservationDate, final Long memberId);
+
+	/**
 	 * 선상낚시 게시글의 예약 일자를 삭제하는 메서드
 	 *
 	 * @param shipFishingPostId {@link Long}

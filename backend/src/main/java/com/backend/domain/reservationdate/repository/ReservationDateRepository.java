@@ -81,6 +81,26 @@ public interface ReservationDateRepository {
 		final LocalDate endDate);
 
 	/**
+	 * 예약 일자의 잔여 인원 업데이트 메서드
+	 *
+	 * @param shipFishingPostId 게시글 id
+	 * @param updateCount 업데이트 할 인원 수
+	 * @param today 오늘 날짜
+	 * @implSpec 잔여 인원 증가 메서드 입니다.
+	 */
+	void updateRemainCountWithPlus(final Long shipFishingPostId, final Integer updateCount, final LocalDate today);
+
+	/**
+	 * 예약 일자의 잔여 인원 업데이트 메서드
+	 *
+	 * @param shipFishingPostId 게시글 id
+	 * @param updateCount 업데이트 할 인원 수
+	 * @param today 오늘 날짜
+	 * @implSpec 잔여 인원 차감 메서드 입니다.
+	 */
+	void updateRemainCountWithMinus(final Long shipFishingPostId, final Integer updateCount, final LocalDate today);
+
+	/**
 	 * 선상낚시 게시글과 연관된 예약 일자 목록 삭제 메서드
 	 *
 	 * @param shipFishingPostId {@link Long}

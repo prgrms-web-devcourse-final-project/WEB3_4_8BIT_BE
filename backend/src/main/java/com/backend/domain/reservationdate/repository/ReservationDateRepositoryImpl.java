@@ -70,6 +70,24 @@ public class ReservationDateRepositoryImpl implements ReservationDateRepository 
 	}
 
 	@Override
+	public void updateRemainCountWithPlus(
+		final Long shipFishingPostId,
+		final Integer updateCount,
+		final LocalDate today) {
+
+		reservationDateQueryRepository.plusRemainCount(shipFishingPostId, updateCount, today);
+	}
+
+	@Override
+	public void updateRemainCountWithMinus(
+		final Long shipFishingPostId,
+		final Integer updateCount,
+		final LocalDate today) {
+
+		reservationDateQueryRepository.minusRemainCount(shipFishingPostId, updateCount, today);
+	}
+
+	@Override
 	public void deleteByShipFishingPostId(final Long shipFishingPostId) {
 
 		reservationDateQueryRepository.deleteByShipFishingPostId(shipFishingPostId);
