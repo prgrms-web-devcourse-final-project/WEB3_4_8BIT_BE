@@ -14,10 +14,11 @@ import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.notifier.FishingTripPostNotifier;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
-import com.backend.domain.fishingtriprecruitment.repository.FishingTripRecruitmentRepository;
 import com.backend.domain.fishpoint.exception.FishPointErrorCode;
 import com.backend.domain.fishpoint.exception.FishPointException;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
+import com.backend.domain.like.domain.LikeTargetType;
+import com.backend.domain.like.repository.LikeRepository;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
@@ -41,8 +42,9 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final FishPointRepository fishPointRepository;
 	private final StorageService storageService;
 	private final StorageRepository storageRepository;
-	private final FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
 	private final FishingTripPostNotifier fishingTripPostNotifier;
+	private final LikeRepository likeRepository;
+	private static final LikeTargetType TARGET_TYPE = LikeTargetType.FISHING_TRIP_POST;
 
 	@Override
 	@Transactional
@@ -101,13 +103,18 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId) {
-		//
+	public FishingTripPostResponse.Detail getFishingTripPostDetail(
+		final Long memberId,
+		final Long fishingTripPostId) {
+
 		FishingTripPostResponse.DetailQueryDto detailQueryDto = getDetailDtoById(fishingTripPostId);
 
 		List<String> fileUrlList = getFileUrlList(detailQueryDto);
 
-		return FishingTripPostResponse.Detail.fromDetailQueryDtoAndFileUrlList(detailQueryDto, fileUrlList);
+		Long likeCount = getLikeCount(fishingTripPostId);
+		boolean isLiked = getIsLiked(memberId, fishingTripPostId);
+
+		return FishingTripPostConverter.toDetail(detailQueryDto, fileUrlList, likeCount, isLiked);
 	}
 
 	@Override
@@ -159,6 +166,35 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		List<FishingTripPostResponse.ParticipantDetail> participants = fishingTripPostRepository.findApprovedParticipants(
 			fishingTripPostId);
 		return FishingTripPostConverter.toParticipationDetail(participantDetailDto, participants);
+	}
+
+	/**
+	 * 현재 로그인한 사용자가 해당 게시글에 '좋아요'를 눌렀는지 여부를 반환합니다.
+	 *
+	 * <p>사용자가 로그인된 상태(memberId != null)일 때만 {@link LikeRepository}를 통해
+	 * 게시글 ID와 사용자 ID 기반으로 좋아요 여부를 조회합니다.</p>
+	 *
+	 * @param memberId 현재 로그인한 사용자의 ID (비로그인 시 null)
+	 * @param fishingTripPostId 대상 게시글의 ID
+	 * @return 사용자가 해당 게시글을 좋아요 했으면 true, 아니면 false
+	 */
+	private boolean getIsLiked(final Long memberId, final Long fishingTripPostId) {
+		return (memberId != null) &&
+			likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, TARGET_TYPE, fishingTripPostId);
+	}
+
+	/**
+	 * 해당 게시글에 등록된 총 '좋아요' 수를 조회합니다.
+	 *
+	 * <p>{@link LikeRepository}를 통해 게시글 ID 기반으로 좋아요 개수를 계산합니다.</p>
+	 *
+	 * @param fishingTripPostId 대상 게시글의 ID
+	 * @return 게시글에 눌린 총 좋아요 수
+	 */
+	private Long getLikeCount(final Long fishingTripPostId) {
+		return likeRepository.countByTargetTypeAndTargetId(
+			TARGET_TYPE, fishingTripPostId
+		);
 	}
 
 	/**

@@ -70,10 +70,12 @@ public class FishingTripPostController {
 	@Operation(summary = "동출 모집 게시글 상세조회", description = "동출 모집 게시글을 상세 조회하는 API")
 	@Parameter(name = "id", required = true, description = "조회할 동출 모집 게시글 ID", example = "1")
 	public ResponseEntity<GenericResponse<FishingTripPostResponse.Detail>> getFishingTripPostDetail(
+		@AuthenticationPrincipal final CustomOAuth2User user,
 		@RequestParam("id") final Long fishingTripPostId
 	) {
+		Long memberId = user != null ? user.getId() : null;
 		FishingTripPostResponse.Detail responseDto = fishingTripPostService.getFishingTripPostDetail(
-			fishingTripPostId);
+			memberId, fishingTripPostId);
 		return ResponseEntity.ok().body(GenericResponse.of(true, responseDto));
 	}
 
@@ -100,10 +102,10 @@ public class FishingTripPostController {
 		@RequestParam(required = false) final Long regionId,
 		@RequestParam(required = false) final String keyword
 	) {
-		ScrollResponse<FishingTripPostResponse.DetailPage> response =
+		ScrollResponse<FishingTripPostResponse.DetailPage> responseDto =
 			fishingTripPostService.getDetailPage(cursorRequest, status, regionId, keyword);
 
-		return ResponseEntity.ok(GenericResponse.of(true, response));
+		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
 	}
 
 	@GetMapping("/participation")
@@ -117,9 +119,9 @@ public class FishingTripPostController {
 		@RequestParam final Long fishingTripPostId
 	) {
 		Long memberId = user != null ? user.getId() : null;
-		FishingTripPostResponse.FishingTripPostParticipationDetail response =
+		FishingTripPostResponse.FishingTripPostParticipationDetail responseDto =
 			fishingTripPostService.getFishingTripPostParticipationDetail(memberId, fishingTripPostId);
 
-		return ResponseEntity.ok(GenericResponse.of(true, response));
+		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
 	}
 }
