@@ -85,12 +85,12 @@ public class FishingTripPost extends BaseEntity {
 	@Builder.Default
 	private Long likeCount = 0L;
 
-	public void updateLikeCount(Long likeCount) {
+	public void updateLikeCount(final Long likeCount) {
 		this.likeCount = likeCount;
 	}
 
 	// 현재 인원 증가 로직
-	public void increaseCurrentCount(int count) {
+	public void increaseCurrentCount(final int count) {
 		if (this.currentCount + count > this.recruitmentCount) {
 			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_OVER_RECRUITMENT);
 		}
@@ -116,7 +116,7 @@ public class FishingTripPost extends BaseEntity {
 		this.fileIdList = fileIdList;
 	}
 
-	public void setPostStatus(PostStatus postStatus) {
+	public void setPostStatus(final PostStatus postStatus) {
 		this.postStatus = postStatus;
 	}
 }

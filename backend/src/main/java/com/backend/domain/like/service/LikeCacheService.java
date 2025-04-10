@@ -79,6 +79,14 @@ public class LikeCacheService {
 			case FISHING_TRIP_POST -> fishingTripPostRepository.existsById(targetId);
 		};
 
+		validTargetTypeAndTargetId(targetType, targetId, exists);
+	}
+
+	private void validTargetTypeAndTargetId(
+		final LikeTargetType targetType,
+		final Long targetId,
+		final boolean exists
+	) {
 		if (!exists) {
 			log.warn("[존재하지 않는 좋아요] 타입: {}, ID: {}", targetType, targetId);
 			throw switch (targetType) {
@@ -96,7 +104,7 @@ public class LikeCacheService {
 	 * @param targetId 대상 ID
 	 * @return Redis key 문자열
 	 */
-	private String buildKey(LikeTargetType type, Long targetId) {
+	private String buildKey(final LikeTargetType type, final Long targetId) {
 		return PREFIX + type.name() + "::" + targetId;
 	}
 }

@@ -97,7 +97,7 @@ public class FishingTripPostQueryRepository {
 			.fetch();
 	}
 
-	public void updateLikeCount(Long postId, Long likeCount) {
+	public void updateLikeCount(final Long postId, final Long likeCount) {
 		jpaQueryFactory.update(fishingTripPost)
 			.set(fishingTripPost.likeCount, likeCount)
 			.where(fishingTripPost.fishingTripPostId.eq(postId))

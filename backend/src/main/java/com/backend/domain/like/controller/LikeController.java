@@ -29,7 +29,7 @@ public class LikeController {
 	@PostMapping("/toggle")
 	public ResponseEntity<GenericResponse<Void>> toggleLike(
 		@AuthenticationPrincipal final CustomOAuth2User user,
-		@Valid @RequestBody LikeRequest requestDto
+		@Valid @RequestBody final LikeRequest requestDto
 	) {
 		likeService.toggleLike(user.getId(), requestDto);
 		return ResponseEntity.ok(GenericResponse.of(true));

@@ -150,7 +150,7 @@ public class ShipFishingPostQueryRepository {
 			hasNext);
 	}
 
-	public void updateLikeCount(Long postId, Long likeCount) {
+	public void updateLikeCount(final Long postId, final Long likeCount) {
 		jpaQueryFactory.update(shipFishingPost)
 			.set(shipFishingPost.likeCount, likeCount)
 			.where(shipFishingPost.shipFishingPostId.eq(postId))

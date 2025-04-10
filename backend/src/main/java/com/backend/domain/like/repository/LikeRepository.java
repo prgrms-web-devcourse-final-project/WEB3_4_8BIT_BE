@@ -14,7 +14,7 @@ public interface LikeRepository {
 	 * @return 저장된 Like 엔티티
 	 * @implSpec 새로운 좋아요를 저장한다.
 	 */
-	Like save(Like like);
+	Like save(final Like like);
 
 	/**
 	 * 특정 게시글의 총 좋아요 수 조회
@@ -54,7 +54,11 @@ public interface LikeRepository {
 	 * @return Optional<Like> 좋아요 정보
 	 * @implSpec 회원 ID, 대상 타입, 대상 ID로 좋아요 단건 조회
 	 */
-	Optional<Like> findByMemberIdAndTargetTypeAndTargetId(Long memberId, LikeTargetType targetType, Long targetId);
+	Optional<Like> findByMemberIdAndTargetTypeAndTargetId(
+		final Long memberId,
+		final LikeTargetType targetType,
+		final Long targetId
+	);
 
 	/**
 	 * 좋아요 소프트 삭제 처리

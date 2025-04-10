@@ -85,6 +85,6 @@ public interface FishingTripPostRepository {
 	 * @param likeCount         업데이트할 좋아요 수
 	 * @implSpec 해당 게시글의 좋아요 수를 갱신합니다.
 	 */
-	void updateLikeCount(Long fishingTripPostId, Long likeCount);
+	void updateLikeCount(final Long fishingTripPostId, final Long likeCount);
 
 }

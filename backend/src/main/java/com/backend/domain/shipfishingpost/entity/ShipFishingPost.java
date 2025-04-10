@@ -92,7 +92,7 @@ public class ShipFishingPost extends BaseEntity {
 	@Builder.Default
 	private Long likeCount = 0L;
 
-	public void updateLikeCount(Long likeCount) {
+	public void updateLikeCount(final Long likeCount) {
 		this.likeCount = likeCount;
 	}
 

@@ -11,5 +11,5 @@ public interface LikeService {
 	 * @param requestDto 좋아요 요청 DTO
 	 * @implSpec 이미 좋아요한 경우 삭제, 좋아요하지 않은 경우 추가
 	 */
-	void toggleLike(Long memberId, LikeRequest requestDto);
+	void toggleLike(final Long memberId, final LikeRequest requestDto);
 }

@@ -25,7 +25,10 @@ public class RedisConfig {
 	 * RedisTemplate 설정
 	 */
 	@Bean
-	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory, ObjectMapper objectMapper) {
+	public RedisTemplate<String, Object> redisTemplate(
+		final RedisConnectionFactory factory,
+		final ObjectMapper objectMapper
+	) {
 		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(factory);
 		template.setKeySerializer(new StringRedisSerializer());
@@ -43,7 +46,9 @@ public class RedisConfig {
 	}
 
 	@Bean
-	public CacheManager cacheManager(RedisConnectionFactory redisConnectionFactory) {
+	public CacheManager cacheManager(
+		final RedisConnectionFactory redisConnectionFactory
+	) {
 		return RedisCacheManager.builder(redisConnectionFactory)
 			.cacheDefaults(cacheConfiguration())
 			.build();

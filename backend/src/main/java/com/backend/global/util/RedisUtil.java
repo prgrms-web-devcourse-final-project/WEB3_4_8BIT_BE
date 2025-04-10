@@ -27,7 +27,7 @@ public class RedisUtil {
 	 * @param key Redis 저장된 key
 	 * @return 증가된 결과 값
 	 */
-	public Long increment(String key) {
+	public Long increment(final String key) {
 		return redisTemplate.opsForValue().increment(key);
 	}
 
@@ -37,7 +37,7 @@ public class RedisUtil {
 	 * @param key Redis 저장된 key
 	 * @return 감소된 결과 값
 	 */
-	public Long decrement(String key) {
+	public Long decrement(final String key) {
 		return redisTemplate.opsForValue().decrement(key);
 	}
 
@@ -55,7 +55,7 @@ public class RedisUtil {
 	 * @return key-value 쌍을 담은 Map
 	 */
 
-	public Map<String, Integer> scanKeysAndValues(String prefix) {
+	public Map<String, Integer> scanKeysAndValues(final String prefix) {
 		Map<String, Integer> result = new HashMap<>();
 		ValueOperations<String, String> ops = redisTemplate.opsForValue();
 
