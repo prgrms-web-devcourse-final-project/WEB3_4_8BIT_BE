@@ -74,9 +74,15 @@ public class SecurityConfig {
 				authorizeHttpRequests
 					.requestMatchers("/swagger-ui.html",
 						"/swagger-ui/**", "/v3/api-docs/**",
-						"/api/v1/fishes/popular","/api/v1/fishing-trip-post/participation",
-						"/api/v1/fishing-trip-post/scroll")
+						"/api/v1/fishes/popular")
 					.permitAll()
+
+					.requestMatchers(
+						HttpMethod.GET,
+						"/api/v1/fishing-trip-post",
+						"/api/v1/fishing-trip-post/participation",
+						"/api/v1/fishing-trip-post/scroll"
+					).permitAll()
 
 					.requestMatchers(HttpMethod.POST, "/api/v1/fishes/encyclopedias")
 					.hasAnyRole("USER", "CAPTAIN", "ADMIN")
