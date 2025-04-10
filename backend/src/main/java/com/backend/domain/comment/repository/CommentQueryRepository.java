@@ -41,10 +41,10 @@ public class CommentQueryRepository {
 		"createdAt", comment.createdAt
 	);
 
-
 	//fishId와 memberId가 일치하는 데이터를 가져오는 조건식 생성 함수
 	private static final Function<Long, BooleanExpression> BOOLEAN_EXPRESSION_FUNCTION =
 		comment.fishingTripPostId::eq;
+
 	private final QueryFactory queryFactory;
 
 	public void addChildCount(final Long parentId) {
@@ -53,6 +53,29 @@ public class CommentQueryRepository {
 			.update(comment)
 			.set(comment.childCount, comment.childCount.add(1))
 			.where(comment.commentId.eq(parentId))
+			.execute();
+	}
+
+	public void minusChildCount(final Long parentId) {
+		// 원자적 연산으로 동시성 문제 방지
+		jpaQueryFactory
+			.update(comment)
+			.set(comment.childCount, comment.childCount.subtract(1))
+			.where(comment.commentId.eq(parentId))
+			.execute();
+	}
+
+	public long deleteByParentId(final Long parentId) {
+		return jpaQueryFactory
+			.delete(comment)
+			.where(comment.parentId.eq(parentId).or(comment.commentId.eq(parentId)))
+			.execute();
+	}
+
+	public void deleteByFishingTripPostId(final Long fishingTripPostId) {
+		jpaQueryFactory
+			.delete(comment)
+			.where(comment.fishingTripPostId.eq(fishingTripPostId))
 			.execute();
 	}
 
@@ -107,9 +130,11 @@ public class CommentQueryRepository {
 		BooleanExpression baseBooleanExpression = BOOLEAN_EXPRESSION_FUNCTION.apply(fishingTripPostId);
 
 		// 입력값 유효성 검사
-		if ((!StringUtils.hasText(cursorRequestDto.fieldValue()) && cursorRequestDto.id() == null) && requestDto.parentId() == null) {
+		if ((!StringUtils.hasText(cursorRequestDto.fieldValue()) && cursorRequestDto.id() == null)
+			&& requestDto.parentId() == null) {
 			return baseBooleanExpression.and(comment.parentId.isNull());
-		} else if ((!StringUtils.hasText(cursorRequestDto.fieldValue()) && cursorRequestDto.id() == null) && requestDto.parentId() != null){
+		} else if ((!StringUtils.hasText(cursorRequestDto.fieldValue()) && cursorRequestDto.id() == null)
+			&& requestDto.parentId() != null) {
 			return baseBooleanExpression.and(comment.parentId.eq(requestDto.parentId()));
 		}
 
@@ -152,7 +177,7 @@ public class CommentQueryRepository {
 		}
 	}
 
-		/**
+	/**
 	 * 정렬할 필드와 정렬 방식을 OrderSpecifier로 반환합니다.
 	 *
 	 * @param pageRequestDto
@@ -172,26 +197,5 @@ public class CommentQueryRepository {
 			new OrderSpecifier<>(queryOrder, sortField),
 			new OrderSpecifier<>(Order.ASC, comment.commentId)
 		};
-	}
-
-	public void deleteById(final Long commentId) {
-		jpaQueryFactory
-			.delete(comment)
-			.where(comment.commentId.eq(commentId))
-			.execute();
-	}
-
-	public void deleteByFishingTripPostId(final Long fishingTripPostId) {
-		jpaQueryFactory
-			.delete(comment)
-			.where(comment.fishingTripPostId.eq(fishingTripPostId))
-			.execute();
-	}
-
-	public void deleteByParentId(final Long parentId) {
-		jpaQueryFactory
-			.delete(comment)
-			.where(comment.parentId.eq(parentId).or(comment.commentId.eq(parentId)))
-			.execute();
 	}
 }
