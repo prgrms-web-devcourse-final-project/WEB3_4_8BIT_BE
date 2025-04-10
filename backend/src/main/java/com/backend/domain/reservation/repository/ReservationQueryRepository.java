@@ -3,10 +3,17 @@ package com.backend.domain.reservation.repository;
 import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.domain.reservation.entity.QReservation.*;
 import static com.backend.domain.shipfishingpost.entity.QShipFishingPost.*;
+import static com.backend.global.storage.entity.QFile.*;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -35,10 +42,20 @@ public class ReservationQueryRepository {
 	public Optional<ReservationResponse.DetailWithMember> findDetailWithMemberNameById(final Long reservationId) {
 
 		ReservationResponse.DetailWithMember detailWithMember = jpaQueryFactory.select(
-				Projections.constructor(ReservationResponse.DetailWithMember.class, reservation.reservationId,
-					reservation.shipFishingPostId, member.memberId, member.name, member.phone,
-					reservation.reservationNumber, reservation.guestCount, reservation.price, reservation.totalPrice,
-					reservation.reservationDate, reservation.status, reservation.createdAt, reservation.modifiedAt))
+				Projections.constructor(ReservationResponse.DetailWithMember.class,
+					reservation.reservationId,
+					reservation.shipFishingPostId,
+					member.memberId,
+					member.name,
+					member.phone,
+					reservation.reservationNumber,
+					reservation.guestCount,
+					reservation.price,
+					reservation.totalPrice,
+					reservation.reservationDate,
+					reservation.status,
+					reservation.createdAt,
+					reservation.modifiedAt))
 			.from(reservation)
 			.leftJoin(member)
 			.on(reservation.memberId.eq(member.memberId))
@@ -86,9 +103,61 @@ public class ReservationQueryRepository {
 			!hasNext);
 	}
 
+	ScrollResponse<ReservationResponse.DetailReservationList> findDetailReservationListByMemberId(
+		final Long memberId,
+		final Boolean afterToday,
+		final Boolean isConfirm,
+		final GlobalRequest.CursorRequest cursorRequestDto) {
+
+		List<ReservationResponse.DetailQueryDto> detailList = jpaQueryFactory
+			.select(Projections.constructor(
+				ReservationResponse.DetailQueryDto.class,
+				reservation.reservationId,
+				reservation.shipFishingPostId,
+				reservation.reservationNumber,
+				shipFishingPost.subject,
+				reservation.reservationDate,
+				shipFishingPost.startTime,
+				shipFishingPost.location,
+				reservation.guestCount,
+				reservation.totalPrice,
+				reservation.status,
+				shipFishingPost.fileIdList,
+				reservation.createdAt
+			))
+			.distinct()
+			.from(reservation)
+			.leftJoin(shipFishingPost)
+			.on(reservation.shipFishingPostId.eq(shipFishingPost.shipFishingPostId))
+			.where(ExpressionUtils.allOf(
+				memberCondition(memberId),
+				getCursorCondition(cursorRequestDto),
+				statusCondition(isConfirm),
+				dayCondition(afterToday)))
+			.orderBy(reservation.reservationDate.desc())
+			.limit(cursorRequestDto.size() + 1)
+			.fetch();
+
+		boolean hasNext = detailList.size() <= cursorRequestDto.size();
+
+		if (!hasNext) {
+			detailList.remove(detailList.size() - 1);
+		}
+
+		List<ReservationResponse.DetailReservationList> content = mapToDetailReservationList(detailList);
+
+		return ScrollResponse.from(
+			content,
+			cursorRequestDto.size(),
+			content.size(),
+			cursorRequestDto.fieldValue() == null,
+			hasNext);
+	}
+
 	ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberIdAndShipFishingPostId(
 		final Long memberId,
 		final Long shipFishingPostId,
+		final Boolean afterToday,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
 		List<ReservationResponse.DetailWithName> detailWithNameList = jpaQueryFactory
@@ -113,7 +182,9 @@ public class ReservationQueryRepository {
 			.where(
 				ExpressionUtils.allOf(
 					shipFishingPostIdCondition(shipFishingPostId),
-					getCursorCondition(cursorRequestDto))
+					getCursorCondition(cursorRequestDto),
+					statusCondition(true),
+					dayCondition(afterToday))
 			)
 			.orderBy(getSortCondition(reservation))
 			.limit(cursorRequestDto.size() + 1)
@@ -143,6 +214,64 @@ public class ReservationQueryRepository {
 				.and(reservation.reservationDate.goe(today))
 				.and(reservation.status.eq(ReservationStatus.CONFIRMED)))
 			.fetchFirst() != null;
+	}
+
+	private List<ReservationResponse.DetailReservationList> mapToDetailReservationList(
+		final List<ReservationResponse.DetailQueryDto> detailQueryDtoList
+	) {
+
+		Set<Long> fileIdList = detailQueryDtoList.stream()
+			.flatMap(dto -> {
+				List<Long> ids = dto.fileIdList();
+				return (ids == null ? List.<Long>of() : ids).stream();
+			})
+			.collect(Collectors.toSet());
+
+		Map<Long, String> fileUrlMap = jpaQueryFactory
+			.select(file.fileId, file.url)
+			.from(file)
+			.where(file.fileId.in(fileIdList))
+			.fetch()
+			.stream()
+			.collect(Collectors.toMap(
+				tuple -> tuple.get(file.fileId),
+				tuple -> tuple.get(file.url)
+			));
+
+		return detailQueryDtoList.stream()
+			.map(dto -> {
+				List<String> fileUrls = Stream.ofNullable(dto.fileIdList())
+					.flatMap(Collection::stream)
+					.map(fileUrlMap::get)
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList());
+
+				return ReservationResponse.DetailReservationList.fromDetailReservationList(dto, fileUrls);
+			})
+			.collect(Collectors.toList());
+	}
+
+	private BooleanExpression memberCondition(final Long memberId) {
+		return memberId == null ? null : reservation.memberId.eq(memberId);
+	}
+
+	private BooleanExpression dayCondition(final Boolean afterToday) {
+		if (afterToday == null) {
+			return null;
+		}
+
+		LocalDate today = LocalDate.now();
+
+		return afterToday ? reservation.reservationDate.goe(today) : reservation.reservationDate.before(today);
+	}
+
+	private BooleanExpression statusCondition(final Boolean isConfirm) {
+		if (isConfirm == null) {
+			return null;
+		}
+
+		return isConfirm ? reservation.status.eq(ReservationStatus.CONFIRMED) :
+			reservation.status.eq(ReservationStatus.CANCELLED);
 	}
 
 	private BooleanExpression shipFishingPostIdCondition(final Long shipFishingPostId) {

@@ -55,12 +55,30 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 	}
 
 	@Override
+	public ScrollResponse<ReservationResponse.DetailReservationList> findDetailReservationListByMemberId(
+		final Long memberId,
+		final Boolean afterToday,
+		final Boolean isConfirm,
+		final GlobalRequest.CursorRequest cursorRequestDto) {
+
+		return reservationQueryRepository.findDetailReservationListByMemberId(
+			memberId,
+			afterToday,
+			isConfirm,
+			cursorRequestDto);
+	}
+
+	@Override
 	public ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberIdAndShipFishingPostId(
 		final Long memberId,
 		final Long shipFishingPostId,
+		final Boolean afterToday,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
-		return reservationQueryRepository.findDetailWithNameByMemberIdAndShipFishingPostId(memberId, shipFishingPostId,
+		return reservationQueryRepository.findDetailWithNameByMemberIdAndShipFishingPostId(
+			memberId,
+			shipFishingPostId,
+			afterToday,
 			cursorRequestDto);
 	}
 }

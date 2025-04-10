@@ -38,7 +38,23 @@ public interface ReservationService {
 	 * @implSpec 로그인 한 유저의 예약 내역을 조회합니다.
 	 * @author swjoon
 	 */
-	ScrollResponse<ReservationResponse.DetailWithName> getUserReservationList(final Long memberId,
+	ScrollResponse<ReservationResponse.DetailWithName> getUserReservationList(
+		final Long memberId,
+		final GlobalRequest.CursorRequest cursorRequestDto);
+
+	/**
+	 * 유저가 예약한 내역을 조회하는 메서드
+	 *
+	 * @param memberId {@link Long}
+	 * @param cursorRequestDto {@link GlobalRequest.CursorRequest}
+	 * @return {@link ScrollResponse<ReservationResponse.DetailWithName>}
+	 * @implSpec 로그인 한 유저의 예약 내역을 조회합니다.
+	 * @author swjoon
+	 */
+	ScrollResponse<ReservationResponse.DetailReservationList> getUserReservationListWithImage(
+		final Long memberId,
+		final Boolean afterToday,
+		final Boolean isConfirm,
 		final GlobalRequest.CursorRequest cursorRequestDto);
 
 	/**
@@ -53,6 +69,7 @@ public interface ReservationService {
 	 */
 	ScrollResponse<ReservationResponse.DetailWithName> getCaptainReservationList(final Long shipFishingPostId,
 		final Long memberId,
+		final Boolean afterToday,
 		final GlobalRequest.CursorRequest cursorRequestDto);
 
 	/**

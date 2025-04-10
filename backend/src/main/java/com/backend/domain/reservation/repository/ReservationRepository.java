@@ -59,6 +59,20 @@ public interface ReservationRepository {
 		final GlobalRequest.CursorRequest cursorRequestDto);
 
 	/**
+	 * 예약 기록 조회 메서드 입니다. (일반 유저)
+	 *
+	 * @param memberId {@link Long}
+	 * @param cursorRequestDto {@link GlobalRequest.CursorRequest}
+	 * @return {@link ScrollResponse<ReservationResponse.DetailReservationList>}
+	 * @implSpec 로그인 된 유저 id를 기반으로 예약 기록들을 조회하고 반환합니다.
+	 */
+	ScrollResponse<ReservationResponse.DetailReservationList> findDetailReservationListByMemberId(
+		final Long memberId,
+		final Boolean afterToday,
+		final Boolean isConfirm,
+		final GlobalRequest.CursorRequest cursorRequestDto);
+
+	/**
 	 * 예약 기록 조회 메서드 입니다. (선장)
 	 *
 	 * @param memberId {@link Long}
@@ -70,5 +84,6 @@ public interface ReservationRepository {
 	ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberIdAndShipFishingPostId(
 		final Long memberId,
 		final Long shipFishingPostId,
+		final Boolean afterToday,
 		final GlobalRequest.CursorRequest cursorRequestDto);
 }

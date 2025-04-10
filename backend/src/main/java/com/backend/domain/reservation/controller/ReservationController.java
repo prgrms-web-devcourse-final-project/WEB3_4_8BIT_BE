@@ -61,13 +61,17 @@ public class ReservationController {
 
 	@GetMapping("/members")
 	@Operation(summary = "예약 내역 조회 (유저)", description = "유저가 본인이 예약한 내역을 조회 할 때 사용하는 API")
-	public ResponseEntity<GenericResponse<ScrollResponse<ReservationResponse.DetailWithName>>> getUserReservationList(
+	@Parameter(name = "afterToday", description = "오늘 이후 예약인지, 이전 예약인지 여부", example = "true")
+	@Parameter(name = "isConfirm", description = "확정된 예약인지, 취소된 예약인지 여부", example = "true")
+	public ResponseEntity<GenericResponse<ScrollResponse<ReservationResponse.DetailReservationList>>> getUserReservationList(
+		@RequestParam final Boolean afterToday,
+		@RequestParam final Boolean isConfirm,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		ScrollResponse<ReservationResponse.DetailWithName> response = reservationService
-			.getUserReservationList(user.getId(), cursorRequestDto);
+		ScrollResponse<ReservationResponse.DetailReservationList> response = reservationService
+			.getUserReservationListWithImage(user.getId(), afterToday, isConfirm, cursorRequestDto);
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
@@ -75,14 +79,16 @@ public class ReservationController {
 	@GetMapping("/captains")
 	@Operation(summary = "예약 내역 조회 (선장)", description = "선장이 예약 리스트를 조회 할 때 사용하는 API")
 	@Parameter(name = "shipFishingPostId", description = "선상 낚시 게시글 ID", example = "1")
+	@Parameter(name = "afterToday", description = "오늘 이후 예약인지, 이전 예약인지 여부", example = "true")
 	public ResponseEntity<GenericResponse<ScrollResponse<ReservationResponse.DetailWithName>>> getCaptainReservationList(
 		@RequestParam(required = false) final Long shipFishingPostId,
+		@RequestParam final Boolean afterToday,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
 		ScrollResponse<ReservationResponse.DetailWithName> response = reservationService
-			.getCaptainReservationList(shipFishingPostId, user.getId(), cursorRequestDto);
+			.getCaptainReservationList(shipFishingPostId, user.getId(), afterToday, cursorRequestDto);
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}
