@@ -342,11 +342,11 @@ public class ShipFishingPostQueryRepository {
 			.collect(Collectors.toList());
 	}
 
-	public void updateLikeCount(final Long postId, final Long likeCount) {
-		jpaQueryFactory.update(shipFishingPost)
+	public boolean updateLikeCount(final Long postId, final Long likeCount) {
+		return jpaQueryFactory.update(shipFishingPost)
 			.set(shipFishingPost.likeCount, likeCount)
 			.where(shipFishingPost.shipFishingPostId.eq(postId))
-			.execute();
+			.execute() > 0;
 	}
 
 	private BooleanExpression buildConditions(

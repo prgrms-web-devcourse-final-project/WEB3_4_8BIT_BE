@@ -71,7 +71,7 @@ public interface ShipFishingPostRepository {
 	/**
 	 * 선상 낚시 평점 업데이트 메서드
 	 *
-	 * @param now 현재 시간
+	 * @param now     현재 시간
 	 * @param lastRun 스케쥴러 마지막 작업 시간
 	 * @implSpec 선상 낚시 게시글의 평균 평점을 업데이트 합니다.
 	 */
@@ -87,7 +87,8 @@ public interface ShipFishingPostRepository {
 
 	/**
 	 * 선상 낚시 게시글 여부 조회 메소드
-	 *r
+	 * r
+	 *
 	 * @param shipFishingPostId {@link Long}
 	 * @return {@link Boolean} 데이터가 있다면 true, 없으면 false
 	 * @implSpec shipFishingPostId로 데이터가 있는지 확인 후 결과 반한
@@ -101,9 +102,9 @@ public interface ShipFishingPostRepository {
 	 * @param likeCount         업데이트할 좋아요 수
 	 * @implSpec 해당 게시글의 좋아요 수를 갱신합니다.
 	 */
-	void updateLikeCount(final Long shipFishingPostId, final Long likeCount);
+	boolean updateLikeCount(final Long shipFishingPostId, final Long likeCount);
 
-  /**
+	/**
 	 * 선박 ID 기준 선상 낚시 게시글 존재 여부 확인하는 메소드
 	 *
 	 * @param shipId {@link Long}
