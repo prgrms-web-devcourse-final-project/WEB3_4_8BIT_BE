@@ -7,6 +7,7 @@ import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.notifier.FishingTripPostNotifier;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
+import com.backend.domain.like.repository.LikeRepository;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 
@@ -42,11 +43,12 @@ public interface FishingTripPostService {
 	/**
 	 * 주어진 게시글 ID를 기반으로 동출 모집 게시글의 상세 정보를 조회합니다.
 	 *
-	 * <p>이 메서드는 게시글의 기본 정보, 작성자 이름, 낚시 포인트 정보, 이미지 URL 목록을 포함한
-	 * {@link FishingTripPostResponse.Detail} DTO를 반환합니다.</p>
+	 * <p>이 메서드는 게시글의 기본 정보, 작성자 이름, 낚시 포인트 정보, 이미지 URL 목록, 좋아요 수,
+	 * 현재 로그인한 사용자의 좋아요 여부를 포함한 {@link FishingTripPostResponse.Detail} DTO를 반환합니다.</p>
 	 *
 	 * <p>내부적으로는 먼저 {@link FishingTripPostResponse.DetailQueryDto}를 조회한 뒤,
-	 * 해당 DTO의 파일 ID 목록을 통해 이미지 URL 리스트를 조회하고, 이를 기반으로 최종 응답 DTO를 생성합니다.</p>
+	 * 해당 DTO의 파일 ID 목록을 통해 이미지 URL 리스트를 조회하고, 좋아요 정보를 함께 조합하여
+	 * 최종 응답 DTO를 생성합니다.</p>
 	 *
 	 * @implSpec
 	 * 이 구현은 다음 순서로 동작합니다:
@@ -54,14 +56,16 @@ public interface FishingTripPostService {
 	 *   <li>{@link FishingTripPostRepository}를 통해 게시글 ID에 해당하는 {@link FishingTripPostResponse.DetailQueryDto}를 조회합니다.</li>
 	 *   <li>조회된 DTO가 존재하지 않으면 {@link FishingTripPostException}을 발생시킵니다.</li>
 	 *   <li>DTO의 fileIdList를 기반으로 {@link com.backend.global.storage.repository.StorageRepository}에서 이미지 URL들을 조회합니다.</li>
+	 *   <li>{@link LikeRepository}를 통해 좋아요 수와 로그인 사용자의 좋아요 여부를 조회합니다.</li>
 	 *   <li>이 정보들을 바탕으로 최종 {@link FishingTripPostResponse.Detail} 객체를 생성하여 반환합니다.</li>
 	 * </ol>
 	 *
+	 * @param memberId 로그인한 사용자 ID (비로그인 사용자의 경우 null)
 	 * @param fishingTripPostId 조회할 게시글의 고유 ID
 	 * @return 게시글 상세 정보가 담긴 {@link FishingTripPostResponse.Detail}
 	 * @throws FishingTripPostException 게시글이 존재하지 않는 경우 발생
 	 */
-	FishingTripPostResponse.Detail getFishingTripPostDetail(final Long fishingTripPostId);
+	FishingTripPostResponse.Detail getFishingTripPostDetail(final Long memberId,final Long fishingTripPostId);
 
 	/**
 	 * 낚시 동행 모집 게시글을 모집 완료 상태로 변경하고, 신청자들에게 완료 안내 메일을 발송합니다.
@@ -75,13 +79,6 @@ public interface FishingTripPostService {
 	 * @param fishingTripPostId 모집 완료로 변경할 게시글 ID
 	 */
 	void completeFishingTripPost(final Long memberId, final Long fishingTripPostId);
-
-	// ScrollResponse<FishingTripPostResponse.DetailPage> getDetailPage(
-	// 	final GlobalRequest.CursorRequest cursorRequestDto,
-	// 	final PostStatus status,
-	// 	final Long regionId,
-	// 	final String keyword
-	// );
 
 	/**
 	 * 커서 기반으로 낚시 동행 게시글 목록을 조회합니다.

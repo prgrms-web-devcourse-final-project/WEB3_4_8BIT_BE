@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 
+import com.backend.domain.fishingtrippost.converter.FishingTripPostConverter;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtriprecruitment.domain.FishingLevel;
@@ -191,8 +192,8 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			.map(File::getUrl)
 			.toList();
 
-		FishingTripPostResponse.Detail detail = FishingTripPostResponse.Detail.fromDetailQueryDtoAndFileUrlList(
-			detailDto, fileUrlList);
+		FishingTripPostResponse.Detail detail = FishingTripPostConverter.toDetail(
+			detailDto, fileUrlList, 0L, false);
 
 		// then
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());
@@ -218,23 +219,25 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		Member savedMember = memberRepository.save(memberArbitraryBuilder.sample());
 		FishPoint savedFishPoint = fishPointRepository.save(createRandomFishPoint());
 
+		ZonedDateTime baseTime = ZonedDateTime.now();
+
 		List<FishingTripPost> savedPosts = new ArrayList<>(List.of(
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
-				.set("createdAt", ZonedDateTime.now().minusSeconds(2))
+				.set("createdAt", baseTime.minusSeconds(2))
 				.set("fishingTripPostId", null)
 				.sample()),
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
-				.set("createdAt", ZonedDateTime.now().minusSeconds(1))
+				.set("createdAt", baseTime.minusSeconds(1))
 				.set("fishingTripPostId", null)
 				.sample()),
 			fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
 				.set("memberId", savedMember.getMemberId())
 				.set("fishingPointId", savedFishPoint.getFishPointId())
-				.set("createdAt", ZonedDateTime.now())
+				.set("createdAt", baseTime)
 				.set("fishingTripPostId", null)
 				.sample())
 		));
@@ -255,7 +258,9 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 		// then
 		assertThat(result).isNotEmpty();
-		assertThat(result.get(0).fishingTripPostId()).isNotEqualTo(cursorBase.getFishingTripPostId());
+		assertThat(result)
+			.extracting(FishingTripPostResponse.DetailPageQueryDto::fishingTripPostId)
+			.doesNotContain(cursorBase.getFishingTripPostId());
 	}
 
 	@Test

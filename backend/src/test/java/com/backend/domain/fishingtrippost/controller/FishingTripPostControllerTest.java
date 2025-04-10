@@ -270,10 +270,11 @@ class FishingTripPostControllerTest extends BaseTest {
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [Controller] - Success")
-	@WithMockCustomUser
+	@WithMockCustomUser // 이 어노테이션이 memberId를 1L로 설정한다고 가정
 	void t10() throws Exception {
 		// Given
 		Long postId = 1L;
+		Long memberId = 1L; // WithMockCustomUser로부터
 
 		FishingTripPostResponse.Detail responseDto = FishingTripPostResponse.Detail.builder()
 			.fishingTripPostId(postId)
@@ -293,9 +294,13 @@ class FishingTripPostControllerTest extends BaseTest {
 				"https://cdn.example.com/2.jpg",
 				"https://cdn.example.com/3.jpg"
 			))
+			.likeCount(12L)
+			.isLiked(true)
+			.postStatus(PostStatus.RECRUITING)
 			.build();
 
-		when(fishingTripPostService.getFishingTripPostDetail(postId)).thenReturn(responseDto);
+		// memberId 1L을 명확하게 설정해줘야 함
+		when(fishingTripPostService.getFishingTripPostDetail(eq(memberId), eq(postId))).thenReturn(responseDto);
 
 		// When
 		ResultActions result = mockMvc.perform(
@@ -322,8 +327,12 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.latitude").value(37.12345))
 			.andExpect(jsonPath("$.data.fileUrlList[0]").value("https://cdn.example.com/1.jpg"))
 			.andExpect(jsonPath("$.data.fileUrlList[1]").value("https://cdn.example.com/2.jpg"))
-			.andExpect(jsonPath("$.data.fileUrlList[2]").value("https://cdn.example.com/3.jpg"));
+			.andExpect(jsonPath("$.data.fileUrlList[2]").value("https://cdn.example.com/3.jpg"))
+			.andExpect(jsonPath("$.data.likeCount").value(12))
+			.andExpect(jsonPath("$.data.isLiked").value(true))
+			.andExpect(jsonPath("$.data.postStatus").value("RECRUITING"));
 	}
+
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Controller] - Fail")
@@ -331,9 +340,10 @@ class FishingTripPostControllerTest extends BaseTest {
 	void t11() throws Exception {
 		// Given
 		Long postId = 999L;
+		Long memberId = 1L; // @WithMockCustomUser로 들어오는 memberId
 
 		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND))
-			.when(fishingTripPostService).getFishingTripPostDetail(postId);
+			.when(fishingTripPostService).getFishingTripPostDetail(eq(memberId), eq(postId));
 
 		// When
 		ResultActions result = mockMvc.perform(

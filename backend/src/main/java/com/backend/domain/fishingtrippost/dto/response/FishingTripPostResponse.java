@@ -12,12 +12,15 @@ import lombok.Builder;
 public class FishingTripPostResponse {
 
 	/**
-	 * 낚시 동행 게시글 상세 정보를 담는 응답 DTO입니다.
+	 * 낚시 동행 게시글의 상세 정보를 담는 응답 DTO입니다.
 	 *
-	 * <p>게시글의 기본 정보, 위치, 첨부 파일 URL 목록, 모집 상태 등을 포함하며,
-	 * {@link DetailQueryDto}와 파일 URL 리스트를 기반으로 생성됩니다.</p>
+	 * <p>게시글의 기본 정보, 작성자, 위치 정보, 첨부 이미지 URL 목록, 모집 상태,
+	 * 좋아요 수 및 사용자의 좋아요 여부를 포함합니다.</p>
 	 *
-	 * <p>예시 JSON 응답 형태:</p>
+	 * <p>이 응답은 게시글 상세 조회 API에서 사용되며,
+	 * {@link DetailQueryDto}, 이미지 URL 리스트, 좋아요 정보로 구성됩니다.</p>
+	 *
+	 * <p>예시 JSON 구조:</p>
 	 * <pre>{@code
 	 * {
 	 *   "fishingTripPostId": 1,
@@ -32,28 +35,12 @@ public class FishingTripPostResponse {
 	 *   "fishPointName": "동해 포인트",
 	 *   "longitude": 128.12345,
 	 *   "latitude": 37.12345,
-	 *   "fileUrlList": [
-	 *     "https://cdn.example.com/image1.jpg",
-	 *     "https://cdn.example.com/image2.jpg"
-	 *   ],
-	 *   "postStatus": "RECRUITING"
+	 *   "fileUrlList": [ "https://cdn.example.com/image1.jpg", "https://cdn.example.com/image2.jpg" ],
+	 *   "postStatus": "RECRUITING",
+	 *   "likeCount": 12,
+	 *   "isLiked": true
 	 * }
 	 * }</pre>
-	 *
-	 * @param fishingTripPostId 게시글 ID
-	 * @param name 작성자 이름
-	 * @param subject 게시글 제목
-	 * @param content 게시글 내용
-	 * @param currentCount 현재 참여 인원
-	 * @param recruitmentCount 모집 정원
-	 * @param createDate 게시글 생성일시 (ISO-8601 ZonedDateTime)
-	 * @param fishingDate 출조 예정일시 (ISO-8601 ZonedDateTime)
-	 * @param fishPointDetailName 낚시 포인트 상세명
-	 * @param fishPointName 낚시 포인트 이름
-	 * @param longitude 낚시 포인트 경도
-	 * @param latitude 낚시 포인트 위도
-	 * @param fileUrlList 첨부 이미지 URL 리스트
-	 * @param postStatus 게시글 상태 (RECRUITING, COMPLETED 등)
 	 */
 
 	@Builder
@@ -71,27 +58,10 @@ public class FishingTripPostResponse {
 		Double longitude,
 		Double latitude,
 		List<String> fileUrlList,
-		PostStatus postStatus
+		PostStatus postStatus,
+		Long likeCount,
+		boolean isLiked
 	) {
-		public static Detail fromDetailQueryDtoAndFileUrlList(DetailQueryDto detailQueryDto,
-			List<String> fileUrlList) {
-			return Detail.builder()
-				.fishingTripPostId(detailQueryDto.fishingTripPostId())
-				.name(detailQueryDto.name())
-				.subject(detailQueryDto.subject())
-				.content(detailQueryDto.content())
-				.currentCount(detailQueryDto.currentCount())
-				.recruitmentCount(detailQueryDto.recruitmentCount())
-				.createDate(detailQueryDto.createDate())
-				.fishingDate(detailQueryDto.fishingDate())
-				.fishPointDetailName(detailQueryDto.fishPointDetailName())
-				.fishPointName(detailQueryDto.fishPointName())
-				.longitude(detailQueryDto.longitude())
-				.latitude(detailQueryDto.latitude())
-				.fileUrlList(fileUrlList)
-				.postStatus(detailQueryDto.postStatus())
-				.build();
-		}
 	}
 
 	public record DetailQueryDto(
