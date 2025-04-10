@@ -3,6 +3,7 @@ package com.backend.domain.reservation.repository;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -236,6 +237,7 @@ public class ReservationRepositoryTest extends BaseTest {
 					.set("shipFishingPostId", id)
 					.set("memberId", memberId)
 					.set("guestCount", 1)
+					.set("status", ReservationStatus.CONFIRMED)
 					.set("reservationDate", LocalDate.now().plusDays(j))
 					.sampleStream()
 					.limit(2)
@@ -256,7 +258,7 @@ public class ReservationRepositoryTest extends BaseTest {
 
 		ScrollResponse<ReservationResponse.DetailWithName> findResponseDto1 = reservationRepository
 			.findDetailWithNameByMemberIdAndShipFishingPostId(
-				captainId, savedShipFishingPostIdList.get(0), givenCursorRequest1);
+				captainId, savedShipFishingPostIdList.get(0), true, givenCursorRequest1);
 
 		assertThat(findResponseDto1.content().get(0).reservationDate()).isEqualTo(LocalDate.now().plusDays(7));
 		assertThat(findResponseDto1.content().get(0).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(0));
@@ -320,6 +322,7 @@ public class ReservationRepositoryTest extends BaseTest {
 					.set("shipFishingPostId", id)
 					.set("memberId", memberId)
 					.set("guestCount", 1)
+					.set("status", ReservationStatus.CONFIRMED)
 					.set("reservationDate", LocalDate.now().plusDays(j))
 					.sampleStream()
 					.limit(2)
@@ -341,7 +344,7 @@ public class ReservationRepositoryTest extends BaseTest {
 
 		ScrollResponse<ReservationResponse.DetailWithName> findResponseDto1 = reservationRepository
 			.findDetailWithNameByMemberIdAndShipFishingPostId(
-				captainId, null, givenCursorRequest1);
+				captainId, null, true, givenCursorRequest1);
 
 		log.debug(" {} ", findResponseDto1.content().toString());
 
@@ -396,5 +399,320 @@ public class ReservationRepositoryTest extends BaseTest {
 			LocalDate.now());
 
 		assertThat(isExists).isFalse();
+	}
+
+	@Test
+	@DisplayName("유저별 예약 리스트 조회 [image 들어있는 버전] [Repository] - Success")
+	void t07() {
+		// Given
+		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", null)
+			.set("email", "test@test.com")
+			.set("name", "member")
+			.set("nickname", "nickname")
+			.set("phone", "010-1234-5678")
+			.sample();
+		Member savedMember = memberRepository.save(givenMember);
+		Long memberId = savedMember.getMemberId();
+
+		ShipFishingPost post = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+			.set("shipFishingPostId", null)
+			.set("subject", "바다낚시 체험")
+			.set("startTime", LocalTime.of(8, 0))
+			.set("location", "부산항")
+			.set("price", 20000L)
+			.set("fileIdList", List.of(1L, 2L, 3L))
+			.sample();
+		ShipFishingPost savedPost = shipFishingPostRepository.save(post);
+
+		for (int i = 1; i <= 7; i++) {
+			fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("memberId", memberId)
+				.set("shipFishingPostId", savedPost.getShipFishingPostId())
+				.set("guestCount", 2)
+				.set("totalPrice", 40000L)
+				.set("status", ReservationStatus.CONFIRMED)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.sampleStream()
+				.limit(2)
+				.forEach(reservationRepository::save);
+		}
+
+		GlobalRequest.CursorRequest cursor1 = fixtureMonkeyValidation.giveMeBuilder(GlobalRequest.CursorRequest.class)
+			.set("order", "desc")
+			.set("sort", "reservationDate")
+			.set("type", "next")
+			.set("fieldValue", null)
+			.set("id", null)
+			.set("size", 6)
+			.sample();
+
+		ScrollResponse<ReservationResponse.DetailReservationList> page1 =
+			reservationRepository.findDetailReservationListByMemberId(
+				memberId,
+				true,
+				null,
+				cursor1
+			);
+
+		// Then
+
+		log.debug("{}", page1.content().toString());
+
+		assertThat(page1.content().get(0).reservationDate())
+			.isEqualTo(LocalDate.now().plusDays(7));
+		assertThat(page1.pageSize()).isEqualTo(6);
+		assertThat(page1.numberOfElements()).isEqualTo(6);
+		assertThat(page1.isFirst()).isTrue();
+		assertThat(page1.isLast()).isFalse();
+
+		String lastFieldValue1 = page1.content().get(5).reservationDate().toString();
+		Long lastId1 = page1.content().get(5).reservationId();
+
+		GlobalRequest.CursorRequest cursor2 = fixtureMonkeyValidation.giveMeBuilder(GlobalRequest.CursorRequest.class)
+			.set("order", "desc")
+			.set("sort", "reservationDate")
+			.set("type", "next")
+			.set("fieldValue", lastFieldValue1)
+			.set("id", lastId1)
+			.set("size", 6)
+			.sample();
+
+		ScrollResponse<ReservationResponse.DetailReservationList> page2 =
+			reservationRepository.findDetailReservationListByMemberId(
+				memberId,
+				true,
+				null,
+				cursor2
+			);
+
+		log.debug("{}", page2.content().toString());
+
+		assertThat(page2.content().get(0).reservationDate())
+			.isEqualTo(LocalDate.now().plusDays(4));
+		assertThat(page2.pageSize()).isEqualTo(6);
+		assertThat(page2.numberOfElements()).isEqualTo(6);
+		assertThat(page2.isFirst()).isFalse();
+		assertThat(page2.isLast()).isFalse();
+	}
+
+	@Test
+	@DisplayName("유저별 예약 리스트 조회 [image 들어있는 버전] [Repository] - Success")
+	void t08() {
+		// Given
+		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", null)
+			.set("email", "test@test.com")
+			.set("name", "member")
+			.set("nickname", "nickname")
+			.set("phone", "010-1234-5678")
+			.sample();
+		Member savedMember = memberRepository.save(givenMember);
+		Long memberId = savedMember.getMemberId();
+
+		ShipFishingPost post = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+			.set("shipFishingPostId", null)
+			.set("subject", "바다낚시 체험")
+			.set("startTime", LocalTime.of(8, 0))
+			.set("location", "부산항")
+			.set("price", 20000L)
+			.set("fileIdList", List.of(1L, 2L, 3L))
+			.sample();
+		ShipFishingPost savedPost = shipFishingPostRepository.save(post);
+
+		for (int i = 1; i <= 7; i++) {
+			fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("memberId", memberId)
+				.set("shipFishingPostId", savedPost.getShipFishingPostId())
+				.set("guestCount", 2)
+				.set("totalPrice", 40000L)
+				.set("status", ReservationStatus.CONFIRMED)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.sampleStream()
+				.limit(1)
+				.forEach(reservationRepository::save);
+		}
+
+		for (int i = 8; i <= 12; i++) {
+			fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("memberId", memberId)
+				.set("shipFishingPostId", savedPost.getShipFishingPostId())
+				.set("guestCount", 2)
+				.set("totalPrice", 40000L)
+				.set("status", ReservationStatus.CANCELLED)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.sampleStream()
+				.limit(1)
+				.forEach(reservationRepository::save);
+		}
+
+		GlobalRequest.CursorRequest cursor1 = fixtureMonkeyValidation.giveMeBuilder(GlobalRequest.CursorRequest.class)
+			.set("order", "desc")
+			.set("sort", "reservationDate")
+			.set("type", "next")
+			.set("fieldValue", null)
+			.set("id", null)
+			.set("size", 6)
+			.sample();
+
+		ScrollResponse<ReservationResponse.DetailReservationList> page1 =
+			reservationRepository.findDetailReservationListByMemberId(
+				memberId,
+				false,
+				null,
+				cursor1
+			);
+
+		// Then
+		assertThat(page1.content().isEmpty()).isTrue();
+	}
+
+	@Test
+	@DisplayName("유저별 예약 리스트 조회 [image 들어있는 버전] [Repository] - Success")
+	void t09() {
+		// Given
+		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", null)
+			.set("email", "test@test.com")
+			.set("name", "member")
+			.set("nickname", "nickname")
+			.set("phone", "010-1234-5678")
+			.sample();
+		Member savedMember = memberRepository.save(givenMember);
+		Long memberId = savedMember.getMemberId();
+
+		ShipFishingPost post = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+			.set("shipFishingPostId", null)
+			.set("subject", "바다낚시 체험")
+			.set("startTime", LocalTime.of(8, 0))
+			.set("location", "부산항")
+			.set("price", 20000L)
+			.set("fileIdList", List.of(1L, 2L, 3L))
+			.sample();
+		ShipFishingPost savedPost = shipFishingPostRepository.save(post);
+
+		for (int i = 1; i <= 7; i++) {
+			fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("memberId", memberId)
+				.set("shipFishingPostId", savedPost.getShipFishingPostId())
+				.set("guestCount", 2)
+				.set("totalPrice", 40000L)
+				.set("status", ReservationStatus.CONFIRMED)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.sampleStream()
+				.limit(1)
+				.forEach(reservationRepository::save);
+		}
+
+		for (int i = 8; i <= 12; i++) {
+			fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("memberId", memberId)
+				.set("shipFishingPostId", savedPost.getShipFishingPostId())
+				.set("guestCount", 2)
+				.set("totalPrice", 40000L)
+				.set("status", ReservationStatus.CANCELLED)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.sampleStream()
+				.limit(1)
+				.forEach(reservationRepository::save);
+		}
+
+		GlobalRequest.CursorRequest cursor1 = fixtureMonkeyValidation.giveMeBuilder(GlobalRequest.CursorRequest.class)
+			.set("order", "desc")
+			.set("sort", "reservationDate")
+			.set("type", "next")
+			.set("fieldValue", null)
+			.set("id", null)
+			.set("size", 12)
+			.sample();
+
+		ScrollResponse<ReservationResponse.DetailReservationList> page1 =
+			reservationRepository.findDetailReservationListByMemberId(
+				memberId,
+				true,
+				false,
+				cursor1
+			);
+
+		// Then
+		assertThat(page1.content().size()).isEqualTo(5);
+	}
+
+	@Test
+	@DisplayName("유저별 예약 리스트 조회 [image 들어있는 버전] [Repository] - Success")
+	void t10() {
+		// Given
+		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
+			.set("memberId", null)
+			.set("email", "test@test.com")
+			.set("name", "member")
+			.set("nickname", "nickname")
+			.set("phone", "010-1234-5678")
+			.sample();
+		Member savedMember = memberRepository.save(givenMember);
+		Long memberId = savedMember.getMemberId();
+
+		ShipFishingPost post = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+			.set("shipFishingPostId", null)
+			.set("subject", "바다낚시 체험")
+			.set("startTime", LocalTime.of(8, 0))
+			.set("location", "부산항")
+			.set("price", 20000L)
+			.set("fileIdList", List.of(1L, 2L, 3L))
+			.sample();
+		ShipFishingPost savedPost = shipFishingPostRepository.save(post);
+
+		for (int i = 1; i <= 7; i++) {
+			fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("memberId", memberId)
+				.set("shipFishingPostId", savedPost.getShipFishingPostId())
+				.set("guestCount", 2)
+				.set("totalPrice", 40000L)
+				.set("status", ReservationStatus.CONFIRMED)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.sampleStream()
+				.limit(1)
+				.forEach(reservationRepository::save);
+		}
+
+		for (int i = 8; i <= 12; i++) {
+			fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
+				.set("reservationId", null)
+				.set("memberId", memberId)
+				.set("shipFishingPostId", savedPost.getShipFishingPostId())
+				.set("guestCount", 2)
+				.set("totalPrice", 40000L)
+				.set("status", ReservationStatus.CANCELLED)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.sampleStream()
+				.limit(1)
+				.forEach(reservationRepository::save);
+		}
+
+		GlobalRequest.CursorRequest cursor1 = fixtureMonkeyValidation.giveMeBuilder(GlobalRequest.CursorRequest.class)
+			.set("order", "desc")
+			.set("sort", "reservationDate")
+			.set("type", "next")
+			.set("fieldValue", null)
+			.set("id", null)
+			.set("size", 12)
+			.sample();
+
+		ScrollResponse<ReservationResponse.DetailReservationList> page1 =
+			reservationRepository.findDetailReservationListByMemberId(
+				memberId,
+				true,
+				true,
+				cursor1
+			);
+
+		// Then
+		assertThat(page1.content().size()).isEqualTo(7);
 	}
 }

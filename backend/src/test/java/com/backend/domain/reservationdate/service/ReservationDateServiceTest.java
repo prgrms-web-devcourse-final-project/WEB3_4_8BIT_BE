@@ -15,6 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.reservation.exception.ReservationErrorCode;
+import com.backend.domain.reservation.exception.ReservationException;
 import com.backend.domain.reservationdate.dto.response.ReservationDateResponse;
 import com.backend.domain.reservationdate.entity.ReservationDate;
 import com.backend.domain.reservationdate.entity.ReservationDateId;
@@ -51,7 +53,7 @@ public class ReservationDateServiceTest extends BaseTest {
 		ReservationDate givenReservationDate = fixtureMonkeyBuilder
 			.giveMeBuilder(ReservationDate.class)
 			.set("shipFishingPostId", 1L)
-			.set("reservationDate", LocalDate.of(2025, 4, 2))
+			.set("reservationDate", LocalDate.now().plusDays(1))
 			.set("remainCount", 1)
 			.set("isBan", false)
 			.sample();
@@ -69,7 +71,7 @@ public class ReservationDateServiceTest extends BaseTest {
 			Optional.ofNullable(givenReservationDate));
 
 		ReservationDateResponse.Detail savedResponseDto =
-			reservationDateServiceImpl.getReservationDate(1L, LocalDate.of(2025, 4, 2));
+			reservationDateServiceImpl.getReservationDate(1L, LocalDate.now().plusDays(1));
 
 		// Then
 		assertThat(savedResponseDto.remainCount()).isEqualTo(givenResponseDto.remainCount());
@@ -90,7 +92,7 @@ public class ReservationDateServiceTest extends BaseTest {
 		ReservationDate givenReservationDate = fixtureMonkeyBuilder
 			.giveMeBuilder(ReservationDate.class)
 			.set("shipFishingPostId", 1L)
-			.set("reservationDate", LocalDate.of(2025, 4, 2))
+			.set("reservationDate", LocalDate.now().plusDays(1))
 			.set("remainCount", 1)
 			.set("isBan", false)
 			.sample();
@@ -110,7 +112,7 @@ public class ReservationDateServiceTest extends BaseTest {
 			.thenReturn(givenReservationDate);
 
 		ReservationDateResponse.Detail savedResponseDto =
-			reservationDateServiceImpl.getReservationDate(1L, LocalDate.of(2025, 4, 2));
+			reservationDateServiceImpl.getReservationDate(1L, LocalDate.now().plusDays(1));
 
 		// Then
 		assertThat(savedResponseDto.remainCount()).isEqualTo(givenResponseDto.remainCount());
@@ -128,7 +130,7 @@ public class ReservationDateServiceTest extends BaseTest {
 
 		// Then
 		assertThatThrownBy(
-			() -> reservationDateServiceImpl.getReservationDate(1L, LocalDate.of(2025, 4, 2)))
+			() -> reservationDateServiceImpl.getReservationDate(1L, LocalDate.now().plusDays(1)))
 			.isInstanceOf(ShipFishingPostException.class)
 			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_NOT_FOUND.getMessage());
 	}
@@ -160,4 +162,61 @@ public class ReservationDateServiceTest extends BaseTest {
 		assertThat(savedUnAvailableDateList.unAvailableDateList().size()).isEqualTo(givenUnAvailableDateList.size());
 	}
 
+	@Test
+	@DisplayName("예약 일자 수정 [예약 가능 여부 전환] [Service] - Success")
+	void t05() {
+		Long givenShipFishingPostId = 1L;
+		Long givenMemberId = 1L;
+		LocalDate givenDate = LocalDate.now().plusDays(2);
+
+		ShipFishingPost givenShipFishingPost = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+			.set("shipFishingPostId", givenShipFishingPostId)
+			.set("subject", "test")
+			.set("content", "test")
+			.set("maxGuestCount", 1)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		ReservationDate givenReservationDate = fixtureMonkeyBuilder
+			.giveMeBuilder(ReservationDate.class)
+			.set("shipFishingPostId", 1L)
+			.set("reservationDate", givenDate)
+			.set("remainCount", 1)
+			.set("isBan", false)
+			.sample();
+
+		when(shipFishingPostRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(givenShipFishingPost));
+		when(reservationDateRepository.findById(any(ReservationDateId.class))).thenReturn(
+			Optional.ofNullable(givenReservationDate));
+
+		reservationDateServiceImpl.updateReservationDate(givenShipFishingPostId, givenDate, givenMemberId);
+	}
+
+	@Test
+	@DisplayName("예약 일자 수정 [예약 가능 여부 전환] [POSTS_NOT_FOUND] [Service] - Fail")
+	void t06() {
+		Long givenShipFishingPostId = 1L;
+		Long givenMemberId = 1L;
+		LocalDate givenDate = LocalDate.now().plusDays(2);
+
+		when(shipFishingPostRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+		assertThatThrownBy(
+			() -> reservationDateServiceImpl.updateReservationDate(givenShipFishingPostId, givenDate, givenMemberId))
+			.isInstanceOf(ShipFishingPostException.class)
+			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_NOT_FOUND.getMessage());
+	}
+
+	@Test
+	@DisplayName("예약 일자 수정 [예약 가능 여부 전환] [NOT_AVAILABLE_DATE_RESERVATION] [Service] - Fail")
+	void t07() {
+		Long givenShipFishingPostId = 1L;
+		Long givenMemberId = 1L;
+		LocalDate givenDate = LocalDate.now().minusDays(2);
+
+		assertThatThrownBy(
+			() -> reservationDateServiceImpl.updateReservationDate(givenShipFishingPostId, givenDate, givenMemberId))
+			.isInstanceOf(ReservationException.class)
+			.hasMessageContaining(ReservationErrorCode.NOT_AVAILABLE_DATE_RESERVATION.getMessage());
+	}
 }

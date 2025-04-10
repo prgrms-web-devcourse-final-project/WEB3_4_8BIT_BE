@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -349,5 +350,88 @@ public class ShipFishingPostServiceTest extends BaseTest {
 			() -> shipFishingPostServiceImpl.deleteShipFishingPost(givenShipFishingPostId, givenMemberId))
 			.isInstanceOf(ShipFishingPostException.class)
 			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_RESERVATION_EXIST.getMessage());
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 업데이트 [Service] - Success")
+	void t11() {
+		Long givenShipFishingPostId = 1L;
+		Long givenMemberId = 1L;
+
+		ShipFishingPostRequest.Update givenUpdateDto = fixtureMonkeyValidation
+			.giveMeBuilder(ShipFishingPostRequest.Update.class)
+			.set("subject", "subject")
+			.set("content", "content")
+			.set("price", 10000L)
+			.set("startTime", LocalTime.of(9, 0))      // ← 추가
+			.set("endTime", LocalTime.of(18, 0))
+			.set("maxGuestCount", 10)
+			.set("fileIdList", List.of())
+			.set("fishIdList", List.of())
+			.sample();
+
+		ShipFishingPost givenShipFishingPost = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+			.set("shipFishingPostId", 1L)
+			.set("subject", "subject")
+			.set("content", "content")
+			.set("maxGuestCount", 15)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class)
+			.set("shipId", 1L)
+			.set("passengerCapacity", 20)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		when(shipFishingPostRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(givenShipFishingPost));
+		when(shipRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(givenShip));
+
+		Long savedShipFishingPostId = shipFishingPostServiceImpl.updateShipFishingPost(givenShipFishingPostId,
+			givenUpdateDto, givenMemberId);
+
+		assertThat(savedShipFishingPostId).isEqualTo(givenShipFishingPostId);
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 업데이트 [Service] - false")
+	void t12() {
+		Long givenShipFishingPostId = 1L;
+		Long givenMemberId = 1L;
+
+		ShipFishingPostRequest.Update givenUpdateDto = fixtureMonkeyValidation
+			.giveMeBuilder(ShipFishingPostRequest.Update.class)
+			.set("subject", "subject")
+			.set("content", "content")
+			.set("price", 10000L)
+			.set("startTime", LocalTime.of(9, 0))      // ← 추가
+			.set("endTime", LocalTime.of(18, 0))
+			.set("maxGuestCount", 20)
+			.set("fileIdList", List.of())
+			.set("fishIdList", List.of())
+			.sample();
+
+		ShipFishingPost givenShipFishingPost = fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+			.set("shipFishingPostId", 1L)
+			.set("subject", "subject")
+			.set("content", "content")
+			.set("maxGuestCount", 15)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		Ship givenShip = fixtureMonkeyBuilder.giveMeBuilder(Ship.class)
+			.set("shipId", 1L)
+			.set("passengerCapacity", 19)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		when(shipFishingPostRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(givenShipFishingPost));
+		when(shipRepository.findById(any(Long.class))).thenReturn(Optional.ofNullable(givenShip));
+
+		assertThatThrownBy(
+			() -> shipFishingPostServiceImpl.updateShipFishingPost(givenShipFishingPostId,
+				givenUpdateDto, givenMemberId))
+			.isInstanceOf(ShipFishingPostException.class)
+			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_CAPACITY_EXCEEDED.getMessage());
 	}
 }

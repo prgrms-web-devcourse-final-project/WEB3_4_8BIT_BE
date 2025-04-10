@@ -134,7 +134,7 @@ public class ReservationQueryRepository {
 				getCursorCondition(cursorRequestDto),
 				statusCondition(isConfirm),
 				dayCondition(afterToday)))
-			.orderBy(reservation.reservationDate.desc())
+			.orderBy(getSortCondition(reservation))
 			.limit(cursorRequestDto.size() + 1)
 			.fetch();
 
