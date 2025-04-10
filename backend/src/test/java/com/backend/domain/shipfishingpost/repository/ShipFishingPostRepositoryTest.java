@@ -449,7 +449,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 				.set("fishIdList", List.of())
 				.set("fileIdList", List.of())
 				.set("price", 10000L * i)
-				.set("shipId", i * 100L)
+				.set("shipId", (long)i)
 				.set("reviewEverRate", 0.3D * i)
 				.set("maxGuestCount", i)
 				.sample();
