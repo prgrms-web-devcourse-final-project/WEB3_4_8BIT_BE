@@ -18,6 +18,8 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Repository;
 
+import com.backend.domain.chat.message.repository.MessageQueryRepository;
+import com.backend.domain.chat.message.repository.MessageRepositoryImpl;
 import com.backend.domain.reservationdate.converter.ReservationDateConverter;
 import com.backend.domain.reservationdate.entity.ReservationDate;
 import com.backend.domain.reservationdate.entity.ReservationDateId;
@@ -29,7 +31,11 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Import(QuerydslConfig.class)
-@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
+@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class),
+	excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+		MessageQueryRepository.class,
+		MessageRepositoryImpl.class}
+	))
 public class ReservationDateRepositoryTest extends BaseTest {
 
 	@Autowired

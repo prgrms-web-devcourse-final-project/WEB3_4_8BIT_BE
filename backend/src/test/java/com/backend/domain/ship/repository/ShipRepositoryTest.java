@@ -18,6 +18,8 @@ import org.springframework.stereotype.Repository;
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
 
+import com.backend.domain.chat.message.repository.MessageQueryRepository;
+import com.backend.domain.chat.message.repository.MessageRepositoryImpl;
 import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.global.config.QuerydslConfig;
@@ -30,7 +32,12 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 
 @Slf4j
 @Import({ShipQueryRepository.class, QuerydslConfig.class})
-@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
+@DataJpaTest(
+	includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class),
+	excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+		MessageQueryRepository.class,
+		MessageRepositoryImpl.class}
+	))
 public class ShipRepositoryTest extends BaseTest {
 
 	@Autowired
