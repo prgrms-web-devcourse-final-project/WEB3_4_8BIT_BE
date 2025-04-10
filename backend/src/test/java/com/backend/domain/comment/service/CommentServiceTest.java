@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -196,5 +197,99 @@ class CommentServiceTest extends BaseTest {
 
 		// Then
 		assertThat(getDetailList.content()).isEqualTo(givenDetailList);
+	}
+
+	@Test
+	@DisplayName("댓글 수정 [Service] - Success")
+	void t06() {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		CommentRequest.Update givenRequestDto = fixtureMonkeyValidation.giveMeOne(CommentRequest.Update.class);
+
+		Comment givenComment = fixtureMonkeyBuilder.giveMeBuilder(Comment.class)
+			.set("commentId", givenCommentId)
+			.set("fishingTripPostId", givenFishingTripPostId)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		when(commentRepository.findByCommentId(givenCommentId)).thenReturn(Optional.ofNullable(givenComment));
+
+		// When
+		commentService.updateComment(givenMemberId, givenCommentId, givenFishingTripPostId, givenRequestDto);
+
+		// Then
+		verify(commentRepository, times(1)).findByCommentId(givenCommentId);
+	}
+
+	@Test
+	@DisplayName("댓글 수정 [Comment Not Found] [Service] - Fail")
+	void t07() {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		CommentRequest.Update givenRequestDto = fixtureMonkeyValidation.giveMeOne(CommentRequest.Update.class);
+
+		when(commentRepository.findByCommentId(givenCommentId)).thenReturn(Optional.empty());
+
+		// When & Then
+		assertThatThrownBy(
+			() -> commentService.updateComment(givenMemberId, givenCommentId, givenFishingTripPostId, givenRequestDto))
+			.isExactlyInstanceOf(CommentExpection.class)
+			.hasMessage(CommentErrorCode.COMMENT_NOT_FOUND.getMessage());
+	}
+
+	@Test
+	@DisplayName("댓글 수정 [Fishing Trip Id Not Valid] [Service] - Fail")
+	void t08() {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		Comment givenComment = fixtureMonkeyBuilder.giveMeBuilder(Comment.class)
+			.set("commentId", givenCommentId)
+			.set("fishingTripPostId", 2L)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		CommentRequest.Update givenRequestDto = fixtureMonkeyValidation.giveMeOne(CommentRequest.Update.class);
+
+		when(commentRepository.findByCommentId(givenCommentId)).thenReturn(Optional.ofNullable(givenComment));
+
+		// When & Then
+		assertThatThrownBy(
+			() -> commentService.updateComment(givenMemberId, givenCommentId, givenFishingTripPostId, givenRequestDto))
+			.isExactlyInstanceOf(CommentExpection.class)
+			.hasMessage(CommentErrorCode.FISHING_TRIP_ID_NOT_VALID.getMessage());
+	}
+
+	@Test
+	@DisplayName("댓글 수정 [Comment Unauthorized Author] [Service] - Fail")
+	void t09() {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		Comment givenComment = fixtureMonkeyBuilder.giveMeBuilder(Comment.class)
+			.set("commentId", givenCommentId)
+			.set("fishingTripPostId", givenFishingTripPostId)
+			.set("memberId", 2L)
+			.sample();
+
+		CommentRequest.Update givenRequestDto = fixtureMonkeyValidation.giveMeOne(CommentRequest.Update.class);
+
+		when(commentRepository.findByCommentId(givenCommentId)).thenReturn(Optional.ofNullable(givenComment));
+
+		// When & Then
+		assertThatThrownBy(
+			() -> commentService.updateComment(givenMemberId, givenCommentId, givenFishingTripPostId, givenRequestDto))
+			.isExactlyInstanceOf(CommentExpection.class)
+			.hasMessage(CommentErrorCode.COMMENT_UNAUTHORIZED_AUTHOR.getMessage());
 	}
 }
