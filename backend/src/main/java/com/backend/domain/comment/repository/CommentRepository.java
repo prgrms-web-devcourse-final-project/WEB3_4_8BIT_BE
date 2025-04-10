@@ -41,6 +41,16 @@ public interface CommentRepository {
 	void addChildCount(final Long parentId);
 
 	/**
+	 * 댓글에 자식 카운트 1개 감소하는 메소드
+	 *
+	 * @param parentId {@link Long}
+	 * @return {@link Boolean}
+	 * @implSpec 자식 댓글이 삭제됐을 경우 부모 댓글에 카운트 1개 감소하여 업데이트
+	 * @author Kim Dong O
+	 */
+	void minusChildCount(final Long parentId);
+
+	/**
 	 * 댓글 전체 조회 메소드
 	 *
 	 * @param fishingTripPostId {@link Long}
@@ -68,14 +78,6 @@ public interface CommentRepository {
 	 */
 	Optional<Comment> findByCommentId(final Long commentId);
 
-	/**
-	 * 댓글 ID로 삭제 메소드
-	 *
-	 * @param commentId {@link Long}
-	 * @implSpec 댓글 ID에 해당하는 데이터 삭제
-	 * @author Kim Dong O
-	 */
-	void deleteById(final Long commentId);
 
 	/**
 	 * 동출 게시글 ID로 삭제 메소드
@@ -90,8 +92,9 @@ public interface CommentRepository {
 	 * 부모 ID로 삭제 메소드
 	 *
 	 * @param parentId {@link Long}
+	 * @return {@link Long} 삭제된 댓글 개수
 	 * @implSpec 부모 ID에 해당하는 데이터 삭제
 	 * @author Kim Dong O
 	 */
-	void deleteByParentId(final Long parentId);
+	long deleteByParentId(final Long parentId);
 }

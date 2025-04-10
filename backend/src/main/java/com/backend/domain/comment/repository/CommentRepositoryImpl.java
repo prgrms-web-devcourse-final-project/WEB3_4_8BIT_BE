@@ -35,6 +35,11 @@ public class CommentRepositoryImpl implements CommentRepository {
 	}
 
 	@Override
+	public void minusChildCount(final Long parentId) {
+		commentQueryRepository.minusChildCount(parentId);
+	}
+
+	@Override
 	public ScrollResponse<CommentResponse.Detail> findDetailByFishTripPostId(
 		final Long fishingTripPostId,
 		final Long memberId,
@@ -55,17 +60,12 @@ public class CommentRepositoryImpl implements CommentRepository {
 	}
 
 	@Override
-	public void deleteById(final Long commentId) {
-		commentQueryRepository.deleteById(commentId);
-	}
-
-	@Override
 	public void deleteByFishingTripPostId(final Long fishingTripPostId) {
 		commentQueryRepository.deleteByFishingTripPostId(fishingTripPostId);
 	}
 
 	@Override
-	public void deleteByParentId(final Long parentId) {
-		commentQueryRepository.deleteByParentId(parentId);
+	public long deleteByParentId(final Long parentId) {
+		return commentQueryRepository.deleteByParentId(parentId);
 	}
 }

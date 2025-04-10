@@ -398,27 +398,8 @@ class CommentRepositoryTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("댓글 삭제 [commentId] [Repository] - Success")
-	void t08() {
-		// Given
-		Comment givenComment = commentArbitraryBuilder
-			.set("commentId", null)
-			.sample();
-
-		Comment savedComment = commentRepository.save(givenComment);
-
-		// When
-		commentRepository.deleteById(savedComment.getCommentId());
-
-		// Then
-		boolean existsById = commentJpaRepository.existsById(savedComment.getCommentId());
-
-		assertThat(existsById).isFalse();
-	}
-
-	@Test
 	@DisplayName("댓글 삭제 [fishingTripPostId] [Repository] - Success")
-	void t09() {
+	void t08() {
 		// Given
 		Comment givenComment = commentArbitraryBuilder
 			.set("commentId", null)
@@ -438,7 +419,7 @@ class CommentRepositoryTest extends BaseTest {
 
 	@Test
 	@DisplayName("댓글 삭제 [parentId] [Repository] - Success")
-	void t10() {
+	void t09() {
 		// Given
 		Comment givenComment = commentArbitraryBuilder
 			.set("commentId", null)
@@ -455,13 +436,33 @@ class CommentRepositoryTest extends BaseTest {
 		commentJpaRepository.saveAll(givenCommentList);
 
 		// When
-		commentRepository.deleteByParentId(givenComment.getCommentId());
+		long deleteCount = commentRepository.deleteByParentId(givenComment.getCommentId());
+
+		// Then
+		assertThat(deleteCount).isEqualTo(6);
+	}
+
+	@Test
+	@DisplayName("댓글 자식 카운트 감소 [Repository] - Success")
+	void t10() {
+		// Given
+		Comment givenComment = commentArbitraryBuilder
+			.set("commentId", null)
+			.set("fishingTripPostId", 1L)
+			.set("childCount", 5)
+			.sample();
+
+		Comment savedComment = commentRepository.save(givenComment);
+
+		// When
+		commentRepository.minusChildCount(savedComment.getCommentId());
 		entityManager.flush();
 		entityManager.clear();
 
 		// Then
-		List<Comment> findAll = commentJpaRepository.findAll();
+		Optional<Comment> findComment = commentRepository.findByCommentId(givenComment.getCommentId());
 
-		assertThat(findAll).hasSize(0);
+		assertThat(findComment).isPresent();
+		assertThat(findComment.get().getChildCount()).isEqualTo(4);
 	}
 }
