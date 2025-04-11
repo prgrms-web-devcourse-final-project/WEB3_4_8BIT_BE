@@ -51,8 +51,8 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	}
 
 	@Override
-	public void updateLikeCount(final Long fishingTripPostId, final Long likeCount) {
-		fishingTripPostQueryRepository.updateLikeCount(fishingTripPostId, likeCount);
+	public boolean updateLikeCount(final Long fishingTripPostId, final Long likeCount) {
+		return fishingTripPostQueryRepository.updateLikeCount(fishingTripPostId, likeCount);
 	}
 
 	@Override
