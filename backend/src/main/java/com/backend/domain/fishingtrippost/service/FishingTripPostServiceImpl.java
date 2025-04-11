@@ -37,6 +37,7 @@ import com.backend.global.exception.GlobalException;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.StorageService;
+import com.backend.global.util.RedisUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final LikeRepository likeRepository;
 	private final FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
 	private final CommentRepository commentRepository;
+	private final RedisUtil redisUtil;
 	private final RedisTemplate<String, List<FishingTripPostResponse.HotPost>> hotPostRedisTemplate;
 
 	private static final LikeTargetType TARGET_TYPE = LikeTargetType.FISHING_TRIP_POST;
@@ -213,6 +215,10 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		fishingTripPostRepository.delete(fishingTripPost);
 		commentRepository.deleteByFishingTripPostId(fishingTripPostId);
 
+		// 동출 게시글 삭제시 게시글 좋아요 List와 캐싱 값 제거
+		likeRepository.deleteLikesByTargetTypeAndTargetId(LikeTargetType.FISHING_TRIP_POST, fishingTripPostId);
+		redisUtil.deleteKeyIfExists("like_count::FISHING_TRIP_POST::" + fishingTripPostId);
+
 		log.debug("[동출 게시글 삭제] : 삭제 성공");
 	}
 
@@ -272,9 +278,10 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @param hotPostDtoList HotPostDto 객체들을 담고 있는 리스트. 각 HotPostDto에는 낚시 게시글의 ID, 제목, 지역 정보,
 	 *                       이미지 파일 ID 리스트, 인기 점수 등의 정보가 포함됩니다.
 	 * @return HotPost 객체로 변환된 리스트. 각 HotPost는 주어진 HotPostDto에서 변환된 데이터로 구성됩니다.
-	 *         이미지 URL은 파일 ID 리스트가 비어 있지 않으면 첫 번째 파일 ID를 기준으로 가져옵니다.
+	 * 이미지 URL은 파일 ID 리스트가 비어 있지 않으면 첫 번째 파일 ID를 기준으로 가져옵니다.
 	 */
-	private List<FishingTripPostResponse.HotPost> getHotPostList(List<FishingTripPostResponse.HotPostDto> hotPostDtoList) {
+	private List<FishingTripPostResponse.HotPost> getHotPostList(
+		List<FishingTripPostResponse.HotPostDto> hotPostDtoList) {
 		return hotPostDtoList.stream()
 			.map(dto -> {
 				String imageUrl = (dto.fileIdList() != null && !dto.fileIdList().isEmpty())
@@ -299,7 +306,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * <p>사용자가 로그인된 상태(memberId != null)일 때만 {@link LikeRepository}를 통해
 	 * 게시글 ID와 사용자 ID 기반으로 좋아요 여부를 조회합니다.</p>
 	 *
-	 * @param memberId 현재 로그인한 사용자의 ID (비로그인 시 null)
+	 * @param memberId          현재 로그인한 사용자의 ID (비로그인 시 null)
 	 * @param fishingTripPostId 대상 게시글의 ID
 	 * @return 사용자가 해당 게시글을 좋아요 했으면 true, 아니면 false
 	 */
