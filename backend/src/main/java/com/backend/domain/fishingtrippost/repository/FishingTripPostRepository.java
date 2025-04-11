@@ -8,6 +8,7 @@ import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 public interface FishingTripPostRepository {
 
@@ -109,7 +110,7 @@ public interface FishingTripPostRepository {
 	List<FishingTripPostResponse.ParticipantDetail> findApprovedParticipants(
 		final Long fishingTripPostId
 	);
-  
+
 	/**
 	 * 동출 모집 게시글 좋아요 수 업데이트 메서드
 	 *
@@ -126,4 +127,22 @@ public interface FishingTripPostRepository {
 	 * @param fishingTripPost 삭제할 동출 게시글 엔티티
 	 */
 	void delete(final FishingTripPost fishingTripPost);
+
+	/**
+	 * 내가 신청한 동출 게시글을 커서 기반으로 조회하는 메서드입니다.
+	 * <p>
+	 * 동출 모집 상태(PostStatus)가 주어진 조건과 일치하는 게시글만 조회되며,
+	 * 커서 기반 페이징을 통해 최신순 정렬로 데이터를 반환합니다.
+	 * </p>
+	 *
+	 * @param cursorRequestDto 커서 페이징 요청 객체 (size, 방향, 기준 필드 등 포함)
+	 * @param postStatus 게시글 상태 필터 (RECRUITING or COMPLETED)
+	 * @param memberId 현재 로그인한 사용자의 ID (신청자 기준)
+	 * @return ScrollResponse 형태로 페이징 처리된 내가 신청한 게시글 목록 반환
+	 */
+	ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripPostDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus postStatus,
+		final Long memberId
+	);
 }

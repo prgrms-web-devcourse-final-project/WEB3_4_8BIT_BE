@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.*;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -19,6 +18,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.backend.domain.fishingtrippost.converter.FishingTripPostConverter;
+import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtriprecruitment.domain.FishingLevel;
@@ -40,6 +40,7 @@ import com.backend.domain.member.repository.MemberRepositoryImpl;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageQueryRepository;
 import com.backend.global.storage.repository.StorageRepository;
@@ -107,11 +108,11 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		.set("memberId", null)
 		.set("nickname", "강태공")
 		.set("name", "테스트")
-		.set("email", "test@example.com")
-		.set("phone", "010-1111-2222")
+		.set("email", UUID.randomUUID() + "@example.com")
+		.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8))
 		.set("role", MemberRole.USER)
 		.set("provider", Provider.KAKAO)
-		.set("providerId", "12345678")
+		.set("providerId", UUID.randomUUID().toString())
 		.set("isAddInfo", false);
 
 	@Test
@@ -206,7 +207,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			.toList();
 
 		FishingTripPostResponse.Detail detail = FishingTripPostConverter.toDetail(
-			detailDto, fileUrlList, 0L, false);
+			detailDto, fileUrlList, false);
 
 		// then
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());
@@ -451,5 +452,66 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 		// then
 		assertThat(deleted).isEmpty();
+	}
+
+	@Test
+	@DisplayName("내가 신청한 동출 게시글 목록 커서 기반 조회 [Repository] - Success")
+	void t08() {
+		// given
+		Member writer = memberRepository.save(memberArbitraryBuilder
+			.set("email", UUID.randomUUID() + "@example.com")
+			.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8).replaceAll("[^0-9]", "1"))
+			.set("providerId", UUID.randomUUID().toString())
+			.sample());
+
+		Member applicant = memberRepository.save(memberArbitraryBuilder
+			.set("nickname", "지원자")
+			.set("email", UUID.randomUUID() + "@example.com")
+			.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8).replaceAll("[^0-9]", "2"))
+			.set("providerId", UUID.randomUUID().toString())
+			.sample());
+
+		FishPoint fishPoint = fishPointRepository.save(createRandomFishPoint());
+
+		List<FishingTripPost> posts = fishingTripPostArbitraryBuilder
+			.set("memberId", writer.getMemberId())
+			.set("fishingPointId", fishPoint.getFishPointId())
+			.sampleList(3);
+
+		fishingTripPostJpaRepository.saveAll(posts);
+
+		for (FishingTripPost post : posts) {
+			fishingTripRecruitmentRepository.save(FishingTripRecruitment.builder()
+				.fishingTripPostId(post.getFishingTripPostId())
+				.memberId(applicant.getMemberId())
+				.introduction("안녕하세요")
+				.fishingLevel(FishingLevel.INTERMEDIATE)
+				.recruitmentStatus(RecruitmentStatus.PENDING)
+				.build());
+		}
+
+		posts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+		FishingTripPost cursorBase = posts.get(0);
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			"desc", "createdAt", "next",
+			cursorBase.getCreatedAt().toString(),
+			cursorBase.getFishingTripPostId(),
+			10
+		);
+
+		// when
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> response =
+			fishingTripPostRepository.findMyFishingTripPostDetailPage(cursorRequest, PostStatus.RECRUITING,
+				applicant.getMemberId());
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.content()).isNotEmpty();
+		assertThat(response.content()).extracting("fishingTripPostId")
+			.doesNotContain(cursorBase.getFishingTripPostId());
+		assertThat(response.content()).allSatisfy(item ->
+			assertThat(item.postStatus()).isEqualTo(PostStatus.RECRUITING)
+		);
 	}
 }

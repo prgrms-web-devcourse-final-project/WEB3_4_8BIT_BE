@@ -123,10 +123,9 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 		List<String> fileUrlList = getFileUrlList(detailQueryDto);
 
-		Long likeCount = getLikeCount(fishingTripPostId);
 		boolean isLiked = getIsLiked(memberId, fishingTripPostId);
 
-		return FishingTripPostConverter.toDetail(detailQueryDto, fileUrlList, likeCount, isLiked);
+		return FishingTripPostConverter.toDetail(detailQueryDto, fileUrlList, isLiked);
 	}
 
 	@Override
@@ -185,11 +184,19 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	public void delete(final Long memberId, final Long fishingTripPostId) {
 
 		FishingTripPost fishingTripPost = getFishingTripPostById(fishingTripPostId);
-		validAuthor(fishingTripPost,memberId);
+		validAuthor(fishingTripPost, memberId);
 
 		fishingTripRecruitmentRepository.deleteAllByPostId(fishingTripPostId);
 		fishingTripPostRepository.delete(fishingTripPost);
 		commentRepository.deleteByFishingTripPostId(fishingTripPostId);
+	}
+
+	@Override
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripPostDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long memberId,
+		final PostStatus postStatus) {
+		return fishingTripPostRepository.findMyFishingTripPostDetailPage(cursorRequestDto, postStatus, memberId);
 	}
 
 	/**

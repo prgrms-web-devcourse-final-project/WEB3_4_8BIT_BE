@@ -20,6 +20,8 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Repository;
 
+import com.backend.domain.chat.message.repository.MessageQueryRepository;
+import com.backend.domain.chat.message.repository.MessageRepositoryImpl;
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishRepository;
 import com.backend.domain.member.dto.MemberResponse;
@@ -48,7 +50,11 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 @Slf4j
 @Import(QuerydslConfig.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class))
+@DataJpaTest(includeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = Repository.class),
+	excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = {
+		MessageQueryRepository.class,
+		MessageRepositoryImpl.class}
+	))
 public class ShipFishingPostRepositoryTest extends BaseTest {
 
 	@Autowired

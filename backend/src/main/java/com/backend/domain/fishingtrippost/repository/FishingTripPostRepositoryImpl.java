@@ -9,6 +9,7 @@ import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,6 +58,14 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	@Override
 	public void delete(final FishingTripPost fishingTripPost) {
 		fishingTripPostJpaRepository.delete(fishingTripPost);
+	}
+
+	@Override
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripPostDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus postStatus,
+		final Long memberId) {
+		return fishingTripPostQueryRepository.findMyFishingTripPostDetailPage(cursorRequestDto, postStatus, memberId);
 	}
 
 	@Override
