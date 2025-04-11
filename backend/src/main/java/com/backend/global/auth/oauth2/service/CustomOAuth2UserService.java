@@ -136,12 +136,10 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 			return member;
 		} else {
 			// 신규 회원 가입
-
-			// TODO default 파일 id 추가해서 저장해야함
 			Member member = Member.builder()
 				.email(userInfo.getEmail())
 				.name(userInfo.getName())
-				// .profileImg(userInfo.getImageUrl())
+				.fileId(104L)
 				.phone(formattedPhone)
 				.providerId(userInfo.getId())
 				.provider(provider)
