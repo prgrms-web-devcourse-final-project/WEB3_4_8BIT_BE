@@ -69,4 +69,10 @@ public class MemberResponse {
 		String phone
 	) {
 	}
+
+	@Builder
+	public record ChatProfile(
+		String nickname,
+		String fileUrl
+	) {}
 }

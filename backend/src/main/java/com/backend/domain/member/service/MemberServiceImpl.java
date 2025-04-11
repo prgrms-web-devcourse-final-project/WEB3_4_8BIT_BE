@@ -1,5 +1,8 @@
 package com.backend.domain.member.service;
 
+import java.util.List;
+
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +12,7 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
+import com.backend.global.storage.service.StorageService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MemberServiceImpl implements MemberService {
 
 	private final MemberRepository memberRepository;
+	private final StorageService storageService;
 
 	@Override
 	@Transactional
@@ -53,6 +58,21 @@ public class MemberServiceImpl implements MemberService {
 		return member.getMemberId();
 	}
 
+	@Override
+	@Cacheable(value = "memberChatProfile", key = "#memberId")
+	public MemberResponse.ChatProfile getChatProfile(final Long memberId) {
+		Member member = getMemberById(memberId);
+		String fileUrl = storageService.getFileUrlsByIdList(List.of(member.getFileId()))
+			.stream()
+			.findFirst()
+			.orElse(null);
+
+		return MemberResponse.ChatProfile.builder()
+			.nickname(member.getNickname())
+			.fileUrl(fileUrl)
+			.build();
+	}
+
 	/**
 	 * 회원 ID로 회원 엔티티를 조회하는 메소드
 	 *
@@ -60,7 +80,6 @@ public class MemberServiceImpl implements MemberService {
 	 * @return {@link Member} 조회된 회원 엔티티
 	 * @throws MemberException 회원이 존재하지 않는 경우 예외 발생
 	 */
-
 	private Member getMemberById(final Long memberId) {
 
 		Member member = memberRepository.findById(memberId)
