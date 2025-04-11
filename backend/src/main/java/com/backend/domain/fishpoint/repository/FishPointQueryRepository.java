@@ -188,4 +188,12 @@ public class FishPointQueryRepository {
 			.limit(3)
 			.fetch();
 	}
+
+	public String findFishPointDetailNameByFishPointId(final Long fishPointId) {
+		return jpaQueryFactory
+			.select(fishPoint.fishPointDetailName)
+			.from(fishPoint)
+			.where(fishPoint.fishPointId.eq(fishPointId))
+			.fetchOne();
+	}
 }
