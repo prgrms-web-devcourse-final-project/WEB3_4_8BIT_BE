@@ -1,6 +1,7 @@
 package com.backend.global.util;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,7 +29,11 @@ public class RedisUtil {
 	 * @return 증가된 결과 값
 	 */
 	public Long increment(final String key) {
-		return redisTemplate.opsForValue().increment(key);
+		Long value = redisTemplate.opsForValue().increment(key);
+		//TTL 설정
+		setCacheExpire(key);
+
+		return value;
 	}
 
 	/**
@@ -38,7 +43,11 @@ public class RedisUtil {
 	 * @return 감소된 결과 값
 	 */
 	public Long decrement(final String key) {
-		return redisTemplate.opsForValue().decrement(key);
+		Long value = redisTemplate.opsForValue().decrement(key);
+		//TTL 설정
+		setCacheExpire(key);
+
+		return value;
 	}
 
 	/**
@@ -106,6 +115,18 @@ public class RedisUtil {
 	public void deleteKeyIfExists(final String key) {
 		if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
 			redisTemplate.delete(key);
+		}
+	}
+
+	/**
+	 * 레디스에 캐싱 TTL 최초에만  6시간으로 설정
+	 *
+	 * @param key TTL 설정할 Redis key
+	 */
+
+	private void setCacheExpire(String key) {
+		if (Boolean.FALSE.equals(redisTemplate.getExpire(key) > 0)) {
+			redisTemplate.expire(key, Duration.ofHours(6));
 		}
 	}
 }
