@@ -2,6 +2,8 @@ package com.backend.domain.review.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -55,6 +57,9 @@ class ReviewRepositoryTest extends BaseTest {
 
 	@Autowired
 	private MemberRepository memberRepository;
+
+	@Autowired
+	private ReviewJpaRepository reviewJpaRepository;
 
 	@Autowired
 	private ShipFishingPostRepository shipFishingPostRepository;
@@ -321,4 +326,33 @@ class ReviewRepositoryTest extends BaseTest {
 		boolean exists = reviewRepository.findById(savedReview.getReviewId()).isPresent();
 		assertThat(exists).isFalse();
 	}
+
+	@Test
+	@DisplayName("리뷰 전체 삭제 with 선상낚시게시글 [Repository] - Success")
+	void t11() {
+		// Given
+		Long givenShipFishingPostId = 1L;
+
+		fixtureMonkeyBuilder.giveMeBuilder(Review.class)
+			.set("reviewId", null)
+			.set("shipFishingPostId", givenShipFishingPostId)
+			.sampleStream()
+			.limit(10)
+			.forEach((review) -> {
+				reviewRepository.save(review);
+			});
+
+		List<Review> savedReview = reviewJpaRepository.findAllByShipFishingPostId(givenShipFishingPostId);
+
+		assertThat(savedReview.size()).isEqualTo(10);
+
+		// When
+		reviewRepository.deleteAllByShipFishingPostId(givenShipFishingPostId);
+
+		List<Review> findReview = reviewJpaRepository.findAllByShipFishingPostId(givenShipFishingPostId);
+
+		// Then
+		assertThat(findReview.size()).isEqualTo(0);
+	}
+
 }

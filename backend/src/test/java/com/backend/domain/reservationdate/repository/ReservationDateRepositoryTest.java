@@ -60,7 +60,7 @@ public class ReservationDateRepositoryTest extends BaseTest {
 	@DisplayName("예약 일자 리스트 저장 [BulkQuery Insert & findAll] [Repository] - Success")
 	void t01() {
 		// Given
-		em.clear();
+		tearDown();
 
 		List<ReservationDate> givenResrvationList = new ArrayList<>();
 
@@ -189,6 +189,8 @@ public class ReservationDateRepositoryTest extends BaseTest {
 	@DisplayName("선상 낚시 게시글 예약 일자 전체 삭제 [Repository] - Success")
 	void t06() {
 		// Given
+		tearDown();
+
 		Long givenShipFishingPostId = 1L;
 
 		List<ReservationDate> givenResrvationList = new ArrayList<>();
@@ -215,6 +217,8 @@ public class ReservationDateRepositoryTest extends BaseTest {
 	@Test
 	@DisplayName("선상 낚시 게시글 예약 일자 전체 삭제 [Repository] - Success")
 	void t07() {
+		// Given
+		tearDown();
 		Long givenShipFishingPostId = 1L;
 
 		List<ReservationDate> givenResrvationList = new ArrayList<>();

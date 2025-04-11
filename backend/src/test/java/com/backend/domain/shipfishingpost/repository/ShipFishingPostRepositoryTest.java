@@ -167,6 +167,8 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 	@DisplayName("선상 낚시 게시글 상세 조회 [ShipFishingPostResponse.DetailAll] [Repository] - Success")
 	void t02() {
 		// Given
+		tearDown();
+
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test.com")
@@ -421,7 +423,12 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 	@DisplayName("선상 낚시 게시글 삭제 [Repository] - Success")
 	void t09() {
 		// Given
-		ShipFishingPost givenShipFishingPost = arbitraryBuilder.set("shipFishingPostId", null).sample();
+		tearDown();
+
+		ShipFishingPost givenShipFishingPost = arbitraryBuilder
+			.set("shipFishingPostId", null)
+			.set("shipId", 1L)
+			.sample();
 
 		ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenShipFishingPost);
 
@@ -439,19 +446,9 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 	@DisplayName("선상 낚시 게시글 마이페이지 조회 [Repository] - Success")
 	void t10() {
 		// Given
-		Long givenMemberId = 1L;
+		tearDown();
 
-		// 먼저 Ship 객체를 생성하여 저장
-		List<Ship> ships = new ArrayList<>();
-		for (int i = 1; i <= 15; i++) {
-			Ship ship = fixtureMonkeyBuilder.giveMeBuilder(Ship.class)
-				.set("shipId", null)  // ID는 DB가 생성하도록 null로 설정
-				.set("shipName", "TestShip " + i)
-				.set("shipNumber", "12345-" + i)
-				.set("departurePort", "test")
-				.sample();
-			ships.add(shipRepository.save(ship));
-		}
+		Long givenMemberId = 1L;
 
 		// Ship을 사용하여 ShipFishingPost 생성
 		for (int i = 0; i < 15; i++) {
@@ -462,7 +459,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 				.set("fishIdList", List.of())
 				.set("fileIdList", List.of())
 				.set("price", 10000L * (i + 1))
-				.set("shipId", ships.get(i).getShipId())  // 저장된 ship의 ID 사용
+				.set("shipId", (long)i)  // 저장된 ship의 ID 사용
 				.set("reviewEverRate", 0.3D * (i + 1))
 				.set("maxGuestCount", i + 1)
 				.sample();

@@ -22,6 +22,7 @@ import com.backend.domain.reservation.entity.Reservation;
 import com.backend.domain.reservation.repository.ReservationRepository;
 import com.backend.domain.reservationdate.repository.ReservationDateRepository;
 import com.backend.domain.reservationdate.service.ReservationDateService;
+import com.backend.domain.review.repository.ReviewRepository;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
@@ -46,6 +47,9 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Mock
 	private FishRepository fishRepository;
+
+	@Mock
+	private ReviewRepository reviewRepository;
 
 	@Mock
 	private StorageRepository storageRepository;
@@ -269,6 +273,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 		when(reservationRepository.findByShipFishingPostIdAndTodayAfter(any(Long.class), any(LocalDate.class)))
 			.thenReturn(false);
 		doNothing().when(s3StorageService).deleteFilesByIdList(any(Long.class), any(List.class));
+		doNothing().when(reviewRepository).deleteAllByShipFishingPostId(any(Long.class));
 
 		// Then
 		shipFishingPostServiceImpl.deleteShipFishingPost(givenShipFishingPostId, givenMemberId);
