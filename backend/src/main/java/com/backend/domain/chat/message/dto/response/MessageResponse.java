@@ -1,6 +1,6 @@
 package com.backend.domain.chat.message.dto.response;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.backend.domain.chat.message.entity.MessageType;
@@ -17,5 +17,5 @@ public record MessageResponse(
 	String content,
 	List<String> fileUrls,
 	MessageType type,
-	ZonedDateTime createdAt
+	LocalDateTime createdAt
 ) {}

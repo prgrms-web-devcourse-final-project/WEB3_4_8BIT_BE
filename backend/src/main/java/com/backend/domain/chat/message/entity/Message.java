@@ -1,11 +1,10 @@
 package com.backend.domain.chat.message.entity;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -50,11 +49,7 @@ public class Message {
 
 	@CreatedDate
 	@Field("createdAt")
-	private ZonedDateTime createdAt;
-
-	@LastModifiedDate
-	@Field("modifiedAt")
-	private ZonedDateTime modifiedAt;
+	private LocalDateTime createdAt;
 
 	/**
 	 * 메세지 활성화 (디폴트 값)
