@@ -30,6 +30,7 @@ import com.backend.domain.fishpoint.exception.FishPointErrorCode;
 import com.backend.domain.fishpoint.exception.FishPointException;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
+import com.backend.domain.region.entity.RegionType;
 import com.backend.global.auth.WithMockCustomUser;
 import com.backend.global.config.TestSecurityConfig;
 import com.backend.global.dto.response.ScrollResponse;
@@ -651,5 +652,53 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.numberOfElements").value(1))
 			.andExpect(jsonPath("$.data.isFirst").value(true))
 			.andExpect(jsonPath("$.data.isLast").value(true));
+	}
+
+	@Test
+	@WithMockCustomUser
+	@DisplayName("HOT 동출 게시글 조회 [Controller] - Success")
+	void t19() throws Exception {
+		// Given
+		List<FishingTripPostResponse.HotPost> hotPosts = List.of(
+			new FishingTripPostResponse.HotPost(
+				100L,
+				"지려버린 낚시",
+				1L,
+				RegionType.JEJU,
+				"https://cdn.example.com/image1.jpg",
+				30L
+			),
+			new FishingTripPostResponse.HotPost(
+				101L,
+				"혼자 낚시 금지",
+				2L,
+				RegionType.SEOUL,
+				null, // 이미지 없는 케이스
+				27L
+			)
+		);
+
+		when(fishingTripPostService.getHotPost()).thenReturn(hotPosts);
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/v1/fishing-trip-post/hot-post")
+				.accept(MediaType.APPLICATION_JSON)
+		);
+
+		// Then
+		result
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data").isArray())
+			.andExpect(jsonPath("$.data[0].fishingTripPostId").value(100L))
+			.andExpect(jsonPath("$.data[0].subject").value("지려버린 낚시"))
+			.andExpect(jsonPath("$.data[0].regionId").value(1L))
+			.andExpect(jsonPath("$.data[0].regionType").value("JEJU"))
+			.andExpect(jsonPath("$.data[0].imageUrl").value("https://cdn.example.com/image1.jpg"))
+			.andExpect(jsonPath("$.data[0].hotScore").value(30))
+			.andExpect(jsonPath("$.data[1].fishingTripPostId").value(101L))
+			.andExpect(jsonPath("$.data[1].imageUrl").doesNotExist()) // null 처리
+			.andExpect(jsonPath("$.data[1].hotScore").value(27));
 	}
 }

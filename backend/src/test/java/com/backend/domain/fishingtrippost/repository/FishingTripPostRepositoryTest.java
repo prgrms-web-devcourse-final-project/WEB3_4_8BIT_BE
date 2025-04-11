@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -259,7 +260,6 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		em.flush();
 		em.clear();
 
-		// ✅ 여기서 DB에서 다시 가져와야 정확한 createdAt 기준 적용됨
 		List<FishingTripPost> refreshedPosts = fishingTripPostJpaRepository.findAll();
 		refreshedPosts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
 		FishingTripPost cursorBase = refreshedPosts.get(0);
@@ -493,6 +493,9 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		posts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
 		FishingTripPost cursorBase = posts.get(0);
 
+		// 커서 기준 확인
+		System.out.println("Cursor Base - CreatedAt: " + cursorBase.getCreatedAt() + ", FishingTripPostId: " + cursorBase.getFishingTripPostId());
+
 		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
 			"desc", "createdAt", "next",
 			cursorBase.getCreatedAt().toString(),
@@ -509,12 +512,13 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		assertThat(response).isNotNull();
 		assertThat(response.content()).isNotEmpty();
 		assertThat(response.content()).extracting("fishingTripPostId")
-			.doesNotContain(cursorBase.getFishingTripPostId());
+			.doesNotContain(cursorBase.getFishingTripPostId());  // 커서값이 제외되는지 확인
 		assertThat(response.content()).allSatisfy(item ->
 			assertThat(item.postStatus()).isEqualTo(PostStatus.RECRUITING)
 		);
 	}
 
+	// Debugging added to check cursor value handling
 	@Test
 	@DisplayName("내가 작성한 동출 게시글 목록 커서 기반 조회 [Repository] - Success")
 	void t09() {
@@ -534,8 +538,11 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 		fishingTripPostJpaRepository.saveAll(posts);
 
-		posts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+		posts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt())); // 최신순으로 정렬
 		FishingTripPost cursorBase = posts.get(0);
+
+		// Log the cursor base for debugging
+		System.out.println("Cursor Base - CreatedAt: " + cursorBase.getCreatedAt() + ", FishingTripPostId: " + cursorBase.getFishingTripPostId());
 
 		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
 			"desc", "createdAt", "next",
@@ -546,17 +553,79 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 		// when
 		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> response =
-			fishingTripPostRepository.findMyPostFishingTripPostDetailPage(cursorRequest, PostStatus.RECRUITING,
-				author.getMemberId());
+			fishingTripPostRepository.findMyPostFishingTripPostDetailPage(cursorRequest, PostStatus.RECRUITING, author.getMemberId());
 
 		// then
 		assertThat(response).isNotNull();
 		assertThat(response.content()).isNotEmpty();
 		assertThat(response.content()).extracting("fishingTripPostId")
-			.doesNotContain(cursorBase.getFishingTripPostId());
+			.doesNotContain(cursorBase.getFishingTripPostId());  // 커서값이 제외되는지 확인
 		assertThat(response.content()).allSatisfy(item ->
 			assertThat(item.postStatus()).isEqualTo(PostStatus.RECRUITING)
 		);
 	}
 
+	@Test
+	@DisplayName("HOT 게시글 조회 [Repository] - Success")
+	void t10() {
+		ZonedDateTime now = ZonedDateTime.of(2025, 4, 10, 10, 0, 0, 0, ZoneId.of("Asia/Seoul"));
+		ZonedDateTime baseTime = now.minusDays(5).withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+		// given
+		Member writer = memberRepository.save(memberArbitraryBuilder.sample());
+		FishPoint fishPoint = fishPointRepository.save(createRandomFishPoint());
+
+		for (int i = 0; i < 6; i++) {
+			FishingTripPost post = fishingTripPostArbitraryBuilder
+				.set("memberId", writer.getMemberId())
+				.set("fishingPointId", fishPoint.getFishPointId())
+				.set("likeCount", (long)(5 - i))
+				.set("commentCount", (long)i)
+				.set("postStatus", PostStatus.RECRUITING)
+				.sample();
+
+			FishingTripPost saved = fishingTripPostJpaRepository.save(post);
+
+			jdbcTemplate.update(
+				"UPDATE fishing_trip_posts SET created_at = ? WHERE fishing_trip_post_id = ?",
+				Timestamp.valueOf(baseTime.plusHours(i + 1).toLocalDateTime()), // baseTime보다 +1시간부터 시작
+				saved.getFishingTripPostId()
+			);
+		}
+
+		em.flush();
+		em.clear();
+
+		FishingTripPost oldPost = fishingTripPostArbitraryBuilder
+			.set("memberId", writer.getMemberId())
+			.set("fishingPointId", fishPoint.getFishPointId())
+			.set("subject", "오래된 게시글")
+			.set("likeCount", 100L)
+			.set("commentCount", 100L)
+			.set("postStatus", PostStatus.RECRUITING)
+			.sample();
+
+		FishingTripPost savedOld = fishingTripPostJpaRepository.save(oldPost);
+		jdbcTemplate.update(
+			"UPDATE fishing_trip_posts SET created_at = ? WHERE fishing_trip_post_id = ?",
+			Timestamp.valueOf(baseTime.minusDays(1).toLocalDateTime()), // 아예 하루 전으로
+			savedOld.getFishingTripPostId()
+		);
+
+		em.flush();
+		em.clear();
+
+		// when
+		List<FishingTripPostResponse.HotPostDto> result = fishingTripPostRepository.findHotPostDto(baseTime);
+
+		// then
+		assertThat(result).hasSize(5); // 상위 5개만
+		assertThat(result).extracting("subject").doesNotContain("오래된 게시글");
+		assertThat(result).extracting(FishingTripPostResponse.HotPostDto::fishingTripPostId)
+			.doesNotContain(savedOld.getFishingTripPostId());
+
+		List<Long> scores = result.stream().map(FishingTripPostResponse.HotPostDto::hotScore).toList();
+		List<Long> sorted = scores.stream().sorted(Comparator.reverseOrder()).toList();
+		assertThat(scores).isEqualTo(sorted);
+	}
 }
