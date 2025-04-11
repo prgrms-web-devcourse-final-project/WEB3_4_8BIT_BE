@@ -16,6 +16,7 @@ import com.backend.domain.reservationdate.converter.ReservationDateConverter;
 import com.backend.domain.reservationdate.entity.ReservationDate;
 import com.backend.domain.reservationdate.repository.ReservationDateRepository;
 import com.backend.domain.reservationdate.service.ReservationDateService;
+import com.backend.domain.review.repository.ReviewRepository;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
@@ -46,6 +47,7 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 	private final FishRepository fishRepository;
 	private final ShipRepository shipRepository;
+	private final ReviewRepository reviewRepository;
 	private final StorageRepository storageRepository;
 	private final ReservationRepository reservationRepository;
 	private final ShipFishingPostRepository shipFishingPostRepository;
@@ -155,6 +157,8 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 		reservationDateService.deleteReservationDateList(shipFishingPostId);
 
 		s3StorageService.deleteFilesByIdList(memberId, shipFishingPost.getFileIdList());
+
+		reviewRepository.deleteAllByShipFishingPostId(shipFishingPostId);
 	}
 
 	/**

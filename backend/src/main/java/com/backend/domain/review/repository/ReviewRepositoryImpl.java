@@ -20,7 +20,6 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 	private final ReviewJpaRepository reviewJpaRepository;
 	private final ReviewQueryRepository reviewQueryRepository;
 
-
 	@Override
 	public Review save(final Review review) {
 		return reviewJpaRepository.save(review);
@@ -73,5 +72,11 @@ public class ReviewRepositoryImpl implements ReviewRepository {
 	@Override
 	public void delete(final Review review) {
 		reviewJpaRepository.delete(review);
+	}
+
+	@Override
+	public void deleteAllByShipFishingPostId(final Long shipFishingPostId) {
+
+		reviewQueryRepository.deleteAllByShipFishingPostId(shipFishingPostId);
 	}
 }

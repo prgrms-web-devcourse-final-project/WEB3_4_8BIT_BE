@@ -1,11 +1,11 @@
 package com.backend.domain.review.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import com.backend.domain.review.dto.response.ReviewWithMemberResponse;
-import java.util.Optional;
-
 import com.backend.domain.review.entity.Review;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
@@ -100,4 +100,11 @@ public interface ReviewRepository {
 	 * @param review 삭제할 리뷰
 	 */
 	void delete(final Review review);
+
+	/**
+	 * 선상낚시게시글과 연관된 리뷰 전체 삭제
+	 *
+	 * @param shipFishingPostId 선상낚시게시글 ID
+	 */
+	void deleteAllByShipFishingPostId(final Long shipFishingPostId);
 }

@@ -116,6 +116,13 @@ public class ReviewQueryRepository {
 		return getReviewWithMemberResponseScrollResponse(cursor, limit, memberId, reviews);
 	}
 
+	public void deleteAllByShipFishingPostId(final Long shipFishingPostId) {
+
+		jpaQueryFactory.delete(review)
+			.where(review.shipFishingPostId.eq(shipFishingPostId))
+			.execute();
+	}
+
 	private ScrollResponse<ReviewWithMemberResponse> getReviewWithMemberResponseScrollResponse(
 		final GlobalRequest.CursorRequest cursor,
 		final int limit,
@@ -133,7 +140,8 @@ public class ReviewQueryRepository {
 
 	// 커서 조건 생성
 	private BooleanExpression cursorCondition(final GlobalRequest.CursorRequest cursor) {
-		if (cursor.fieldValue() == null || cursor.id() == null) return null;
+		if (cursor.fieldValue() == null || cursor.id() == null)
+			return null;
 
 		ZonedDateTime fieldTime = ZonedDateTime.parse(cursor.fieldValue());
 
