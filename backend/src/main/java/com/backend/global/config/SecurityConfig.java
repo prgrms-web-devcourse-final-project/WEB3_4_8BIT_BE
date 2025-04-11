@@ -81,7 +81,8 @@ public class SecurityConfig {
 						HttpMethod.GET,
 						"/api/v1/fishing-trip-post",
 						"/api/v1/fishing-trip-post/participation",
-						"/api/v1/fishing-trip-post/scroll"
+						"/api/v1/fishing-trip-post/scroll",
+						"/api/v1/fishing-trip-post/hot-post"
 					).permitAll()
 
 					.requestMatchers(HttpMethod.POST, "/api/v1/fishes/encyclopedias")
