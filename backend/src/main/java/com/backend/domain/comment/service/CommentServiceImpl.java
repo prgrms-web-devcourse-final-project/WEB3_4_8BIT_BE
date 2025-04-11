@@ -88,7 +88,7 @@ public class CommentServiceImpl implements CommentService {
 	) {
 		Comment getComment = getComment(commentId);
 
-		validMemberIdAndFishingTripPostId(memberId, fishingTripPostId, getComment);
+		validCommentAuthor(memberId, getComment);
 
 		getComment.setContent(requestDto.content());
 	}
@@ -102,7 +102,7 @@ public class CommentServiceImpl implements CommentService {
 	) {
 		Comment getComment = getComment(commentId);
 
-		validMemberIdAndFishingTripPostId(memberId, fishingTripPostId, getComment);
+		validCommentAuthor(memberId, getComment);
 
 		minusChildCount(getComment);
 
@@ -118,17 +118,9 @@ public class CommentServiceImpl implements CommentService {
 		}
 	}
 
-	private void validMemberIdAndFishingTripPostId(
-		final Long memberId,
-		final Long fishingTripPostId,
-		final Comment getComment
-	) {
+	private void validCommentAuthor(final Long memberId, final Comment getComment) {
 		if (!getComment.getMemberId().equals(memberId)) {
 			throw new CommentExpection(CommentErrorCode.COMMENT_UNAUTHORIZED_AUTHOR);
-		}
-
-		if (!getComment.getFishingTripPostId().equals(fishingTripPostId)) {
-			throw new CommentExpection(CommentErrorCode.FISHING_TRIP_ID_NOT_VALID);
 		}
 	}
 
