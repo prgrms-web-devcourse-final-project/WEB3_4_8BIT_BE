@@ -2,6 +2,7 @@ package com.backend.domain.activityhistory.repository;
 
 import static org.assertj.core.api.Assertions.*;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import net.jqwik.api.Arbitraries;
 import net.jqwik.api.Arbitrary;
@@ -34,6 +36,9 @@ import lombok.extern.slf4j.Slf4j;
 @DataJpaTest
 @Slf4j
 class ActivityHistoryRepositoryTest extends BaseTest {
+
+	@Autowired
+	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
 	private ActivityHistoryRepository activityHistoryRepository;
@@ -147,5 +152,64 @@ class ActivityHistoryRepositoryTest extends BaseTest {
 		assertThat(content).isNotEmpty();
 		assertThat(content).hasSize(1);
 		assertThat(content.get(0).activityType()).isEqualTo(ActivityType.RESERVATION);
+	}
+
+	@Test
+	@DisplayName("한달이 지난 데이터 ID 조회 [시간대 조회 검증] [Repository] - Success")
+	void t10() {
+		// Given
+		activityHistoryJpaRepository.deleteAll();
+
+		List<ActivityHistory> givenActivityHistory = fixtureMonkeyBuilder.giveMeBuilder(ActivityHistory.class)
+			.set("activityHistoryId", null)
+			.set("description", englishStringLength)
+			.set("activityType", ActivityType.FISH_ENCYCLOPEDIA)
+			.set("memberId", 1L)
+			.sampleList(5);
+
+		activityHistoryJpaRepository.saveAll(givenActivityHistory);
+
+		// 저장한 물고기 도감 데이터 전부 2시간 전으로 생성일 수정
+		jdbcTemplate.update(
+			"UPDATE activity_histories " +
+				"SET created_at = ? " +
+				"WHERE activity_history_id = ?",
+			ZonedDateTime.now().minusMonths(2),
+			1L);
+
+		// When
+		List<Long> activityHistoryIdsBeforeOneMonthList = activityHistoryRepository
+			.findActivityHistoryIdsBeforeOneMonth();
+
+		// Then
+		assertThat(activityHistoryIdsBeforeOneMonthList).hasSize(1);
+	}
+
+	@Test
+	@DisplayName("여러개의 ID 값으로 데이터 삭제 [Repository] - Success")
+	void t11() {
+		// Given
+		activityHistoryJpaRepository.deleteAll();
+
+		List<ActivityHistory> givenActivityHistory = fixtureMonkeyBuilder.giveMeBuilder(ActivityHistory.class)
+			.set("activityHistoryId", null)
+			.set("description", englishStringLength)
+			.set("activityType", ActivityType.FISH_ENCYCLOPEDIA)
+			.set("memberId", 1L)
+			.sampleList(5);
+
+		List<ActivityHistory> savedActivityHistoryList = activityHistoryJpaRepository.saveAll(givenActivityHistory);
+
+		List<Long> givenActivityHistoryIdList = savedActivityHistoryList.stream()
+			.map(ActivityHistory::getActivityHistoryId)
+			.toList();
+
+		// When
+		activityHistoryRepository.deleteByIdList(givenActivityHistoryIdList);
+
+		// Then
+		List<ActivityHistory> findAll = activityHistoryJpaRepository.findAll();
+
+		assertThat(findAll).isEmpty();
 	}
 }
