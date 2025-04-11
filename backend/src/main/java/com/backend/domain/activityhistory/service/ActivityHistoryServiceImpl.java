@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service;
 
 import com.backend.domain.activityhistory.converter.ActivityHistoryConverter;
 import com.backend.domain.activityhistory.domain.ActivityType;
+import com.backend.domain.activityhistory.dto.request.ActivityHistoryRequest;
+import com.backend.domain.activityhistory.dto.response.ActivityHistoryResponse;
 import com.backend.domain.activityhistory.entity.ActivityHistory;
 import com.backend.domain.activityhistory.repository.ActivityHistoryRepository;
 import com.backend.domain.activityhistory.util.ActivityDescriptionBuilder;
@@ -13,6 +15,8 @@ import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.reservation.entity.Reservation;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +39,16 @@ public class ActivityHistoryServiceImpl implements ActivityHistoryService {
 		}
 	}
 
+	@Override
+	public ScrollResponse<ActivityHistoryResponse.Detail> getDetailList(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final ActivityHistoryRequest.Search requestDto,
+		final Long memberId
+	) {
+
+		return activityHistoryRepository.findDetail(cursorRequestDto, requestDto, memberId);
+	}
+
 	private ActivityHistory getActivityHistory(final Object target) {
 		//물고기 도감 활동 기록 생성
 		if (target instanceof FishEncyclopedia fishEncyclopedia) {
@@ -54,7 +68,8 @@ public class ActivityHistoryServiceImpl implements ActivityHistoryService {
 			return ActivityHistoryConverter.from(
 				ActivityType.FISH_ENCYCLOPEDIA,
 				fishEncyclopedia.getFishEncyclopediaId(),
-				description
+				description,
+				fishEncyclopedia.getMemberId()
 			);
 		}
 
@@ -66,7 +81,8 @@ public class ActivityHistoryServiceImpl implements ActivityHistoryService {
 			return ActivityHistoryConverter.from(
 				ActivityType.FISHING_TRIP_POST,
 				fishingTripPost.getFishingTripPostId(),
-				subject
+				subject,
+				fishingTripPost.getMemberId()
 			);
 		}
 
@@ -81,7 +97,12 @@ public class ActivityHistoryServiceImpl implements ActivityHistoryService {
 
 			String description = ActivityDescriptionBuilder.createReservation(subject, reservationDate);
 
-			return ActivityHistoryConverter.from(ActivityType.RESERVATION, reservation.getReservationId(), description);
+			return ActivityHistoryConverter.from(
+				ActivityType.RESERVATION,
+				reservation.getReservationId(),
+				description,
+				reservation.getMemberId()
+			);
 		}
 
 		return null;

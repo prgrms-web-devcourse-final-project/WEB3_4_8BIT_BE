@@ -1,9 +1,13 @@
 package com.backend.domain.activityhistory.domain;
 
-import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.stream.Stream;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum ActivityType {
 	FISHING_TRIP_POST("동출 모집"),
@@ -12,8 +16,13 @@ public enum ActivityType {
 
 	private final String displayName;
 
-	@JsonValue
-	public String getDisplayName() {
-		return displayName;
+	@JsonCreator
+	public static ActivityType from(String param) {
+		return Stream.of(ActivityType.values())
+			.filter(a ->
+				a.name().equalsIgnoreCase(param) || a.getDisplayName().equalsIgnoreCase(param)
+			)
+			.findFirst()
+			.orElse(null);
 	}
 }
