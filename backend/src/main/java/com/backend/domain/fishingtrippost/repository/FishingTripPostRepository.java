@@ -140,7 +140,26 @@ public interface FishingTripPostRepository {
 	 * @param memberId 현재 로그인한 사용자의 ID (신청자 기준)
 	 * @return ScrollResponse 형태로 페이징 처리된 내가 신청한 게시글 목록 반환
 	 */
-	ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripPostDetailPage(
+	ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripRecruitmentDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus postStatus,
+		final Long memberId
+	);
+
+	/**
+	 * 내가 작성한 동출 게시글 목록을 커서 기반으로 조회하는 메서드입니다.
+	 *
+	 * <p>
+	 * 동출 모집 상태(PostStatus)가 주어진 조건과 일치하는 게시글만 조회되며,
+	 * 커서 기반 페이징을 통해 최신순 정렬로 데이터를 반환합니다.
+	 * </p>
+	 *
+	 * @param cursorRequestDto 커서 기반 페이징 요청 정보 (정렬 기준, 방향, 기준 값 등)
+	 * @param postStatus 조회할 게시글의 상태 (예: RECRUITING, COMPLETED 등)
+	 * @param memberId 현재 로그인한 회원의 ID
+	 * @return 내가 작성한 동출 게시글 목록의 스크롤 응답 (ScrollResponse)
+	 */
+	ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyPostFishingTripPostDetailPage(
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final PostStatus postStatus,
 		final Long memberId
