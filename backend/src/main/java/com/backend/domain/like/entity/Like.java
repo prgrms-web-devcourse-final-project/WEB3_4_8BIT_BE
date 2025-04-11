@@ -5,6 +5,8 @@ import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -43,6 +45,7 @@ public class Like extends BaseEntity {
 	private Long memberId;
 
 	@Column(nullable = false)
+	@Enumerated(EnumType.STRING)
 	private LikeTargetType targetType;
 
 	@Column(nullable = false)
