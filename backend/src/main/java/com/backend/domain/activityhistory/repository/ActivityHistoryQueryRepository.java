@@ -27,7 +27,9 @@ import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class ActivityHistoryQueryRepository {
@@ -80,6 +82,22 @@ public class ActivityHistoryQueryRepository {
 			cursorRequestDto.fieldValue() == null,
 			isLast
 		);
+	}
+
+	public List<Long> findActivityHistoryIdsBeforeOneMonth() {
+		// 현재 시간으로부터 1달 전 시간 계산
+		ZonedDateTime now = ZonedDateTime.now();
+		ZonedDateTime oneMonthAgo = now.minusMonths(1);
+
+		log.debug("검색 시간 조건: * ~ {}", oneMonthAgo);
+
+		//
+		return jpaQueryFactory
+			.select(activityHistory.activityHistoryId)
+			.from(activityHistory)
+			.where(activityHistory.createdAt.before(oneMonthAgo))
+			.groupBy(activityHistory.activityHistoryId)
+			.fetch();
 	}
 
 	private BooleanExpression whereCondition(
@@ -158,5 +176,11 @@ public class ActivityHistoryQueryRepository {
 			new OrderSpecifier<>(queryOrder, sortField),
 			new OrderSpecifier<>(Order.ASC, activityHistory.activityHistoryId)
 		};
+	}
+
+	public long deleteByIdList(final List<Long> activityHistoryidList) {
+		return jpaQueryFactory.delete(activityHistory)
+			.where(activityHistory.activityHistoryId.in(activityHistoryidList))
+			.execute();
 	}
 }
