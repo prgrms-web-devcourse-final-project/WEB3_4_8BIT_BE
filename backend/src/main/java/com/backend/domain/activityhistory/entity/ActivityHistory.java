@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
-@Table(name = "activity_historys")
+@Table(name = "activity_histories")
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -36,6 +36,9 @@ public class ActivityHistory extends BaseEntity {
 	@Column(nullable = false)
 	private Long targetId;
 
-	@Column(nullable = false, length = 100, columnDefinition = "TEXT")
+	@Column(nullable = false, length = 100)
 	private String description;
+
+	@Column(nullable = false)
+	private Long memberId;
 }
