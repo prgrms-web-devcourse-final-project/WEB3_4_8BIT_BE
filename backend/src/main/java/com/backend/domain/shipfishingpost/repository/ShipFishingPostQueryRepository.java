@@ -277,11 +277,11 @@ public class ShipFishingPostQueryRepository {
 			.execute();
 	}
 
-	public void updateLikeCount(final Long postId, final Long likeCount) {
-		jpaQueryFactory.update(shipFishingPost)
+	public boolean updateLikeCount(final Long postId, final Long likeCount) {
+		return jpaQueryFactory.update(shipFishingPost)
 			.set(shipFishingPost.likeCount, likeCount)
 			.where(shipFishingPost.shipFishingPostId.eq(postId))
-			.execute();
+			.execute() > 0;
 	}
 
 	private List<ShipFishingPostResponse.MyPagePostList> mapToMyPagePostList(
@@ -373,13 +373,6 @@ public class ShipFishingPostQueryRepository {
 				return ShipFishingPostResponse.DetailScroll.fromDetailScroll(dto, fileUrls, fishNames);
 			})
 			.collect(Collectors.toList());
-	}
-
-	public boolean updateLikeCount(final Long postId, final Long likeCount) {
-		return jpaQueryFactory.update(shipFishingPost)
-			.set(shipFishingPost.likeCount, likeCount)
-			.where(shipFishingPost.shipFishingPostId.eq(postId))
-			.execute() > 0;
 	}
 
 	public String findSubjectByShipFishingPostId(final Long shipFishingPostId) {
