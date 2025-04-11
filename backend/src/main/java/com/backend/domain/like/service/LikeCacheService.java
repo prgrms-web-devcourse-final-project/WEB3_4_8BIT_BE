@@ -51,8 +51,7 @@ public class LikeCacheService {
 
 	/**
 	 * 게시글 좋아요 수를 실시간 캐시로 업데이트한다.
-	 * - 좋아요를 누르면 캐시 +1
-	 * - 좋아요를 취소하면 캐시 -1
+	 * 좋아요를 누르면 캐시 +1, 취소하면 캐시 -1
 	 *
 	 * @param type     좋아요 대상 타입 (SHIP_FISHING_POST, FISHING_TRIP_POST)
 	 * @param targetId 좋아요 대상 ID
@@ -63,6 +62,22 @@ public class LikeCacheService {
 	public Long updateLikeCountCache(final LikeTargetType type, final Long targetId, final Boolean isLike) {
 		String key = buildKey(type, targetId); // like_count::TYPE::ID
 		return isLike ? redisUtil.increment(key) : redisUtil.decrement(key);
+	}
+
+	/**
+	 * 좋아요 수를 Redis 캐시에 초기화
+	 *
+	 * @param type     좋아요 대상 타입 (예: SHIP_FISHING_POST, FISHING_TRIP_POST)
+	 * @param targetId 좋아요 대상 ID
+	 */
+	public void initializeLikeCache(final LikeTargetType type, final Long targetId) {
+		String key = buildKey(type, targetId);
+		if (!redisUtil.hasKey(key)) {
+			Long count = likeRepository.countByTargetTypeAndTargetId(type, targetId);
+			redisUtil.setValue(key, count.toString());
+
+			log.debug("[LikeCache] 캐시 미존재 → DB 조회 후 저장: {} = {}", key, count);
+		}
 	}
 
 	/**
@@ -82,13 +97,21 @@ public class LikeCacheService {
 		validTargetTypeAndTargetId(targetType, targetId, exists);
 	}
 
+	/**
+	 * @param targetType 좋아요 대상 타입
+	 * @param targetId   좋아요 대상 ID
+	 * @param exists     게시글 존재 유무
+	 * @throws ShipFishingPostException 존재하지 않는 선상 낚시 게시글일 경우 예외 발생
+	 * @throws FishingTripPostException 존재하지 않는 동출 모집 게시글일 경우 예외 발생
+	 */
+
 	private void validTargetTypeAndTargetId(
 		final LikeTargetType targetType,
 		final Long targetId,
 		final boolean exists
 	) {
 		if (!exists) {
-			log.warn("[존재하지 않는 좋아요] 타입: {}, ID: {}", targetType, targetId);
+			log.warn("[존재하지 게시글] 타입: {}, ID: {}", targetType, targetId);
 			throw switch (targetType) {
 				case SHIP_FISHING_POST -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND);
 				case FISHING_TRIP_POST ->

@@ -78,9 +78,11 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 	}
 
 	@Override
-	public void updateLikeCount(final Long shipFishingPostId, final Long likeCount) {
+	public boolean updateLikeCount(final Long shipFishingPostId, final Long likeCount) {
 
 		shipFishingPostQueryRepository.updateLikeCount(shipFishingPostId, likeCount);
+    
+		return shipFishingPostQueryRepository.updateLikeCount(shipFishingPostId, likeCount);
 	}
 
 	@Override

@@ -1,13 +1,14 @@
 package com.backend.domain.fishingtrippost.repository;
 
 import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
+import static com.backend.domain.fishingtriprecruitment.entity.QFishingTripRecruitment.*;
 import static com.backend.domain.fishpoint.entity.QFishPoint.*;
 import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.domain.region.entity.QRegion.*;
+import static com.backend.global.storage.entity.QFile.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -16,25 +17,18 @@ import org.springframework.util.StringUtils;
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 
-import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
-import static com.backend.domain.fishingtriprecruitment.entity.QFishingTripRecruitment.*;
-import static com.backend.domain.member.entity.QMember.*;
-import static com.backend.domain.fishpoint.entity.QFishPoint.*;
-import static com.backend.domain.region.entity.QRegion.*;
-import static com.backend.global.storage.entity.QFile.*;
-
-import com.backend.domain.fishingtrippost.dto.response.QFishingTripPostResponse_DetailPage;
 import com.backend.domain.fishingtrippost.dto.response.QFishingTripPostResponse_DetailPageQueryDto;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.QuerydslUtil;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.ComparableExpressionBase;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -44,11 +38,6 @@ import lombok.RequiredArgsConstructor;
 public class FishingTripPostQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
-
-	//TODO 인기순 나중에 추가해야함
-	Map<String, ComparableExpressionBase<?>> FIELD_MAP = Map.of(
-		"createdAt", fishingTripPost.createdAt
-	);
 
 	public Optional<FishingTripPostResponse.DetailQueryDto> findDetailDtoById(final Long fishingTripPostId) {
 		return Optional.ofNullable(
@@ -68,7 +57,8 @@ public class FishingTripPostQueryRepository {
 					fishPoint.longitude,
 					fishPoint.latitude,
 					fishingTripPost.fileIdList,
-					fishingTripPost.postStatus
+					fishingTripPost.postStatus,
+					fishingTripPost.likeCount
 				))
 				.from(fishingTripPost)
 				.leftJoin(member).on(member.memberId.eq(fishingTripPost.memberId))
@@ -108,11 +98,11 @@ public class FishingTripPostQueryRepository {
 			.fetch();
 	}
 
-	public void updateLikeCount(final Long postId, final Long likeCount) {
-		jpaQueryFactory.update(fishingTripPost)
+	public boolean updateLikeCount(final Long postId, final Long likeCount) {
+		return jpaQueryFactory.update(fishingTripPost)
 			.set(fishingTripPost.likeCount, likeCount)
 			.where(fishingTripPost.fishingTripPostId.eq(postId))
-			.execute();
+			.execute() > 0;
 	}
 
 	private BooleanExpression whereCondition(final Long regionId,
@@ -197,7 +187,6 @@ public class FishingTripPostQueryRepository {
 		return fishingTripPost.memberId.eq(memberId);
 	}
 
-
 	private static BooleanExpression isParticipant(final Long memberId) {
 		if (memberId == null) {
 			return Expressions.FALSE.isTrue(); // 로그인 안 했으면 false
@@ -229,4 +218,96 @@ public class FishingTripPostQueryRepository {
 			)
 			.fetch();
 	}
+
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripRecruitmentDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus postStatus,
+		final Long memberId
+	) {
+		List<FishingTripPostResponse.MyFishingTripPostDetailPage> MyFishingTripPostDetailPage =
+			fetchMyFishingTripPostPages(ParticipationType.APPLICANT, cursorRequestDto, postStatus, memberId);
+
+		return createScrollResponse(MyFishingTripPostDetailPage, cursorRequestDto);
+	}
+
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyPostFishingTripPostDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus postStatus,
+		final Long memberId
+	) {
+		List<FishingTripPostResponse.MyFishingTripPostDetailPage> MyFishingTripPostDetailPage =
+			fetchMyFishingTripPostPages(ParticipationType.AUTHOR, cursorRequestDto, postStatus, memberId);
+
+		return createScrollResponse(MyFishingTripPostDetailPage, cursorRequestDto);
+	}
+
+	private ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> createScrollResponse(
+		final List<FishingTripPostResponse.MyFishingTripPostDetailPage> MyFishingTripPostDetailPage,
+		final GlobalRequest.CursorRequest cursorRequest
+	) {
+		boolean isLast = MyFishingTripPostDetailPage.size() <= cursorRequest.size();
+		if (!isLast)
+			MyFishingTripPostDetailPage.remove(MyFishingTripPostDetailPage.size() - 1);
+
+		return ScrollResponse.from(
+			MyFishingTripPostDetailPage,
+			cursorRequest.size(),
+			MyFishingTripPostDetailPage.size(),
+			cursorRequest.fieldValue() == null,
+			isLast
+		);
+	}
+
+	private List<FishingTripPostResponse.MyFishingTripPostDetailPage> fetchMyFishingTripPostPages(
+		final ParticipationType base,
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus postStatus,
+		final Long memberId
+	) {
+		BooleanExpression whereCondition = base == ParticipationType.APPLICANT
+			? fishingTripRecruitment.memberId.eq(memberId)
+			: fishingTripPost.memberId.eq(memberId);
+
+		JPAQuery<FishingTripPostResponse.MyFishingTripPostDetailPage> query = jpaQueryFactory
+			.select(Projections.constructor(
+				FishingTripPostResponse.MyFishingTripPostDetailPage.class,
+				fishingTripPost.fishingTripPostId,
+				fishingTripPost.subject,
+				fishingTripPost.fishingPointId,
+				fishPoint.fishPointName,
+				fishPoint.fishPointDetailName,
+				fishingTripPost.fishingDate,
+				fishingTripPost.createdAt,
+				fishingTripPost.currentCount,
+				fishingTripPost.recruitmentCount,
+				fishingTripPost.postStatus,
+				fishingTripPost.commentCount,
+				fishingTripPost.likeCount
+			));
+
+		if (base == ParticipationType.APPLICANT) {
+			query.from(fishingTripRecruitment)
+				.innerJoin(fishingTripPost)
+				.on(fishingTripRecruitment.fishingTripPostId.eq(fishingTripPost.fishingTripPostId));
+		} else {
+			query.from(fishingTripPost);
+		}
+
+		query.leftJoin(fishPoint).on(fishPoint.fishPointId.eq(fishingTripPost.fishingPointId))
+			.where(
+				whereCondition,
+				fishingTripPost.postStatus.eq(postStatus),
+				cursorCondition(cursorRequestDto)
+			)
+			.orderBy(getOrderBy(cursorRequestDto))
+			.limit(cursorRequestDto.size() + 1);
+
+		return query.fetch();
+	}
+
+	private enum ParticipationType {
+		AUTHOR,
+		APPLICANT
+	}
+
 }

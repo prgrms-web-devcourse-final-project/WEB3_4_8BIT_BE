@@ -12,6 +12,7 @@ import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -47,6 +48,7 @@ public class Like extends BaseEntity {
 	@Column(nullable = false)
 	private Long targetId;
 
+	@Builder.Default
 	@Column(nullable = false)
 	private Boolean isDeleted = false;
 

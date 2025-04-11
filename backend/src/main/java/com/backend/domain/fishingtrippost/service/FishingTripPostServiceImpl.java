@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.backend.domain.activityhistory.service.ActivityHistoryService;
 import com.backend.domain.chat.room.entity.TargetType;
 import com.backend.domain.chat.room.service.RoomService;
+import com.backend.domain.comment.repository.CommentRepository;
 import com.backend.domain.fishingtrippost.converter.FishingTripPostConverter;
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
@@ -52,6 +53,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final FishingTripPostNotifier fishingTripPostNotifier;
 	private final LikeRepository likeRepository;
 	private final FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
+	private final CommentRepository commentRepository;
 
 	private static final LikeTargetType TARGET_TYPE = LikeTargetType.FISHING_TRIP_POST;
 
@@ -128,10 +130,9 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 		List<String> fileUrlList = getFileUrlList(detailQueryDto);
 
-		Long likeCount = getLikeCount(fishingTripPostId);
 		boolean isLiked = getIsLiked(memberId, fishingTripPostId);
 
-		return FishingTripPostConverter.toDetail(detailQueryDto, fileUrlList, likeCount, isLiked);
+		return FishingTripPostConverter.toDetail(detailQueryDto, fileUrlList, isLiked);
 	}
 
 	@Override
@@ -190,10 +191,29 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	public void delete(final Long memberId, final Long fishingTripPostId) {
 
 		FishingTripPost fishingTripPost = getFishingTripPostById(fishingTripPostId);
-		validAuthor(fishingTripPost,memberId);
+		validAuthor(fishingTripPost, memberId);
 
 		fishingTripRecruitmentRepository.deleteAllByPostId(fishingTripPostId);
 		fishingTripPostRepository.delete(fishingTripPost);
+		commentRepository.deleteByFishingTripPostId(fishingTripPostId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> getMyFishingTripPostDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long memberId,
+		final PostStatus postStatus) {
+		return fishingTripPostRepository.findMyFishingTripRecruitmentDetailPage(cursorRequestDto, postStatus, memberId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> getMyPostFishingTripPostDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long memberId,
+		final PostStatus postStatus) {
+		return fishingTripPostRepository.findMyPostFishingTripPostDetailPage(cursorRequestDto, postStatus, memberId);
 	}
 
 	/**
@@ -209,20 +229,6 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private boolean getIsLiked(final Long memberId, final Long fishingTripPostId) {
 		return (memberId != null) &&
 			likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, TARGET_TYPE, fishingTripPostId);
-	}
-
-	/**
-	 * 해당 게시글에 등록된 총 '좋아요' 수를 조회합니다.
-	 *
-	 * <p>{@link LikeRepository}를 통해 게시글 ID 기반으로 좋아요 개수를 계산합니다.</p>
-	 *
-	 * @param fishingTripPostId 대상 게시글의 ID
-	 * @return 게시글에 눌린 총 좋아요 수
-	 */
-	private Long getLikeCount(final Long fishingTripPostId) {
-		return likeRepository.countByTargetTypeAndTargetId(
-			TARGET_TYPE, fishingTripPostId
-		);
 	}
 
 	/**

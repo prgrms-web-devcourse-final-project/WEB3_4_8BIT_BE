@@ -98,13 +98,13 @@ public class FishingTripPostController {
 	@Parameter(name = "keyword", description = "제목 키워드 검색", example = "해적")
 	@Parameter(name = "status", description = "게시글 상태 (예: RECRUITING, COMPLETED)", example = "RECRUITING")
 	public ResponseEntity<GenericResponse<ScrollResponse<FishingTripPostResponse.DetailPage>>> getFishingTripPostPages(
-		@Valid final GlobalRequest.CursorRequest cursorRequest,
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
 		@RequestParam(required = false) final PostStatus status,
 		@RequestParam(required = false) final Long regionId,
 		@RequestParam(required = false) final String keyword
 	) {
 		ScrollResponse<FishingTripPostResponse.DetailPage> responseDto =
-			fishingTripPostService.getDetailPage(cursorRequest, status, regionId, keyword);
+			fishingTripPostService.getDetailPage(cursorRequestDto, status, regionId, keyword);
 
 		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
 	}
@@ -138,5 +138,39 @@ public class FishingTripPostController {
 	) {
 		fishingTripPostService.delete(user.getId(), fishingTripPostId);
 		return ResponseEntity.ok(GenericResponse.of(true));
+	}
+
+	@GetMapping("/my-participate")
+	@Operation(
+		summary = "내가 신청한 동출 모집글 스크롤 조회",
+		description = "로그인한 사용자가 신청한 동출 모집글을 상태 기준으로 조회하는 API"
+	)
+	@Parameter(name = "status", required = true, description = "게시글 상태 ", example = "RECRUITING")
+	public ResponseEntity<GenericResponse<ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage>>> getMyParticipatedFishingTripPosts(
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
+		@RequestParam final PostStatus status
+	) {
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> responseDto =
+			fishingTripPostService.getMyFishingTripPostDetailPage(cursorRequestDto, user.getId(), status);
+
+		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
+	}
+
+	@GetMapping("/my-post")
+	@Operation(
+		summary = "내가 작성한 동출 모집글 스크롤 조회",
+		description = "로그인한 사용자가 작성한 동출 모집글을 상태 기준으로 조회하는 API"
+	)
+	@Parameter(name = "status", required = true, description = "게시글 상태", example = "RECRUITING")
+	public ResponseEntity<GenericResponse<ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage>>> getMyPostedFishingTripPosts(
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
+		@RequestParam final PostStatus status
+	) {
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> responseDto =
+			fishingTripPostService.getMyPostFishingTripPostDetailPage(cursorRequestDto, user.getId(), status);
+
+		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
 	}
 }

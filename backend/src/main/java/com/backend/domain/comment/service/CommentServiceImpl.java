@@ -10,6 +10,7 @@ import com.backend.domain.comment.entity.Comment;
 import com.backend.domain.comment.exception.CommentErrorCode;
 import com.backend.domain.comment.exception.CommentExpection;
 import com.backend.domain.comment.repository.CommentRepository;
+import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
 import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
@@ -35,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
 		final CommentRequest.Create requestDto
 	) {
 
-		boolean existsByfishingTripPostId = existsByfishingTripPostId(fishingTripPostId);
+		boolean existsByfishingTripPostId = existsByFishingTripPostId(fishingTripPostId);
 
 		validFishingTripPostId(existsByfishingTripPostId);
 
@@ -47,10 +48,17 @@ public class CommentServiceImpl implements CommentService {
 
 		Comment comment = CommentConverter.fromCommentRequestCreate(requestDto, memberId, fishingTripPostId);
 		Comment savedComment = commentRepository.save(comment);
-
 		log.debug("댓글 저장: {}", savedComment);
 
+		FishingTripPost fishingTripPost = getFishingTripPostById(fishingTripPostId);
+		fishingTripPost.plusCommentCount();
+
 		return savedComment.getCommentId();
+	}
+
+	private FishingTripPost getFishingTripPostById(Long fishingTripPostId) {
+		return fishingTripPostRepository.findById(fishingTripPostId)
+			.orElseThrow(() -> new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND));
 	}
 
 	@Override
@@ -83,6 +91,31 @@ public class CommentServiceImpl implements CommentService {
 		validMemberIdAndFishingTripPostId(memberId, fishingTripPostId, getComment);
 
 		getComment.setContent(requestDto.content());
+	}
+
+	@Override
+	@Transactional
+	public void deleteComment(
+		final Long memberId,
+		final Long commentId,
+		final Long fishingTripPostId
+	) {
+		Comment getComment = getComment(commentId);
+
+		validMemberIdAndFishingTripPostId(memberId, fishingTripPostId, getComment);
+
+		minusChildCount(getComment);
+
+		long deleteCount = commentRepository.deleteByParentId(commentId);
+
+		FishingTripPost fishingTripPost = getFishingTripPostById(fishingTripPostId);
+		fishingTripPost.minusCommentCount(deleteCount);
+	}
+
+	private void minusChildCount(final Comment getComment) {
+		if (getComment.getParentId() != null) {
+			commentRepository.minusChildCount(getComment.getParentId());
+		}
 	}
 
 	private void validMemberIdAndFishingTripPostId(
@@ -120,7 +153,7 @@ public class CommentServiceImpl implements CommentService {
 		return commentRepository.existsByCommentId(parentId);
 	}
 
-	private boolean existsByfishingTripPostId(final Long fishingTripPostId) {
+	private boolean existsByFishingTripPostId(final Long fishingTripPostId) {
 		return fishingTripPostRepository.existsById(fishingTripPostId);
 	}
 }

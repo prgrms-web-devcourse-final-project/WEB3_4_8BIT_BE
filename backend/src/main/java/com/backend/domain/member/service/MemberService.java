@@ -37,4 +37,12 @@ public interface MemberService {
 	 * @implSpec 회원 ID로 회원 엔티티를 조회한 후, 엔티티의 수정 메소드를 통해 회원 정보를 갱신한다.
 	 */
 	Long updateMember(final Long memberId, final MemberRequest.Form requestDto);
+
+	/**
+	 * 회원 프로필 이미지를 가져오는 메소드
+	 *
+	 * @param memberId 프로필 이미지를 가져올 회원 ID
+	 * @return	회원의 프로필 이미지 URL
+	 */
+	MemberResponse.ChatProfile getChatProfile(final Long memberId);
 }

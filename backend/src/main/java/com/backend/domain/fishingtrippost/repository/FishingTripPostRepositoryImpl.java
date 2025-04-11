@@ -9,6 +9,7 @@ import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,13 +51,29 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	}
 
 	@Override
-	public void updateLikeCount(final Long fishingTripPostId, final Long likeCount) {
-		fishingTripPostQueryRepository.updateLikeCount(fishingTripPostId, likeCount);
+	public boolean updateLikeCount(final Long fishingTripPostId, final Long likeCount) {
+		return fishingTripPostQueryRepository.updateLikeCount(fishingTripPostId, likeCount);
 	}
 
 	@Override
 	public void delete(final FishingTripPost fishingTripPost) {
 		fishingTripPostJpaRepository.delete(fishingTripPost);
+	}
+
+	@Override
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripRecruitmentDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus postStatus,
+		final Long memberId) {
+		return fishingTripPostQueryRepository.findMyFishingTripRecruitmentDetailPage(cursorRequestDto, postStatus,
+			memberId);
+	}
+
+	@Override
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyPostFishingTripPostDetailPage(
+		GlobalRequest.CursorRequest cursorRequestDto, PostStatus postStatus, Long memberId) {
+		return fishingTripPostQueryRepository.findMyPostFishingTripPostDetailPage(cursorRequestDto, postStatus,
+			memberId);
 	}
 
 	@Override
@@ -71,5 +88,4 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 		final Long fishingTripPostId) {
 		return fishingTripPostQueryRepository.findApprovedParticipants(fishingTripPostId);
 	}
-
 }
