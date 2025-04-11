@@ -79,7 +79,7 @@ public class FishingTripPostResponse {
 		Double latitude,
 		List<Long> fileIdList,
 		PostStatus postStatus,
-		Long likes
+		Long likeCount
 	) {
 		@QueryProjection
 		public DetailQueryDto {
@@ -118,8 +118,9 @@ public class FishingTripPostResponse {
 	 * @param recruitmentCount 모집 정원
 	 * @param postStatus 게시글 상태
 	 * @param imageUrl 대표 이미지 URL
+	 * @param commentCount 댓글수
+	 * @param likeCount 좋아요수
 	 */
-	//TODO 좋아요랑 댓글수도 추가해야함 추후에
 	@Builder
 	public record DetailPage(
 		Long fishingTripPostId,
@@ -131,7 +132,9 @@ public class FishingTripPostResponse {
 		ZonedDateTime createdAt,
 		Integer recruitmentCount,
 		PostStatus postStatus,
-		String imageUrl
+		String imageUrl,
+		Long commentCount,
+		Long likeCount
 	) {
 		@QueryProjection
 		public DetailPage {
@@ -158,7 +161,9 @@ public class FishingTripPostResponse {
 		ZonedDateTime createdAt,
 		Integer recruitmentCount,
 		PostStatus postStatus,
-		List<Long> fileIdList
+		List<Long> fileIdList,
+		Long commentCount,
+		Long likeCount
 	) {
 		@QueryProjection
 		public DetailPageQueryDto {
