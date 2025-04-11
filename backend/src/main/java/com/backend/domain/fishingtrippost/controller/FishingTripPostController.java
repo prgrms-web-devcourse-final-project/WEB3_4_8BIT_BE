@@ -1,6 +1,7 @@
 package com.backend.domain.fishingtrippost.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -173,4 +174,15 @@ public class FishingTripPostController {
 
 		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
 	}
+
+	@GetMapping("/hot-post")
+	@Operation(
+		summary = "HOT 동출 모집글 조회",
+		description = "최근 5일 내 작성된 동출 모집글 중 댓글 + 좋아요 수를 기준으로 인기글 상위 5개를 조회하는 api"
+	)
+	public ResponseEntity<GenericResponse<List<FishingTripPostResponse.HotPost>>> getHotFishingTripPosts() {
+		List<FishingTripPostResponse.HotPost> response = fishingTripPostService.getHotPost();
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
+
 }
