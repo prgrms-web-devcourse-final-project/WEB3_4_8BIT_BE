@@ -82,7 +82,7 @@ public class CommentController {
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		commentService.updateComment(fishingTripPostId, commentId, user.getId(), requestDto);
+		commentService.updateComment(user.getId(), commentId, fishingTripPostId, requestDto);
 
 		return ResponseEntity.ok(GenericResponse.of(true));
 	}
@@ -96,7 +96,7 @@ public class CommentController {
 		@PathVariable final Long commentId,
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
-		commentService.deleteComment(fishingTripPostId, commentId, user.getId());
+		commentService.deleteComment( user.getId(), commentId, fishingTripPostId);
 
 		return ResponseEntity.ok(GenericResponse.of(true));
 	}
