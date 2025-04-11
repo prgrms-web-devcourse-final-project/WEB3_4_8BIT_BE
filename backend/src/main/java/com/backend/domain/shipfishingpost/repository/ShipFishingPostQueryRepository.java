@@ -183,23 +183,28 @@ public class ShipFishingPostQueryRepository {
 
 	public List<ShipFishingPostResponse.MainPageHotPost> findMainPageHotPostListWithSize(final int size) {
 
-		List<ShipFishingPostResponse.MainPageQueryDto> MainPageList = jpaQueryFactory
+		return jpaQueryFactory
 			.select(Projections.constructor(
-				ShipFishingPostResponse.MainPageQueryDto.class,
+				ShipFishingPostResponse.MainPageHotPost.class,
 				shipFishingPost.shipFishingPostId,
 				shipFishingPost.subject,
 				shipFishingPost.startTime,
 				shipFishingPost.endTime,
-				shipFishingPost.fishIdList,
 				shipFishingPost.location,
 				shipFishingPost.reviewEverRate
 			))
+			.distinct()
 			.from(shipFishingPost)
+			.leftJoin(reservationDate1)
+			.on(reservationDate1.shipFishingPostId.eq(shipFishingPost.shipFishingPostId)
+				.and(reservationDateCondition(LocalDate.now())))
+			.where(
+				Expressions.allOf(
+					shipFishingPost.startTime.gt(LocalTime.now()),
+					searchDateCondition(LocalDate.now())))
 			.orderBy(shipFishingPost.reviewEverRate.desc())
 			.limit(size)
 			.fetch();
-
-		return mapToMainPageHotPostList(MainPageList);
 	}
 
 	public void updateReviewEverRate(final ZonedDateTime now, final ZonedDateTime lastRun) {
@@ -277,39 +282,6 @@ public class ShipFishingPostQueryRepository {
 			.set(shipFishingPost.likeCount, likeCount)
 			.where(shipFishingPost.shipFishingPostId.eq(postId))
 			.execute();
-	}
-
-	private List<ShipFishingPostResponse.MainPageHotPost> mapToMainPageHotPostList(
-		List<ShipFishingPostResponse.MainPageQueryDto> MainPageDtoList
-	) {
-		Set<Long> fishIdList = MainPageDtoList.stream()
-			.flatMap(dto -> {
-				List<Long> ids = dto.fishIdList();
-				return (ids == null ? List.<Long>of() : ids).stream();
-			})
-			.collect(Collectors.toSet());
-
-		Map<Long, String> fishNameMap = jpaQueryFactory
-			.select(fish.fishId, fish.name)
-			.from(fish)
-			.where(fish.fishId.in(fishIdList))
-			.fetch()
-			.stream()
-			.collect(Collectors.toMap(
-				tuple -> tuple.get(fish.fishId),
-				tuple -> tuple.get(fish.name)
-			));
-
-		return MainPageDtoList.stream()
-			.map(dto -> {
-				List<String> fishNames = Stream.ofNullable(dto.fishIdList())
-					.flatMap(Collection::stream)
-					.map(fishNameMap::get)
-					.filter(Objects::nonNull)
-					.collect(Collectors.toList());
-				return ShipFishingPostResponse.MainPageHotPost.fromMainPageHotPostList(dto, fishNames);
-			})
-			.collect(Collectors.toList());
 	}
 
 	private List<ShipFishingPostResponse.MyPagePostList> mapToMyPagePostList(
@@ -485,6 +457,14 @@ public class ShipFishingPostQueryRepository {
 	private BooleanExpression reservationDateCondition(final LocalDate searchDate) {
 
 		return searchDate == null ? null : reservationDate1.reservationDate.eq(searchDate);
+	}
+
+	private BooleanExpression startTimeCondition(final LocalDate searchDate) {
+		if (searchDate == null || searchDate.isEqual(LocalDate.now())) {
+			return null;
+		}
+
+		return shipFishingPost.startTime.gt(LocalTime.now());
 	}
 
 	// 물고기 검증 : JSON_CONTAINS 고려
