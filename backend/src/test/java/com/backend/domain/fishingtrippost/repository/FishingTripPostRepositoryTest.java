@@ -502,7 +502,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 		// when
 		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> response =
-			fishingTripPostRepository.findMyFishingTripPostDetailPage(cursorRequest, PostStatus.RECRUITING,
+			fishingTripPostRepository.findMyFishingTripRecruitmentDetailPage(cursorRequest, PostStatus.RECRUITING,
 				applicant.getMemberId());
 
 		// then
@@ -514,4 +514,49 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			assertThat(item.postStatus()).isEqualTo(PostStatus.RECRUITING)
 		);
 	}
+
+	@Test
+	@DisplayName("내가 작성한 동출 게시글 목록 커서 기반 조회 [Repository] - Success")
+	void t09() {
+		// given
+		Member author = memberRepository.save(memberArbitraryBuilder
+			.set("email", UUID.randomUUID() + "@example.com")
+			.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8).replaceAll("[^0-9]", "3"))
+			.set("providerId", UUID.randomUUID().toString())
+			.sample());
+
+		FishPoint fishPoint = fishPointRepository.save(createRandomFishPoint());
+
+		List<FishingTripPost> posts = fishingTripPostArbitraryBuilder
+			.set("memberId", author.getMemberId())
+			.set("fishingPointId", fishPoint.getFishPointId())
+			.sampleList(3);
+
+		fishingTripPostJpaRepository.saveAll(posts);
+
+		posts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+		FishingTripPost cursorBase = posts.get(0);
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			"desc", "createdAt", "next",
+			cursorBase.getCreatedAt().toString(),
+			cursorBase.getFishingTripPostId(),
+			10
+		);
+
+		// when
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> response =
+			fishingTripPostRepository.findMyPostFishingTripPostDetailPage(cursorRequest, PostStatus.RECRUITING,
+				author.getMemberId());
+
+		// then
+		assertThat(response).isNotNull();
+		assertThat(response.content()).isNotEmpty();
+		assertThat(response.content()).extracting("fishingTripPostId")
+			.doesNotContain(cursorBase.getFishingTripPostId());
+		assertThat(response.content()).allSatisfy(item ->
+			assertThat(item.postStatus()).isEqualTo(PostStatus.RECRUITING)
+		);
+	}
+
 }
