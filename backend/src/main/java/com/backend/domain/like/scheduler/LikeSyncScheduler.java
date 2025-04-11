@@ -54,7 +54,7 @@ public class LikeSyncScheduler {
 			boolean isUpdated = updateLikeCountToDB(type, targetId, redisLikeCount);
 
 			if (isUpdated) {
-				log.debug("[Like 동기화 완료] {} (ID: {}) → {}개", type, targetId, redisLikeCount);
+				log.info("[Like 동기화 완료] 대상: {}, 좋아요 수: {}", key, redisLikeCount);
 				redisUtil.deleteKeyIfExists(key);
 			} else {
 				log.warn("[Like 동기화 실패] 존재하지 않는 {} 게시글 (ID: {})", type, targetId);
