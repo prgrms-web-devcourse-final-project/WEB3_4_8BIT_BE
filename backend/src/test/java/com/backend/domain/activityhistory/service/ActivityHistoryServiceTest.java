@@ -2,6 +2,9 @@ package com.backend.domain.activityhistory.service;
 
 import static org.mockito.Mockito.*;
 
+import java.util.List;
+
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,6 +12,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.activityhistory.dto.request.ActivityHistoryRequest;
+import com.backend.domain.activityhistory.dto.response.ActivityHistoryResponse;
 import com.backend.domain.activityhistory.entity.ActivityHistory;
 import com.backend.domain.activityhistory.repository.ActivityHistoryRepository;
 import com.backend.domain.fish.repository.FishRepository;
@@ -17,6 +22,8 @@ import com.backend.domain.fishingtrippost.entity.FishingTripPost;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.reservation.entity.Reservation;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
+import com.backend.global.dto.request.GlobalRequest;
+import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,5 +98,42 @@ class ActivityHistoryServiceTest extends BaseTest {
 
 		// Then
 		verify(activityHistoryRepository, times(1)).save(any(ActivityHistory.class));
+	}
+
+	@Test
+	@DisplayName("활동 내역 전체 조회 [Service] Success")
+	void t04() {
+		Long givenMemberId = 1L;
+
+		GlobalRequest.CursorRequest givenCursorRequestDto = new GlobalRequest.CursorRequest(
+			null,
+			null,
+			null,
+			null,
+			null,
+			10
+		);
+
+		ActivityHistoryRequest.Search givenRequestDto = new ActivityHistoryRequest.Search(null);
+
+		List<ActivityHistoryResponse.Detail> givenDetailList = fixtureMonkeyRecord
+			.giveMeBuilder(ActivityHistoryResponse.Detail.class)
+			.sampleList(10);
+
+		ScrollResponse<ActivityHistoryResponse.Detail> givenScrollResponse = fixtureMonkeyRecord
+			.giveMeBuilder(ScrollResponse.class)
+			.set("content", givenDetailList)
+			.sample();
+
+		when(activityHistoryRepository.findDetail(givenCursorRequestDto, givenRequestDto, givenMemberId))
+			.thenReturn(givenScrollResponse);
+
+		// When
+		ScrollResponse<ActivityHistoryResponse.Detail> detailList = activityHistoryService.getDetailList(
+			givenCursorRequestDto, givenRequestDto, givenMemberId);
+
+		// Then
+		Assertions.assertThat(detailList).isEqualTo(givenScrollResponse);
+
 	}
 }
