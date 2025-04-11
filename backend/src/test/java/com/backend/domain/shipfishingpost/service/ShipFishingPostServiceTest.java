@@ -394,7 +394,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 	}
 
 	@Test
-	@DisplayName("선상 낚시 게시글 업데이트 [Service] - false")
+	@DisplayName("선상 낚시 게시글 업데이트 [Service] - Fail")
 	void t12() {
 		Long givenShipFishingPostId = 1L;
 		Long givenMemberId = 1L;
@@ -433,5 +433,25 @@ public class ShipFishingPostServiceTest extends BaseTest {
 				givenUpdateDto, givenMemberId))
 			.isInstanceOf(ShipFishingPostException.class)
 			.hasMessageContaining(ShipFishingPostErrorCode.POSTS_CAPACITY_EXCEEDED.getMessage());
+	}
+
+	@Test
+	@DisplayName("선상 낚시 게시글 메인 페이지 조회 [Service] - Success")
+	void t13() {
+		// Given
+		int givenSize = 3;
+
+		List<ShipFishingPostResponse.MainPageHotPost> givenResponseDto = fixtureMonkeyBuilder
+			.giveMeBuilder(ShipFishingPostResponse.MainPageHotPost.class)
+			.sampleList(givenSize);
+
+		// When
+		when(shipFishingPostServiceImpl.getMainPageHotShipFishingPostList(givenSize)).thenReturn(givenResponseDto);
+
+		// Then
+		List<ShipFishingPostResponse.MainPageHotPost> findResponseDto = shipFishingPostServiceImpl
+			.getMainPageHotShipFishingPostList(givenSize);
+
+		assertThat(findResponseDto).hasSize(givenSize);
 	}
 }
