@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.activityhistory.service.ActivityHistoryService;
 import com.backend.domain.reservation.dto.response.ReservationResponse;
 import com.backend.domain.reservation.exception.ReservationErrorCode;
 import com.backend.domain.reservation.exception.ReservationException;
@@ -25,6 +26,9 @@ import com.backend.global.util.BaseTest;
 
 @ExtendWith(MockitoExtension.class)
 public class ReservationServiceTest extends BaseTest {
+
+	@Mock
+	private ActivityHistoryService activityHistoryService;
 
 	@Mock
 	private ReservationRepository reservationRepository;

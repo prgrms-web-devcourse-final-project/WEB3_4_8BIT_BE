@@ -129,11 +129,13 @@ public class ShipRepositoryTest extends BaseTest {
 		List<Ship> givenShip1 = arbitraryBuilder
 			.set("shipId", null)
 			.set("memberId", givenMemberId)
+			.set("shipNumber", englishStringLength)
 			.sampleList(5);
 
 		List<Ship> givenShip2 = arbitraryBuilder
 			.set("shipId", null)
 			.set("memberId", 2L)
+			.set("shipNumber", englishStringLength)
 			.sampleList(7);
 
 		List<Ship> savedShip1 = shipJpaRepository.saveAll(givenShip1);

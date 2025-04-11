@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.activityhistory.service.ActivityHistoryService;
 import com.backend.domain.catchmaxlength.converter.CatchMaxLengthConvert;
 import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
 import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
@@ -31,6 +32,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
+
+	private final ActivityHistoryService activityHistoryService;
 
 	private final FishEncyclopediaRepository fishEncyclopediaRepository;
 	private final FishPointRepository fishPointRepository;
@@ -74,6 +77,8 @@ public class FishEncyclopediaServiceImpl implements FishEncyclopediaService {
 		FishEncyclopedia savedFishEncyclopedia = fishEncyclopediaRepository.createFishEncyclopedia(fishEncyclopedia);
 
 		log.debug("물고기 도감 저장: {}", savedFishEncyclopedia);
+
+		activityHistoryService.createActivityHistory(savedFishEncyclopedia);
 
 		return savedFishEncyclopedia.getFishEncyclopediaId();
 	}
