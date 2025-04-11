@@ -57,4 +57,9 @@ public class FishRepositoryImpl implements FishRepository {
 	public List<FishResponse.Summary> findFishSummaryById(final List<Long> fishIdList) {
 		return fishQueryRepository.findSummaryById(fishIdList);
 	}
+
+	@Override
+	public String findNameById(final Long fishId) {
+		return fishQueryRepository.findNameById(fishId);
+	}
 }

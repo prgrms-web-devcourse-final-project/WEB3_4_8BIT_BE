@@ -85,4 +85,11 @@ public interface FishRepository {
 	 * @implSpec 물고기 ID 에 따른 요약 정보 목록 반환
 	 */
 	List<FishResponse.Summary> findFishSummaryById(final List<Long> fishIdList);
+
+	/**
+	 * 물고기 ID와 일치하는 물고기 이름 조회 메소드
+	 * @param fishId 물고기 ID
+	 * @return {@link String} 물고기 이름
+	 */
+	String findNameById(final Long fishId);
 }
