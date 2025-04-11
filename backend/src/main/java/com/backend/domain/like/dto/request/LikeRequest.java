@@ -4,6 +4,7 @@ import com.backend.domain.like.domain.LikeTargetType;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 
 /**
  * 좋아요 요청 DTO
@@ -18,6 +19,7 @@ import jakarta.validation.constraints.NotNull;
  * @param targetType 좋아요 대상 타입 (SHIP_FISHING_POST, FISHING_TRIP_POST) (필수)
  * @param targetId   좋아요 대상 ID (필수)
  */
+@Builder
 public record LikeRequest(
 
 	@NotNull(message = "대상 타입은 필수입니다.")

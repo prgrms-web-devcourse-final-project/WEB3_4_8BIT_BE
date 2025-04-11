@@ -88,8 +88,17 @@ public interface FishRepository {
 
 	/**
 	 * 물고기 ID와 일치하는 물고기 이름 조회 메소드
+	 *
 	 * @param fishId 물고기 ID
 	 * @return {@link String} 물고기 이름
 	 */
 	String findNameById(final Long fishId);
+
+	/**
+	 * 여러 물고기 ID에 대한 이름 리스트 조회
+	 *
+	 * @param fishIdList 물고기 ID 리스트
+	 * @return 물고기 이름 리스트
+	 */
+	List<String> findFishNameListByIdList(final List<Long> fishIdList);
 }

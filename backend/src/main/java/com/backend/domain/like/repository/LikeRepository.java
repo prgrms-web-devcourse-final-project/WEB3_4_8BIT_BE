@@ -1,9 +1,12 @@
 package com.backend.domain.like.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.backend.domain.like.domain.LikeTargetType;
+import com.backend.domain.like.dto.response.LikeResponse;
 import com.backend.domain.like.entity.Like;
+import com.backend.global.dto.request.GlobalRequest;
 
 public interface LikeRepository {
 
@@ -95,4 +98,41 @@ public interface LikeRepository {
 	 * @implSpec 소프트 삭제된 좋아요를 DB에서 완전히 제거
 	 */
 	int deleteAllSoftDeletedLikes();
+
+	/**
+	 * 로그인한 사용자가 좋아요를 누른 낚시 동행 게시글 목록을 커서 기반으로 조회합니다.
+	 *
+	 * <p>정렬 기준은 좋아요를 누른 시점(like.createdAt)이며, ID(likeId)를 보조 커서로 사용합니다.
+	 * 커서 기반 페이징을 통해 최신순으로 정렬된 좋아요 게시글을 효율적으로 조회할 수 있습니다.</p>
+	 *
+	 * <p>응답은 {@link LikeResponse.FishingTripPostLikedQueryDto} 형태로,
+	 * 게시글의 요약 정보 및 대표 이미지 ID 리스트를 포함합니다.</p>
+	 *
+	 * @param cursorRequestDto 커서 기반 페이지네이션 요청 정보 (정렬 방향, 커서 값 등)
+	 * @param memberId         로그인한 사용자 ID
+	 * @return 커서 기반 페이징된 좋아요 게시글 리스트
+	 */
+	List<LikeResponse.FishingTripPostLikedQueryDto> getFishingTripPostLikedDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long memberId
+	);
+
+	/**
+	 * 로그인한 사용자가 좋아요를 누른 선상 낚시 게시글 목록을 커서 기반으로 조회합니다.
+	 *
+	 * <p>정렬 기준은 좋아요를 누른 시점(like.createdAt)이며, ID(likeId)를 보조 커서로 사용합니다.
+	 * 커서 기반 페이징을 통해 최신순으로 정렬된 좋아요 게시글을 효율적으로 조회할 수 있습니다.</p>
+	 *
+	 * <p>응답은 {@link LikeResponse.FishingTripPostLikedQueryDto} 형태로,
+	 * 게시글의 요약 정보 및 대표 이미지 ID 리스트를 포함합니다.</p>
+	 *
+	 * @param cursorRequestDto 커서 기반 페이지네이션 요청 정보 (정렬 방향, 커서 값 등)
+	 * @param memberId         로그인한 사용자 ID
+	 * @return 커서 기반 페이징된 좋아요 게시글 리스트
+	 */
+	List<LikeResponse.ShipFishingPostLikedQueryDto> getShipFishingPostLikedDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long memberId
+	);
+
 }
