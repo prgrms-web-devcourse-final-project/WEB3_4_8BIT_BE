@@ -54,6 +54,12 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 	}
 
 	@Override
+	public List<ShipFishingPostResponse.MainPageHotPost> findMainPageHotPostWithSize(final Integer size) {
+
+		return shipFishingPostQueryRepository.findMainPageHotPostListWithSize(size);
+	}
+
+	@Override
 	public void deleteById(final Long shipFishingPostId) {
 
 		shipFishingPostJpaRepository.deleteById(shipFishingPostId);

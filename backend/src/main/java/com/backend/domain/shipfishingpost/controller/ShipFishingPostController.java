@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
@@ -29,6 +30,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 
 @Tag(name = "선상 낚시 게시글 API")
@@ -85,6 +87,19 @@ public class ShipFishingPostController {
 
 		ScrollResponse<ShipFishingPostResponse.DetailScroll> response = shipFishingPostService
 			.getShipFishingPostScroll(requestDto, cursorRequestDto);
+
+		return ResponseEntity.ok(GenericResponse.of(true, response));
+	}
+
+	@GetMapping("/hot")
+	@Operation(summary = "메인페이지 인기 선상 낚시", description = "메인페이지에 인기 선상낚시 목록을 조회할 때 사용하는 API")
+	@Parameter(name = "size", required = true, description = "인기 선상낚시 목록 사이즈", example = "3")
+	public ResponseEntity<GenericResponse<List<ShipFishingPostResponse.MainPageHotPost>>> getHotShipFishingPostList(
+		@RequestParam @Min(1) final Integer size
+	) {
+
+		List<ShipFishingPostResponse.MainPageHotPost> response = shipFishingPostService
+			.getMainPageHotShipFishingPostList(size);
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}

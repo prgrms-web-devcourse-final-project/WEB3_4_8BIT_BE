@@ -261,4 +261,32 @@ public class ShipFishingPostResponse {
 				.build();
 		}
 	}
+
+	/**
+	 * {
+	 *     "shipFishingPostId": 1,
+	 *     "subject": "선상낚시 제목",
+	 *     "startTime": "12:00",
+	 *     "endTime": "16:00",
+	 *     "location": "게시글 지역",
+	 *     "reviewEverRate": "3.5"
+	 * }
+	 *
+	 * @param shipFishingPostId
+	 * @param subject
+	 * @param startTime
+	 * @param endTime
+	 * @param location
+	 * @param reviewEverRate
+	 */
+	@Builder
+	public record MainPageHotPost(
+		Long shipFishingPostId,
+		String subject,
+		LocalTime startTime,
+		LocalTime endTime,
+		String location,
+		Double reviewEverRate
+	) {
+	}
 }

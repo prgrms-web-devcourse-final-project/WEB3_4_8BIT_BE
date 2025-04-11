@@ -3,6 +3,7 @@ package com.backend.domain.shipfishingpost.repository;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -86,16 +87,6 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 	@BeforeAll
 	void init() {
-		for (int i = 0; i < 20; i++) {
-			fishRepository.save(fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
-				.set("fishId", null)
-				.set("description", "test description")
-				.set("icon", "icon")
-				.set("spawnLocation", "test")
-				.set("name", String.format("fish %d", i))
-				.sample());
-		}
-
 		List<Fish> givenFishList = new ArrayList<>();
 
 		for (int i = 1; i <= 19; i++) {
@@ -122,6 +113,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 					givenFishList.get(i + 3).getFishId()))
 				.set("price", 10000L * i)
 				.set("reviewEverRate", 0.3D * i)
+				.set("startTime", LocalTime.now().plusMinutes(1))
 				.set("maxGuestCount", i)
 				.set("likeCount", 0L)
 				.sample();
@@ -217,7 +209,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		assertThat(postDetail.subject()).isEqualTo(savedShipFishingPost.getSubject());
 		assertThat(postDetail.content()).isEqualTo(savedShipFishingPost.getContent());
 		assertThat(postDetail.fileIdList().toString()).isEqualTo(savedShipFishingPost.getFileIdList().toString());
-		assertThat(postDetail.startTime()).isEqualTo(savedShipFishingPost.getStartTime());
+		assertThat(postDetail.startTime()).isEqualToIgnoringNanos(savedShipFishingPost.getStartTime());
 		assertThat(postDetail.durationTime()).isEqualTo(savedShipFishingPost.getDurationTime());
 		assertThat(postDetail.maxGuestCount()).isEqualTo(savedShipFishingPost.getMaxGuestCount());
 		assertThat(postDetail.reviewEverRate()).isEqualTo(savedShipFishingPost.getReviewEverRate());
@@ -533,4 +525,17 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		assertThat(findShipFishingPost.getReviewEverRate()).isEqualTo(5.0D);
 	}
 
+	@Test
+	@DisplayName("마이페이지 선상 낚시 게시글 인기 목록 조회 [Repository] - Success")
+	void t12() {
+		// Given
+		int givenSize = 3;
+
+		List<ShipFishingPostResponse.MainPageHotPost> findMainPageHotPostList = shipFishingPostRepository
+			.findMainPageHotPostWithSize(givenSize);
+
+		assertThat(findMainPageHotPostList.get(0).shipFishingPostId()).isEqualTo(14);
+		assertThat(findMainPageHotPostList.get(1).shipFishingPostId()).isEqualTo(13);
+		assertThat(findMainPageHotPostList.get(2).shipFishingPostId()).isEqualTo(12);
+	}
 }

@@ -181,6 +181,32 @@ public class ShipFishingPostQueryRepository {
 			hasNext);
 	}
 
+	public List<ShipFishingPostResponse.MainPageHotPost> findMainPageHotPostListWithSize(final int size) {
+
+		return jpaQueryFactory
+			.select(Projections.constructor(
+				ShipFishingPostResponse.MainPageHotPost.class,
+				shipFishingPost.shipFishingPostId,
+				shipFishingPost.subject,
+				shipFishingPost.startTime,
+				shipFishingPost.endTime,
+				shipFishingPost.location,
+				shipFishingPost.reviewEverRate
+			))
+			.distinct()
+			.from(shipFishingPost)
+			.leftJoin(reservationDate1)
+			.on(reservationDate1.shipFishingPostId.eq(shipFishingPost.shipFishingPostId)
+				.and(reservationDateCondition(LocalDate.now())))
+			.where(
+				Expressions.allOf(
+					shipFishingPost.startTime.gt(LocalTime.now()),
+					searchDateCondition(LocalDate.now())))
+			.orderBy(shipFishingPost.reviewEverRate.desc())
+			.limit(size)
+			.fetch();
+	}
+
 	public void updateReviewEverRate(final ZonedDateTime now, final ZonedDateTime lastRun) {
 
 		// 현재 생성 & 수정된 이력이 있는 리뷰만 반영됨. 삭제는 리뷰 삭제시 직접 반영하거나 soft delete 를 적용한 후 반영해야 함
@@ -249,6 +275,13 @@ public class ShipFishingPostQueryRepository {
 			.set(shipFishingPost.reviewEverRate, newAvg)
 			.where(shipFishingPost.shipFishingPostId.eq(shipFishingPostId))
 			.execute();
+	}
+
+	public boolean updateLikeCount(final Long postId, final Long likeCount) {
+		return jpaQueryFactory.update(shipFishingPost)
+			.set(shipFishingPost.likeCount, likeCount)
+			.where(shipFishingPost.shipFishingPostId.eq(postId))
+			.execute() > 0;
 	}
 
 	private List<ShipFishingPostResponse.MyPagePostList> mapToMyPagePostList(
@@ -342,13 +375,6 @@ public class ShipFishingPostQueryRepository {
 			.collect(Collectors.toList());
 	}
 
-	public boolean updateLikeCount(final Long postId, final Long likeCount) {
-		return jpaQueryFactory.update(shipFishingPost)
-			.set(shipFishingPost.likeCount, likeCount)
-			.where(shipFishingPost.shipFishingPostId.eq(postId))
-			.execute() > 0;
-	}
-
 	public String findSubjectByShipFishingPostId(final Long shipFishingPostId) {
 
 		return jpaQueryFactory.select(shipFishingPost.subject)
@@ -424,6 +450,14 @@ public class ShipFishingPostQueryRepository {
 	private BooleanExpression reservationDateCondition(final LocalDate searchDate) {
 
 		return searchDate == null ? null : reservationDate1.reservationDate.eq(searchDate);
+	}
+
+	private BooleanExpression startTimeCondition(final LocalDate searchDate) {
+		if (searchDate == null || searchDate.isEqual(LocalDate.now())) {
+			return null;
+		}
+
+		return shipFishingPost.startTime.gt(LocalTime.now());
 	}
 
 	// 물고기 검증 : JSON_CONTAINS 고려

@@ -46,8 +46,12 @@ public class ReservationDateRepositoryTest extends BaseTest {
 	@Autowired
 	private ReservationDateRepository reservationDateRepository;
 
+	@Autowired
+	private ReservationDateJpaRepository reservationDateJpaRepository;
+
 	@AfterEach
 	public void tearDown() {
+		reservationDateJpaRepository.deleteAll();
 		em.flush();
 		em.clear();
 	}
