@@ -100,5 +100,5 @@ public interface FishRepository {
 	 * @param fishIdList 물고기 ID 리스트
 	 * @return 물고기 이름 리스트
 	 */
-	List<String> findFishNameListByIdList(List<Long> fishIdList);
+	List<String> findFishNameListByIdList(final List<Long> fishIdList);
 }

@@ -193,7 +193,6 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data").value(requestDto.fishingPointId()));
 	}
 
-
 	@Test
 	@DisplayName("동출 게시글 수정 [FISHING_TRIP_POST_NOT_FOUND] [Controller] - Fail")
 	@WithMockCustomUser
@@ -270,7 +269,8 @@ class FishingTripPostControllerTest extends BaseTest {
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [Controller] - Success")
-	@WithMockCustomUser // 이 어노테이션이 memberId를 1L로 설정한다고 가정
+	@WithMockCustomUser
+		// 이 어노테이션이 memberId를 1L로 설정한다고 가정
 	void t10() throws Exception {
 		// Given
 		Long postId = 1L;
@@ -332,7 +332,6 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.isLiked").value(true))
 			.andExpect(jsonPath("$.data.postStatus").value("RECRUITING"));
 	}
-
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Controller] - Fail")

@@ -22,10 +22,10 @@ import lombok.experimental.SuperBuilder;
 	name = "likes",
 	uniqueConstraints = @UniqueConstraint(columnNames = {"memberId", "targetType", "targetId"}),
 	indexes = {
-		@Index(name = "idx_target_type_id", columnList = "targetType, targetId"),
-		@Index(name = "idx_member_id", columnList = "memberId"),
-		@Index(name = "idx_like_createdAt_id", columnList = "createdAt, likeId"),
-		@Index(name = "idx_member_type_target_deleted", columnList = "memberId, targetType, targetId, isDeleted")
+		@Index(name = "idx_like_01", columnList = "targetType, targetId"),
+		@Index(name = "idx_like_02", columnList = "memberId"),
+		@Index(name = "idx_like_03", columnList = "createdAt, likeId"),
+		@Index(name = "idx_like_04", columnList = "memberId, targetType, targetId, isDeleted")
 	}
 )
 @Entity
