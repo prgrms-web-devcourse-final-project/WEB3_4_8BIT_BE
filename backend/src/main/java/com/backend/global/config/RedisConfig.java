@@ -1,5 +1,7 @@
 package com.backend.global.config;
 
+import java.util.List;
+
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +14,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
@@ -53,4 +56,17 @@ public class RedisConfig {
 			.cacheDefaults(cacheConfiguration())
 			.build();
 	}
+
+	@Bean
+	public RedisTemplate<String, List<FishingTripPostResponse.HotPost>> hotPostRedisTemplate(
+		RedisConnectionFactory factory,
+		ObjectMapper objectMapper
+	) {
+		RedisTemplate<String, List<FishingTripPostResponse.HotPost>> template = new RedisTemplate<>();
+		template.setConnectionFactory(factory);
+		template.setKeySerializer(new StringRedisSerializer());
+		template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
+		return template;
+	}
+
 }
