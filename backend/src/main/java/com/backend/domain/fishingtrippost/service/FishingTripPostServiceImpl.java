@@ -209,6 +209,28 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		return fishingTripPostRepository.findMyPostFishingTripPostDetailPage(cursorRequestDto, postStatus, memberId);
 	}
 
+	@Override
+	public List<FishingTripPostResponse.HotPost> getHotPost() {
+		List<FishingTripPostResponse.HotPostDto> hotPostDtoList = fishingTripPostRepository.findHotPostDto();
+
+		return hotPostDtoList.stream()
+			.map(dto -> {
+				String imageUrl = (dto.fileIdList() != null && !dto.fileIdList().isEmpty())
+					? getImageUrlById(dto.fileIdList().get(0))
+					: null;
+
+				return new FishingTripPostResponse.HotPost(
+					dto.fishingTripPostId(),
+					dto.subject(),
+					dto.regionId(),
+					dto.regionType(),
+					imageUrl,
+					dto.hotScore()
+				);
+			})
+			.toList();
+	}
+
 	/**
 	 * 현재 로그인한 사용자가 해당 게시글에 '좋아요'를 눌렀는지 여부를 반환합니다.
 	 *

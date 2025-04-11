@@ -1,5 +1,7 @@
 package com.backend.domain.fishingtrippost.service;
 
+import java.util.List;
+
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
@@ -174,4 +176,6 @@ public interface FishingTripPostService {
 		final Long memberId,
 		final PostStatus postStatus
 	);
+
+	List<FishingTripPostResponse.HotPost> getHotPost();
 }
