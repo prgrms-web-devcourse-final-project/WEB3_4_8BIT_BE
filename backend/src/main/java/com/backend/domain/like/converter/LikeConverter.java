@@ -86,6 +86,7 @@ public class LikeConverter {
 			.fileUrl(imageUrl)
 			.fishNameList(fishNameList)
 			.reviewEverRate(dto.reviewEverRate())
+			.reviewCount(dto.reviewCount())
 			.likeCount(dto.likeCount())
 			.build();
 	}
