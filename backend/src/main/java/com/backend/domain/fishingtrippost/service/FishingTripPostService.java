@@ -177,5 +177,17 @@ public interface FishingTripPostService {
 		final PostStatus postStatus
 	);
 
+	/**
+	 * 인기 동출 모집글(HOT 게시글) 조회 메서드
+	 *
+	 * <p> 좋아요 수 + 댓글 수를 기준으로 HOT 게시글을 선정하고,
+	 * 최근 5일 이내 게시글 중에서 상위 5개를 반환한다.
+	 *
+	 * <p> 성능 최적화를 위해 Redis 캐시를 사용하며, 캐시에 값이 존재하면 캐시에서 바로 반환한다.
+	 *
+	 * <p> 캐시에 값이 없으면 DB에서 직접 조회 후, Redis에 캐싱(30분 TTL)하여 저장한다.
+	 *
+	 * @return 인기 동출 모집글 리스트 (최대 5개)
+	 */
 	List<FishingTripPostResponse.HotPost> getHotPost();
 }
