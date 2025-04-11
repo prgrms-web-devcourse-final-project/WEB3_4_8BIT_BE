@@ -111,4 +111,11 @@ public interface ShipFishingPostRepository {
 	 * @implSpec 선박 ID 기준 선상 낚시 게시글 존재 여부 결과 값 반환
 	 */
 	boolean existsByShipId(final Long shipId);
+
+	/**
+	 * 선상 낚시 제목 조회 메소드
+	 * @param shipFishingPostId {@link Long}
+	 * @return 선상 낚시 ID로 제목 조회 후 결과 값 반환
+	 */
+	String findSubjectByShipFishingPostId(final Long shipFishingPostId);
 }

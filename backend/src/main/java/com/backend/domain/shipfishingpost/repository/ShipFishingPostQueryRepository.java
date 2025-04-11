@@ -349,6 +349,14 @@ public class ShipFishingPostQueryRepository {
 			.execute();
 	}
 
+	public String findSubjectByShipFishingPostId(final Long shipFishingPostId) {
+
+		return jpaQueryFactory.select(shipFishingPost.subject)
+			.from(shipFishingPost)
+			.where(shipFishingPost.shipFishingPostId.eq(shipFishingPostId))
+			.fetchOne();
+	}
+
 	private BooleanExpression buildConditions(
 		final ShipFishingPostRequest.Search requestDto,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
