@@ -103,6 +103,13 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
+	public List<ShipFishingPostResponse.MainPageHotPost> getMainPageHotShipFishingPostList(final Integer size) {
+
+		return shipFishingPostRepository.findMainPageHotPostWithSize(size);
+	}
+
+	@Override
 	@Transactional
 	public Long updateShipFishingPost(final Long shipFishingPostId, final ShipFishingPostRequest.Update requestDto,
 		final Long memberId) {

@@ -86,16 +86,6 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 	@BeforeAll
 	void init() {
-		for (int i = 0; i < 20; i++) {
-			fishRepository.save(fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
-				.set("fishId", null)
-				.set("description", "test description")
-				.set("icon", "icon")
-				.set("spawnLocation", "test")
-				.set("name", String.format("fish %d", i))
-				.sample());
-		}
-
 		List<Fish> givenFishList = new ArrayList<>();
 
 		for (int i = 1; i <= 19; i++) {
@@ -533,4 +523,17 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		assertThat(findShipFishingPost.getReviewEverRate()).isEqualTo(5.0D);
 	}
 
+	@Test
+	@DisplayName("마이페이지 선상 낚시 게시글 인기 목록 조회 [Repository] - Success")
+	void t12() {
+		// Given
+		int givenSize = 3;
+
+		List<ShipFishingPostResponse.MainPageHotPost> findMainPageHotPostList = shipFishingPostRepository
+			.findMainPageHotPostWithSize(givenSize);
+
+		assertThat(findMainPageHotPostList.get(0).shipFishingPostId()).isEqualTo(15);
+		assertThat(findMainPageHotPostList.get(1).shipFishingPostId()).isEqualTo(14);
+		assertThat(findMainPageHotPostList.get(2).shipFishingPostId()).isEqualTo(13);
+	}
 }

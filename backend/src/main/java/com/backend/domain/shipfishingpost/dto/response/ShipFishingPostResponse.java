@@ -261,4 +261,75 @@ public class ShipFishingPostResponse {
 				.build();
 		}
 	}
+
+	/**
+	 * {
+	 *     "shipFishingPostId": 1,
+	 *     "subject": "선상낚시 제목",
+	 *     "startTime": "12:00",
+	 *     "endTime": "16:00",
+	 *     "fishIdList": [1, 2]
+	 *     "location": "게시글 지역",
+	 *     "reviewEverRate": "3.5"
+	 * }
+	 *
+	 * @param shipFishingPostId
+	 * @param subject
+	 * @param startTime
+	 * @param endTime
+	 * @param fishIdList
+	 * @param location
+	 * @param reviewEverRate
+	 */
+	public record MainPageQueryDto(
+		Long shipFishingPostId,
+		String subject,
+		LocalTime startTime,
+		LocalTime endTime,
+		List<Long> fishIdList,
+		String location,
+		Double reviewEverRate
+	) {
+	}
+
+	/**
+	 * {
+	 *     "shipFishingPostId": 1,
+	 *     "subject": "선상낚시 제목",
+	 *     "startTime": "12:00",
+	 *     "endTime": "16:00",
+	 *     "fishNameList": ["참돔", "우럭"]
+	 *     "location": "게시글 지역"
+	 * }
+	 *
+	 * @param shipFishingPostId
+	 * @param subject
+	 * @param startTime
+	 * @param endTime
+	 * @param fishNameList
+	 * @param location
+	 */
+	@Builder
+	public record MainPageHotPost(
+		Long shipFishingPostId,
+		String subject,
+		LocalTime startTime,
+		LocalTime endTime,
+		List<String> fishNameList,
+		String location
+	) {
+		public static MainPageHotPost fromMainPageHotPostList(
+			final MainPageQueryDto mainpage,
+			final List<String> fishNameList
+		) {
+			return MainPageHotPost.builder()
+				.shipFishingPostId(mainpage.shipFishingPostId())
+				.subject(mainpage.subject())
+				.startTime(mainpage.startTime())
+				.endTime(mainpage.endTime())
+				.fishNameList(fishNameList)
+				.location(mainpage.location())
+				.build();
+		}
+	}
 }

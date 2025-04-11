@@ -61,6 +61,15 @@ public interface ShipFishingPostRepository {
 		final GlobalRequest.CursorRequest cursorRequestDto);
 
 	/**
+	 * 메인페이지에 인기 게시글 목록 조회 메서드
+	 *
+	 * @param size 조회할 데이터 사이즈
+	 * @return {@link List<ShipFishingPostResponse.MainPageHotPost>}
+	 * @implSpec 메인페이지에 보여줄 인기 게시글 목록을 사이즈에 맞게 제공하는 메서드입니다.
+	 */
+	List<ShipFishingPostResponse.MainPageHotPost> findMainPageHotPostWithSize(final Integer size);
+
+	/**
 	 * 선상 낚시 게시글 삭제 메서드
 	 *
 	 * @param shipFishingPostId {@link Long}

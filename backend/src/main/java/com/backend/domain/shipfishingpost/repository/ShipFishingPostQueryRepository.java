@@ -181,6 +181,27 @@ public class ShipFishingPostQueryRepository {
 			hasNext);
 	}
 
+	public List<ShipFishingPostResponse.MainPageHotPost> findMainPageHotPostListWithSize(final int size) {
+
+		List<ShipFishingPostResponse.MainPageQueryDto> MainPageList = jpaQueryFactory
+			.select(Projections.constructor(
+				ShipFishingPostResponse.MainPageQueryDto.class,
+				shipFishingPost.shipFishingPostId,
+				shipFishingPost.subject,
+				shipFishingPost.startTime,
+				shipFishingPost.endTime,
+				shipFishingPost.fishIdList,
+				shipFishingPost.location,
+				shipFishingPost.reviewEverRate
+			))
+			.from(shipFishingPost)
+			.orderBy(shipFishingPost.reviewEverRate.desc())
+			.limit(size)
+			.fetch();
+
+		return mapToMainPageHotPostList(MainPageList);
+	}
+
 	public void updateReviewEverRate(final ZonedDateTime now, final ZonedDateTime lastRun) {
 
 		// 현재 생성 & 수정된 이력이 있는 리뷰만 반영됨. 삭제는 리뷰 삭제시 직접 반영하거나 soft delete 를 적용한 후 반영해야 함
@@ -249,6 +270,46 @@ public class ShipFishingPostQueryRepository {
 			.set(shipFishingPost.reviewEverRate, newAvg)
 			.where(shipFishingPost.shipFishingPostId.eq(shipFishingPostId))
 			.execute();
+	}
+
+	public void updateLikeCount(final Long postId, final Long likeCount) {
+		jpaQueryFactory.update(shipFishingPost)
+			.set(shipFishingPost.likeCount, likeCount)
+			.where(shipFishingPost.shipFishingPostId.eq(postId))
+			.execute();
+	}
+
+	private List<ShipFishingPostResponse.MainPageHotPost> mapToMainPageHotPostList(
+		List<ShipFishingPostResponse.MainPageQueryDto> MainPageDtoList
+	) {
+		Set<Long> fishIdList = MainPageDtoList.stream()
+			.flatMap(dto -> {
+				List<Long> ids = dto.fishIdList();
+				return (ids == null ? List.<Long>of() : ids).stream();
+			})
+			.collect(Collectors.toSet());
+
+		Map<Long, String> fishNameMap = jpaQueryFactory
+			.select(fish.fishId, fish.name)
+			.from(fish)
+			.where(fish.fishId.in(fishIdList))
+			.fetch()
+			.stream()
+			.collect(Collectors.toMap(
+				tuple -> tuple.get(fish.fishId),
+				tuple -> tuple.get(fish.name)
+			));
+
+		return MainPageDtoList.stream()
+			.map(dto -> {
+				List<String> fishNames = Stream.ofNullable(dto.fishIdList())
+					.flatMap(Collection::stream)
+					.map(fishNameMap::get)
+					.filter(Objects::nonNull)
+					.collect(Collectors.toList());
+				return ShipFishingPostResponse.MainPageHotPost.fromMainPageHotPostList(dto, fishNames);
+			})
+			.collect(Collectors.toList());
 	}
 
 	private List<ShipFishingPostResponse.MyPagePostList> mapToMyPagePostList(
