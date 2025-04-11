@@ -88,4 +88,9 @@ public class LikeRepositoryImpl implements LikeRepository {
 	) {
 		return likeQueryRepository.getLikedShipFishingPosts(cursorRequestDto, memberId);
 	}
+
+	@Override
+	public Long countLikedPostsByType(final Long memberId, final LikeTargetType targetType) {
+		return likeQueryRepository.countLikedPostsByType(memberId, targetType);
+	}
 }

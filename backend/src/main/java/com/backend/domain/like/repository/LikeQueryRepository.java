@@ -163,6 +163,18 @@ public class LikeQueryRepository {
 			.fetch();
 	}
 
+	public Long countLikedPostsByType(final Long memberId, final LikeTargetType targetType) {
+		return jpaQueryFactory
+			.select(like.count())
+			.from(like)
+			.where(
+				like.targetType.eq(targetType),
+				like.memberId.eq(memberId),
+				like.isDeleted.isFalse()
+			)
+			.fetchOne();
+	}
+
 	private BooleanExpression cursorCondition(final GlobalRequest.CursorRequest cursorRequestDto) {
 		if (cursorRequestDto.fieldValue() == null || cursorRequestDto.id() == null) {
 			return null;

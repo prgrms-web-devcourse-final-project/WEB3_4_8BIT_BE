@@ -135,4 +135,10 @@ public interface LikeRepository {
 		final Long memberId
 	);
 
+	/**
+	 * @param memberId 로그인한 멤버 ID
+	 * @param targetType 조회할 게시글 종류
+	 * @return 선상낚시 위시리스트 count
+	 */
+	Long countLikedPostsByType(final Long memberId, final LikeTargetType targetType);
 }
