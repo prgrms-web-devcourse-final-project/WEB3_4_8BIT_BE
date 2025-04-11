@@ -71,7 +71,11 @@ public class LikeSyncScheduler {
 	 * @return 업데이트가 성공적으로 이루어진 경우 true, 대상 게시글이 존재하지 않아 실패한 경우 false
 	 */
 
-	private boolean updateLikeCountToDB(final LikeTargetType type, Long targetId, final int redisLikeCount) {
+	private boolean updateLikeCountToDB(
+		final LikeTargetType type,
+		final Long targetId,
+		final int redisLikeCount
+	) {
 		return switch (type) {
 			case SHIP_FISHING_POST -> shipFishingPostRepository.existsById(targetId)
 				&& shipFishingPostRepository.updateLikeCount(targetId, (long)redisLikeCount);

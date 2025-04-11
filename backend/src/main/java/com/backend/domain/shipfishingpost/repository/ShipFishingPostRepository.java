@@ -87,7 +87,6 @@ public interface ShipFishingPostRepository {
 
 	/**
 	 * 선상 낚시 게시글 여부 조회 메소드
-	 * r
 	 *
 	 * @param shipFishingPostId {@link Long}
 	 * @return {@link Boolean} 데이터가 있다면 true, 없으면 false
