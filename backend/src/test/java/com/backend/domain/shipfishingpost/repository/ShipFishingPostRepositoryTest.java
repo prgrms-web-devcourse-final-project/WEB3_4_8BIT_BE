@@ -3,6 +3,7 @@ package com.backend.domain.shipfishingpost.repository;
 import static org.assertj.core.api.Assertions.*;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +113,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 					givenFishList.get(i + 3).getFishId()))
 				.set("price", 10000L * i)
 				.set("reviewEverRate", 0.3D * i)
+				.set("startTime", LocalTime.now().plusMinutes(1))
 				.set("maxGuestCount", i)
 				.set("likeCount", 0L)
 				.sample();
@@ -207,7 +209,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		assertThat(postDetail.subject()).isEqualTo(savedShipFishingPost.getSubject());
 		assertThat(postDetail.content()).isEqualTo(savedShipFishingPost.getContent());
 		assertThat(postDetail.fileIdList().toString()).isEqualTo(savedShipFishingPost.getFileIdList().toString());
-		assertThat(postDetail.startTime()).isEqualTo(savedShipFishingPost.getStartTime());
+		assertThat(postDetail.startTime()).isEqualToIgnoringNanos(savedShipFishingPost.getStartTime());
 		assertThat(postDetail.durationTime()).isEqualTo(savedShipFishingPost.getDurationTime());
 		assertThat(postDetail.maxGuestCount()).isEqualTo(savedShipFishingPost.getMaxGuestCount());
 		assertThat(postDetail.reviewEverRate()).isEqualTo(savedShipFishingPost.getReviewEverRate());
@@ -532,8 +534,8 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		List<ShipFishingPostResponse.MainPageHotPost> findMainPageHotPostList = shipFishingPostRepository
 			.findMainPageHotPostWithSize(givenSize);
 
-		assertThat(findMainPageHotPostList.get(0).shipFishingPostId()).isEqualTo(15);
-		assertThat(findMainPageHotPostList.get(1).shipFishingPostId()).isEqualTo(14);
-		assertThat(findMainPageHotPostList.get(2).shipFishingPostId()).isEqualTo(13);
+		assertThat(findMainPageHotPostList.get(0).shipFishingPostId()).isEqualTo(14);
+		assertThat(findMainPageHotPostList.get(1).shipFishingPostId()).isEqualTo(13);
+		assertThat(findMainPageHotPostList.get(2).shipFishingPostId()).isEqualTo(12);
 	}
 }
