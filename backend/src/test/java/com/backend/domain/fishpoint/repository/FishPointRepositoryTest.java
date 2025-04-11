@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
@@ -26,6 +27,7 @@ import com.backend.global.config.JpaAuditingConfig;
 	FishPointQueryRepository.class,
 	JpaAuditingConfig.class,
 	QuerydslConfig.class})
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FishPointRepositoryTest extends BaseTest {
 
 	@Autowired
