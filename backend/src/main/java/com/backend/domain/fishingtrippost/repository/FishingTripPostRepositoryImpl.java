@@ -77,6 +77,11 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	}
 
 	@Override
+	public List<FishingTripPostResponse.HotPostDto> findHotPostDto() {
+		return fishingTripPostQueryRepository.findHotPostDto();
+	}
+
+	@Override
 	public FishingTripPostResponse.ParticipantDetailDto findParticipantDetailDto(
 		final Long fishingTripPostId,
 		final Long memberId) {

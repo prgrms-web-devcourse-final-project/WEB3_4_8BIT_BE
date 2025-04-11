@@ -164,4 +164,6 @@ public interface FishingTripPostRepository {
 		final PostStatus postStatus,
 		final Long memberId
 	);
+
+	List<FishingTripPostResponse.HotPostDto> findHotPostDto();
 }
