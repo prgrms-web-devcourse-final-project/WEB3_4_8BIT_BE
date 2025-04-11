@@ -312,12 +312,7 @@ public class FishingTripPostQueryRepository {
 		APPLICANT
 	}
 
-	public List<FishingTripPostResponse.HotPostDto> findHotPostDto() {
-
-		ZonedDateTime baseTime = LocalDate.now()
-			.minusDays(5)
-			.atStartOfDay(ZoneId.of("Asia/Seoul"));
-
+	public List<FishingTripPostResponse.HotPostDto> findHotPostDto(final ZonedDateTime baseTime) {
 		return jpaQueryFactory
 			.select(Projections.constructor(
 				FishingTripPostResponse.HotPostDto.class,

@@ -1,5 +1,6 @@
 package com.backend.domain.fishingtrippost.repository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -165,5 +166,19 @@ public interface FishingTripPostRepository {
 		final Long memberId
 	);
 
-	List<FishingTripPostResponse.HotPostDto> findHotPostDto();
+	/**
+	 * 최근 5일 내에 작성된 동출 모집글 중에서 HOT 게시글을 조회합니다.
+	 *
+	 * <p>HOT 게시글 기준:
+	 * - 게시글 상태가 RECRUITING
+	 * - 생성일 기준 최근 5일 이내
+	 * - (좋아요 수 + 댓글 수)를 기반으로 내림차순 정렬
+	 * - 같은 점수일 경우 최신순으로 정렬
+	 * - 최대 5개까지 조회</p>
+	 *
+	 * <p>조회된 게시글은 이후 서비스단에서 대표 이미지 URL로 가공되어 응답됩니다.</p>
+	 *
+	 * @return HOT 게시글 DTO 리스트
+	 */
+	List<FishingTripPostResponse.HotPostDto> findHotPostDto(final ZonedDateTime baseTime);
 }
