@@ -1,5 +1,6 @@
 package com.backend.domain.like.service;
 
+import com.backend.domain.like.domain.LikeTargetType;
 import com.backend.domain.like.dto.request.LikeRequest;
 import com.backend.domain.like.dto.response.LikeResponse;
 import com.backend.global.dto.request.GlobalRequest;
@@ -50,4 +51,12 @@ public interface LikeService {
 		final Long memberId
 	);
 
+	/**
+	 * 로그인한 사용자가 좋아요한 게시글 개수를 조회합니다.
+	 *
+	 * @param memberId   로그인한 유저 Id
+	 * @param targetType 게시글 종류
+	 * @return 사용자가 좋아요한 선상 낚시 게시글 개수
+	 */
+	Long getCountLikedShipFishingPosts(final Long memberId, final LikeTargetType targetType);
 }

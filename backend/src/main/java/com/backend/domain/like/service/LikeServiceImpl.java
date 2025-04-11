@@ -134,6 +134,12 @@ public class LikeServiceImpl implements LikeService {
 		);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
+	public Long getCountLikedShipFishingPosts(final Long memberId, final LikeTargetType targetType) {
+		return likeRepository.countLikedPostsByType(memberId, targetType);
+	}
+
 	/**
 	 * 좋아요 취소 처리
 	 *
