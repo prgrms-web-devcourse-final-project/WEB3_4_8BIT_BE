@@ -254,7 +254,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		log.debug("[인기 동출글 조회] : 직접 조회");
 
 		hotPostRedisTemplate.opsForValue().set(hotPostKey, responseDto, Duration.ofMinutes(30));
-		log.debug("[인기 동출글 조회] : 캐사에 추가");
+		log.debug("[인기 동출글 조회] : 캐시에 추가");
 
 		return responseDto;
 	}
