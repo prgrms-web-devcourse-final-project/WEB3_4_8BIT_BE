@@ -78,7 +78,8 @@ public class FishingTripPostResponse {
 		Double longitude,
 		Double latitude,
 		List<Long> fileIdList,
-		PostStatus postStatus
+		PostStatus postStatus,
+		Long likes
 	) {
 		@QueryProjection
 		public DetailQueryDto {
@@ -266,6 +267,45 @@ public class FishingTripPostResponse {
 		@QueryProjection
 		public ParticipantDetail {
 
+		}
+	}
+
+	/**
+	 * 내가 신청한 동출 게시글 리스트 조회 시 사용되는 DTO입니다.
+	 * <p>
+	 * 커서 기반 스크롤 API 응답에서 사용되며, 게시글의 기본 정보와 상태를 포함합니다.
+	 * </p>
+	 *
+	 * @param fishingTripPostId 게시글 ID
+	 * @param subject 게시글 제목
+	 * @param fishingPointId 출조 포인트 ID
+	 * @param fishingPointName 출조 포인트 대분류 이름
+	 * @param fishingPointDetailName 출조 포인트 상세 이름
+	 * @param fishingDate 출조 예정 일자
+	 * @param createdAt 게시글 생성 시각
+	 * @param currentCount 현재 모집된 인원 수
+	 * @param recruitmentCount 총 모집 인원 수
+	 * @param postStatus 게시글 상태 (RECRUITING or COMPLETED)
+	 * @param commentCount 댓글 개수
+	 * @param likeCount 좋아요 수
+	 */
+	public record MyFishingTripPostDetailPage(
+		Long fishingTripPostId,
+		String subject,
+		Long fishingPointId,
+		String fishingPointName,
+		String fishingPointDetailName,
+		ZonedDateTime fishingDate,
+		ZonedDateTime createdAt,
+		Integer currentCount,
+		Integer recruitmentCount,
+		PostStatus postStatus,
+		Long commentCount,
+		Long likeCount
+	) {
+		@QueryProjection
+		public MyFishingTripPostDetailPage {
+			
 		}
 	}
 

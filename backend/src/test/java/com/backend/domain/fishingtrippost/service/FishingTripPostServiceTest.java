@@ -292,7 +292,8 @@ class FishingTripPostServiceTest extends BaseTest {
 			128.12345,
 			37.12345,
 			fileIds,
-			PostStatus.RECRUITING
+			PostStatus.RECRUITING,
+			3L
 		);
 
 		List<File> mockFiles = List.of(
@@ -303,8 +304,8 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		when(fishingTripPostRepository.findDetailQueryDtoById(postId)).thenReturn(Optional.of(queryDto));
 		when(storageRepository.findAllById(fileIds)).thenReturn(mockFiles);
-		when(likeRepository.countByTargetTypeAndTargetId(LikeTargetType.FISHING_TRIP_POST, postId)).thenReturn(3L);
-		when(likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST, postId)).thenReturn(true);
+		when(likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST,
+			postId)).thenReturn(true);
 
 		// When
 		FishingTripPostResponse.Detail actual = fishingTripPostService.getFishingTripPostDetail(memberId, postId);
@@ -328,10 +329,9 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verify(storageRepository).findAllById(fileIds);
-		verify(likeRepository).countByTargetTypeAndTargetId(LikeTargetType.FISHING_TRIP_POST, postId);
-		verify(likeRepository).existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST, postId);
+		verify(likeRepository).existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST,
+			postId);
 	}
-
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
@@ -350,7 +350,6 @@ class FishingTripPostServiceTest extends BaseTest {
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verifyNoInteractions(storageRepository); // 파일 조회는 호출되지 않아야 함
 	}
-
 
 	@Test
 	@DisplayName("동출 게시글 모집 완료 처리 [작성자 본인일 경우] - Success")
@@ -553,5 +552,67 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		verify(fishingTripPostRepository).findParticipantDetailDto(postId, memberId);
 		verify(fishingTripPostRepository).findApprovedParticipants(postId);
+	}
+
+	@Test
+	@DisplayName("내가 신청한 동출 게시글 목록 커서 기반 조회 [Service] - Success")
+	void t14() {
+		// Given
+		Long memberId = 1L;
+		PostStatus postStatus = PostStatus.RECRUITING;
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			"desc", "createdAt", "next", null, null, 10
+		);
+
+		FishingTripPostResponse.MyFishingTripPostDetailPage dto1 =
+			new FishingTripPostResponse.MyFishingTripPostDetailPage(
+				100L,                         // fishingTripPostId
+				"같이 갑시다",                // subject
+				1L,                          // fishingPointId
+				"남해",                       // fishingPointName
+				"남해 앞바다",                 // fishingPointDetailName
+				ZonedDateTime.now().plusDays(2), // fishingDate
+				ZonedDateTime.now(),         // createdAt
+				1,                           // currentCount
+				5,                           // recruitmentCount
+				PostStatus.RECRUITING,       // postStatus
+				3L,                          // commentCount
+				12L                          // likeCount
+			);
+
+		FishingTripPostResponse.MyFishingTripPostDetailPage dto2 =
+			new FishingTripPostResponse.MyFishingTripPostDetailPage(
+				101L, "지려버린 낚시", 2L, "동해", "동해 큰방파제",
+				ZonedDateTime.now().plusDays(3), ZonedDateTime.now(), 2, 3,
+				PostStatus.RECRUITING, 5L, 8L
+			);
+
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> mockResponse =
+			new ScrollResponse<>(
+				List.of(dto1, dto2),
+				10,
+				2,
+				false,
+				true
+			);
+
+		when(fishingTripPostRepository.findMyFishingTripPostDetailPage(cursorRequest, postStatus, memberId))
+			.thenReturn(mockResponse);
+
+		// When
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> result =
+			fishingTripPostService.findMyFishingTripPostDetailPage(cursorRequest, memberId, postStatus);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result.content()).hasSize(2);
+
+		FishingTripPostResponse.MyFishingTripPostDetailPage resultDto1 = result.content().get(0);
+		assertThat(resultDto1.fishingTripPostId()).isEqualTo(100L);
+		assertThat(resultDto1.fishingPointName()).isEqualTo("남해");
+
+		FishingTripPostResponse.MyFishingTripPostDetailPage resultDto2 = result.content().get(1);
+		assertThat(resultDto2.fishingTripPostId()).isEqualTo(101L);
 	}
 }

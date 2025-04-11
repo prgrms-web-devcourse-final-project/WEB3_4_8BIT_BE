@@ -533,5 +533,63 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.participants[1].profileImageUrl").value("https://cdn.example.com/참가자2.jpg"));
 	}
 
+	@Test
+	@WithMockCustomUser
+	@DisplayName("내가 신청한 동출 게시글 스크롤 조회 [Controller] - Success")
+	void t17() throws Exception {
+		// Given
+		Long postId = 100L;
+		Long memberId = 1L;
 
+		FishingTripPostResponse.MyFishingTripPostDetailPage dto1 =
+			new FishingTripPostResponse.MyFishingTripPostDetailPage(
+				postId,
+				"같이 갑시다",
+				1L,
+				"남해",
+				"남해 앞바다",
+				ZonedDateTime.parse("2025-06-10T08:00:00+09:00"),
+				ZonedDateTime.parse("2025-04-09T04:00:00+09:00"),
+				1,
+				5,
+				PostStatus.RECRUITING,
+				12L,
+				3L
+			);
+
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> response =
+			ScrollResponse.from(List.of(dto1), 10, 1, true, true);
+
+		when(fishingTripPostService.findMyFishingTripPostDetailPage(any(), eq(memberId), eq(PostStatus.RECRUITING)))
+			.thenReturn(response);
+
+		// When
+		ResultActions result = mockMvc.perform(
+			MockMvcRequestBuilders.get("/api/v1/fishing-trip-post/my-participate")
+				.param("order", "createdAt")
+				.param("sort", "desc")
+				.param("type", "next")
+				.param("status", "RECRUITING")
+				.param("fieldValue", "2025-04-09T04:00:00+09:00")
+				.param("id", postId.toString())
+				.param("size", "10")
+				.accept(MediaType.APPLICATION_JSON)
+		);
+
+		// Then
+		result.andExpect(status().isOk())
+			.andExpect(jsonPath("$.success").value(true))
+			.andExpect(jsonPath("$.data.content[0].fishingTripPostId").value(postId))
+			.andExpect(jsonPath("$.data.content[0].subject").value("같이 갑시다"))
+			.andExpect(jsonPath("$.data.content[0].fishingPointId").value(1L))
+			.andExpect(jsonPath("$.data.content[0].fishingPointName").value("남해"))
+			.andExpect(jsonPath("$.data.content[0].fishingPointDetailName").value("남해 앞바다"))
+			.andExpect(jsonPath("$.data.content[0].postStatus").value("RECRUITING"))
+			.andExpect(jsonPath("$.data.content[0].commentCount").value(12))
+			.andExpect(jsonPath("$.data.content[0].likeCount").value(3))
+			.andExpect(jsonPath("$.data.pageSize").value(10))
+			.andExpect(jsonPath("$.data.numberOfElements").value(1))
+			.andExpect(jsonPath("$.data.isFirst").value(true))
+			.andExpect(jsonPath("$.data.isLast").value(true));
+	}
 }
