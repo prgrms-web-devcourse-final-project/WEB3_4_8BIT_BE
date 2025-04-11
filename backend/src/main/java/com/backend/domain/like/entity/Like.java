@@ -24,10 +24,10 @@ import lombok.experimental.SuperBuilder;
 	indexes = {
 		@Index(name = "idx_target_type_id", columnList = "targetType, targetId"),
 		@Index(name = "idx_member_id", columnList = "memberId"),
+		@Index(name = "idx_like_createdAt_id", columnList = "createdAt, likeId"),
 		@Index(name = "idx_member_type_target_deleted", columnList = "memberId, targetType, targetId, isDeleted")
 	}
 )
-
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
