@@ -6,6 +6,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.entity.Member;
@@ -34,6 +35,7 @@ public class MemberServiceImpl implements MemberService {
 		validAddInfo(member);
 
 		member.updateMember(requestDto.nickname(), requestDto.fileId(), requestDto.description());
+		member.updateRole(MemberRole.USER);
 		log.debug("추가 정보저장에 성공하였습니다. 닉네임 :{} ", member.getNickname());
 
 		return member.getMemberId();
