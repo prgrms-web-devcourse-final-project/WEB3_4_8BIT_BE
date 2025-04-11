@@ -304,7 +304,6 @@ class CommentServiceTest extends BaseTest {
 		verify(commentRepository, times(1)).minusChildCount(givenComment.getParentId());
 	}
 
-
 	@Test
 	@DisplayName("댓글 삭제 [Comment Not Found] [Service] - Fail")
 	void t10() {
@@ -343,5 +342,53 @@ class CommentServiceTest extends BaseTest {
 			() -> commentService.deleteComment(givenMemberId, givenCommentId, givenFishingTripPostId))
 			.isExactlyInstanceOf(CommentExpection.class)
 			.hasMessage(CommentErrorCode.COMMENT_UNAUTHORIZED_AUTHOR.getMessage());
+	}
+
+	@Test
+	@DisplayName("댓글 수정 [Fishing Trip Id Not Valid] [Service] - Fail")
+	void t12() {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		Comment givenComment = fixtureMonkeyBuilder.giveMeBuilder(Comment.class)
+			.set("commentId", givenCommentId)
+			.set("fishingTripPostId", 2L)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		CommentRequest.Update givenRequestDto = fixtureMonkeyValidation.giveMeOne(CommentRequest.Update.class);
+
+		when(commentRepository.findByCommentId(givenCommentId)).thenReturn(Optional.ofNullable(givenComment));
+
+		// When & Then
+		assertThatThrownBy(
+			() -> commentService.updateComment(givenMemberId, givenCommentId, givenFishingTripPostId, givenRequestDto))
+			.isExactlyInstanceOf(CommentExpection.class)
+			.hasMessage(CommentErrorCode.FISHING_TRIP_ID_NOT_VALID.getMessage());
+	}
+
+	@Test
+	@DisplayName("댓글 삭제 [Fishing Trip Id Not Valid] [Service] - Success")
+	void t13() {
+		// Given
+		Long givenMemberId = 1L;
+		Long givenFishingTripPostId = 1L;
+		Long givenCommentId = 1L;
+
+		Comment givenComment = fixtureMonkeyBuilder.giveMeBuilder(Comment.class)
+			.set("commentId", givenCommentId)
+			.set("fishingTripPostId", 2L)
+			.set("memberId", givenMemberId)
+			.sample();
+
+		when(commentRepository.findByCommentId(givenCommentId)).thenReturn(Optional.ofNullable(givenComment));
+
+		// When & Then
+		assertThatThrownBy(
+			() -> commentService.deleteComment(givenMemberId, givenCommentId, givenFishingTripPostId))
+			.isExactlyInstanceOf(CommentExpection.class)
+			.hasMessage(CommentErrorCode.FISHING_TRIP_ID_NOT_VALID.getMessage());
 	}
 }
