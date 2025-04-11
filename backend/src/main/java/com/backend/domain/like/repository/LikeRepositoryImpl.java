@@ -69,6 +69,11 @@ public class LikeRepositoryImpl implements LikeRepository {
 	}
 
 	@Override
+	public void deleteLikesByTargetTypeAndTargetId(final LikeTargetType targetType, final Long targetId) {
+		likeJpaRepository.deleteLikesByTargetTypeAndTargetId(targetType, targetId);
+	}
+
+	@Override
 	public int deleteAllSoftDeletedLikes() {
 		return likeQueryRepository.deleteAllSoftDeletedLikes();
 	}

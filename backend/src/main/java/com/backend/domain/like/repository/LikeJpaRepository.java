@@ -20,4 +20,9 @@ public interface LikeJpaRepository extends JpaRepository<Like, Long> {
 		final LikeTargetType targetType,
 		final Long targetId
 	);
+
+	void deleteLikesByTargetTypeAndTargetId(
+		final LikeTargetType targetType,
+		final Long targetId
+	);
 }
