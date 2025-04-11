@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.activityhistory.service.ActivityHistoryService;
 import com.backend.domain.chat.room.entity.TargetType;
 import com.backend.domain.chat.room.service.RoomService;
 import com.backend.domain.comment.repository.CommentRepository;
@@ -41,6 +42,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class FishingTripPostServiceImpl implements FishingTripPostService {
 
+	private final RoomService roomService;
+	private final ActivityHistoryService activityHistoryService;
+
 	private final FishingTripPostRepository fishingTripPostRepository;
 	private final MemberRepository memberRepository;
 	private final FishPointRepository fishPointRepository;
@@ -49,7 +53,6 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final FishingTripPostNotifier fishingTripPostNotifier;
 	private final LikeRepository likeRepository;
 	private final FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
-	private final RoomService roomService;
 	private final CommentRepository commentRepository;
 
 	private static final LikeTargetType TARGET_TYPE = LikeTargetType.FISHING_TRIP_POST;
@@ -62,9 +65,13 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 		FishingTripPost fishingTripPost = FishingTripPostConverter.fromCreate(memberId, requestDto);
 
-		Long fishingTripPostId = fishingTripPostRepository.save(fishingTripPost).getFishingTripPostId();
+		FishingTripPost savedFishingTripPost = fishingTripPostRepository.save(fishingTripPost);
+
+		Long fishingTripPostId = savedFishingTripPost.getFishingTripPostId();
 
 		roomService.createRoom(fishingTripPostId, TargetType.FISHING_TRIP_POST);
+
+		activityHistoryService.createActivityHistory(savedFishingTripPost);
 
 		return fishingTripPostId;
 	}

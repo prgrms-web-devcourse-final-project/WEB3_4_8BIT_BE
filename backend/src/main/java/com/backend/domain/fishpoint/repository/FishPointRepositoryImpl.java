@@ -62,4 +62,9 @@ public class FishPointRepositoryImpl implements FishPointRepository {
 	public Optional<FishPoint> findByFishPointId(final Long fishPointId) {
 		return fishPointJpaRepository.findById(fishPointId);
 	}
+
+	@Override
+	public String findFishPointDetailNameByFishPointId(final Long fishPointId) {
+		return fishPointQueryRepository.findFishPointDetailNameByFishPointId(fishPointId);
+	}
 }

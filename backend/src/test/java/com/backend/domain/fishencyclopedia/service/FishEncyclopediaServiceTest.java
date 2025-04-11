@@ -13,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.activityhistory.service.ActivityHistoryService;
 import com.backend.domain.catchmaxlength.entity.CatchMaxLength;
 import com.backend.domain.catchmaxlength.repository.CatchMaxLengthRepository;
 import com.backend.domain.fish.entity.Fish;
@@ -37,6 +38,9 @@ import com.navercorp.fixturemonkey.ArbitraryBuilder;
 class FishEncyclopediaServiceTest extends BaseTest {
 
 	private static final Member GIVEN_MEMBER = fixtureMonkeyBuilder.giveMeOne(Member.class);
+
+	@Mock
+	private ActivityHistoryService activityHistoryService;
 
 	@Mock
 	private FishEncyclopediaRepository fishEncyclopediaRepository;
@@ -85,6 +89,8 @@ class FishEncyclopediaServiceTest extends BaseTest {
 
 		when(fishEncyclopediaRepository.createFishEncyclopedia(any(FishEncyclopedia.class)))
 			.thenReturn(givenFishEncyclopedia);
+
+		doNothing().when(activityHistoryService).createActivityHistory(any(FishEncyclopedia.class));
 
 		// When
 		Long savedId = fishEncyclopediasService.createFishEncyclopedia(givenCreate, GIVEN_MEMBER.getMemberId());

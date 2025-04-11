@@ -73,12 +73,15 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 
 	@Override
 	public boolean existsById(final Long shipFishingPostId) {
+
 		return shipFishingPostJpaRepository.existsById(shipFishingPostId);
 	}
 
 	@Override
 	public boolean updateLikeCount(final Long shipFishingPostId, final Long likeCount) {
 
+		shipFishingPostQueryRepository.updateLikeCount(shipFishingPostId, likeCount);
+    
 		return shipFishingPostQueryRepository.updateLikeCount(shipFishingPostId, likeCount);
 	}
 
@@ -86,5 +89,11 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 	public boolean existsByShipId(final Long shipId) {
 
 		return shipFishingPostJpaRepository.existsByShipId(shipId);
+	}
+
+	@Override
+	public String findSubjectByShipFishingPostId(Long shipFishingPostId) {
+
+		return shipFishingPostQueryRepository.findSubjectByShipFishingPostId(shipFishingPostId);
 	}
 }

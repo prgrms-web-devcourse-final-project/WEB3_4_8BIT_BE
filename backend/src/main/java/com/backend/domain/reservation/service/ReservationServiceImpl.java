@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.backend.domain.activityhistory.service.ActivityHistoryService;
 import com.backend.domain.reservation.converter.ReservationConverter;
 import com.backend.domain.reservation.dto.request.ReservationRequest;
 import com.backend.domain.reservation.dto.response.ReservationResponse;
@@ -28,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class ReservationServiceImpl implements ReservationService {
+
+	private final ActivityHistoryService activityHistoryService;
 
 	private final ReservationRepository reservationRepository;
 	private final ReservationDateRepository reservationDateRepository;
@@ -54,6 +57,9 @@ public class ReservationServiceImpl implements ReservationService {
 		// 예약 정보 저장
 		Reservation reservation = reservationRepository.save(
 			ReservationConverter.fromReservationRequest(requestDto, memberId));
+
+		// 활동 내역 저장
+		activityHistoryService.createActivityHistory(reservation);
 
 		log.debug("선상 낚시 예약 신청 {} , {}", shipFishingPost.toString(), reservation.toString());
 

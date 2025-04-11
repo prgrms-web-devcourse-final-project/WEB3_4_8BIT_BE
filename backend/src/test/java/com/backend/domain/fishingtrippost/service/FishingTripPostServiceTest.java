@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.backend.domain.activityhistory.service.ActivityHistoryService;
 import com.backend.domain.chat.room.entity.TargetType;
 import com.backend.domain.chat.room.service.RoomService;
 import com.backend.domain.comment.repository.CommentRepository;
@@ -48,6 +49,9 @@ class FishingTripPostServiceTest extends BaseTest {
 
 	@InjectMocks
 	private FishingTripPostServiceImpl fishingTripPostService;
+
+	@Mock
+	private ActivityHistoryService activityHistoryService;
 
 	@Mock
 	private StorageService storageService;
@@ -109,6 +113,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		when(memberRepository.existsById(givenMember.getMemberId())).thenReturn(true);
 		when(fishPointRepository.existsById(givenRequestDto.fishingPointId())).thenReturn(true);
 		when(fishingTripPostRepository.save(any(FishingTripPost.class))).thenReturn(savedPost);
+		doNothing().when(activityHistoryService).createActivityHistory(any(FishingTripPost.class));
 
 		// When
 		Long savedId = fishingTripPostService.createFishingTripPost(givenMember.getMemberId(), givenRequestDto);

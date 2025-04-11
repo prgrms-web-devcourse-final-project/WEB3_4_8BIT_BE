@@ -118,4 +118,13 @@ public class FishQueryRepository {
 			.where(fish.fishId.in(fishIdList))
 			.fetch();
 	}
+
+	public String findNameById(final Long fishId) {
+
+		return jpaQueryFactory
+			.select(fish.name)
+			.from(fish)
+			.where(fish.fishId.eq(fishId))
+			.fetchOne();
+	}
 }

@@ -89,4 +89,11 @@ public interface FishPointRepository {
 	 * @return 해당 ID에 대응하는 {@link FishPoint} 객체, 없을 경우 {@link Optional#empty()}
 	 */
 	Optional<FishPoint> findByFishPointId(final Long fishPointId);
+
+	/**
+	 * 낚시 포인트 ID와 일치하는 데이터의 fishPointDetailName을 가져오는 메소드
+	 * @param fishPointId 조회할 낚시 포인트의 ID
+	 * @return {@link String}
+	 */
+	String findFishPointDetailNameByFishPointId(final Long fishPointId);
 }
