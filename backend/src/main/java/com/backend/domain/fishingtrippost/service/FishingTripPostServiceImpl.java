@@ -1,7 +1,11 @@
 package com.backend.domain.fishingtrippost.service;
 
+import java.time.Duration;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,8 +58,10 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final LikeRepository likeRepository;
 	private final FishingTripRecruitmentRepository fishingTripRecruitmentRepository;
 	private final CommentRepository commentRepository;
+	private final RedisTemplate<String, List<FishingTripPostResponse.HotPost>> hotPostRedisTemplate;
 
 	private static final LikeTargetType TARGET_TYPE = LikeTargetType.FISHING_TRIP_POST;
+	private static final String hotPostKey = "hotFishingTripPosts";
 
 	@Override
 	@Transactional
@@ -132,7 +138,11 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 		boolean isLiked = getIsLiked(memberId, fishingTripPostId);
 
-		return FishingTripPostConverter.toDetail(detailQueryDto, fileUrlList, isLiked);
+		FishingTripPostResponse.Detail responseDto = FishingTripPostConverter.toDetail(detailQueryDto, fileUrlList,
+			isLiked);
+		log.debug("[동출 상세보기] : 조회 성공");
+
+		return responseDto;
 	}
 
 	@Override
@@ -165,6 +175,8 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 			.map(dto -> FishingTripPostConverter.toDetailPage(dto, this::getImageUrlById))
 			.toList();
 
+		log.debug("[동출 전체보기] : 조회 성공");
+
 		return ScrollResponse.from(
 			result,
 			cursorRequestDto.size(),
@@ -183,7 +195,11 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 			fishingTripPostId, memberId);
 		List<FishingTripPostResponse.ParticipantDetail> participants = fishingTripPostRepository.findApprovedParticipants(
 			fishingTripPostId);
-		return FishingTripPostConverter.toParticipationDetail(participantDetailDto, participants);
+		FishingTripPostResponse.FishingTripPostParticipationDetail responseDto = FishingTripPostConverter.toParticipationDetail(
+			participantDetailDto, participants);
+		log.debug("[동출 인원 상세정보 조회] : 조회 성공");
+
+		return responseDto;
 	}
 
 	@Override
@@ -196,6 +212,8 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		fishingTripRecruitmentRepository.deleteAllByPostId(fishingTripPostId);
 		fishingTripPostRepository.delete(fishingTripPost);
 		commentRepository.deleteByFishingTripPostId(fishingTripPostId);
+
+		log.debug("[동출 게시글 삭제] : 삭제 성공");
 	}
 
 	@Override
@@ -204,7 +222,10 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long memberId,
 		final PostStatus postStatus) {
-		return fishingTripPostRepository.findMyFishingTripRecruitmentDetailPage(cursorRequestDto, postStatus, memberId);
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> responseDto = fishingTripPostRepository.findMyFishingTripRecruitmentDetailPage(
+			cursorRequestDto, postStatus, memberId);
+		log.debug("[마이페이지 내가 신청한 동출 조회] : 조회 성공");
+		return responseDto;
 	}
 
 	@Override
@@ -213,7 +234,63 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long memberId,
 		final PostStatus postStatus) {
-		return fishingTripPostRepository.findMyPostFishingTripPostDetailPage(cursorRequestDto, postStatus, memberId);
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> responseDto = fishingTripPostRepository.findMyPostFishingTripPostDetailPage(
+			cursorRequestDto, postStatus, memberId);
+		log.debug("[마이페이지 내 동출게시글 조회] : 조회 성공");
+		return responseDto;
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public List<FishingTripPostResponse.HotPost> getHotPost() {
+
+		List<FishingTripPostResponse.HotPost> cached = hotPostRedisTemplate.opsForValue().get(hotPostKey);
+		if (cached != null) {
+			log.debug("[인기 동출글 조회] : 캐시에서 가져옴");
+			return cached;
+		}
+
+		ZonedDateTime baseTime = ZonedDateTime.now(ZoneId.of("Asia/Seoul"))
+			.minusDays(5)
+			.withHour(0).withMinute(0).withSecond(0).withNano(0);
+
+		List<FishingTripPostResponse.HotPostDto> hotPostDtoList = fishingTripPostRepository.findHotPostDto(baseTime);
+
+		List<FishingTripPostResponse.HotPost> responseDto = getHotPostList(hotPostDtoList);
+
+		log.debug("[인기 동출글 조회] : 직접 조회");
+
+		hotPostRedisTemplate.opsForValue().set(hotPostKey, responseDto, Duration.ofMinutes(30));
+		log.debug("[인기 동출글 조회] : 캐시에 추가");
+
+		return responseDto;
+	}
+
+	/**
+	 * 주어진 리스트의 HotPostDto 객체들을 HotPost 객체로 변환하여 반환하는 메서드입니다.
+	 *
+	 * @param hotPostDtoList HotPostDto 객체들을 담고 있는 리스트. 각 HotPostDto에는 낚시 게시글의 ID, 제목, 지역 정보,
+	 *                       이미지 파일 ID 리스트, 인기 점수 등의 정보가 포함됩니다.
+	 * @return HotPost 객체로 변환된 리스트. 각 HotPost는 주어진 HotPostDto에서 변환된 데이터로 구성됩니다.
+	 *         이미지 URL은 파일 ID 리스트가 비어 있지 않으면 첫 번째 파일 ID를 기준으로 가져옵니다.
+	 */
+	private List<FishingTripPostResponse.HotPost> getHotPostList(List<FishingTripPostResponse.HotPostDto> hotPostDtoList) {
+		return hotPostDtoList.stream()
+			.map(dto -> {
+				String imageUrl = (dto.fileIdList() != null && !dto.fileIdList().isEmpty())
+					? getImageUrlById(dto.fileIdList().get(0))
+					: null;
+
+				return new FishingTripPostResponse.HotPost(
+					dto.fishingTripPostId(),
+					dto.subject(),
+					dto.regionId(),
+					dto.regionType(),
+					imageUrl,
+					dto.hotScore()
+				);
+			})
+			.toList();
 	}
 
 	/**

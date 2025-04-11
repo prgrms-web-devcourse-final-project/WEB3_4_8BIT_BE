@@ -7,6 +7,8 @@ import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.domain.region.entity.QRegion.*;
 import static com.backend.global.storage.entity.QFile.*;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -310,4 +312,26 @@ public class FishingTripPostQueryRepository {
 		APPLICANT
 	}
 
+	public List<FishingTripPostResponse.HotPostDto> findHotPostDto(final ZonedDateTime baseTime) {
+		return jpaQueryFactory
+			.select(Projections.constructor(
+				FishingTripPostResponse.HotPostDto.class,
+				fishingTripPost.fishingTripPostId,
+				fishingTripPost.subject,
+				fishingTripPost.regionId,
+				region.type,
+				fishingTripPost.fileIdList,
+				fishingTripPost.likeCount.add(fishingTripPost.commentCount)
+			))
+			.from(fishingTripPost)
+			.leftJoin(region).on(region.regionId.eq(fishingTripPost.regionId))
+			.where(
+				fishingTripPost.createdAt.goe(baseTime),
+				fishingTripPost.postStatus.eq(PostStatus.RECRUITING)
+			)
+			.orderBy(fishingTripPost.likeCount.add(fishingTripPost.commentCount).desc(),
+				fishingTripPost.createdAt.desc())
+			.limit(5)
+			.fetch();
+	}
 }

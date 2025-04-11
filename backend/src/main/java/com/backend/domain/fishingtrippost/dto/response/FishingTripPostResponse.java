@@ -305,8 +305,31 @@ public class FishingTripPostResponse {
 	) {
 		@QueryProjection
 		public MyFishingTripPostDetailPage {
-			
+
 		}
 	}
 
+	public record HotPost(
+		Long fishingTripPostId,
+		String subject,
+		Long regionId,
+		RegionType regionType,
+		String imageUrl,
+		Long hotScore
+	) {
+	}
+
+	public record HotPostDto(
+		Long fishingTripPostId,
+		String subject,
+		Long regionId,
+		RegionType regionType,
+		List<Long> fileIdList,
+		Long hotScore
+	) {
+		@QueryProjection
+		public HotPostDto {
+
+		}
+	}
 }

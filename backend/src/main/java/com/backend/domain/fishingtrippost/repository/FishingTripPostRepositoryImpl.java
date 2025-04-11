@@ -1,5 +1,6 @@
 package com.backend.domain.fishingtrippost.repository;
 
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -74,6 +75,11 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 		GlobalRequest.CursorRequest cursorRequestDto, PostStatus postStatus, Long memberId) {
 		return fishingTripPostQueryRepository.findMyPostFishingTripPostDetailPage(cursorRequestDto, postStatus,
 			memberId);
+	}
+
+	@Override
+	public List<FishingTripPostResponse.HotPostDto> findHotPostDto(final ZonedDateTime baseTime) {
+		return fishingTripPostQueryRepository.findHotPostDto(baseTime);
 	}
 
 	@Override

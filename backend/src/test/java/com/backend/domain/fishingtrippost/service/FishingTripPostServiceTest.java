@@ -35,6 +35,7 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
+import com.backend.domain.region.entity.RegionType;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.storage.entity.File;
@@ -76,9 +77,6 @@ class FishingTripPostServiceTest extends BaseTest {
 
 	@Mock
 	private RoomService roomService;
-
-	@Mock
-	private CommentRepository commentRepository;
 
 	private final ArbitraryBuilder<FishingTripPostRequest.Form> createRequestBuilder =
 		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Form.class);
