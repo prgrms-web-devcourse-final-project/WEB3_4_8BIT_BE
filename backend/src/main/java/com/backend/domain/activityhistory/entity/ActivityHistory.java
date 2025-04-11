@@ -21,7 +21,8 @@ import lombok.experimental.SuperBuilder;
 @Table(
 	name = "activity_histories",
 	indexes = {
-		@Index(name = "idx_activity_histories_01", columnList = "activity_history_id, activity_type, created_at")
+		@Index(name = "idx_activity_histories_01", columnList = "member_id, activity_type, created_at, activity_history_id"),
+		@Index(name = "idx_activity_histories_02", columnList = "member_id, created_at, activity_history_id")
 	}
 )
 @Entity
