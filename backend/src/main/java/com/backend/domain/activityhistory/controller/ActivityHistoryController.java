@@ -14,17 +14,21 @@ import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.GenericResponse;
 import com.backend.global.dto.response.ScrollResponse;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/activity-histories")
+@Tag(name = "최근 활동 내역 API")
 public class ActivityHistoryController {
 
 	private final ActivityHistoryService activityHistoryService;
 
 	@GetMapping
+	@Operation(summary = "최근 활동 내역 조회", description = "최근 활동 내역 조회시 사용하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ActivityHistoryResponse.Detail>>> getDetailList(
 		@Valid final ActivityHistoryRequest.Search requestDto,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
