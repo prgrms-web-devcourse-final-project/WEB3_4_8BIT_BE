@@ -1,12 +1,14 @@
 package com.backend.domain.shipfishingpost.repository;
 
 import static com.backend.domain.fish.entity.QFish.*;
+import static com.backend.domain.like.entity.QLike.*;
 import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.domain.reservationdate.entity.QReservationDate.*;
 import static com.backend.domain.review.entity.QReview.*;
 import static com.backend.domain.ship.entity.QShip.*;
 import static com.backend.domain.shipfishingpost.entity.QShipFishingPost.*;
 import static com.backend.global.storage.entity.QFile.*;
+import static com.querydsl.core.types.dsl.Expressions.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -25,6 +27,7 @@ import java.util.stream.Stream;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
+import com.backend.domain.like.domain.LikeTargetType;
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.ship.dto.response.ShipResponse;
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
@@ -39,6 +42,7 @@ import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -72,7 +76,8 @@ public class ShipFishingPostQueryRepository {
 					shipFishingPost.startTime,
 					shipFishingPost.durationTime,
 					shipFishingPost.maxGuestCount,
-					shipFishingPost.reviewEverRate
+					shipFishingPost.reviewEverRate,
+					shipFishingPost.likeCount
 				),
 				Projections.constructor(
 					ShipResponse.Detail.class,
@@ -119,6 +124,8 @@ public class ShipFishingPostQueryRepository {
 				shipFishingPost.fishIdList,
 				shipFishingPost.reviewEverRate,
 				shipFishingPost.createdAt,
+				shipFishingPost.likeCount,
+				Expressions.constant(false),
 				JPAExpressions
 					.select(review.count())
 					.from(review)
@@ -134,6 +141,7 @@ public class ShipFishingPostQueryRepository {
 	}
 
 	public ScrollResponse<ShipFishingPostResponse.DetailScroll> findDetailScrollBySearch(
+		final Long memberId,
 		final ShipFishingPostRequest.Search requestDto,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
@@ -150,10 +158,9 @@ public class ShipFishingPostQueryRepository {
 				shipFishingPost.fishIdList,
 				shipFishingPost.reviewEverRate,
 				shipFishingPost.createdAt,
-				JPAExpressions
-					.select(review.count())
-					.from(review)
-					.where(review.shipFishingPostId.eq(shipFishingPost.shipFishingPostId))
+				shipFishingPost.likeCount,
+				likedExpression(memberId),
+				reviewCountExpression()
 			))
 			.distinct()
 			.from(shipFishingPost)
@@ -282,6 +289,38 @@ public class ShipFishingPostQueryRepository {
 			.set(shipFishingPost.likeCount, likeCount)
 			.where(shipFishingPost.shipFishingPostId.eq(postId))
 			.execute() > 0;
+	}
+
+	/**
+	 * 특정 게시글의 리뷰 개수를 서브쿼리로 반환 -> 추후 필드값으로 수정 예정
+	 */
+	private SubQueryExpression<Long> reviewCountExpression() {
+		return JPAExpressions
+			.select(review.count())
+			.from(review)
+			.where(review.shipFishingPostId.eq(shipFishingPost.shipFishingPostId));
+	}
+
+	/**
+	 * 특정 회원이 해당 게시글을 좋아요 했는지 여부 반환
+	 */
+	private Expression<Boolean> likedExpression(Long memberId) {
+
+		if (memberId == null) {
+
+			return constant(false);
+		}
+
+		return JPAExpressions
+			.selectOne()
+			.from(like)
+			.where(
+				like.targetType.eq(LikeTargetType.SHIP_FISHING_POST),
+				like.targetId.eq(shipFishingPost.shipFishingPostId),
+				like.memberId.eq(memberId),
+				like.isDeleted.eq(false)
+			)
+			.exists();
 	}
 
 	private List<ShipFishingPostResponse.MyPagePostList> mapToMyPagePostList(

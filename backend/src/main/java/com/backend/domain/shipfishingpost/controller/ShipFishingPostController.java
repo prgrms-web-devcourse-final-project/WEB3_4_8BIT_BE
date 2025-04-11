@@ -82,11 +82,14 @@ public class ShipFishingPostController {
 	@Operation(summary = "선상 낚시 게시글 검색 및 조회", description = "유저가 선상 낚시 게시글을 조회할 때 사용하는 API")
 	public ResponseEntity<GenericResponse<ScrollResponse<ShipFishingPostResponse.DetailScroll>>> getShipFishingPostList(
 		@ParameterObject @ModelAttribute final ShipFishingPostRequest.Search requestDto,
-		@Valid final GlobalRequest.CursorRequest cursorRequestDto
+		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
+		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
+		Long memberId = user.getId() == null ? null : user.getId();
+
 		ScrollResponse<ShipFishingPostResponse.DetailScroll> response = shipFishingPostService
-			.getShipFishingPostScroll(requestDto, cursorRequestDto);
+			.getShipFishingPostScroll(memberId, requestDto, cursorRequestDto);
 
 		return ResponseEntity.ok(GenericResponse.of(true, response));
 	}

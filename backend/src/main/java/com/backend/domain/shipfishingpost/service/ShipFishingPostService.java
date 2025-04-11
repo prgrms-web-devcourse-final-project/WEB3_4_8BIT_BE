@@ -49,6 +49,7 @@ public interface ShipFishingPostService {
 	 * @author swjoon
 	 */
 	ScrollResponse<ShipFishingPostResponse.DetailScroll> getShipFishingPostScroll(
+		final Long memberId,
 		final ShipFishingPostRequest.Search searchDto,
 		final GlobalRequest.CursorRequest cursorRequestDto);
 

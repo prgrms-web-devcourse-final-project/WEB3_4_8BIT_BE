@@ -98,10 +98,11 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	@Override
 	@Transactional(readOnly = true)
 	public ScrollResponse<ShipFishingPostResponse.DetailScroll> getShipFishingPostScroll(
+		final Long memberId,
 		final ShipFishingPostRequest.Search searchDto,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
-		return shipFishingPostRepository.findDetailScrollBySearch(searchDto, cursorRequestDto);
+		return shipFishingPostRepository.findDetailScrollBySearch(memberId, searchDto, cursorRequestDto);
 	}
 
 	@Override
