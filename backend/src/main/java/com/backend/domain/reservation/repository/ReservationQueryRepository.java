@@ -67,7 +67,7 @@ public class ReservationQueryRepository {
 		return Optional.ofNullable(detailWithMember);
 	}
 
-	ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberId(final Long memberId,
+	public ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberId(final Long memberId,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
 		List<ReservationResponse.DetailWithName> detailWithNameList = jpaQueryFactory
@@ -105,7 +105,7 @@ public class ReservationQueryRepository {
 			!hasNext);
 	}
 
-	ScrollResponse<ReservationResponse.DetailReservationList> findDetailReservationListByMemberId(
+	public ScrollResponse<ReservationResponse.DetailReservationList> findDetailReservationListByMemberId(
 		final Long memberId,
 		final Boolean afterToday,
 		final Boolean isConfirm,
@@ -156,7 +156,7 @@ public class ReservationQueryRepository {
 			hasNext);
 	}
 
-	ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberIdAndShipFishingPostId(
+	public ScrollResponse<ReservationResponse.DetailWithName> findDetailWithNameByMemberIdAndShipFishingPostId(
 		final Long memberId,
 		final Long shipFishingPostId,
 		final Boolean afterToday,
@@ -206,7 +206,7 @@ public class ReservationQueryRepository {
 			hasNext);
 	}
 
-	Boolean findReservationListByShipFishingPostIdWithReservationConfirmAfterToday(
+	public Boolean findReservationListByShipFishingPostIdWithReservationConfirmAfterToday(
 		final Long shipFishingPostId, final LocalDate today) {
 
 		return jpaQueryFactory
@@ -218,7 +218,7 @@ public class ReservationQueryRepository {
 			.fetchFirst() != null;
 	}
 
-	ReservationResponse.DashBoard findDashBoardByMemberId(final Long memberId, final Integer limitDays) {
+	public ReservationResponse.DashBoard findDashBoardByMemberId(final Long memberId, final Integer limitDays) {
 
 		Long todayReservationCount = jpaQueryFactory.select(reservation.count())
 			.from(reservation)
