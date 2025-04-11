@@ -35,7 +35,7 @@ public class ActivityHistoryServiceImpl implements ActivityHistoryService {
 		}
 	}
 
-	private ActivityHistory getActivityHistory(Object target) {
+	private ActivityHistory getActivityHistory(final Object target) {
 		//물고기 도감 활동 기록 생성
 		if (target instanceof FishEncyclopedia fishEncyclopedia) {
 			Long fishId = fishEncyclopedia.getFishId();
