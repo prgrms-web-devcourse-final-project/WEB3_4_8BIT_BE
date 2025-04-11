@@ -1,5 +1,7 @@
 package com.backend.domain.activityhistory.repository;
 
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.activityhistory.dto.request.ActivityHistoryRequest;
@@ -29,5 +31,15 @@ public class ActivityHistoryRepositoryImpl implements ActivityHistoryRepository 
 		final Long memberId
 	) {
 		return activityHistoryQueryRepository.findDetail(cursorRequestDto, requestDto, memberId);
+	}
+
+	@Override
+	public List<Long> findActivityHistoryIdsBeforeOneMonth() {
+		return activityHistoryQueryRepository.findActivityHistoryIdsBeforeOneMonth();
+	}
+
+	@Override
+	public long deleteByIdList(final List<Long> activityHistoryidList) {
+		return activityHistoryQueryRepository.deleteByIdList(activityHistoryidList);
 	}
 }

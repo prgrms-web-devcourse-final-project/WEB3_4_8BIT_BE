@@ -1,5 +1,7 @@
 package com.backend.domain.activityhistory.repository;
 
+import java.util.List;
+
 import com.backend.domain.activityhistory.dto.request.ActivityHistoryRequest;
 import com.backend.domain.activityhistory.dto.response.ActivityHistoryResponse;
 import com.backend.domain.activityhistory.entity.ActivityHistory;
@@ -31,4 +33,21 @@ public interface ActivityHistoryRepository {
 		final ActivityHistoryRequest.Search requestDto,
 		final Long memberId
 	);
+
+	/**
+	 * 현재 날짜 기준 1달 전까지의 데이터 ID 값을 조회하는 메소드 입니다.
+	 *
+	 * @return {@link List<Long>}
+	 * @implSpec 현재 날짜 기준 1달 전까지의 데이터의 ID 값을 조회 후 결과 값 반환
+	 */
+	List<Long> findActivityHistoryIdsBeforeOneMonth();
+
+	/**
+	 * 파라미터로 받은 List에 해당하는 ID의 데이터를 삭제하는 메소드 입니다.
+	 *
+	 * @param activityHistoryidList {@link List<Long>}
+	 * @return {@link Long} 삭제된 데이터 개수
+	 * @implSpec 파라미터로 받은 List에 해당하는 ID의 데이터를 삭제
+	 */
+	long deleteByIdList(final List<Long> activityHistoryidList);
 }
