@@ -249,7 +249,26 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 		List<FishingTripPostResponse.HotPostDto> hotPostDtoList = fishingTripPostRepository.findHotPostDto(baseTime);
 
-		List<FishingTripPostResponse.HotPost> responseDto = hotPostDtoList.stream()
+		List<FishingTripPostResponse.HotPost> responseDto = getHotPostList(hotPostDtoList);
+
+		log.debug("[인기 동출글 조회] : 직접 조회");
+
+		hotPostRedisTemplate.opsForValue().set(hotPostKey, responseDto, Duration.ofMinutes(30));
+		log.debug("[인기 동출글 조회] : 캐사에 추가");
+
+		return responseDto;
+	}
+
+	/**
+	 * 주어진 리스트의 HotPostDto 객체들을 HotPost 객체로 변환하여 반환하는 메서드입니다.
+	 *
+	 * @param hotPostDtoList HotPostDto 객체들을 담고 있는 리스트. 각 HotPostDto에는 낚시 게시글의 ID, 제목, 지역 정보,
+	 *                       이미지 파일 ID 리스트, 인기 점수 등의 정보가 포함됩니다.
+	 * @return HotPost 객체로 변환된 리스트. 각 HotPost는 주어진 HotPostDto에서 변환된 데이터로 구성됩니다.
+	 *         이미지 URL은 파일 ID 리스트가 비어 있지 않으면 첫 번째 파일 ID를 기준으로 가져옵니다.
+	 */
+	private List<FishingTripPostResponse.HotPost> getHotPostList(List<FishingTripPostResponse.HotPostDto> hotPostDtoList) {
+		return hotPostDtoList.stream()
 			.map(dto -> {
 				String imageUrl = (dto.fileIdList() != null && !dto.fileIdList().isEmpty())
 					? getImageUrlById(dto.fileIdList().get(0))
@@ -265,13 +284,6 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 				);
 			})
 			.toList();
-
-		log.debug("[인기 동출글 조회] : 직접 조회");
-
-		hotPostRedisTemplate.opsForValue().set(hotPostKey, responseDto, Duration.ofMinutes(30));
-		log.debug("[인기 동출글 조회] : 캐사에 추가");
-
-		return responseDto;
 	}
 
 	/**
