@@ -28,6 +28,7 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -218,50 +219,95 @@ public class FishingTripPostQueryRepository {
 			.fetch();
 	}
 
-	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripPostDetailPage(
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripRecruitmentDetailPage(
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final PostStatus postStatus,
 		final Long memberId
 	) {
-		List<FishingTripPostResponse.MyFishingTripPostDetailPage> myFishingTripPostDetailPages = jpaQueryFactory.selectDistinct(
-				Projections.constructor(
-					FishingTripPostResponse.MyFishingTripPostDetailPage.class,
-					fishingTripPost.fishingTripPostId,
-					fishingTripPost.subject,
-					fishingTripPost.fishingPointId,
-					fishPoint.fishPointName,
-					fishPoint.fishPointDetailName,
-					fishingTripPost.fishingDate,
-					fishingTripPost.createdAt,
-					fishingTripPost.currentCount,
-					fishingTripPost.recruitmentCount,
-					fishingTripPost.postStatus,
-					fishingTripPost.commentCount,
-					fishingTripPost.likeCount
-				))
-			.from(fishingTripRecruitment)
-			.innerJoin(fishingTripPost)
-			.on(fishingTripRecruitment.fishingTripPostId.eq(fishingTripPost.fishingTripPostId))
-			.leftJoin(fishPoint)
-			.on(fishPoint.fishPointId.eq(fishingTripPost.fishingPointId))
-			.where(fishingTripRecruitment.memberId.eq(memberId),
-				fishingTripPost.postStatus.eq(postStatus),
-				cursorCondition(cursorRequestDto))
-			.orderBy(getOrderBy(cursorRequestDto))
-			.limit(cursorRequestDto.size() + 1)
-			.fetch();
+		List<FishingTripPostResponse.MyFishingTripPostDetailPage> MyFishingTripPostDetailPage =
+			fetchMyFishingTripPostPages(ParticipationType.APPLICANT, cursorRequestDto, postStatus, memberId);
 
-		boolean isLast = myFishingTripPostDetailPages.size() <= cursorRequestDto.size();
+		return createScrollResponse(MyFishingTripPostDetailPage, cursorRequestDto);
+	}
 
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyPostFishingTripPostDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus postStatus,
+		final Long memberId
+	) {
+		List<FishingTripPostResponse.MyFishingTripPostDetailPage> MyFishingTripPostDetailPage =
+			fetchMyFishingTripPostPages(ParticipationType.AUTHOR, cursorRequestDto, postStatus, memberId);
+
+		return createScrollResponse(MyFishingTripPostDetailPage, cursorRequestDto);
+	}
+
+	private ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> createScrollResponse(
+		final List<FishingTripPostResponse.MyFishingTripPostDetailPage> MyFishingTripPostDetailPage,
+		final GlobalRequest.CursorRequest cursorRequest
+	) {
+		boolean isLast = MyFishingTripPostDetailPage.size() <= cursorRequest.size();
 		if (!isLast)
-			myFishingTripPostDetailPages.remove(myFishingTripPostDetailPages.size() - 1);
+			MyFishingTripPostDetailPage.remove(MyFishingTripPostDetailPage.size() - 1);
 
 		return ScrollResponse.from(
-			myFishingTripPostDetailPages,
-			cursorRequestDto.size(),
-			myFishingTripPostDetailPages.size(),
-			cursorRequestDto.fieldValue() == null,
+			MyFishingTripPostDetailPage,
+			cursorRequest.size(),
+			MyFishingTripPostDetailPage.size(),
+			cursorRequest.fieldValue() == null,
 			isLast
 		);
 	}
+
+	private List<FishingTripPostResponse.MyFishingTripPostDetailPage> fetchMyFishingTripPostPages(
+		final ParticipationType base,
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final PostStatus postStatus,
+		final Long memberId
+	) {
+		BooleanExpression whereCondition = base == ParticipationType.APPLICANT
+			? fishingTripRecruitment.memberId.eq(memberId)
+			: fishingTripPost.memberId.eq(memberId);
+
+		JPAQuery<FishingTripPostResponse.MyFishingTripPostDetailPage> query = jpaQueryFactory
+			.select(Projections.constructor(
+				FishingTripPostResponse.MyFishingTripPostDetailPage.class,
+				fishingTripPost.fishingTripPostId,
+				fishingTripPost.subject,
+				fishingTripPost.fishingPointId,
+				fishPoint.fishPointName,
+				fishPoint.fishPointDetailName,
+				fishingTripPost.fishingDate,
+				fishingTripPost.createdAt,
+				fishingTripPost.currentCount,
+				fishingTripPost.recruitmentCount,
+				fishingTripPost.postStatus,
+				fishingTripPost.commentCount,
+				fishingTripPost.likeCount
+			));
+
+		if (base == ParticipationType.APPLICANT) {
+			query.from(fishingTripRecruitment)
+				.innerJoin(fishingTripPost)
+				.on(fishingTripRecruitment.fishingTripPostId.eq(fishingTripPost.fishingTripPostId));
+		} else {
+			query.from(fishingTripPost);
+		}
+
+		query.leftJoin(fishPoint).on(fishPoint.fishPointId.eq(fishingTripPost.fishingPointId))
+			.where(
+				whereCondition,
+				fishingTripPost.postStatus.eq(postStatus),
+				cursorCondition(cursorRequestDto)
+			)
+			.orderBy(getOrderBy(cursorRequestDto))
+			.limit(cursorRequestDto.size() + 1);
+
+		return query.fetch();
+	}
+
+	private enum ParticipationType {
+		AUTHOR,
+		APPLICANT
+	}
+
 }

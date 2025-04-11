@@ -150,7 +150,26 @@ public interface FishingTripPostService {
 	 * @param postStatus 게시글 상태 필터 (RECRUITING | COMPLETED)
 	 * @return 페이징 처리된 내가 신청한 동출 게시글 리스트 응답
 	 */
-	ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripPostDetailPage(
+	ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> getMyFishingTripPostDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long memberId,
+		final PostStatus postStatus
+	);
+
+	/**
+	 * 내가 작성한 동출 모집 게시글을 커서 기반으로 조회합니다.
+	 * <p>
+	 * 게시글 상태(PostStatus)에 따라 '모집중' 또는 '모집완료'인 게시글만 필터링되며,
+	 * 로그인한 사용자가 신청자(memberId)인 게시글에 대해서만 결과를 반환합니다.
+	 * 커서 기반 페이징을 적용하여 무한 스크롤 형태로 응답합니다.
+	 * </p>
+	 *
+	 * @param cursorRequestDto 커서 기반 페이지네이션 요청 정보 (정렬 기준, 방향, 커서 값 등)
+	 * @param memberId 조회할 작성자의 회원 ID
+	 * @param postStatus 조회할 게시글 상태 (예: RECRUITING, COMPLETED 등)
+	 * @return 내가 작성한 동출 모집 게시글 목록을 커서 기반으로 응답하는 ScrollResponse 객체
+	 */
+	ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> getMyPostFishingTripPostDetailPage(
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long memberId,
 		final PostStatus postStatus

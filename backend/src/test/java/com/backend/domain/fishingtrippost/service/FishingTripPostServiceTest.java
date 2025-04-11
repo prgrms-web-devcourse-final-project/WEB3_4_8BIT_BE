@@ -597,12 +597,12 @@ class FishingTripPostServiceTest extends BaseTest {
 				true
 			);
 
-		when(fishingTripPostRepository.findMyFishingTripPostDetailPage(cursorRequest, postStatus, memberId))
+		when(fishingTripPostRepository.findMyFishingTripRecruitmentDetailPage(cursorRequest, postStatus, memberId))
 			.thenReturn(mockResponse);
 
 		// When
 		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> result =
-			fishingTripPostService.findMyFishingTripPostDetailPage(cursorRequest, memberId, postStatus);
+			fishingTripPostService.getMyFishingTripPostDetailPage(cursorRequest, memberId, postStatus);
 
 		// Then
 		assertThat(result).isNotNull();
@@ -614,5 +614,61 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		FishingTripPostResponse.MyFishingTripPostDetailPage resultDto2 = result.content().get(1);
 		assertThat(resultDto2.fishingTripPostId()).isEqualTo(101L);
+	}
+
+	@Test
+	@DisplayName("내가 작성한 동출 게시글 목록 커서 기반 조회 [Service] - Success")
+	void t15() {
+		// Given
+		Long memberId = 1L;
+		PostStatus postStatus = PostStatus.RECRUITING;
+
+		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+			"desc", "createdAt", "next", null, null, 10
+		);
+
+		FishingTripPostResponse.MyFishingTripPostDetailPage dto1 =
+			new FishingTripPostResponse.MyFishingTripPostDetailPage(
+				200L, "서울낚시", 10L, "서해", "서해 갯벌",
+				ZonedDateTime.now().plusDays(4), ZonedDateTime.now(),
+				3, 6, PostStatus.RECRUITING, 4L, 15L
+			);
+
+		FishingTripPostResponse.MyFishingTripPostDetailPage dto2 =
+			new FishingTripPostResponse.MyFishingTripPostDetailPage(
+				201L, "혼자보단 함께", 11L, "제주", "제주 바다",
+				ZonedDateTime.now().plusDays(5), ZonedDateTime.now(),
+				2, 5, PostStatus.RECRUITING, 2L, 9L
+			);
+
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> mockResponse =
+			new ScrollResponse<>(
+				List.of(dto1, dto2),
+				10,
+				2,
+				false,
+				true
+			);
+
+		when(fishingTripPostRepository.findMyPostFishingTripPostDetailPage(cursorRequest, postStatus, memberId))
+			.thenReturn(mockResponse);
+
+		// When
+		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> result =
+			fishingTripPostService.getMyPostFishingTripPostDetailPage(cursorRequest, memberId, postStatus);
+
+		// Then
+		assertThat(result).isNotNull();
+		assertThat(result.content()).hasSize(2);
+
+		FishingTripPostResponse.MyFishingTripPostDetailPage resultDto1 = result.content().get(0);
+		assertThat(resultDto1.fishingTripPostId()).isEqualTo(200L);
+		assertThat(resultDto1.fishingPointName()).isEqualTo("서해");
+
+		FishingTripPostResponse.MyFishingTripPostDetailPage resultDto2 = result.content().get(1);
+		assertThat(resultDto2.fishingTripPostId()).isEqualTo(201L);
+		assertThat(resultDto2.fishingPointName()).isEqualTo("제주");
+
+		verify(fishingTripPostRepository).findMyPostFishingTripPostDetailPage(cursorRequest, postStatus, memberId);
 	}
 }

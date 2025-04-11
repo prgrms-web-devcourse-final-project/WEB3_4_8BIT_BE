@@ -61,11 +61,19 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	}
 
 	@Override
-	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripPostDetailPage(
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripRecruitmentDetailPage(
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final PostStatus postStatus,
 		final Long memberId) {
-		return fishingTripPostQueryRepository.findMyFishingTripPostDetailPage(cursorRequestDto, postStatus, memberId);
+		return fishingTripPostQueryRepository.findMyFishingTripRecruitmentDetailPage(cursorRequestDto, postStatus,
+			memberId);
+	}
+
+	@Override
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyPostFishingTripPostDetailPage(
+		GlobalRequest.CursorRequest cursorRequestDto, PostStatus postStatus, Long memberId) {
+		return fishingTripPostQueryRepository.findMyPostFishingTripPostDetailPage(cursorRequestDto, postStatus,
+			memberId);
 	}
 
 	@Override
@@ -80,5 +88,4 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 		final Long fishingTripPostId) {
 		return fishingTripPostQueryRepository.findApprovedParticipants(fishingTripPostId);
 	}
-
 }
