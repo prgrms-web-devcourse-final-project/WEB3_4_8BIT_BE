@@ -7,8 +7,6 @@ import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.domain.region.entity.QRegion.*;
 import static com.backend.global.storage.entity.QFile.*;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -18,7 +16,6 @@ import org.springframework.util.StringUtils;
 
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
-
 import com.backend.domain.fishingtrippost.dto.response.QFishingTripPostResponse_DetailPageQueryDto;
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.global.dto.request.GlobalRequest;
@@ -29,6 +26,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -87,7 +85,9 @@ public class FishingTripPostQueryRepository {
 				fishingTripPost.createdAt,
 				fishingTripPost.recruitmentCount,
 				fishingTripPost.postStatus,
-				fishingTripPost.fileIdList
+				fishingTripPost.fileIdList,
+				fishingTripPost.commentCount,
+				fishingTripPost.likeCount
 			))
 			.from(fishingTripPost)
 			.leftJoin(region).on(fishingTripPost.regionId.eq(region.regionId))
@@ -130,10 +130,9 @@ public class FishingTripPostQueryRepository {
 	private BooleanExpression cursorCondition(final GlobalRequest.CursorRequest cursorRequestDto) {
 		if (cursorRequestDto.fieldValue() == null || cursorRequestDto.id() == null)
 			return null;
-		// TODO: 다른 정렬 필드 추가 시 확장
 		return switch (cursorRequestDto.sort()) {
 			case "createdAt" -> getBooleanExpressionByCreatedAt(cursorRequestDto);
-
+			case "popularity" -> getBooleanExpressionByPopularity(cursorRequestDto);
 			default -> throw new IllegalArgumentException("지원되지 않는 정렬 필드: " + cursorRequestDto.sort());
 		};
 	}
@@ -144,8 +143,26 @@ public class FishingTripPostQueryRepository {
 		Order order = QuerydslUtil.getOrder(cursorRequestDto);
 
 		return QuerydslUtil.createFieldPredicate(
-			fishingTripPost.fishingTripPostId, cursorRequestDto.id(),
-			fishingTripPost.createdAt, value,
+			fishingTripPost.fishingTripPostId,
+			cursorRequestDto.id(),
+			fishingTripPost.createdAt,
+			value,
+			order
+		);
+	}
+
+	private static BooleanExpression getBooleanExpressionByPopularity(
+		final GlobalRequest.CursorRequest cursorRequestDto) {
+		Long value = Long.parseLong(cursorRequestDto.fieldValue());
+		Order order = QuerydslUtil.getOrder(cursorRequestDto);
+
+		NumberExpression<Long> popularityScore = fishingTripPost.likeCount.add(fishingTripPost.commentCount);
+
+		return QuerydslUtil.createFieldPredicate(
+			fishingTripPost.fishingTripPostId,
+			cursorRequestDto.id(),
+			popularityScore,
+			value,
 			order
 		);
 	}
@@ -153,9 +170,20 @@ public class FishingTripPostQueryRepository {
 	private OrderSpecifier<?>[] getOrderBy(final GlobalRequest.CursorRequest cursorRequestDto) {
 		Order direction = QuerydslUtil.getOrder(cursorRequestDto);
 
-		return new OrderSpecifier<?>[] {
-			new OrderSpecifier<>(direction, fishingTripPost.createdAt),
-			new OrderSpecifier<>(direction, fishingTripPost.fishingTripPostId)
+		return switch (cursorRequestDto.sort()) {
+			case "createdAt" -> new OrderSpecifier<?>[] {
+				new OrderSpecifier<>(direction, fishingTripPost.createdAt),
+				new OrderSpecifier<>(direction, fishingTripPost.fishingTripPostId)
+			};
+			case "popularity" -> {
+				NumberExpression<Long> popularityScore =
+					fishingTripPost.likeCount.add(fishingTripPost.commentCount);
+				yield new OrderSpecifier<?>[] {
+					new OrderSpecifier<>(direction, popularityScore),
+					new OrderSpecifier<>(direction, fishingTripPost.fishingTripPostId)
+				};
+			}
+			default -> throw new IllegalArgumentException("지원되지 않는 정렬 필드: " + cursorRequestDto.sort());
 		};
 	}
 

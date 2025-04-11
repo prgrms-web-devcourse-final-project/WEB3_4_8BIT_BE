@@ -17,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.backend.domain.activityhistory.service.ActivityHistoryService;
 import com.backend.domain.chat.room.entity.TargetType;
 import com.backend.domain.chat.room.service.RoomService;
-import com.backend.domain.comment.repository.CommentRepository;
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.fishingtrippost.dto.request.FishingTripPostRequest;
 import com.backend.domain.fishingtrippost.dto.response.FishingTripPostResponse;
@@ -35,7 +34,6 @@ import com.backend.domain.member.entity.Member;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
-import com.backend.domain.region.entity.RegionType;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.storage.entity.File;
@@ -417,7 +415,9 @@ class FishingTripPostServiceTest extends BaseTest {
 				ZonedDateTime.parse("2025-04-09T04:00:00+09:00"),
 				5,
 				PostStatus.RECRUITING,
-				List.of(fileId)
+				List.of(fileId),
+				0L,
+				0L
 			);
 
 		when(fishingTripPostRepository.findScrollDetailPageDto(any(), isNull(), isNull(), isNull()))
@@ -469,7 +469,9 @@ class FishingTripPostServiceTest extends BaseTest {
 				ZonedDateTime.parse("2025-04-09T04:00:00+09:00"),
 				5,
 				PostStatus.RECRUITING,
-				List.of(fileId)
+				List.of(fileId),
+				0L,
+				0L
 			);
 
 		when(fishingTripPostRepository.findScrollDetailPageDto(any(), isNull(), isNull(), isNull()))
