@@ -192,11 +192,21 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	}
 
 	@Override
-	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> findMyFishingTripPostDetailPage(
+	@Transactional(readOnly = true)
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> getMyFishingTripPostDetailPage(
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long memberId,
 		final PostStatus postStatus) {
-		return fishingTripPostRepository.findMyFishingTripPostDetailPage(cursorRequestDto, postStatus, memberId);
+		return fishingTripPostRepository.findMyFishingTripRecruitmentDetailPage(cursorRequestDto, postStatus, memberId);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> getMyPostFishingTripPostDetailPage(
+		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long memberId,
+		final PostStatus postStatus) {
+		return fishingTripPostRepository.findMyPostFishingTripPostDetailPage(cursorRequestDto, postStatus, memberId);
 	}
 
 	/**
@@ -212,20 +222,6 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private boolean getIsLiked(final Long memberId, final Long fishingTripPostId) {
 		return (memberId != null) &&
 			likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, TARGET_TYPE, fishingTripPostId);
-	}
-
-	/**
-	 * 해당 게시글에 등록된 총 '좋아요' 수를 조회합니다.
-	 *
-	 * <p>{@link LikeRepository}를 통해 게시글 ID 기반으로 좋아요 개수를 계산합니다.</p>
-	 *
-	 * @param fishingTripPostId 대상 게시글의 ID
-	 * @return 게시글에 눌린 총 좋아요 수
-	 */
-	private Long getLikeCount(final Long fishingTripPostId) {
-		return likeRepository.countByTargetTypeAndTargetId(
-			TARGET_TYPE, fishingTripPostId
-		);
 	}
 
 	/**
