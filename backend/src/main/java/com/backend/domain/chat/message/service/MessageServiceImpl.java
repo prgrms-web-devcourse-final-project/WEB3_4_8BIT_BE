@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.backend.domain.chat.dto.request.CursorRequest;
+import com.backend.domain.chat.dto.request.ChatRequest;
 import com.backend.domain.chat.dto.response.CursorResponse;
 import com.backend.domain.chat.message.converter.MessageConverter;
 import com.backend.domain.chat.message.dto.request.MessageRequest;
@@ -58,7 +58,7 @@ public class MessageServiceImpl implements MessageService {
 	@Override
 	public CursorResponse<MessageResponse.Basic> getMessagesByRoomId(
 		final Long roomId,
-		final CursorRequest cursorRequestDto
+		final ChatRequest.MessageCursorRequest cursorRequestDto
 	) {
 		// 1. 메시지 목록 조회
 		List<Message> messageList = messageQueryRepository.findMessagesByRoomId(roomId, cursorRequestDto);

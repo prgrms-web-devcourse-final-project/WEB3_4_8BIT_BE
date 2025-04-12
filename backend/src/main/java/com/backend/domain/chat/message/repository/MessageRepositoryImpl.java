@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Repository;
 
-import com.backend.domain.chat.dto.request.CursorRequest;
+import com.backend.domain.chat.dto.request.ChatRequest;
 import com.backend.domain.chat.message.entity.Message;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,10 @@ public class MessageRepositoryImpl implements MessageRepository {
 	}
 
 	@Override
-	public List<Message> findMessagesByRoomId(final Long roomId, final CursorRequest cursorRequestDto) {
+	public List<Message> findMessagesByRoomId(
+		final Long roomId,
+		final ChatRequest.MessageCursorRequest cursorRequestDto
+	) {
 		return messageQueryRepository.findMessagesByRoomId(roomId, cursorRequestDto);
 	}
 }
