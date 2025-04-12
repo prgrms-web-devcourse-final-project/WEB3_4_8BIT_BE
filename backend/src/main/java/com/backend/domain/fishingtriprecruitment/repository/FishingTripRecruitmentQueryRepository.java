@@ -1,17 +1,16 @@
 package com.backend.domain.fishingtriprecruitment.repository;
 
+import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
+import static com.backend.domain.fishingtriprecruitment.entity.QFishingTripRecruitment.*;
+import static com.backend.domain.member.entity.QMember.*;
+import static com.backend.global.storage.entity.QFile.*;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
-
-import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
-import static com.backend.domain.fishingtriprecruitment.entity.QFishingTripRecruitment.*;
-import static com.backend.domain.member.entity.QMember.*;
-import static com.backend.global.storage.entity.QFile.*;
 
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruitmentResponse;
@@ -56,15 +55,10 @@ public class FishingTripRecruitmentQueryRepository {
 
 		List<FishingTripRecruitmentResponse.DetailPage> pageList = new ArrayList<>(detailPageList);
 
-
 		boolean isLast = pageList.size() <= cursorRequestDto.size();
 
 		if (!isLast) {
 			pageList.remove(pageList.size() - 1);
-		}
-
-		if ("prev".equalsIgnoreCase(cursorRequestDto.type())) {
-			Collections.reverse(pageList);
 		}
 
 		return ScrollResponse.from(
