@@ -120,7 +120,6 @@ public class FishingTripPost extends BaseEntity {
 		final Integer recruitmentCount,
 		final Boolean isShipFish,
 		final ZonedDateTime fishingDate,
-		final Long fishingPointId,
 		final List<Long> fileIdList
 	) {
 		this.subject = subject;
@@ -128,7 +127,6 @@ public class FishingTripPost extends BaseEntity {
 		this.recruitmentCount = recruitmentCount;
 		this.isShipFish = isShipFish;
 		this.fishingDate = fishingDate;
-		this.fishingPointId = fishingPointId;
 		this.fileIdList = fileIdList;
 	}
 
