@@ -27,7 +27,10 @@ public class MessageQueryRepository {
 
 		// 커서 조건 (_id 기준으로만)
 		if (cursorRequestDto != null) {
-			criteria = criteria.and("_id").lt(new ObjectId(cursorRequestDto.id()));
+			String cursorId = cursorRequestDto.id();
+			if (cursorId != null && !cursorId.isBlank() && ObjectId.isValid(cursorId)) {
+				criteria = criteria.and("_id").lt(new ObjectId(cursorId));
+			}
 		}
 
 		Query query = new Query(criteria)

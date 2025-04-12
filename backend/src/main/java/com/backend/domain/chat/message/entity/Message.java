@@ -22,6 +22,7 @@ import lombok.experimental.SuperBuilder;
 public class Message {
 
 	@Id
+	@Field("_id")
 	private ObjectId messageId;
 
 	@Field("room_id")
