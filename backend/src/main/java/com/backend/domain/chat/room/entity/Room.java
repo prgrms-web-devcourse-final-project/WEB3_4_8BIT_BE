@@ -40,6 +40,9 @@ public class Room extends BaseEntity {
 	@Column(nullable = false)
 	private Long targetId;
 
+	@Column(nullable = false)
+	private String targetName;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private TargetType targetType;

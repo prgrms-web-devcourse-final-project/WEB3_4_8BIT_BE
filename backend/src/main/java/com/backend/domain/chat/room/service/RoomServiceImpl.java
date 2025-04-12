@@ -85,6 +85,7 @@ public class RoomServiceImpl implements RoomService {
 				return new RoomResponse.Basic(
 					room.getRoomId(),
 					room.getTargetId(),
+					room.getTargetName(),
 					room.getTargetType(),
 					participantCount,
 					lastMessage

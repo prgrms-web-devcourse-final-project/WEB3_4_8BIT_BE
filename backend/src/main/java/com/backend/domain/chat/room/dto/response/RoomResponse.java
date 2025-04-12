@@ -8,6 +8,7 @@ public class RoomResponse {
 	public record Basic(
 		Long roomId,
 		Long targetId,
+		String targetName,
 		TargetType targetType,
 		int participantCount,
 		MessageResponse.Last lastMessage
