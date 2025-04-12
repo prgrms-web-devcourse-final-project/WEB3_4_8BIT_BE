@@ -100,6 +100,16 @@ public interface LikeRepository {
 	int deleteAllSoftDeletedLikes();
 
 	/**
+	 * 게시글의 좋아요를 전체 영구 삭제
+	 *
+	 * @implSpec 하드 딜리트 메서드
+	 */
+	void deleteLikesByTargetTypeAndTargetId(
+		final LikeTargetType targetType,
+		final Long targetId
+	);
+
+	/**
 	 * 로그인한 사용자가 좋아요를 누른 낚시 동행 게시글 목록을 커서 기반으로 조회합니다.
 	 *
 	 * <p>정렬 기준은 좋아요를 누른 시점(like.createdAt)이며, ID(likeId)를 보조 커서로 사용합니다.
