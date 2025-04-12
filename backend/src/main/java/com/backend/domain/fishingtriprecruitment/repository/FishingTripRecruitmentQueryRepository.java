@@ -1,9 +1,12 @@
 package com.backend.domain.fishingtriprecruitment.repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
+import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
 import static com.backend.domain.fishingtriprecruitment.entity.QFishingTripRecruitment.*;
 import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.global.storage.entity.QFile.*;
@@ -13,6 +16,7 @@ import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruit
 import com.backend.domain.fishingtriprecruitment.dto.response.QFishingTripRecruitmentResponse_DetailPage;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -83,5 +87,27 @@ public class FishingTripRecruitmentQueryRepository {
 		jpaQueryFactory.delete(fishingTripRecruitment)
 			.where(fishingTripRecruitment.fishingTripPostId.eq(fishingTripPostId))
 			.execute();
+	}
+
+	public Map<Long, Integer> findApprovedFishingTripPostIdsWithCount(final Long memberId) {
+		List<Tuple> tupleList = jpaQueryFactory
+			.select(
+				fishingTripPost.fishingTripPostId,
+				fishingTripPost.currentCount
+			)
+			.from(fishingTripRecruitment)
+			.join(fishingTripPost)
+			.on(fishingTripRecruitment.fishingTripPostId.eq(fishingTripPost.fishingTripPostId))
+			.where(
+				fishingTripRecruitment.memberId.eq(memberId),
+				fishingTripRecruitment.recruitmentStatus.eq(RecruitmentStatus.APPROVED)
+			)
+			.groupBy(fishingTripPost.fishingTripPostId, fishingTripPost.currentCount)
+			.fetch();
+
+		return tupleList.stream().collect(Collectors.toMap(
+			t -> t.get(fishingTripPost.fishingTripPostId),
+			t -> t.get(fishingTripPost.currentCount)
+		));
 	}
 }

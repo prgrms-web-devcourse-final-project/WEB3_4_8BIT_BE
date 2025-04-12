@@ -9,7 +9,9 @@ import static com.backend.global.storage.entity.QFile.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
@@ -362,4 +364,18 @@ public class FishingTripPostQueryRepository {
 			.limit(5)
 			.fetch();
 	}
+
+	public Map<Long, Integer> findFishingTripPostIdWithApprovedCount(final Long memberId) {
+		return jpaQueryFactory
+			.select(fishingTripPost.fishingTripPostId, fishingTripPost.currentCount)
+			.from(fishingTripPost)
+			.where(fishingTripPost.memberId.eq(memberId))
+			.fetch()
+			.stream()
+			.collect(Collectors.toMap(
+				tuple -> tuple.get(fishingTripPost.fishingTripPostId),
+				tuple -> tuple.get(fishingTripPost.currentCount)
+			));
+	}
+
 }

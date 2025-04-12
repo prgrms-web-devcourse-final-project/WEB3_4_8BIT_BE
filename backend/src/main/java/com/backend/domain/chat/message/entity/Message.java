@@ -1,11 +1,11 @@
 package com.backend.domain.chat.message.entity;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -22,9 +22,11 @@ import lombok.experimental.SuperBuilder;
 public class Message {
 
 	@Id
+	@Field("_id")
 	private ObjectId messageId;
 
 	@Field("room_id")
+	@Indexed
 	private Long roomId;
 
 	@Field("sender_id")
@@ -50,11 +52,7 @@ public class Message {
 
 	@CreatedDate
 	@Field("createdAt")
-	private ZonedDateTime createdAt;
-
-	@LastModifiedDate
-	@Field("modifiedAt")
-	private ZonedDateTime modifiedAt;
+	private LocalDateTime createdAt;
 
 	/**
 	 * 메세지 활성화 (디폴트 값)

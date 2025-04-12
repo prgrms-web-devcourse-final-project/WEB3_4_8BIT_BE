@@ -1,7 +1,10 @@
 package com.backend.domain.member.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -47,5 +50,19 @@ public class MemberQueryRepository {
 			.from(member)
 			.where(member.memberId.in(memberIdList))
 			.fetch();
+	}
+
+	public Map<Long, String> getFileUrlMapByIdList(final Set<Long> memberIdList) {
+		return queryFactory
+			.select(member.memberId, file.url)
+			.from(member)
+			.join(file).on(member.fileId.eq(file.fileId))
+			.where(member.memberId.in(memberIdList))
+			.fetch()
+			.stream()
+			.collect(Collectors.toMap(
+				tuple -> tuple.get(member.memberId),
+				tuple -> tuple.get(file.url)
+			));
 	}
 }

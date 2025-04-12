@@ -1,5 +1,8 @@
 package com.backend.domain.member.service;
 
+import java.util.Map;
+import java.util.Set;
+
 import com.backend.domain.member.dto.MemberRequest;
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.exception.MemberException;
@@ -45,4 +48,12 @@ public interface MemberService {
 	 * @return	회원의 프로필 이미지 URL
 	 */
 	MemberResponse.ChatProfile getChatProfile(final Long memberId);
+
+	/**
+	 * 주어진 회원 ID 집합을 기반으로 각 회원의 채팅 프로필 이미지 URL을 조회
+	 *
+	 * @param memberIds 조회할 회원 ID 집합
+	 * @return 회원 ID를 키로, 채팅 프로필 이미지 URL을 값으로 갖는 Map
+	 */
+	Map<Long, String> getChatProfileUrls(final Set<Long> memberIds);
 }

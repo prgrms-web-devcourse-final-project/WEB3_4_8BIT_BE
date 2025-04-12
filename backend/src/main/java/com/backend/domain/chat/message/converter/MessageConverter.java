@@ -26,8 +26,8 @@ public class MessageConverter {
 			.build();
 	}
 
-	public static MessageResponse toResponse(final Message message, final String senderProfileImageUrl) {
-		return MessageResponse.builder()
+	public static MessageResponse.Basic toResponse(final Message message, final String senderProfileImageUrl) {
+		return MessageResponse.Basic.builder()
 			.messageId(message.getMessageId().toHexString())
 			.roomId(message.getRoomId())
 			.senderId(message.getSenderId())
@@ -38,5 +38,14 @@ public class MessageConverter {
 			.type(message.getType())
 			.createdAt(message.getCreatedAt())
 			.build();
+	}
+
+	public static MessageResponse.Last toLastMessageResponse(final Message message) {
+		return new MessageResponse.Last(
+			message.getContent(),
+			message.getType(),
+			message.getSenderNickname(),
+			message.getCreatedAt()
+		);
 	}
 }

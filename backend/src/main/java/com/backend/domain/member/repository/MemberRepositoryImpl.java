@@ -1,7 +1,9 @@
 package com.backend.domain.member.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.stereotype.Repository;
 
@@ -44,5 +46,10 @@ public class MemberRepositoryImpl implements MemberRepository {
 	@Override
 	public List<String> findEmailListByIdList(final List<Long> memberIdList) {
 		return memberQueryRepository.findEmailListByIdList(memberIdList);
+	}
+
+	@Override
+	public Map<Long, String> getFileUrlMapByIdList(final Set<Long> memberIdList) {
+		return Map.of();
 	}
 }

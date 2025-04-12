@@ -1,7 +1,9 @@
 package com.backend.domain.member.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.entity.Member;
@@ -65,4 +67,12 @@ public interface MemberRepository {
 	 * @implSpec 내부적으로 {@code member.id IN (:memberIdList)} 조건으로 쿼리를 수행하며, 컬럼만 추출하여 반환합니다.
 	 */
 	List<String> findEmailListByIdList(final List<Long> memberIdList);
+
+	/**
+	 * 주어진 회원 ID 리스트를 기반으로 각 회원의 프로필 이미지 URL을 조회
+	 *
+	 * @param memberIdList 조회할 회원 ID 리스트
+	 * @return 회원 ID를 키로, 프로필 이미지 URL을 값으로 갖는 Map
+	 */
+	Map<Long, String> getFileUrlMapByIdList(final Set<Long> memberIdList);
 }

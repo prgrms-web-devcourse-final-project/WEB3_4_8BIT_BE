@@ -1,5 +1,7 @@
 package com.backend.domain.chat.message.service;
 
+import com.backend.domain.chat.dto.request.ChatRequest;
+import com.backend.domain.chat.dto.response.ChatResponse;
 import com.backend.domain.chat.message.dto.request.MessageRequest;
 import com.backend.domain.chat.message.dto.response.MessageResponse;
 
@@ -15,10 +17,22 @@ public interface MessageService {
 	 * @param requestDto 저장할 메시지의 정보를 담은 DTO
 	 * @return 저장된 메시지에 대한 응답 DTO
 	 */
-	MessageResponse saveMessage(
+	MessageResponse.Basic saveMessage(
 		final Long senderId,
 		final String nickname,
 		final String fileUrl,
 		final MessageRequest requestDto
+	);
+
+	/**
+	 * 채팅방의 이전 메시지 목록을 커서 기반으로 조회
+	 *
+	 * @param roomId 메시지를 조회할 채팅방 ID
+	 * @param cursorRequestDto 커서 기반 페이지네이션 요청 정보
+	 * @return 메시지 목록과 다음 커서 정보
+	 */
+	ChatResponse.MessageCursorResponse<MessageResponse.Basic> getMessagesByRoomId(
+		final Long roomId,
+		final ChatRequest.MessageCursorRequest cursorRequestDto
 	);
 }

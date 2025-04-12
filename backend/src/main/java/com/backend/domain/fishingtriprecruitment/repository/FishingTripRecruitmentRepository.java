@@ -1,6 +1,7 @@
 package com.backend.domain.fishingtriprecruitment.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
@@ -69,4 +70,12 @@ public interface FishingTripRecruitmentRepository {
 	 * @param fishingTripPostId 삭제할 동출 게시글의 ID
 	 */
 	void deleteAllByPostId(final Long fishingTripPostId);
+
+	/**
+	 * 주어진 회원 ID를 기준으로 승인된 동출 게시글 ID와 각 게시글의 현재 참여자 수를 조회
+	 *
+	 * @param memberId 조회할 회원의 ID
+	 * @return 게시글 ID를 키로, 참여자 수를 값으로 갖는 Map
+	 */
+	Map<Long, Integer> findApprovedFishingTripPostIdsWithCount(final Long memberId);
 }

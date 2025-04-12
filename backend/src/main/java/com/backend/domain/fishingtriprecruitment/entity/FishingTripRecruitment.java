@@ -25,6 +25,10 @@ import lombok.experimental.SuperBuilder;
 		@Index(
 			name = "idx_fishing_trip_recruitment_01",
 			columnList = "fishing_trip_post_id, recruitment_status, fishing_trip_recruitment_id"
+		),
+		@Index(
+			name = "idx_fishing_trip_recruitment_02",
+			columnList = "fishing_trip_post_id, member_id, recruitment_status"
 		)
 	}
 )

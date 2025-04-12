@@ -1,7 +1,11 @@
 package com.backend.domain.chat.message.repository;
 
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.stereotype.Repository;
 
+import com.backend.domain.chat.dto.request.ChatRequest;
 import com.backend.domain.chat.message.entity.Message;
 
 import lombok.RequiredArgsConstructor;
@@ -16,5 +20,18 @@ public class MessageRepositoryImpl implements MessageRepository {
 	@Override
 	public Message save(final Message message) {
 		return messageMongoRepository.save(message);
+	}
+
+	@Override
+	public List<Message> findMessagesByRoomId(
+		final Long roomId,
+		final ChatRequest.MessageCursorRequest cursorRequestDto
+	) {
+		return messageQueryRepository.findMessagesByRoomId(roomId, cursorRequestDto);
+	}
+
+	@Override
+	public Map<Long, Message> findLastMessageByRoomIds(final List<Long> roomIdList) {
+		return messageQueryRepository.findLastMessagesByRoomIds(roomIdList);
 	}
 }

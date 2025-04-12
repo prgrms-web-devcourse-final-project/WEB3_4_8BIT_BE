@@ -31,7 +31,7 @@ public class MessageController {
 		String nickname = (String)sessionAttributes.get("nickname");
 		String fileUrl = (String)sessionAttributes.get("fileUrl");
 
-		MessageResponse messageResponse = messageService.saveMessage(senderId, nickname, fileUrl, requestDto);
+		MessageResponse.Basic messageResponse = messageService.saveMessage(senderId, nickname, fileUrl, requestDto);
 
 		messagingTemplate.convertAndSend("/topic/chat/" + requestDto.roomId(), messageResponse);
 	}
