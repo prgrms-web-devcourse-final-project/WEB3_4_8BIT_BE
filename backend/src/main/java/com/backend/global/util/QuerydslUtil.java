@@ -44,9 +44,12 @@ public class QuerydslUtil {
 		final Integer sortFieldValue,
 		final Order order
 	) {
-		return sortField.eq(sortFieldValue)
-			.and(idField.gt(idFieldValue))
-			.or(order.equals(Order.DESC) ? sortField.lt(sortFieldValue) : sortField.gt(sortFieldValue));
+
+		return order == Order.DESC
+			? sortField.lt(sortFieldValue)
+			.or(sortField.eq(sortFieldValue).and(idField.lt(idFieldValue)))
+			: sortField.gt(sortFieldValue)
+			.or(sortField.eq(sortFieldValue).and(idField.gt(idFieldValue)));
 	}
 
 	/**
@@ -68,9 +71,11 @@ public class QuerydslUtil {
 		final Order order
 	) {
 
-		return sortField.eq(sortFieldValue)
-			.and(idField.gt(idFieldValue))
-			.or(order.equals(Order.DESC) ? sortField.lt(sortFieldValue) : sortField.gt(sortFieldValue));
+		return order == Order.DESC
+			? sortField.lt(sortFieldValue)
+			.or(sortField.eq(sortFieldValue).and(idField.lt(idFieldValue)))
+			: sortField.gt(sortFieldValue)
+			.or(sortField.eq(sortFieldValue).and(idField.gt(idFieldValue)));
 	}
 
 	/**
@@ -92,9 +97,11 @@ public class QuerydslUtil {
 		final Order order
 	) {
 
-		return sortField.eq(sortFieldValue)
-			.and(idField.gt(idFieldValue))
-			.or(order.equals(Order.DESC) ? sortField.lt(sortFieldValue) : sortField.gt(sortFieldValue));
+		return order == Order.DESC
+			? sortField.lt(sortFieldValue)
+			.or(sortField.eq(sortFieldValue).and(idField.lt(idFieldValue)))
+			: sortField.gt(sortFieldValue)
+			.or(sortField.eq(sortFieldValue).and(idField.gt(idFieldValue)));
 	}
 
 	/**
@@ -116,9 +123,11 @@ public class QuerydslUtil {
 		final Order order
 	) {
 
-		return sortField.eq(sortFieldValue)
-			.and(idField.gt(idFieldValue))
-			.or(order.equals(Order.DESC) ? sortField.lt(sortFieldValue) : sortField.gt(sortFieldValue));
+		return order == Order.DESC
+			? sortField.lt(sortFieldValue)
+			.or(sortField.eq(sortFieldValue).and(idField.lt(idFieldValue)))
+			: sortField.gt(sortFieldValue)
+			.or(sortField.eq(sortFieldValue).and(idField.gt(idFieldValue)));
 	}
 
 	/**
@@ -140,22 +149,23 @@ public class QuerydslUtil {
 		final Order order
 	) {
 
-		return sortField.eq(sortFieldValue)
-			.and(idField.gt(idFieldValue))
-			.or(order.equals(Order.DESC) ? sortField.lt(sortFieldValue) : sortField.gt(sortFieldValue));
+		return order == Order.DESC
+			? sortField.lt(sortFieldValue)
+			.or(sortField.eq(sortFieldValue).and(idField.lt(idFieldValue)))
+			: sortField.gt(sortFieldValue)
+			.or(sortField.eq(sortFieldValue).and(idField.gt(idFieldValue)));
 	}
 
 	/**
 	 * 커서 방식 Where 조건절 생성 메소드 입니다.
-	 * <p>두 개 이상의 필드를 더하거나 계산된 결과로 정렬할 때 사용 가능합니다.</p>
-	 * <p>예: likeCount + commentCount 와 같은 계산식을 기반으로 커서 정렬을 수행할 때 사용됩니다.</p>
+	 * <p>likeCount + commentCount 같은 계산식 정렬 시 사용</p>
 	 *
 	 * @param idField        기본키 필드
-	 * @param idFieldValue   기본키 필드 값
-	 * @param sortExpression 정렬 대상 계산식 (예: likeCount + commentCount)
-	 * @param sortFieldValue 정렬 대상 필드 값
-	 * @param order          정렬 순서 (ASC 또는 DESC)
-	 * @return {@link BooleanExpression} 커서 기반 정렬을 위한 조건절
+	 * @param idFieldValue   커서 기준 ID
+	 * @param sortExpression 정렬 기준 계산식
+	 * @param sortFieldValue 커서 기준 정렬값
+	 * @param order          정렬 방향
+	 * @return BooleanExpression
 	 */
 	public static BooleanExpression createFieldPredicate(
 		final NumberPath<Long> idField,
@@ -164,11 +174,12 @@ public class QuerydslUtil {
 		final Long sortFieldValue,
 		final Order order
 	) {
-		return sortExpression.eq(sortFieldValue)
-			.and(idField.gt(idFieldValue))
-			.or(order.equals(Order.DESC)
-				? sortExpression.lt(sortFieldValue)
-				: sortExpression.gt(sortFieldValue));
+
+		return order == Order.DESC
+			? sortExpression.lt(sortFieldValue)
+			.or(sortExpression.eq(sortFieldValue).and(idField.lt(idFieldValue)))
+			: sortExpression.gt(sortFieldValue)
+			.or(sortExpression.eq(sortFieldValue).and(idField.gt(idFieldValue)));
 	}
 
 }
