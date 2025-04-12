@@ -60,7 +60,8 @@ public class FishingTripPostResponse {
 		List<String> fileUrlList,
 		PostStatus postStatus,
 		Long likeCount,
-		boolean isLiked
+		boolean isLiked,
+		boolean isPostOwner
 	) {
 	}
 
