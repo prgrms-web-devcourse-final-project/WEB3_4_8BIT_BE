@@ -37,6 +37,7 @@ public class ShipFishingPostResponse {
 	 * @param durationTime 프로그램 진행 시간
 	 * @param maxGuestCount 최대 인원 수
 	 * @param reviewEverRate 평점
+	 * @param likeCount 좋아요 수
 	 */
 	@Builder
 	public record Detail(
@@ -49,7 +50,8 @@ public class ShipFishingPostResponse {
 		LocalTime startTime,
 		LocalTime durationTime,
 		Integer maxGuestCount,
-		Double reviewEverRate) {
+		Double reviewEverRate,
+		Long likeCount) {
 		@QueryProjection
 		public Detail {
 		}
@@ -115,6 +117,7 @@ public class ShipFishingPostResponse {
 		LocalTime durationTime,
 		Integer maxGuestCount,
 		Double reviewEverRate,
+		Long likeCount,
 		List<FishResponse.Summary> detailFish,
 		ShipResponse.Detail detailShip,
 		MemberResponse.ContactInfo detailMember
@@ -130,6 +133,8 @@ public class ShipFishingPostResponse {
 	 *   "fileUrlList": ["http://example.com/image1.jpg", "http://example.com/image2.jpg"],
 	 *   "fishNameList": ["광어", "우럭"],
 	 *   "reviewEverRate": 4.7,
+	 *   "likeCount": 2,
+	 *   "isLiked": true,
 	 *   "reviewCount": 2
 	 * }
 	 *
@@ -140,7 +145,10 @@ public class ShipFishingPostResponse {
 	 * @param fileUrlList - 사진 url 리스트
 	 * @param fishNameList - 어류 Name 리스트
 	 * @param reviewEverRate - 평점
+	 * @param likeCount - 좋아요 수
+	 * @param isLiked - 좋아요 여부
 	 * @param reviewCount - 댓글 수
+	 * @param createdAt - 생성 날짜
 	 */
 	@Builder
 	public record DetailScroll(
@@ -151,9 +159,10 @@ public class ShipFishingPostResponse {
 		List<String> fileUrlList,
 		List<String> fishNameList,
 		Double reviewEverRate,
+		Long likeCount,
+		Boolean isLiked,
 		Long reviewCount,
 		ZonedDateTime createdAt
-		// Todo : 위시리스트 반영
 	) {
 		public static DetailScroll fromDetailScroll(
 			final ShipFishingPostResponse.DetailQueryDto detail,
@@ -168,6 +177,8 @@ public class ShipFishingPostResponse {
 				.fileUrlList(fileUrlList)
 				.fishNameList(fishNameList)
 				.reviewEverRate(detail.reviewEverRate())
+				.likeCount(detail.likeCount())
+				.isLiked(detail.isLiked())
 				.reviewCount(detail.reviewCount())
 				.createdAt(detail.createdAt())
 				.build();
@@ -184,6 +195,8 @@ public class ShipFishingPostResponse {
 	 *   "fishIdList": [1, 2],
 	 *   "reviewEverRate": 4.7,
 	 *   "createdAt": ""
+	 *   "likeCount": 2,
+	 *   "isLiked": true,
 	 *   "reviewCount": 2,
 	 * }
 	 *
@@ -195,6 +208,8 @@ public class ShipFishingPostResponse {
 	 * @param fishIdList - 어류 Name 리스트
 	 * @param reviewEverRate - 평점
 	 * @param createdAt - 생성 일자
+	 * @param likeCount - 좋아요 수
+	 * @param isLiked - 좋아요 여부
 	 * @param reviewCount - 댓글 수
 	 */
 	@Builder
@@ -207,6 +222,8 @@ public class ShipFishingPostResponse {
 		List<Long> fishIdList,
 		Double reviewEverRate,
 		ZonedDateTime createdAt,
+		Long likeCount,
+		Boolean isLiked,
 		Long reviewCount
 	) {
 		public DetailQueryDto {

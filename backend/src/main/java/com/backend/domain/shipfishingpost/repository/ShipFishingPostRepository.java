@@ -57,6 +57,7 @@ public interface ShipFishingPostRepository {
 	 * @implSpec 선상 낚시 게시글 검색 조건을 입력받아 필터링된 게시글 값들을 반환한다.
 	 */
 	ScrollResponse<ShipFishingPostResponse.DetailScroll> findDetailScrollBySearch(
+		final Long memberId,
 		final ShipFishingPostRequest.Search requestDto,
 		final GlobalRequest.CursorRequest cursorRequestDto);
 

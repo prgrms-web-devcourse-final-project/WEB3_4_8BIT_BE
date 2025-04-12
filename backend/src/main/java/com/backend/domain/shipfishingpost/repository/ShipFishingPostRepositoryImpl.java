@@ -47,10 +47,11 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 
 	@Override
 	public ScrollResponse<ShipFishingPostResponse.DetailScroll> findDetailScrollBySearch(
+		final Long memberId,
 		final ShipFishingPostRequest.Search requestDto,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
-		return shipFishingPostQueryRepository.findDetailScrollBySearch(requestDto, cursorRequestDto);
+		return shipFishingPostQueryRepository.findDetailScrollBySearch(memberId, requestDto, cursorRequestDto);
 	}
 
 	@Override
@@ -87,7 +88,7 @@ public class ShipFishingPostRepositoryImpl implements ShipFishingPostRepository 
 	public boolean updateLikeCount(final Long shipFishingPostId, final Long likeCount) {
 
 		shipFishingPostQueryRepository.updateLikeCount(shipFishingPostId, likeCount);
-    
+
 		return shipFishingPostQueryRepository.updateLikeCount(shipFishingPostId, likeCount);
 	}
 

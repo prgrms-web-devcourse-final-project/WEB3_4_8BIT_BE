@@ -54,6 +54,7 @@ public class ShipFishingPostConverter {
 			.durationTime(detail.detailShipFishingPost().durationTime())
 			.maxGuestCount(detail.detailShipFishingPost().maxGuestCount())
 			.reviewEverRate(detail.detailShipFishingPost().reviewEverRate())
+			.likeCount(detail.detailShipFishingPost().likeCount())
 			.detailFish(fishInfoList)
 			.detailShip(detail.detailShip())
 			.detailMember(detail.detailMember())

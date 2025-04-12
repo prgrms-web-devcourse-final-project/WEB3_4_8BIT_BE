@@ -11,6 +11,8 @@ import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.exception.FishErrorCode;
 import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fish.repository.FishRepository;
+import com.backend.domain.like.domain.LikeTargetType;
+import com.backend.domain.like.repository.LikeRepository;
 import com.backend.domain.reservation.repository.ReservationRepository;
 import com.backend.domain.reservationdate.converter.ReservationDateConverter;
 import com.backend.domain.reservationdate.entity.ReservationDate;
@@ -33,6 +35,7 @@ import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.S3StorageService;
+import com.backend.global.util.RedisUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,9 +45,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
+	private static final String LIKE_CACHE_KEY = "like_count::SHIP_FISHING_POST::";
+
+	private final RedisUtil redisUtil;
+
 	private final S3StorageService s3StorageService;
 	private final ReservationDateService reservationDateService;
 
+	private final LikeRepository likeRepository;
 	private final FishRepository fishRepository;
 	private final ShipRepository shipRepository;
 	private final ReviewRepository reviewRepository;
@@ -98,10 +106,11 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	@Override
 	@Transactional(readOnly = true)
 	public ScrollResponse<ShipFishingPostResponse.DetailScroll> getShipFishingPostScroll(
+		final Long memberId,
 		final ShipFishingPostRequest.Search searchDto,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
-		return shipFishingPostRepository.findDetailScrollBySearch(searchDto, cursorRequestDto);
+		return shipFishingPostRepository.findDetailScrollBySearch(memberId, searchDto, cursorRequestDto);
 	}
 
 	@Override
@@ -159,6 +168,10 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 		s3StorageService.deleteFilesByIdList(memberId, shipFishingPost.getFileIdList());
 
 		reviewRepository.deleteAllByShipFishingPostId(shipFishingPostId);
+
+		likeRepository.deleteLikesByTargetTypeAndTargetId(LikeTargetType.SHIP_FISHING_POST, shipFishingPostId);
+
+		redisUtil.deleteKeyIfExists(LIKE_CACHE_KEY + shipFishingPostId);
 	}
 
 	/**

@@ -252,7 +252,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		// When
 		ScrollResponse<ShipFishingPostResponse.DetailScroll> responsePage1 = shipFishingPostRepository.findDetailScrollBySearch(
-			givenSearchDto, givenCursorRequest1);
+			null, givenSearchDto, givenCursorRequest1);
 
 		log.debug("{} {} \n {} {} \n {} {} \n {} {} ",
 			responsePage1.content().get(0).price(), responsePage1.content().get(0).shipFishingPostId(),
@@ -275,7 +275,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		// When
 		ScrollResponse<ShipFishingPostResponse.DetailScroll> responsePage2 = shipFishingPostRepository.findDetailScrollBySearch(
-			givenSearchDto, givenCursorRequest2);
+			null, givenSearchDto, givenCursorRequest2);
 
 		log.debug("{} {} \n {} {} \n {} {} \n {} {} ",
 			responsePage2.content().get(0).price(), responsePage2.content().get(0).shipFishingPostId(),
@@ -307,7 +307,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		// When
 		ScrollResponse<ShipFishingPostResponse.DetailScroll> response = shipFishingPostRepository.findDetailScrollBySearch(
-			givenSearchDto, givenCursorRequest);
+			null, givenSearchDto, givenCursorRequest);
 
 		log.debug("{} {} \n {} {} \n {} {} \n {} {} ",
 			response.content().get(0).price(), response.content().get(0).shipFishingPostId(),
@@ -339,7 +339,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		// When
 		ScrollResponse<ShipFishingPostResponse.DetailScroll> response = shipFishingPostRepository.findDetailScrollBySearch(
-			givenSearchDto, givenCursorRequest);
+			null, givenSearchDto, givenCursorRequest);
 
 		log.debug("{} {} \n {} {} \n {} {} \n {} {} ",
 			response.content().get(0).price(), response.content().get(0).shipFishingPostId(),
@@ -371,7 +371,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		// When
 		ScrollResponse<ShipFishingPostResponse.DetailScroll> response = shipFishingPostRepository.findDetailScrollBySearch(
-			givenSearchDto, givenCursorRequest);
+			null, givenSearchDto, givenCursorRequest);
 
 		log.debug("{} {} \n {} {} \n {} {} \n {} {} ",
 			response.content().get(0).price(), response.content().get(0).shipFishingPostId(),
@@ -403,7 +403,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 
 		// When
 		ScrollResponse<ShipFishingPostResponse.DetailScroll> response = shipFishingPostRepository.findDetailScrollBySearch(
-			givenSearchDto, givenCursorRequest);
+			null, givenSearchDto, givenCursorRequest);
 
 		log.debug("{} {} \n {} {} ",
 			response.content().get(0).price(), response.content().get(0).shipFishingPostId(),
