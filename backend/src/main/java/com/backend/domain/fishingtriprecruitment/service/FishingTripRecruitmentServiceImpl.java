@@ -1,7 +1,5 @@
 package com.backend.domain.fishingtriprecruitment.service;
 
-import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +22,6 @@ import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
-import com.backend.global.email.service.EmailService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -77,8 +74,6 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final Long fishingTripPostId,
 		final RecruitmentStatus status) {
-
-		validateFishingTripPostOwner(memberId, fishingTripPostId);
 
 		ScrollResponse<FishingTripRecruitmentResponse.DetailPage> detailPageList = fishingTripRecruitmentRepository.findDetailPageByFishingTripPostIdAndStatus(
 			cursorRequestDto, fishingTripPostId, status);
