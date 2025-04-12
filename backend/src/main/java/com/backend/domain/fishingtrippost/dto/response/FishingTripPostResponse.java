@@ -2,6 +2,7 @@ package com.backend.domain.fishingtrippost.dto.response;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 import com.backend.domain.fishingtrippost.domain.PostStatus;
 import com.backend.domain.region.entity.RegionType;
@@ -57,7 +58,7 @@ public class FishingTripPostResponse {
 		String fishPointName,
 		Double longitude,
 		Double latitude,
-		List<String> fileUrlList,
+		Map<Long,String> fileUrlList,
 		PostStatus postStatus,
 		Long likeCount,
 		boolean isLiked,
