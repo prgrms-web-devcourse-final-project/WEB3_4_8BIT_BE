@@ -2,6 +2,7 @@ package com.backend.domain.like.scheduler;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.like.repository.LikeRepository;
 
@@ -24,6 +25,7 @@ public class LikeCleanUpScheduler {
 	 * 매 시간 정각마다 소프트 삭제된 좋아요를 DB 영구 삭제
 	 */
 	@Scheduled(cron = "0 0 * * * *")
+	@Transactional
 	public void cleanUpSoftDeletedLikes() {
 		try {
 			int deletedCount = likeRepository.deleteAllSoftDeletedLikes();

@@ -44,7 +44,7 @@ public class FishingTripPostConverter {
 	 * 대표 이미지 ID가 존재할 경우 해당 ID를 통해 URL을 조회한 뒤 최종 응답 DTO인 {@link FishingTripPostResponse.DetailPage}를 생성합니다.</p>
 	 *
 	 * @param detailPageQueryDto {@link FishingTripPostResponse.DetailPageQueryDto} - 게시글의 기본 정보와 이미지 ID 목록을 포함하는 중간 DTO
-	 * @param fileUrlResolver {@link Function} - 파일 ID를 통해 이미지 URL을 매핑하는 함수 (예: fileStorageService::getUrlById)
+	 * @param fileUrlResolver    {@link Function} - 파일 ID를 통해 이미지 URL을 매핑하는 함수 (예: fileStorageService::getUrlById)
 	 * @return {@link FishingTripPostResponse.DetailPage} - 클라이언트에 전달될 게시글 응답 객체
 	 *
 	 * <p>주의: fileIdList가 null 또는 비어있는 경우 imageUrl은 null로 설정됩니다.</p>
@@ -70,13 +70,15 @@ public class FishingTripPostConverter {
 			.recruitmentCount(detailPageQueryDto.recruitmentCount())
 			.postStatus(detailPageQueryDto.postStatus())
 			.imageUrl(imageUrl)
+			.commentCount(detailPageQueryDto.commentCount())
+			.likeCount(detailPageQueryDto.likeCount())
 			.build();
 	}
 
 	/**
 	 * 게시글 참여 상세 정보를 응답 객체로 변환하는 정적 메서드입니다.
 	 *
-	 * @param dto         게시글 정보 및 로그인 사용자 상태를 담은 중간 DTO
+	 * @param dto          게시글 정보 및 로그인 사용자 상태를 담은 중간 DTO
 	 * @param participants 승인된 참여자 정보 리스트
 	 * @return {@link FishingTripPostResponse.FishingTripPostParticipationDetail} 완성된 응답 DTO
 	 */
@@ -105,8 +107,8 @@ public class FishingTripPostConverter {
 	 * 현재 사용자의 좋아요 여부를 받아 최종 응답 DTO인 {@link FishingTripPostResponse.Detail}을 생성합니다.</p>
 	 *
 	 * @param detailQueryDto 게시글의 상세 정보를 담은 DTO
-	 * @param fileUrlList 게시글에 첨부된 이미지 파일의 URL 리스트
-	 * @param isLiked 현재 로그인한 사용자가 해당 게시글에 좋아요를 눌렀는지 여부
+	 * @param fileUrlList    게시글에 첨부된 이미지 파일의 URL 리스트
+	 * @param isLiked        현재 로그인한 사용자가 해당 게시글에 좋아요를 눌렀는지 여부
 	 * @return 게시글 상세 응답 DTO
 	 */
 	public static FishingTripPostResponse.Detail toDetail(
@@ -129,7 +131,7 @@ public class FishingTripPostConverter {
 			.latitude(detailQueryDto.latitude())
 			.fileUrlList(fileUrlList)
 			.postStatus(detailQueryDto.postStatus())
-			.likeCount(detailQueryDto.likes())
+			.likeCount(detailQueryDto.likeCount())
 			.isLiked(isLiked)
 			.build();
 	}

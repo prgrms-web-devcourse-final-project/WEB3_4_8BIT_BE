@@ -108,7 +108,7 @@ public class LikeQueryRepository {
 				fishingTripPost.subject,
 				fishingTripPost.content,
 				fishingTripPost.fishingDate,
-				like.createdAt, // 좋아요 누른 시각
+				like.createdAt,
 				fishingTripPost.recruitmentCount,
 				fishingTripPost.postStatus,
 				fishingTripPost.fileIdList,
@@ -116,7 +116,7 @@ public class LikeQueryRepository {
 				fishingTripPost.likeCount
 			))
 			.from(fishingTripPost)
-			.leftJoin(like).on(
+			.join(like).on(
 				like.targetId.eq(fishingTripPost.fishingTripPostId)
 					.and(like.targetType.eq(LikeTargetType.FISHING_TRIP_POST))
 					.and(like.memberId.eq(memberId))
@@ -151,7 +151,7 @@ public class LikeQueryRepository {
 					.where(review.shipFishingPostId.eq(shipFishingPost.shipFishingPostId))
 			))
 			.from(shipFishingPost)
-			.leftJoin(like).on(
+			.join(like).on(
 				like.targetType.eq(LikeTargetType.SHIP_FISHING_POST),
 				like.targetId.eq(shipFishingPost.shipFishingPostId),
 				like.memberId.eq(memberId),
