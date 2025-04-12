@@ -3,6 +3,8 @@ package com.backend.domain.fishingtrippost.service;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -67,7 +69,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 	@Override
 	@Transactional
-	public Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.Form requestDto) {
+	public Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.create requestDto) {
 		// 멤버, 낚시 포인트 존재 검증
 		validMemberAndFishPoint(memberId, requestDto);
 
@@ -89,7 +91,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	public Long updateFishingTripPost(
 		final Long memberId,
 		final Long fishTripPostId,
-		final FishingTripPostRequest.Form requestDto
+		final FishingTripPostRequest.update requestDto
 	) {
 
 		FishingTripPost fishingTripPost = getFishingTripPostById(fishTripPostId);
@@ -119,13 +121,12 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 			requestDto.recruitmentCount(),
 			requestDto.isShipFish(),
 			requestDto.fishingDate(),
-			requestDto.fishingPointId(),
 			requestDto.fileIdList()
 		);
 
 		log.debug("[동출 모집 게시글 정보 수정] : {}", fishingTripPost);
 
-		return fishingTripPost.getFishingPointId();
+		return fishingTripPost.getFishingTripPostId();
 	}
 
 	@Override
@@ -139,9 +140,9 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		List<String> fileUrlList = getFileUrlList(detailQueryDto);
 
 		boolean isLiked = getIsLiked(memberId, fishingTripPostId);
-
+		boolean isPostOwner = getIsPostOwner(memberId, fishingTripPostId);
 		FishingTripPostResponse.Detail responseDto = FishingTripPostConverter.toDetail(detailQueryDto, fileUrlList,
-			isLiked);
+			isLiked, isPostOwner);
 		log.debug("[동출 상세보기] : 조회 성공");
 
 		return responseDto;
@@ -173,16 +174,20 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		if (!isLast)
 			detailPageDto.remove(detailPageDto.size() - 1);
 
-		List<FishingTripPostResponse.DetailPage> result = detailPageDto.stream()
+		List<FishingTripPostResponse.DetailPage> responseDto = new ArrayList<>(detailPageDto.stream()
 			.map(dto -> FishingTripPostConverter.toDetailPage(dto, this::getImageUrlById))
-			.toList();
+			.toList());
+
+		if ("prev".equalsIgnoreCase(cursorRequestDto.type())) {
+			Collections.reverse(responseDto);
+		}
 
 		log.debug("[동출 전체보기] : 조회 성공");
 
 		return ScrollResponse.from(
-			result,
+			responseDto,
 			cursorRequestDto.size(),
-			result.size(),
+			responseDto.size(),
 			cursorRequestDto.fieldValue() == null,
 			isLast
 		);
@@ -388,7 +393,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @throws FishPointException 존재하지 않는 낚시 포인트면 예외 발생
 	 */
 
-	private void validMemberAndFishPoint(final Long memberId, final FishingTripPostRequest.Form requestDto)
+	private void validMemberAndFishPoint(final Long memberId, final FishingTripPostRequest.create requestDto)
 		throws GlobalException {
 
 		if (!memberRepository.existsById(memberId)) {
@@ -411,5 +416,21 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		if (!post.getMemberId().equals(memberId)) {
 			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR);
 		}
+	}
+
+	/**
+	 * 주어진 사용자가 특정 동출 모집 게시글의 작성자인지 여부를 판단하는 메서드입니다.
+	 *
+	 * <p>memberId가 null이 아닌 경우에만 게시글 작성자 여부를 확인합니다.</p>
+	 *
+	 * @param memberId           확인할 회원 ID (null일 경우 false 반환)
+	 * @param fishingTripPostId  확인할 동출 모집 게시글 ID
+	 * @return true: 해당 게시글의 작성자인 경우<br>
+	 *         false: memberId가 null이거나, 작성자가 아닌 경우
+	 */
+
+	private boolean getIsPostOwner(final Long memberId, final Long fishingTripPostId) {
+		return memberId != null && fishingTripPostRepository.existFishingTripPostByMemberIdAndPostId(memberId,
+			fishingTripPostId);
 	}
 }
