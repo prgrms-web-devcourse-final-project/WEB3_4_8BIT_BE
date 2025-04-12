@@ -87,8 +87,10 @@ public class LikeServiceImpl implements LikeService {
 		);
 
 		boolean isLast = detailPageDto.size() <= cursorRequestDto.size();
-		if (!isLast)
+
+		if (!isLast) {
 			detailPageDto.remove(detailPageDto.size() - 1);
+		}
 
 		List<LikeResponse.FishingTripPostLikedDetailResponse> result = detailPageDto.stream()
 			.map(dto -> LikeConverter.toFishingTripPostDetailPage(dto, this::getImageUrlById))
@@ -115,8 +117,10 @@ public class LikeServiceImpl implements LikeService {
 		);
 
 		boolean isLast = detailPageDto.size() <= cursorRequestDto.size();
-		if (!isLast)
+
+		if (!isLast) {
 			detailPageDto.remove(detailPageDto.size() - 1);
+		}
 
 		List<LikeResponse.ShipFishingPostLikedDetailResponse> result = detailPageDto.stream()
 			.map(dto -> {
