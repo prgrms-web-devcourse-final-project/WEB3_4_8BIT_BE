@@ -2,6 +2,9 @@ package com.backend.domain.chat.message.service;
 
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -60,22 +63,30 @@ public class MessageServiceImpl implements MessageService {
 		final Long roomId,
 		final ChatRequest.MessageCursorRequest cursorRequestDto
 	) {
-		// 1. 메시지 목록 조회
+		// 1. 메시지 목록 조회 (커서 기반 페이징)
 		List<Message> messageList = messageQueryRepository.findMessagesByRoomId(roomId, cursorRequestDto);
 
-		// 2. Message → MessageResponse 변환 (getChatProfile 호출)
+		// 2. 메시지 발신자 ID 목록 추출
+		Set<Long> senderIds = messageList.stream()
+			.map(Message::getSenderId)
+			.collect(Collectors.toSet());
+
+		// 3. 발신자 ID에 해당하는 프로필 이미지 URL Map 조회
+		Map<Long, String> memberIdToProfileImageMap = memberService.getChatProfileUrls(senderIds);
+
+		// 4. Message → MessageResponse 변환 (프로필 이미지 URL 포함)
 		List<MessageResponse.Basic> responseList = messageList.stream()
 			.map(message -> {
-				String profileImageUrl = memberService.getChatProfile(message.getSenderId()).fileUrl();
+				String profileImageUrl = memberIdToProfileImageMap.getOrDefault(message.getSenderId(), null);
 				return MessageConverter.toResponse(message, profileImageUrl);
 			})
 			.toList();
 
-		// 3. 다음 커서 설정
+		// 5. 다음 커서 ID 설정 (마지막 메시지 기준)
 		String nextCursorId = messageList.isEmpty() ? null
 			: messageList.get(messageList.size() - 1).getMessageId().toString();
 
-		// 4. 커서 응답 생성
+		// 6. 커서 응답 객체 생성 및 반환
 		return ChatResponse.MessageCursorResponse.of(responseList, nextCursorId);
 	}
 }

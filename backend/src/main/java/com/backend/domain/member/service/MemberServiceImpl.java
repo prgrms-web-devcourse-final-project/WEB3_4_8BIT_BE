@@ -1,6 +1,9 @@
 package com.backend.domain.member.service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -73,6 +76,15 @@ public class MemberServiceImpl implements MemberService {
 			.nickname(member.getNickname())
 			.fileUrl(fileUrl)
 			.build();
+	}
+
+	@Override
+	public Map<Long, String> getChatProfileUrls(Set<Long> memberIds) {
+		if (memberIds == null || memberIds.isEmpty()) {
+			return Collections.emptyMap();
+		}
+
+		return memberRepository.getFileUrlMapByIdList(memberIds);
 	}
 
 	/**
