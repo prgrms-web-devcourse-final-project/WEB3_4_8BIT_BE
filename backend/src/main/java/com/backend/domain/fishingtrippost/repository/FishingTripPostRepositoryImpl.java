@@ -2,6 +2,7 @@ package com.backend.domain.fishingtrippost.repository;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -93,5 +94,10 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	public List<FishingTripPostResponse.ParticipantDetail> findApprovedParticipants(
 		final Long fishingTripPostId) {
 		return fishingTripPostQueryRepository.findApprovedParticipants(fishingTripPostId);
+	}
+
+	@Override
+	public Map<Long, Integer> findFishingTripPostIdWithApprovedCount(final Long memberId) {
+		return fishingTripPostQueryRepository.findFishingTripPostIdWithApprovedCount(memberId);
 	}
 }

@@ -2,6 +2,7 @@ package com.backend.domain.fishingtrippost.repository;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.backend.domain.fishingtrippost.domain.PostStatus;
@@ -181,4 +182,12 @@ public interface FishingTripPostRepository {
 	 * @return HOT 게시글 DTO 리스트
 	 */
 	List<FishingTripPostResponse.HotPostDto> findHotPostDto(final ZonedDateTime baseTime);
+
+	/**
+	 * 주어진 회원 ID를 기준으로, 해당 회원이 작성한 동출 게시글 ID와 각 게시글의 참여자 수를 조회
+	 *
+	 * @param memberId 게시글 작성자(회원)의 ID
+	 * @return 게시글 ID를 키로, 참여자 수를 값으로 갖는 Map
+	 */
+	Map<Long, Integer> findFishingTripPostIdWithApprovedCount(final Long memberId);
 }
