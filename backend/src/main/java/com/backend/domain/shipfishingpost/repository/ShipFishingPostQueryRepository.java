@@ -612,7 +612,10 @@ public class ShipFishingPostQueryRepository {
 		if (cursorRequestDto.sort() == null ||
 			cursorRequestDto.sort().isEmpty() ||
 			!isValidColumn(cursorRequestDto.sort())) {
-			return new OrderSpecifier<?>[] {shipFishingPost.createdAt.desc()};
+			return new OrderSpecifier<?>[] {
+				new OrderSpecifier<>(Order.DESC, shipFishingPost.createdAt),
+				new OrderSpecifier<>(Order.DESC, shipFishingPost.shipFishingPostId)
+			};
 		}
 
 		Order order = QuerydslUtil.getOrder(cursorRequestDto);
@@ -621,7 +624,7 @@ public class ShipFishingPostQueryRepository {
 
 		return new OrderSpecifier<?>[] {
 			new OrderSpecifier<>(order, path),
-			new OrderSpecifier<>(Order.ASC, shipFishingPost.shipFishingPostId)
+			new OrderSpecifier<>(Order.DESC, shipFishingPost.shipFishingPostId)
 		};
 	}
 }

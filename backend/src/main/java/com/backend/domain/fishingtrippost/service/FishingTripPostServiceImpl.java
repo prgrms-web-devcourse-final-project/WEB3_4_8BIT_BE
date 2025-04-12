@@ -4,7 +4,6 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -171,16 +170,14 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 			cursorRequestDto, status, regionId, keyword);
 
 		boolean isLast = detailPageDto.size() <= cursorRequestDto.size();
-		if (!isLast)
+
+		if (!isLast) {
 			detailPageDto.remove(detailPageDto.size() - 1);
+		}
 
 		List<FishingTripPostResponse.DetailPage> responseDto = new ArrayList<>(detailPageDto.stream()
 			.map(dto -> FishingTripPostConverter.toDetailPage(dto, this::getImageUrlById))
 			.toList());
-
-		if ("prev".equalsIgnoreCase(cursorRequestDto.type())) {
-			Collections.reverse(responseDto);
-		}
 
 		log.debug("[동출 전체보기] : 조회 성공");
 
@@ -423,10 +420,10 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 *
 	 * <p>memberId가 null이 아닌 경우에만 게시글 작성자 여부를 확인합니다.</p>
 	 *
-	 * @param memberId           확인할 회원 ID (null일 경우 false 반환)
-	 * @param fishingTripPostId  확인할 동출 모집 게시글 ID
+	 * @param memberId          확인할 회원 ID (null일 경우 false 반환)
+	 * @param fishingTripPostId 확인할 동출 모집 게시글 ID
 	 * @return true: 해당 게시글의 작성자인 경우<br>
-	 *         false: memberId가 null이거나, 작성자가 아닌 경우
+	 * false: memberId가 null이거나, 작성자가 아닌 경우
 	 */
 
 	private boolean getIsPostOwner(final Long memberId, final Long fishingTripPostId) {

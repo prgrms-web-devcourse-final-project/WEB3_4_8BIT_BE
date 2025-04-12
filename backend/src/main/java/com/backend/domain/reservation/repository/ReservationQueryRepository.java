@@ -349,7 +349,7 @@ public class ReservationQueryRepository {
 
 		return new OrderSpecifier<?>[] {
 			reservation.reservationDate.desc(),
-			reservation.reservationId.asc()
+			reservation.reservationId.desc()
 		};
 	}
 }

@@ -18,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.repository.FishRepository;
+import com.backend.domain.like.repository.LikeRepository;
 import com.backend.domain.reservation.entity.Reservation;
 import com.backend.domain.reservation.repository.ReservationRepository;
 import com.backend.domain.reservationdate.repository.ReservationDateRepository;
@@ -38,6 +39,7 @@ import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.S3StorageService;
 import com.backend.global.util.BaseTest;
+import com.backend.global.util.RedisUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipFishingPostServiceTest extends BaseTest {
@@ -68,6 +70,12 @@ public class ShipFishingPostServiceTest extends BaseTest {
 
 	@Mock
 	private ReservationDateService reservationDateService;
+
+	@Mock
+	private LikeRepository likeRepository;
+
+	@Mock
+	private RedisUtil redisUtil;
 
 	@InjectMocks
 	private ShipFishingPostServiceImpl shipFishingPostServiceImpl;

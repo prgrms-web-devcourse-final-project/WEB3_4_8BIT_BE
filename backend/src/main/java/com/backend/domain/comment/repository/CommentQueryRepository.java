@@ -195,7 +195,7 @@ public class CommentQueryRepository {
 		// 두 개의 OrderSpecifier를 배열로 반환
 		return new OrderSpecifier<?>[] {
 			new OrderSpecifier<>(queryOrder, sortField),
-			new OrderSpecifier<>(Order.ASC, comment.commentId)
+			new OrderSpecifier<>(Order.DESC, comment.commentId)
 		};
 	}
 }
