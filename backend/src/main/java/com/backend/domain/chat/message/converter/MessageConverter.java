@@ -39,4 +39,13 @@ public class MessageConverter {
 			.createdAt(message.getCreatedAt())
 			.build();
 	}
+
+	public static MessageResponse.Last toLastMessageResponse(final Message message) {
+		return new MessageResponse.Last(
+			message.getContent(),
+			message.getType(),
+			message.getSenderNickname(),
+			message.getCreatedAt()
+		);
+	}
 }
