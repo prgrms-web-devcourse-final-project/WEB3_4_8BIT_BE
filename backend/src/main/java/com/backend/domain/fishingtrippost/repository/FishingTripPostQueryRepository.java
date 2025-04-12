@@ -8,6 +8,8 @@ import static com.backend.domain.region.entity.QRegion.*;
 import static com.backend.global.storage.entity.QFile.*;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -277,14 +279,20 @@ public class FishingTripPostQueryRepository {
 		final List<FishingTripPostResponse.MyFishingTripPostDetailPage> MyFishingTripPostDetailPage,
 		final GlobalRequest.CursorRequest cursorRequest
 	) {
-		boolean isLast = MyFishingTripPostDetailPage.size() <= cursorRequest.size();
+
+		List<FishingTripPostResponse.MyFishingTripPostDetailPage> pageList = new ArrayList<>(MyFishingTripPostDetailPage);
+		boolean isLast = pageList.size() <= cursorRequest.size();
 		if (!isLast)
-			MyFishingTripPostDetailPage.remove(MyFishingTripPostDetailPage.size() - 1);
+			pageList.remove(pageList.size() - 1);
+
+		if ("prev".equalsIgnoreCase(cursorRequest.type())) {
+			Collections.reverse(pageList);
+		}
 
 		return ScrollResponse.from(
-			MyFishingTripPostDetailPage,
+			pageList,
 			cursorRequest.size(),
-			MyFishingTripPostDetailPage.size(),
+			pageList.size(),
 			cursorRequest.fieldValue() == null,
 			isLast
 		);
