@@ -78,7 +78,7 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 		final Long fishingTripPostId,
 		final RecruitmentStatus status) {
 
-		validateFishingTripPostOwner(memberId, fishingTripPostId);
+		validatePostOwnerOrApplicant(memberId, fishingTripPostId);
 
 		ScrollResponse<FishingTripRecruitmentResponse.DetailPage> detailPageList = fishingTripRecruitmentRepository.findDetailPageByFishingTripPostIdAndStatus(
 			cursorRequestDto, fishingTripPostId, status);
@@ -190,6 +190,46 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 		if (!fishingTripPostRepository.existsById(fishingTripPostId)) {
 			throw new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND);
 		}
+	}
+
+	/**
+	 * 주어진 사용자가 해당 동출 게시글의 작성자이거나 참여자인지 검증합니다.
+	 * <p>작성자도 아니고 신청자도 아닌 경우 예외를 발생시킵니다.</p>
+	 *
+	 * @param memberId          현재 로그인한 사용자 ID
+	 * @param fishingTripPostId 검증 대상 동출 게시글 ID
+	 */
+	private void validatePostOwnerOrApplicant(final Long memberId, final Long fishingTripPostId) {
+		if (!isPostOwner(memberId, fishingTripPostId) && !isPostApplicant(memberId, fishingTripPostId)) {
+			throw new FishingTripRecruitmentException(
+				FishingTripRecruitmentErrorCode.FISHING_TRIP_RECRUITMENT_UNAUTHORIZED);
+		}
+	}
+
+	/**
+	 * 사용자가 특정 동출 모집 게시글의 작성자인지 확인합니다.
+	 *
+	 * <p>게시글 ID와 사용자 ID를 기준으로 작성자 여부를 판단합니다.</p>
+	 *
+	 * @param memberId 사용자의 고유 ID
+	 * @param fishingTripPostId 동출 모집 게시글의 고유 ID
+	 * @return true: 해당 게시글의 작성자인 경우, false: 그렇지 않은 경우
+	 */
+	private boolean isPostOwner(final Long memberId, final Long fishingTripPostId) {
+		return fishingTripPostRepository.existFishingTripPostByMemberIdAndPostId(memberId, fishingTripPostId);
+	}
+
+	/**
+	 * 사용자가 특정 동출 모집 게시글에 신청한 참여자인지 확인합니다.
+	 *
+	 * <p>게시글 ID와 사용자 ID를 기준으로 참여자 여부를 판단합니다.</p>
+	 *
+	 * @param memberId 사용자의 고유 ID
+	 * @param fishingTripPostId 동출 모집 게시글의 고유 ID
+	 * @return true: 해당 게시글에 신청한 사용자일 경우, false: 그렇지 않은 경우
+	 */
+	private boolean isPostApplicant(final Long memberId, final Long fishingTripPostId) {
+		return fishingTripRecruitmentRepository.existsByFishingTripPostIdAndMemberId(fishingTripPostId, memberId);
 	}
 
 }
