@@ -190,4 +190,17 @@ public interface FishingTripPostRepository {
 	 * @return 게시글 ID를 키로, 참여자 수를 값으로 갖는 Map
 	 */
 	Map<Long, Integer> findFishingTripPostIdWithApprovedCount(final Long memberId);
+
+	/**
+	 * 특정 회원이 작성한 특정 동출 모집 게시글이 존재하는지 확인하는 메서드입니다.
+	 *
+	 * <p>게시글 ID와 작성자 ID를 함께 조건으로 조회하여,
+	 * 해당 사용자가 실제로 해당 게시글을 작성한 사용자인지 여부를 판단합니다.</p>
+	 *
+	 * @param memberId 확인할 회원 ID
+	 * @param postId   확인할 동출 모집 게시글 ID
+	 * @return true: 해당 회원이 해당 게시글의 작성자인 경우<br>
+	 *         false: 존재하지 않거나 작성자가 아닌 경우
+	 */
+	boolean existFishingTripPostByMemberIdAndPostId(final Long memberId, final Long postId);
 }

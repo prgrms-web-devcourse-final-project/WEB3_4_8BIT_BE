@@ -100,4 +100,9 @@ public class FishingTripPostRepositoryImpl implements FishingTripPostRepository 
 	public Map<Long, Integer> findFishingTripPostIdWithApprovedCount(final Long memberId) {
 		return fishingTripPostQueryRepository.findFishingTripPostIdWithApprovedCount(memberId);
 	}
+
+	@Override
+	public boolean existFishingTripPostByMemberIdAndPostId(final Long memberId, final Long postId) {
+		return fishingTripPostJpaRepository.existsFishingTripPostByFishingTripPostIdAndMemberId(postId, memberId);
+	}
 }
