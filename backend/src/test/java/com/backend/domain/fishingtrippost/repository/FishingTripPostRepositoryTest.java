@@ -7,8 +7,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DisplayName;
@@ -189,6 +191,9 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			.map(File::getFileId)
 			.toList();
 
+		Map<Long, String> expectedFileUrlMap = savedFiles.stream()
+			.collect(Collectors.toMap(File::getFileId, File::getUrl));
+
 		FishingTripPost givenPost = fishingTripPostArbitraryBuilder
 			.set("fishingTripPostId", null)
 			.set("memberId", savedMember.getMemberId())
@@ -205,12 +210,11 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		assertThat(optionalDto).isPresent();
 		FishingTripPostResponse.DetailQueryDto detailDto = optionalDto.get();
 
-		List<String> fileUrlList = storageRepository.findAllById(detailDto.fileIdList()).stream()
-			.map(File::getUrl)
-			.toList();
+		Map<Long, String> fileUrlMap = storageRepository.findAllById(detailDto.fileIdList()).stream()
+			.collect(Collectors.toMap(File::getFileId, File::getUrl));
 
 		FishingTripPostResponse.Detail detail = FishingTripPostConverter.toDetail(
-			detailDto, fileUrlList, false,false);
+			detailDto, false, false, fileUrlMap);
 
 		// then
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());
@@ -224,9 +228,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		assertThat(detail.fishPointDetailName()).isEqualTo(savedFishPoint.getFishPointDetailName());
 		assertThat(detail.longitude()).isEqualTo(savedFishPoint.getLongitude());
 		assertThat(detail.latitude()).isEqualTo(savedFishPoint.getLatitude());
-
-		List<String> expectedUrls = savedFiles.stream().map(File::getUrl).toList();
-		assertThat(detail.fileUrlList()).containsExactlyElementsOf(expectedUrls);
+		assertThat(detail.fileUrlList()).containsExactlyInAnyOrderEntriesOf(expectedFileUrlMap);
 	}
 
 	@Test

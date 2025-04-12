@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.DisplayName;
@@ -302,10 +303,15 @@ class FishingTripPostServiceTest extends BaseTest {
 			File.builder().fileId(103L).url(fileUrls.get(2)).uploaded(true).build()
 		);
 
+		Map<Long, String> expectedMap = Map.of(
+			101L, "https://cdn.example.com/1.jpg",
+			102L, "https://cdn.example.com/2.jpg",
+			103L, "https://cdn.example.com/3.jpg"
+		);
+
 		when(fishingTripPostRepository.findDetailQueryDtoById(postId)).thenReturn(Optional.of(queryDto));
 		when(storageRepository.findAllById(fileIds)).thenReturn(mockFiles);
-		when(likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST,
-			postId)).thenReturn(true);
+		when(likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST, postId)).thenReturn(true);
 
 		// When
 		FishingTripPostResponse.Detail actual = fishingTripPostService.getFishingTripPostDetail(memberId, postId);
@@ -323,15 +329,14 @@ class FishingTripPostServiceTest extends BaseTest {
 		assertThat(actual.fishPointName()).isEqualTo("남해");
 		assertThat(actual.longitude()).isEqualTo(128.12345);
 		assertThat(actual.latitude()).isEqualTo(37.12345);
-		assertThat(actual.fileUrlList()).containsExactlyElementsOf(fileUrls);
+		assertThat(actual.fileUrlList()).containsExactlyInAnyOrderEntriesOf(expectedMap);
 		assertThat(actual.likeCount()).isEqualTo(3L);
 		assertThat(actual.isLiked()).isTrue();
 		assertThat(actual.isPostOwner()).isFalse();
 
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verify(storageRepository).findAllById(fileIds);
-		verify(likeRepository).existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST,
-			postId);
+		verify(likeRepository).existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST, postId);
 	}
 
 	@Test
@@ -351,7 +356,6 @@ class FishingTripPostServiceTest extends BaseTest {
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verifyNoInteractions(storageRepository); // 파일 조회는 호출되지 않아야 함
 	}
-
 	@Test
 	@DisplayName("동출 게시글 모집 완료 처리 [작성자 본인일 경우] - Success")
 	void t09() {

@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -270,12 +271,17 @@ class FishingTripPostControllerTest extends BaseTest {
 
 	@Test
 	@DisplayName("동출 게시글 상세 조회 [Controller] - Success")
-	@WithMockCustomUser
-		// 이 어노테이션이 memberId를 1L로 설정한다고 가정
+	@WithMockCustomUser // 이 어노테이션이 memberId를 1L로 설정한다고 가정
 	void t10() throws Exception {
 		// Given
 		Long postId = 1L;
-		Long memberId = 1L; // WithMockCustomUser로부터
+		Long memberId = 1L;
+
+		Map<Long, String> fileUrlMap = Map.of(
+			101L, "https://cdn.example.com/1.jpg",
+			102L, "https://cdn.example.com/2.jpg",
+			103L, "https://cdn.example.com/3.jpg"
+		);
 
 		FishingTripPostResponse.Detail responseDto = FishingTripPostResponse.Detail.builder()
 			.fishingTripPostId(postId)
@@ -290,17 +296,13 @@ class FishingTripPostControllerTest extends BaseTest {
 			.fishPointName("남해")
 			.longitude(128.12345)
 			.latitude(37.12345)
-			.fileUrlList(List.of(
-				"https://cdn.example.com/1.jpg",
-				"https://cdn.example.com/2.jpg",
-				"https://cdn.example.com/3.jpg"
-			))
+			.fileUrlList(fileUrlMap)
 			.likeCount(12L)
 			.isLiked(true)
 			.postStatus(PostStatus.RECRUITING)
+			.isPostOwner(false)
 			.build();
 
-		// memberId 1L을 명확하게 설정해줘야 함
 		when(fishingTripPostService.getFishingTripPostDetail(eq(memberId), eq(postId))).thenReturn(responseDto);
 
 		// When
@@ -326,12 +328,13 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.fishPointName").value("남해"))
 			.andExpect(jsonPath("$.data.longitude").value(128.12345))
 			.andExpect(jsonPath("$.data.latitude").value(37.12345))
-			.andExpect(jsonPath("$.data.fileUrlList[0]").value("https://cdn.example.com/1.jpg"))
-			.andExpect(jsonPath("$.data.fileUrlList[1]").value("https://cdn.example.com/2.jpg"))
-			.andExpect(jsonPath("$.data.fileUrlList[2]").value("https://cdn.example.com/3.jpg"))
+			.andExpect(jsonPath("$.data.fileUrlList.101").value("https://cdn.example.com/1.jpg"))
+			.andExpect(jsonPath("$.data.fileUrlList.102").value("https://cdn.example.com/2.jpg"))
+			.andExpect(jsonPath("$.data.fileUrlList.103").value("https://cdn.example.com/3.jpg"))
 			.andExpect(jsonPath("$.data.likeCount").value(12))
 			.andExpect(jsonPath("$.data.isLiked").value(true))
-			.andExpect(jsonPath("$.data.postStatus").value("RECRUITING"));
+			.andExpect(jsonPath("$.data.postStatus").value("RECRUITING"))
+			.andExpect(jsonPath("$.data.isPostOwner").value(false));
 	}
 
 	@Test
