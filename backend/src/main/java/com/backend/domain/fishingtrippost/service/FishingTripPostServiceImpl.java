@@ -4,7 +4,11 @@ import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -136,12 +140,12 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 		FishingTripPostResponse.DetailQueryDto detailQueryDto = getDetailDtoById(fishingTripPostId);
 
-		List<String> fileUrlList = getFileUrlList(detailQueryDto);
+		Map<Long, String> fileUrlMap = getFileUrlMap(detailQueryDto);
 
 		boolean isLiked = getIsLiked(memberId, fishingTripPostId);
 		boolean isPostOwner = getIsPostOwner(memberId, fishingTripPostId);
-		FishingTripPostResponse.Detail responseDto = FishingTripPostConverter.toDetail(detailQueryDto, fileUrlList,
-			isLiked, isPostOwner);
+		FishingTripPostResponse.Detail responseDto = FishingTripPostConverter.toDetail(detailQueryDto,
+			isLiked, isPostOwner, fileUrlMap);
 		log.debug("[동출 상세보기] : 조회 성공");
 
 		return responseDto;
@@ -429,5 +433,26 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private boolean getIsPostOwner(final Long memberId, final Long fishingTripPostId) {
 		return memberId != null && fishingTripPostRepository.existFishingTripPostByMemberIdAndPostId(memberId,
 			fishingTripPostId);
+	}
+
+	/**
+	 * 상세 조회용 DTO에서 이미지 파일 ID 리스트를 기반으로 실제 이미지 ID-URL 매핑 정보를 조회합니다.
+	 *
+	 * <p>저장소에서 파일 엔티티를 조회하고, 각 파일의 ID와 URL을 Map 형태로 반환합니다.</p>
+	 *
+	 * @param detailQueryDto 동출 게시글 상세 정보가 담긴 DTO
+	 * @return 이미지 ID → URL 매핑 정보
+	 */
+	private Map<Long, String> getFileUrlMap(final FishingTripPostResponse.DetailQueryDto detailQueryDto) {
+		List<Long> fileIdList = detailQueryDto.fileIdList();
+		if (fileIdList == null || fileIdList.isEmpty()) {
+			return Collections.emptyMap();
+		}
+
+		return storageRepository.findAllById(fileIdList).stream()
+			.collect(Collectors.toMap(
+				File::getFileId,
+				File::getUrl
+			));
 	}
 }
