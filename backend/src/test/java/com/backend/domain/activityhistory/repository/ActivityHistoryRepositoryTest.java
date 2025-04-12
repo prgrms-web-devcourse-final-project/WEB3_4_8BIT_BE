@@ -25,6 +25,7 @@ import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.util.BaseTest;
 
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 
 @Import({
@@ -45,6 +46,9 @@ class ActivityHistoryRepositoryTest extends BaseTest {
 
 	@Autowired
 	private ActivityHistoryJpaRepository activityHistoryJpaRepository;
+
+	@Autowired
+	private EntityManager em;
 
 	private final Arbitrary<String> englishStringLength = Arbitraries.strings()
 		.withCharRange('a', 'z')
@@ -160,6 +164,9 @@ class ActivityHistoryRepositoryTest extends BaseTest {
 		// Given
 		activityHistoryJpaRepository.deleteAll();
 
+		em.flush();
+		em.clear();
+
 		List<ActivityHistory> givenActivityHistory = fixtureMonkeyBuilder.giveMeBuilder(ActivityHistory.class)
 			.set("activityHistoryId", null)
 			.set("description", englishStringLength)
@@ -167,7 +174,10 @@ class ActivityHistoryRepositoryTest extends BaseTest {
 			.set("memberId", 1L)
 			.sampleList(5);
 
-		activityHistoryJpaRepository.saveAll(givenActivityHistory);
+		List<ActivityHistory> activityHistories = activityHistoryJpaRepository.saveAll(givenActivityHistory);
+
+		em.flush();
+		em.clear();
 
 		// 저장한 물고기 도감 데이터 전부 2시간 전으로 생성일 수정
 		jdbcTemplate.update(
@@ -175,7 +185,7 @@ class ActivityHistoryRepositoryTest extends BaseTest {
 				"SET created_at = ? " +
 				"WHERE activity_history_id = ?",
 			ZonedDateTime.now().minusMonths(2),
-			1L);
+			activityHistories.get(0).getActivityHistoryId());
 
 		// When
 		List<Long> activityHistoryIdsBeforeOneMonthList = activityHistoryRepository

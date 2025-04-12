@@ -9,7 +9,6 @@ import static com.backend.global.storage.entity.QFile.*;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -111,7 +110,8 @@ public class FishingTripPostQueryRepository {
 			.execute() > 0;
 	}
 
-	private BooleanExpression whereCondition(final Long regionId,
+	private BooleanExpression whereCondition(
+		final Long regionId,
 		final PostStatus status,
 		final String keyword) {
 		BooleanExpression condition = Expressions.TRUE;
@@ -156,7 +156,8 @@ public class FishingTripPostQueryRepository {
 	}
 
 	private static BooleanExpression getBooleanExpressionByPopularity(
-		final GlobalRequest.CursorRequest cursorRequestDto) {
+		final GlobalRequest.CursorRequest cursorRequestDto
+	) {
 		Long value = Long.parseLong(cursorRequestDto.fieldValue());
 		Order order = QuerydslUtil.getOrder(cursorRequestDto);
 
@@ -177,14 +178,14 @@ public class FishingTripPostQueryRepository {
 		return switch (cursorRequestDto.sort()) {
 			case "createdAt" -> new OrderSpecifier<?>[] {
 				new OrderSpecifier<>(direction, fishingTripPost.createdAt),
-				new OrderSpecifier<>(direction, fishingTripPost.fishingTripPostId)
+				new OrderSpecifier<>(Order.DESC, fishingTripPost.fishingTripPostId)
 			};
 			case "popularity" -> {
 				NumberExpression<Long> popularityScore =
 					fishingTripPost.likeCount.add(fishingTripPost.commentCount);
 				yield new OrderSpecifier<?>[] {
 					new OrderSpecifier<>(direction, popularityScore),
-					new OrderSpecifier<>(direction, fishingTripPost.fishingTripPostId)
+					new OrderSpecifier<>(Order.DESC, fishingTripPost.fishingTripPostId)
 				};
 			}
 			default -> throw new IllegalArgumentException("지원되지 않는 정렬 필드: " + cursorRequestDto.sort());
@@ -193,7 +194,8 @@ public class FishingTripPostQueryRepository {
 
 	public FishingTripPostResponse.ParticipantDetailDto findParticipantDetailDto(
 		final Long fishingTripPostId,
-		final Long memberId) {
+		final Long memberId
+	) {
 		return jpaQueryFactory
 			.select(Projections.constructor(
 				FishingTripPostResponse.ParticipantDetailDto.class,
@@ -282,11 +284,9 @@ public class FishingTripPostQueryRepository {
 
 		List<FishingTripPostResponse.MyFishingTripPostDetailPage> pageList = new ArrayList<>(MyFishingTripPostDetailPage);
 		boolean isLast = pageList.size() <= cursorRequest.size();
-		if (!isLast)
-			pageList.remove(pageList.size() - 1);
 
-		if ("prev".equalsIgnoreCase(cursorRequest.type())) {
-			Collections.reverse(pageList);
+		if (!isLast) {
+			pageList.remove(pageList.size() - 1);
 		}
 
 		return ScrollResponse.from(

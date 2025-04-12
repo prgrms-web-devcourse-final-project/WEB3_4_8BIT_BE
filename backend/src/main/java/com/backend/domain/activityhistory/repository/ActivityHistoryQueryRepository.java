@@ -174,7 +174,7 @@ public class ActivityHistoryQueryRepository {
 		// 두 개의 OrderSpecifier를 배열로 반환
 		return new OrderSpecifier<?>[] {
 			new OrderSpecifier<>(queryOrder, sortField),
-			new OrderSpecifier<>(Order.ASC, activityHistory.activityHistoryId)
+			new OrderSpecifier<>(Order.DESC, activityHistory.activityHistoryId)
 		};
 	}
 

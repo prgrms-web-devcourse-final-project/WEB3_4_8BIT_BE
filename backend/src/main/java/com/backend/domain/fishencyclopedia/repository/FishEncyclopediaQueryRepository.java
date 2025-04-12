@@ -264,7 +264,7 @@ public class FishEncyclopediaQueryRepository {
 		// 두 개의 OrderSpecifier를 배열로 반환
 		return new OrderSpecifier<?>[] {
 			new OrderSpecifier<>(queryOrder, sortField),
-			new OrderSpecifier<>(Order.ASC, fishEncyclopedia.fishEncyclopediaId)
+			new OrderSpecifier<>(Order.DESC, fishEncyclopedia.fishEncyclopediaId)
 		};
 	}
 
