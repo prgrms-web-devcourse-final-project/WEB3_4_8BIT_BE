@@ -14,13 +14,13 @@ public class FishingTripPostConverter {
 	 * 로그인한 멤버가 모집 게시글 작성 Dto를 Entity로 변환 메서드
 	 *
 	 * @param memberId   {@link Long}
-	 * @param requestDto {@link FishingTripPostRequest.create}
+	 * @param requestDto {@link FishingTripPostRequest.Create}
 	 * @return {@link FishingTripPost}
 	 */
 
 	public static FishingTripPost fromCreate(
 		final Long memberId,
-		final FishingTripPostRequest.create requestDto
+		final FishingTripPostRequest.Create requestDto
 	) {
 		return FishingTripPost.builder()
 			.subject(requestDto.subject())

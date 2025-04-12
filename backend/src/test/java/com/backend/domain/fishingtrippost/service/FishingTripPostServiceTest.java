@@ -76,11 +76,11 @@ class FishingTripPostServiceTest extends BaseTest {
 	@Mock
 	private RoomService roomService;
 
-	private final ArbitraryBuilder<FishingTripPostRequest.create> createRequestBuilder =
-		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.create.class);
+	private final ArbitraryBuilder<FishingTripPostRequest.Create> createRequestBuilder =
+		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Create.class);
 
-	private final ArbitraryBuilder<FishingTripPostRequest.update> updateRequestBuilder =
-		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.update.class);
+	private final ArbitraryBuilder<FishingTripPostRequest.Update> updateRequestBuilder =
+		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Update.class);
 
 	private final ArbitraryBuilder<FishingTripPost> postBuilder =
 		fixtureMonkeyBuilder.giveMeBuilder(FishingTripPost.class);
@@ -94,8 +94,8 @@ class FishingTripPostServiceTest extends BaseTest {
 			.set("memberId", 1L)
 			.sample();
 
-		FishingTripPostRequest.create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
-				FishingTripPostRequest.create.class)
+		FishingTripPostRequest.Create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
+				FishingTripPostRequest.Create.class)
 			.set("subject", "같이 낚시 가실 분~")
 			.set("content", "초보 환영합니다!")
 			.set("recruitmentCount", 5)
@@ -132,7 +132,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		// Given
 		Long memberId = 999L;
 
-		FishingTripPostRequest.create requestDto = createRequestBuilder
+		FishingTripPostRequest.Create requestDto = createRequestBuilder
 			.set("fishingTripPointId", 1L)
 			.sample();
 
@@ -154,7 +154,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		// Given
 		Long memberId = 1L;
 
-		FishingTripPostRequest.create requestDto = createRequestBuilder
+		FishingTripPostRequest.Create requestDto = createRequestBuilder
 			.set("subject", "같이 낚시 가실 분~")
 			.set("content", "초보 환영합니다!")
 			.set("recruitmentCount", 5)
@@ -187,7 +187,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		List<Long> originalFileIds = List.of(10L, 30L); // 기존 이미지
 		List<Long> updatedFileIds = List.of(10L, 20L);  // 요청 이미지 (30 제거됨)
 
-		FishingTripPostRequest.update requestDto = FishingTripPostRequest.update.builder()
+		FishingTripPostRequest.Update requestDto = FishingTripPostRequest.Update.builder()
 			.subject("수정된 제목")
 			.content("수정된 내용")
 			.recruitmentCount(2)
@@ -229,7 +229,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		Long memberId = 1L;
 		Long postId = 999L;
 
-		FishingTripPostRequest.update requestDto = updateRequestBuilder.sample();
+		FishingTripPostRequest.Update requestDto = updateRequestBuilder.sample();
 
 		when(fishingTripPostRepository.findById(postId)).thenReturn(java.util.Optional.empty());
 
@@ -248,7 +248,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		Long memberId = 1L;
 		Long postId = 100L;
 
-		FishingTripPostRequest.update requestDto = updateRequestBuilder.sample();
+		FishingTripPostRequest.Update requestDto = updateRequestBuilder.sample();
 
 		FishingTripPost existingPost = postBuilder
 			.set("fishingTripPostId", postId)

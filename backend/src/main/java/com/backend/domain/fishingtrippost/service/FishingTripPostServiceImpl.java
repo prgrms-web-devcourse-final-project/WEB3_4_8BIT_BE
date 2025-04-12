@@ -69,7 +69,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 	@Override
 	@Transactional
-	public Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.create requestDto) {
+	public Long createFishingTripPost(final Long memberId, final FishingTripPostRequest.Create requestDto) {
 		// 멤버, 낚시 포인트 존재 검증
 		validMemberAndFishPoint(memberId, requestDto);
 
@@ -91,7 +91,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	public Long updateFishingTripPost(
 		final Long memberId,
 		final Long fishTripPostId,
-		final FishingTripPostRequest.update requestDto
+		final FishingTripPostRequest.Update requestDto
 	) {
 
 		FishingTripPost fishingTripPost = getFishingTripPostById(fishTripPostId);
@@ -393,7 +393,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @throws FishPointException 존재하지 않는 낚시 포인트면 예외 발생
 	 */
 
-	private void validMemberAndFishPoint(final Long memberId, final FishingTripPostRequest.create requestDto)
+	private void validMemberAndFishPoint(final Long memberId, final FishingTripPostRequest.Create requestDto)
 		throws GlobalException {
 
 		if (!memberRepository.existsById(memberId)) {

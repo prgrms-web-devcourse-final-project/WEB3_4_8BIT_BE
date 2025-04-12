@@ -19,27 +19,27 @@ public interface FishingTripPostService {
 	 * 동출 게시글 저장 메소드
 	 *
 	 * @param memberId   동출 게시글 작성하는 멤버
-	 * @param requestDto {@link FishingTripPostRequest.create}
+	 * @param requestDto {@link FishingTripPostRequest.Create}
 	 * @return {@link Long fishingTripPostId} Long: 동출 게시글 Id fishingTripPostId
 	 * @implSpec 로그인한 멤버 Id와 동출 게시글 작성에 필요한 정보를 받아 게시글 작성
 	 */
 	Long createFishingTripPost(
 		final Long memberId,
-		final FishingTripPostRequest.create requestDto
+		final FishingTripPostRequest.Create requestDto
 	);
 
 	/**
 	 * 동출 게시글 수정 메소드
 	 *
 	 * @param memberId   동출 게시글 작성하는 멤버
-	 * @param requestDto {@link FishingTripPostRequest.update}
+	 * @param requestDto {@link FishingTripPostRequest.Update}
 	 * @return {@link Long fishingTripPostId} Long: 동출 게시글 Id fishingTripPostId
 	 * @implSpec 로그인한 멤버 Id와 동출 게시글 수정에 필요한 정보를 받아 게시글 수정
 	 */
 	Long updateFishingTripPost(
 		final Long memberId,
 		final Long fishingTripPostId,
-		final FishingTripPostRequest.update requestDto
+		final FishingTripPostRequest.Update requestDto
 	);
 
 	/**
