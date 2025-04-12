@@ -78,4 +78,15 @@ public interface FishingTripRecruitmentRepository {
 	 * @return 게시글 ID를 키로, 참여자 수를 값으로 갖는 Map
 	 */
 	Map<Long, Integer> findApprovedFishingTripPostIdsWithCount(final Long memberId);
+
+	/**
+	 * 주어진 게시글 ID와 사용자 ID를 기준으로,
+	 * 사용자가 해당 동출 모집 게시글에 신청했는지 여부를 확인합니다.
+	 *
+	 * @param fishingTripPostId 동출 모집 게시글의 고유 ID
+	 * @param memberId          사용자의 고유 ID
+	 * @return true: 사용자가 해당 게시글에 신청한 경우,
+	 *         false: 그렇지 않은 경우
+	 */
+	boolean existsByFishingTripPostIdAndMemberId(final Long fishingTripPostId, final Long memberId);
 }

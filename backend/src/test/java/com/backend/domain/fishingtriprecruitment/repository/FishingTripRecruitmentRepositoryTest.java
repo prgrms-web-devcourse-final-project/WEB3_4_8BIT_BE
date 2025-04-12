@@ -225,4 +225,34 @@ class FishingTripRecruitmentRepositoryTest extends BaseTest {
 		List<FishingTripRecruitment> remaining = fishingTripRecruitmentJpaRepository.findAll();
 		assertThat(remaining).isEmpty();
 	}
+
+	@Test
+	@DisplayName("특정 게시글에 특정 사용자가 신청했는지 여부 확인 [Repository] - Success")
+	void t05() {
+		// given
+		Member applicant = memberRepository.save(memberArbitraryBuilder
+			.set("nickname", "신청자")
+			.set("email", "applicant@example.com")
+			.sample());
+
+		FishingTripPost post = fishingTripPostRepository.save(fishingTripPostArbitraryBuilder
+			.set("memberId", applicant.getMemberId())
+			.sample());
+
+		FishingTripRecruitment recruitment = fishingTripRecruitmentArbitraryBuilder
+			.set("fishingTripPostId", post.getFishingTripPostId())
+			.set("memberId", applicant.getMemberId())
+			.sample();
+
+		fishingTripRecruitmentRepository.save(recruitment);
+
+		// when
+		boolean exists = fishingTripRecruitmentRepository.existsByFishingTripPostIdAndMemberId(
+			post.getFishingTripPostId(),
+			applicant.getMemberId()
+		);
+
+		// then
+		assertThat(exists).isTrue();
+	}
 }

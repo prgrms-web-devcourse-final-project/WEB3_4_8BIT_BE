@@ -25,6 +25,8 @@ import com.backend.domain.fishingtriprecruitment.domain.RecruitmentStatus;
 import com.backend.domain.fishingtriprecruitment.dto.request.FishingTripRecruitmentRequest;
 import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruitmentResponse;
 import com.backend.domain.fishingtriprecruitment.entity.FishingTripRecruitment;
+import com.backend.domain.fishingtriprecruitment.exception.FishingTripRecruitmentErrorCode;
+import com.backend.domain.fishingtriprecruitment.exception.FishingTripRecruitmentException;
 import com.backend.domain.fishingtriprecruitment.repository.FishingTripRecruitmentRepository;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
@@ -208,11 +210,6 @@ class FishingTripRecruitmentServiceTest extends BaseTest {
 		RecruitmentStatus status = RecruitmentStatus.PENDING;
 		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(null, "createdAt", "next", null, null, 10);
 
-		FishingTripPost post = FishingTripPost.builder()
-			.fishingTripPostId(fishingTripPostId)
-			.memberId(memberId)
-			.build();
-
 		List<FishingTripRecruitmentResponse.DetailPage> content = List.of(
 			new FishingTripRecruitmentResponse.DetailPage(
 				1L, "닉네임", "image.png", FishingLevel.BEGINNER, "소개글", status, ZonedDateTime.now()
@@ -223,7 +220,8 @@ class FishingTripRecruitmentServiceTest extends BaseTest {
 			content, 10, 1, true, true
 		);
 
-		when(fishingTripPostRepository.findById(fishingTripPostId)).thenReturn(Optional.of(post));
+		// 작성자일 경우만 stub 설정
+		when(fishingTripPostRepository.existFishingTripPostByMemberIdAndPostId(memberId, fishingTripPostId)).thenReturn(true);
 		when(fishingTripRecruitmentRepository.findDetailPageByFishingTripPostIdAndStatus(
 			cursorRequest, fishingTripPostId, status
 		)).thenReturn(expected);
@@ -237,12 +235,12 @@ class FishingTripRecruitmentServiceTest extends BaseTest {
 		assertThat(actual.content()).hasSize(1);
 		assertThat(actual.content().get(0).recruitmentStatus()).isEqualTo(status);
 
-		verify(fishingTripPostRepository).findById(fishingTripPostId);
+		verify(fishingTripPostRepository).existFishingTripPostByMemberIdAndPostId(memberId, fishingTripPostId);
 		verify(fishingTripRecruitmentRepository).findDetailPageByFishingTripPostIdAndStatus(cursorRequest, fishingTripPostId, status);
 	}
 
 	@Test
-	@DisplayName("동출 모집 신청자 목록 조회 실패 [FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR] [Service] - Fail")
+	@DisplayName("동출 모집 신청자 목록 조회 실패 [FISHING_TRIP_RECRUITMENT_UNAUTHORIZED] [Service] - Fail")
 	void t07() {
 		// Given
 		Long memberId = 2L;
@@ -250,22 +248,20 @@ class FishingTripRecruitmentServiceTest extends BaseTest {
 		RecruitmentStatus status = RecruitmentStatus.PENDING;
 		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(null, "createdAt", "next", null, null, 10);
 
-		FishingTripPost post = FishingTripPost.builder()
-			.fishingTripPostId(fishingTripPostId)
-			.memberId(1L)
-			.build();
-
-		when(fishingTripPostRepository.findById(fishingTripPostId)).thenReturn(Optional.of(post));
+		when(fishingTripPostRepository.existFishingTripPostByMemberIdAndPostId(memberId, fishingTripPostId)).thenReturn(false);
+		when(fishingTripRecruitmentRepository.existsByFishingTripPostIdAndMemberId(fishingTripPostId, memberId)).thenReturn(false);
 
 		// When & Then
 		assertThatThrownBy(() -> fishingTripRecruitmentService.getDetailPageList(memberId, cursorRequest, fishingTripPostId, status))
-			.isInstanceOf(FishingTripPostException.class)
-			.hasFieldOrPropertyWithValue("errorCode", FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR)
-			.hasMessageContaining(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR.getMessage());
+			.isInstanceOf(FishingTripRecruitmentException.class)
+			.hasFieldOrPropertyWithValue("errorCode", FishingTripRecruitmentErrorCode.FISHING_TRIP_RECRUITMENT_UNAUTHORIZED)
+			.hasMessageContaining(FishingTripRecruitmentErrorCode.FISHING_TRIP_RECRUITMENT_UNAUTHORIZED.getMessage());
 
-		verify(fishingTripPostRepository).findById(fishingTripPostId);
+		verify(fishingTripPostRepository).existFishingTripPostByMemberIdAndPostId(memberId, fishingTripPostId);
+		verify(fishingTripRecruitmentRepository).existsByFishingTripPostIdAndMemberId(fishingTripPostId, memberId);
 		verify(fishingTripRecruitmentRepository, never()).findDetailPageByFishingTripPostIdAndStatus(any(), any(), any());
 	}
+
 
 	@Test
 	@DisplayName("동출 모집 신청 승인 [Service] - Success")
