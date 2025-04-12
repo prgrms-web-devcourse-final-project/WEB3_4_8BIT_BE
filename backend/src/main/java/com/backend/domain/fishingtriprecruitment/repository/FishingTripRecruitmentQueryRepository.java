@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
+import static com.backend.domain.fishingtrippost.entity.QFishingTripPost.*;
 import static com.backend.domain.fishingtriprecruitment.entity.QFishingTripRecruitment.*;
 import static com.backend.domain.member.entity.QMember.*;
 import static com.backend.global.storage.entity.QFile.*;
@@ -91,39 +92,24 @@ public class FishingTripRecruitmentQueryRepository {
 	}
 
 	public Map<Long, Integer> findApprovedFishingTripPostIdsWithCount(final Long memberId) {
-		// memberId가 APPROVED로 참여한 게시글 ID 목록 조회
-		List<Long> joinedPostIdList = jpaQueryFactory
-			.select(fishingTripRecruitment.fishingTripPostId)
+		List<Tuple> tupleList = jpaQueryFactory
+			.select(
+				fishingTripPost.fishingTripPostId,
+				fishingTripPost.currentCount
+			)
 			.from(fishingTripRecruitment)
+			.join(fishingTripPost)
+			.on(fishingTripRecruitment.fishingTripPostId.eq(fishingTripPost.fishingTripPostId))
 			.where(
 				fishingTripRecruitment.memberId.eq(memberId),
 				fishingTripRecruitment.recruitmentStatus.eq(RecruitmentStatus.APPROVED)
 			)
-			.distinct()
+			.groupBy(fishingTripPost.fishingTripPostId, fishingTripPost.currentCount)
 			.fetch();
 
-		if (joinedPostIdList.isEmpty()) {
-			return Collections.emptyMap();
-		}
-
-		// 해당 게시글 ID들에 대해 전체 approved 참여자 수 조회
-		List<Tuple> tupleList = jpaQueryFactory
-			.select(
-				fishingTripRecruitment.fishingTripPostId,
-				fishingTripRecruitment.count()
-			)
-			.from(fishingTripRecruitment)
-			.where(
-				fishingTripRecruitment.fishingTripPostId.in(joinedPostIdList),
-				fishingTripRecruitment.recruitmentStatus.eq(RecruitmentStatus.APPROVED)
-			)
-			.groupBy(fishingTripRecruitment.fishingTripPostId)
-			.fetch();
-
-		// Map<Long, Integer> 형태로 변환
 		return tupleList.stream().collect(Collectors.toMap(
-			t -> t.get(fishingTripRecruitment.fishingTripPostId),
-			t -> Objects.requireNonNull(t.get(fishingTripRecruitment.count())).intValue()
+			t -> t.get(fishingTripPost.fishingTripPostId),
+			t -> t.get(fishingTripPost.currentCount)
 		));
 	}
 }
