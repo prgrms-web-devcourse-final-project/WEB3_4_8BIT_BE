@@ -1,6 +1,8 @@
 package com.backend.domain.chat.message.repository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
@@ -33,5 +35,25 @@ public class MessageQueryRepository {
 			.limit(cursorRequestDto.size());
 
 		return mongoTemplate.find(query, Message.class);
+	}
+
+	public Map<Long, Message> findLastMessagesByRoomIds(final List<Long> roomIdList) {
+		if (roomIdList == null || roomIdList.isEmpty()) {
+			return Map.of();
+		}
+
+		Map<Long, Message> resultMap = new HashMap<>();
+
+		for (Long roomId : roomIdList) {
+			Query query = new Query(Criteria.where("room_id").is(roomId))
+				.with(Sort.by(Sort.Direction.DESC, "_id"))
+				.limit(1);
+
+			Message message = mongoTemplate.findOne(query, Message.class);
+			if (message != null) {
+				resultMap.put(roomId, message);
+			}
+		}
+		return resultMap;
 	}
 }

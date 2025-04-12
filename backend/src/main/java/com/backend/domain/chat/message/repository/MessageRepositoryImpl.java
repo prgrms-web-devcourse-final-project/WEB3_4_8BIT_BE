@@ -1,6 +1,7 @@
 package com.backend.domain.chat.message.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +28,10 @@ public class MessageRepositoryImpl implements MessageRepository {
 		final ChatRequest.MessageCursorRequest cursorRequestDto
 	) {
 		return messageQueryRepository.findMessagesByRoomId(roomId, cursorRequestDto);
+	}
+
+	@Override
+	public Map<Long, Message> findLastMessageByRoomIds(final List<Long> roomIdList) {
+		return messageQueryRepository.findLastMessagesByRoomIds(roomIdList);
 	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -24,6 +25,7 @@ public class Message {
 	private ObjectId messageId;
 
 	@Field("room_id")
+	@Indexed
 	private Long roomId;
 
 	@Field("sender_id")

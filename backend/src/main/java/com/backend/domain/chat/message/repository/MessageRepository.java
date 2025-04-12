@@ -1,6 +1,7 @@
 package com.backend.domain.chat.message.repository;
 
 import java.util.List;
+import java.util.Map;
 
 import com.backend.domain.chat.dto.request.ChatRequest;
 import com.backend.domain.chat.message.entity.Message;
@@ -23,4 +24,12 @@ public interface MessageRepository {
 	 * @return 메시지 목록 (최신순)
 	 */
 	List<Message> findMessagesByRoomId(final Long roomId, final ChatRequest.MessageCursorRequest cursorRequestDto);
+
+	/**
+	 * 채팅방 ID 리스트에 대해 각 채팅방의 마지막 메시지를 조회
+	 *
+	 * @param roomIdList 채팅방 ID 목록
+	 * @return roomId → 마지막 메시지 매핑 Map
+	 */
+	Map<Long, Message> findLastMessageByRoomIds(final List<Long> roomIdList);
 }
