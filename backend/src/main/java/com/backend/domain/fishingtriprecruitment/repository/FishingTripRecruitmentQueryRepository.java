@@ -1,6 +1,10 @@
 package com.backend.domain.fishingtriprecruitment.repository;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
 
@@ -13,6 +17,7 @@ import com.backend.domain.fishingtriprecruitment.dto.response.FishingTripRecruit
 import com.backend.domain.fishingtriprecruitment.dto.response.QFishingTripRecruitmentResponse_DetailPage;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
@@ -83,5 +88,42 @@ public class FishingTripRecruitmentQueryRepository {
 		jpaQueryFactory.delete(fishingTripRecruitment)
 			.where(fishingTripRecruitment.fishingTripPostId.eq(fishingTripPostId))
 			.execute();
+	}
+
+	public Map<Long, Integer> findApprovedFishingTripPostIdsWithCount(final Long memberId) {
+		// memberId가 APPROVED로 참여한 게시글 ID 목록 조회
+		List<Long> joinedPostIdList = jpaQueryFactory
+			.select(fishingTripRecruitment.fishingTripPostId)
+			.from(fishingTripRecruitment)
+			.where(
+				fishingTripRecruitment.memberId.eq(memberId),
+				fishingTripRecruitment.recruitmentStatus.eq(RecruitmentStatus.APPROVED)
+			)
+			.distinct()
+			.fetch();
+
+		if (joinedPostIdList.isEmpty()) {
+			return Collections.emptyMap();
+		}
+
+		// 해당 게시글 ID들에 대해 전체 approved 참여자 수 조회
+		List<Tuple> tupleList = jpaQueryFactory
+			.select(
+				fishingTripRecruitment.fishingTripPostId,
+				fishingTripRecruitment.count()
+			)
+			.from(fishingTripRecruitment)
+			.where(
+				fishingTripRecruitment.fishingTripPostId.in(joinedPostIdList),
+				fishingTripRecruitment.recruitmentStatus.eq(RecruitmentStatus.APPROVED)
+			)
+			.groupBy(fishingTripRecruitment.fishingTripPostId)
+			.fetch();
+
+		// Map<Long, Integer> 형태로 변환
+		return tupleList.stream().collect(Collectors.toMap(
+			t -> t.get(fishingTripRecruitment.fishingTripPostId),
+			t -> Objects.requireNonNull(t.get(fishingTripRecruitment.count())).intValue()
+		));
 	}
 }

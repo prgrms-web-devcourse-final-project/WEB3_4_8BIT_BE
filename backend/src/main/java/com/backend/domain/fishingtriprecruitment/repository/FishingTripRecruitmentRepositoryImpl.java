@@ -1,6 +1,7 @@
 package com.backend.domain.fishingtriprecruitment.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -47,5 +48,10 @@ public class FishingTripRecruitmentRepositoryImpl implements FishingTripRecruitm
 	@Override
 	public void deleteAllByPostId(final Long fishingTripPostId) {
 		fishingTripRecruitmentQueryRepository.deleteAllByPostId(fishingTripPostId);
+	}
+
+	@Override
+	public Map<Long, Integer> findApprovedFishingTripPostIdsWithCount(final Long memberId) {
+		return fishingTripRecruitmentQueryRepository.findApprovedFishingTripPostIdsWithCount(memberId);
 	}
 }
