@@ -26,8 +26,8 @@ public class MessageConverter {
 			.build();
 	}
 
-	public static MessageResponse toResponse(final Message message, final String senderProfileImageUrl) {
-		return MessageResponse.builder()
+	public static MessageResponse.Basic toResponse(final Message message, final String senderProfileImageUrl) {
+		return MessageResponse.Basic.builder()
 			.messageId(message.getMessageId().toHexString())
 			.roomId(message.getRoomId())
 			.senderId(message.getSenderId())

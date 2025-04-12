@@ -7,15 +7,18 @@ import com.backend.domain.chat.message.entity.MessageType;
 
 import lombok.Builder;
 
-@Builder
-public record MessageResponse(
-	String messageId,
-	Long roomId,
-	Long senderId,
-	String senderNickname,
-	String senderProfileImageUrl,
-	String content,
-	List<String> fileUrls,
-	MessageType type,
-	LocalDateTime createdAt
-) {}
+public class MessageResponse {
+
+	@Builder
+	public record Basic(
+		String messageId,
+		Long roomId,
+		Long senderId,
+		String senderNickname,
+		String senderProfileImageUrl,
+		String content,
+		List<String> fileUrls,
+		MessageType type,
+		LocalDateTime createdAt
+	) {}
+}

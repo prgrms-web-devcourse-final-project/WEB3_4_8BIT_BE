@@ -27,7 +27,7 @@ public class MessageServiceImpl implements MessageService {
 	private final MemberService memberService;
 
 	@Override
-	public MessageResponse saveMessage(
+	public MessageResponse.Basic saveMessage(
 		final Long senderId,
 		final String nickname,
 		final String fileUrl,
@@ -50,7 +50,7 @@ public class MessageServiceImpl implements MessageService {
 	}
 
 	@Override
-	public CursorResponse<MessageResponse> getMessagesByRoomId(
+	public CursorResponse<MessageResponse.Basic> getMessagesByRoomId(
 		final Long roomId,
 		final CursorRequest cursorRequestDto
 	) {
@@ -58,7 +58,7 @@ public class MessageServiceImpl implements MessageService {
 		List<Message> messageList = messageQueryRepository.findMessagesByRoomId(roomId, cursorRequestDto);
 
 		// 2. Message → MessageResponse 변환 (getChatProfile 호출)
-		List<MessageResponse> responseList = messageList.stream()
+		List<MessageResponse.Basic> responseList = messageList.stream()
 			.map(message -> {
 				String profileImageUrl = memberService.getChatProfile(message.getSenderId()).fileUrl();
 				return MessageConverter.toResponse(message, profileImageUrl);

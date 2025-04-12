@@ -40,11 +40,11 @@ public class ChatController {
 
 	@GetMapping("/{roomId}")
 	@Operation(summary = "메세지 조회", description = "해당 채팅방의 이전 메세지를 조회하는 API")
-	public ResponseEntity<GenericResponse<CursorResponse<MessageResponse>>> getRoomDetail(
+	public ResponseEntity<GenericResponse<CursorResponse<MessageResponse.Basic>>> getRoomDetail(
 		@PathVariable final Long roomId,
 		@Valid final CursorRequest cursorRequestDto
 	) {
-		CursorResponse<MessageResponse> messageScrollResponse = messageService.getMessagesByRoomId(roomId, cursorRequestDto);
+		CursorResponse<MessageResponse.Basic> messageScrollResponse = messageService.getMessagesByRoomId(roomId, cursorRequestDto);
 
 		return ResponseEntity.ok(GenericResponse.of(true, messageScrollResponse));
 	}
