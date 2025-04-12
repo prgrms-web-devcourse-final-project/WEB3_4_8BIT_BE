@@ -25,7 +25,7 @@ import lombok.experimental.SuperBuilder;
 	uniqueConstraints = @UniqueConstraint(columnNames = {"memberId", "targetType", "targetId"}),
 	indexes = {
 		@Index(name = "idx_like_01", columnList = "targetType, targetId"),
-		@Index(name = "idx_like_02", columnList = "memberId"),
+		@Index(name = "idx_like_02", columnList = "memberId, targetType"),
 		@Index(name = "idx_like_03", columnList = "createdAt, likeId"),
 		@Index(name = "idx_like_04", columnList = "memberId, targetType, targetId, isDeleted")
 	}

@@ -6,8 +6,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.backend.domain.like.domain.LikeTargetType;
 import com.backend.domain.like.dto.request.LikeRequest;
 import com.backend.domain.like.dto.response.LikeResponse;
 import com.backend.domain.like.service.LikeService;
@@ -17,6 +19,7 @@ import com.backend.global.dto.response.GenericResponse;
 import com.backend.global.dto.response.ScrollResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +56,7 @@ public class LikeController {
 	}
 
 	@GetMapping("/ship-fishing-post")
-	@Operation(summary = "좋아요한 선상 낚시 게시글 스크롤 조회", description = "로그인한 사용자가 좋아요한 동출 모집 게시글을 최신순으로 조회합니다.")
+	@Operation(summary = "좋아요한 선상 낚시 게시글 스크롤 조회", description = "로그인한 사용자가 좋아요한 선상 낚시 게시글을 최신순으로 조회합니다.")
 	public ResponseEntity<GenericResponse<ScrollResponse<LikeResponse.ShipFishingPostLikedDetailResponse>>> getLikedShipFishingPosts(
 		@AuthenticationPrincipal final CustomOAuth2User user,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto
@@ -63,5 +66,16 @@ public class LikeController {
 			user.getId()
 		);
 		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
+	}
+
+	@GetMapping("/count")
+	@Operation(summary = "좋아요한 게시글 개수 조회", description = "로그인한 사용자가 종류별로 좋아요한 게시글 개수를 조회합니다.")
+	@Parameter(name = "targetType", required = true, description = "게시글 종류", example = "SHIP_FISHING_POST")
+	public ResponseEntity<GenericResponse<Long>> getCountLikedShipFishingPosts(
+		@AuthenticationPrincipal final CustomOAuth2User user,
+		@RequestParam("targetType") final LikeTargetType targetType
+	) {
+		Long count = likeService.getCountLikedShipFishingPosts(user.getId(), targetType);
+		return ResponseEntity.ok(GenericResponse.of(true, count));
 	}
 }
