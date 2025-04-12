@@ -281,7 +281,8 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * 이미지 URL은 파일 ID 리스트가 비어 있지 않으면 첫 번째 파일 ID를 기준으로 가져옵니다.
 	 */
 	private List<FishingTripPostResponse.HotPost> getHotPostList(
-		List<FishingTripPostResponse.HotPostDto> hotPostDtoList) {
+		final List<FishingTripPostResponse.HotPostDto> hotPostDtoList
+	) {
 		return hotPostDtoList.stream()
 			.map(dto -> {
 				String imageUrl = (dto.fileIdList() != null && !dto.fileIdList().isEmpty())
