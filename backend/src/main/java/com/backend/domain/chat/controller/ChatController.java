@@ -1,5 +1,7 @@
 package com.backend.domain.chat.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +13,7 @@ import com.backend.domain.chat.dto.request.ChatRequest;
 import com.backend.domain.chat.dto.response.ChatResponse;
 import com.backend.domain.chat.message.dto.response.MessageResponse;
 import com.backend.domain.chat.message.service.MessageService;
+import com.backend.domain.chat.room.dto.response.RoomResponse;
 import com.backend.domain.chat.room.service.RoomService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.response.GenericResponse;
@@ -31,11 +34,12 @@ public class ChatController {
 
 	@GetMapping
 	@Operation(summary = "채팅방 목록 조회", description = "로그인 한 회원의 채팅방 목록을 조회하는 API")
-	public ResponseEntity<GenericResponse<Void>> getRooms(
+	public ResponseEntity<GenericResponse<List<RoomResponse.Basic>>> getRooms(
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
-		//TODO 채팅방 목록 조회
-		return ResponseEntity.ok(GenericResponse.of(true));
+		List<RoomResponse.Basic> roomList = roomService.getRoomList(user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true, roomList));
 	}
 
 	@GetMapping("/{roomId}/messages")
