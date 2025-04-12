@@ -1,6 +1,7 @@
 package com.backend.domain.chat.room.repository;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
@@ -29,5 +30,10 @@ public class RoomRepositoryImpl implements RoomRepository {
 	@Override
 	public void updateLastMessageTime(final Long roomId, final ZonedDateTime lastMessageTime) {
 		roomQueryRepository.updateLastMessageTime(roomId, lastMessageTime);
+	}
+
+	@Override
+	public List<Room> findRoomsByIds(final List<Long> roomIdList) {
+		return roomQueryRepository.findRoomsByIds(roomIdList);
 	}
 }

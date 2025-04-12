@@ -1,6 +1,7 @@
 package com.backend.domain.chat.room.repository;
 
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import com.backend.domain.chat.room.entity.Room;
@@ -31,4 +32,11 @@ public interface RoomRepository {
 	 */
 	void updateLastMessageTime(final Long roomId, final ZonedDateTime lastMessageTime);
 
+	/**
+	 * 주어진 채팅방 ID 목록에 해당하는 Room 엔티티들을 조회
+	 *
+	 * @param roomIdList 조회할 Room ID 목록
+	 * @return 조회된 Room 리스트
+	 */
+	List<Room> findRoomsByIds(final List<Long> roomIdList);
 }
