@@ -14,13 +14,13 @@ public class FishingTripPostConverter {
 	 * 로그인한 멤버가 모집 게시글 작성 Dto를 Entity로 변환 메서드
 	 *
 	 * @param memberId   {@link Long}
-	 * @param requestDto {@link FishingTripPostRequest.Form}
+	 * @param requestDto {@link FishingTripPostRequest.Create}
 	 * @return {@link FishingTripPost}
 	 */
 
 	public static FishingTripPost fromCreate(
 		final Long memberId,
-		final FishingTripPostRequest.Form requestDto
+		final FishingTripPostRequest.Create requestDto
 	) {
 		return FishingTripPost.builder()
 			.subject(requestDto.subject())
@@ -114,7 +114,8 @@ public class FishingTripPostConverter {
 	public static FishingTripPostResponse.Detail toDetail(
 		final FishingTripPostResponse.DetailQueryDto detailQueryDto,
 		final List<String> fileUrlList,
-		final boolean isLiked
+		final boolean isLiked,
+		final boolean isPostOwner
 	) {
 		return FishingTripPostResponse.Detail.builder()
 			.fishingTripPostId(detailQueryDto.fishingTripPostId())
@@ -133,6 +134,7 @@ public class FishingTripPostConverter {
 			.postStatus(detailQueryDto.postStatus())
 			.likeCount(detailQueryDto.likeCount())
 			.isLiked(isLiked)
+			.isPostOwner(isPostOwner)
 			.build();
 	}
 }

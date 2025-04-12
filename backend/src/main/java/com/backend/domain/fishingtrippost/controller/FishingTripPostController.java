@@ -42,7 +42,7 @@ public class FishingTripPostController {
 	@Operation(summary = "동출 모집 게시글 생성", description = "로그인한 사용자가 동출 모집 게시글 작성시 사용하는 API")
 	public ResponseEntity<GenericResponse<Long>> createFishingTripPost(
 		@AuthenticationPrincipal final CustomOAuth2User user,
-		@RequestBody @Valid final FishingTripPostRequest.Form requestDto
+		@RequestBody @Valid final FishingTripPostRequest.Create requestDto
 	) {
 
 		Long saveFishingTripPostId = fishingTripPostService.createFishingTripPost(user.getId(), requestDto);
@@ -56,7 +56,7 @@ public class FishingTripPostController {
 	public ResponseEntity<GenericResponse<Long>> updateFishingTripPost(
 		@AuthenticationPrincipal final CustomOAuth2User user,
 		@PathVariable final Long fishingTripPostId,
-		@RequestBody @Valid final FishingTripPostRequest.Form requestDto
+		@RequestBody @Valid final FishingTripPostRequest.Update requestDto
 	) {
 
 		Long updateFishingTripPostId = fishingTripPostService.updateFishingTripPost(
