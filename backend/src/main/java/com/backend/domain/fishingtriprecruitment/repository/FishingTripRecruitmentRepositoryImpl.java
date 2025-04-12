@@ -54,4 +54,9 @@ public class FishingTripRecruitmentRepositoryImpl implements FishingTripRecruitm
 	public Map<Long, Integer> findApprovedFishingTripPostIdsWithCount(final Long memberId) {
 		return fishingTripRecruitmentQueryRepository.findApprovedFishingTripPostIdsWithCount(memberId);
 	}
+
+	@Override
+	public boolean existsByFishingTripPostIdAndMemberId(final Long fishingTripPostId, final Long memberId) {
+		return fishingTripRecruitmentJpaRepository.existsByFishingTripPostIdAndMemberId(fishingTripPostId, memberId);
+	}
 }
