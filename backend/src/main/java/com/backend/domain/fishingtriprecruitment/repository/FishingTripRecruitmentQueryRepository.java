@@ -1,5 +1,7 @@
 package com.backend.domain.fishingtriprecruitment.repository;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,16 +54,23 @@ public class FishingTripRecruitmentQueryRepository {
 			.limit(cursorRequestDto.size() + 1)
 			.fetch();
 
-		boolean isLast = detailPageList.size() <= cursorRequestDto.size();
+		List<FishingTripRecruitmentResponse.DetailPage> pageList = new ArrayList<>(detailPageList);
+
+
+		boolean isLast = pageList.size() <= cursorRequestDto.size();
 
 		if (!isLast) {
-			detailPageList.remove(detailPageList.size() - 1);
+			pageList.remove(pageList.size() - 1);
+		}
+
+		if ("prev".equalsIgnoreCase(cursorRequestDto.type())) {
+			Collections.reverse(pageList);
 		}
 
 		return ScrollResponse.from(
-			detailPageList,
+			pageList,
 			cursorRequestDto.size(),
-			detailPageList.size(),
+			pageList.size(),
 			cursorRequestDto.id() == null,
 			isLast
 		);
