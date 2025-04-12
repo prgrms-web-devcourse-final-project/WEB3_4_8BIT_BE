@@ -1,5 +1,6 @@
 package com.backend.domain.chat.message.service;
 
+import java.time.ZoneId;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import com.backend.domain.chat.message.dto.response.MessageResponse;
 import com.backend.domain.chat.message.entity.Message;
 import com.backend.domain.chat.message.repository.MessageQueryRepository;
 import com.backend.domain.chat.message.repository.MessageRepository;
+import com.backend.domain.chat.room.service.RoomService;
 import com.backend.domain.member.service.MemberService;
 import com.backend.global.storage.service.StorageService;
 
@@ -25,6 +27,7 @@ public class MessageServiceImpl implements MessageService {
 	private final StorageService storageService;
 	private final MessageQueryRepository messageQueryRepository;
 	private final MemberService memberService;
+	private final RoomService roomService;
 
 	@Override
 	public MessageResponse.Basic saveMessage(
@@ -44,6 +47,9 @@ public class MessageServiceImpl implements MessageService {
 
 		// 3. 저장
 		Message saved = messageRepository.save(message);
+
+		// 4. 채팅방 마지막 메세지 시간 비동기 업데이트
+		roomService.updateLastMessageTime(saved.getRoomId(), saved.getCreatedAt().atZone(ZoneId.of("Asia/Seoul")));
 
 		// 5. 응답 객체로 변환 후 반환
 		return MessageConverter.toResponse(saved, fileUrl);

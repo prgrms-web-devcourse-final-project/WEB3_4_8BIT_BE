@@ -1,5 +1,8 @@
 package com.backend.domain.chat.room.service;
 
+import java.time.ZonedDateTime;
+
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,5 +26,12 @@ public class RoomServiceImpl implements RoomService {
 	public Long createRoom(final Long targetId, final TargetType targetType) {
 		Room room = RoomConverter.fromTargetIdAndTargetType(targetId, targetType);
 		return roomRepository.save(room).getRoomId();
+	}
+
+	@Async
+	@Override
+	@Transactional
+	public void updateLastMessageTime(Long roomId, ZonedDateTime lastMessageTime) {
+		roomRepository.updateLastMessageTime(roomId, lastMessageTime);
 	}
 }

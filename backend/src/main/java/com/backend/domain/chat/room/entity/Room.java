@@ -1,5 +1,7 @@
 package com.backend.domain.chat.room.entity;
 
+import java.time.ZonedDateTime;
+
 import com.backend.global.baseentity.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -45,4 +47,6 @@ public class Room extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private Status status;
+
+	private ZonedDateTime lastMessageTime;
 }
