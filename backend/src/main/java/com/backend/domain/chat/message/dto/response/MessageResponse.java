@@ -21,4 +21,11 @@ public class MessageResponse {
 		MessageType type,
 		LocalDateTime createdAt
 	) {}
+
+	public record Last(
+		String content,
+		MessageType type,
+		String senderNickname,
+		LocalDateTime createdAt
+	) {}
 }
