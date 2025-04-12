@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.domain.chat.dto.request.ChatRequest;
-import com.backend.domain.chat.dto.response.CursorResponse;
+import com.backend.domain.chat.dto.response.ChatResponse;
 import com.backend.domain.chat.message.dto.response.MessageResponse;
 import com.backend.domain.chat.message.service.MessageService;
 import com.backend.domain.chat.room.service.RoomService;
@@ -40,11 +40,11 @@ public class ChatController {
 
 	@GetMapping("/{roomId}/messages")
 	@Operation(summary = "메세지 조회", description = "해당 채팅방의 이전 메세지를 조회하는 API")
-	public ResponseEntity<GenericResponse<CursorResponse<MessageResponse.Basic>>> getRoomDetail(
+	public ResponseEntity<GenericResponse<ChatResponse.MessageCursorResponse<MessageResponse.Basic>>> getRoomDetail(
 		@PathVariable final Long roomId,
 		@Valid final ChatRequest.MessageCursorRequest cursorRequestDto
 	) {
-		CursorResponse<MessageResponse.Basic> messageScrollResponse = messageService.getMessagesByRoomId(roomId, cursorRequestDto);
+		ChatResponse.MessageCursorResponse<MessageResponse.Basic> messageScrollResponse = messageService.getMessagesByRoomId(roomId, cursorRequestDto);
 
 		return ResponseEntity.ok(GenericResponse.of(true, messageScrollResponse));
 	}
