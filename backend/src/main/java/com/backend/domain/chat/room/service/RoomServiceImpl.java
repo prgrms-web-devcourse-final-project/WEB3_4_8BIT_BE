@@ -53,43 +53,35 @@ public class RoomServiceImpl implements RoomService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<RoomResponse.Basic> getRoomList(final Long memberId) {
-		// 1. 내가 작성한 게시글 ID + currentCount
+		// 1. 내가 작성한 게시글 및 참여자 수 조회
 		Map<Long, Integer> authoredPostCountMap =
 			fishingTripPostRepository.findFishingTripPostIdWithApprovedCount(memberId);
 
-		// 2. 내가 참여한 게시글 ID + currentCount
+		// 2. 내가 참여한 게시글 및 참여자 수 조회
 		Map<Long, Integer> joinedPostCountMap =
 			fishingTripRecruitmentRepository.findApprovedFishingTripPostIdsWithCount(memberId);
 
-		// 3. 병합
+		// 3. 참여자 수 병합 (작성자 포함)
 		Map<Long, Integer> postIdToParticipantCount = new HashMap<>();
+		authoredPostCountMap.forEach((postId, count) -> postIdToParticipantCount.put(postId, count + 1));
+		joinedPostCountMap.forEach((postId, count) -> postIdToParticipantCount.putIfAbsent(postId, count + 1));
 
-		authoredPostCountMap.forEach((postId, count) ->
-			postIdToParticipantCount.put(postId, count + 1)
-		);
-		joinedPostCountMap.forEach((postId, count) ->
-			postIdToParticipantCount.putIfAbsent(postId, count + 1)
-		);
-
-		// 2. Room 조회
+		// 4. 채팅방 목록 조회
 		List<Room> rooms = roomRepository.findRoomsByIds(new ArrayList<>(postIdToParticipantCount.keySet()));
 
-		// 3. 마지막 메시지 조회
+		// 5. 마지막 메시지 조회
 		Map<Long, Message> lastMessageByRoomIds = messageRepository.findLastMessageByRoomIds(
 			rooms.stream().map(Room::getRoomId).toList());
 
-		// 4. DTO 변환
+		// 6. 응답 DTO 변환
 		return rooms.stream()
 			.map(room -> {
-				// 4-1. 마지막 메시지 변환
 				MessageResponse.Last lastMessage = Optional.ofNullable(lastMessageByRoomIds.get(room.getRoomId()))
 					.map(MessageConverter::toLastMessageResponse)
 					.orElse(null);
 
-				// 4-2. 참여자 수 (작성자 포함)
 				int participantCount = postIdToParticipantCount.getOrDefault(room.getTargetId(), 0);
 
-				// 4-3. DTO 생성
 				return new RoomResponse.Basic(
 					room.getRoomId(),
 					room.getTargetId(),
