@@ -57,8 +57,8 @@ class FishingTripPostControllerTest extends BaseTest {
 	@Autowired
 	private ObjectMapper objectMapper;
 
-	final ArbitraryBuilder<FishingTripPostRequest.Form> arbitraryBuilder = fixtureMonkeyBuilder
-		.giveMeBuilder(FishingTripPostRequest.Form.class)
+	final ArbitraryBuilder<FishingTripPostRequest.create> arbitraryBuilder = fixtureMonkeyBuilder
+		.giveMeBuilder(FishingTripPostRequest.create.class)
 		.set("subject", "동출 구합니다!")
 		.set("content", "다같이 낚시가요~")
 		.set("recruitmentCount", 5)
@@ -72,7 +72,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	@DisplayName("동출 게시글 저장 [Controller] - Success")
 	@WithMockCustomUser
 	void t01() throws Exception {
-		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
+		FishingTripPostRequest.create requestDto = arbitraryBuilder.sample();
 		Long savedId = 0L;
 
 		when(fishingTripPostService.createFishingTripPost(1L, requestDto)).thenReturn(savedId);
@@ -91,7 +91,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	@DisplayName("동출 게시글 저장 [존재하지 않는 Member] [Controller] - Fail")
 	@WithMockCustomUser
 	void t02() throws Exception {
-		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
+		FishingTripPostRequest.create requestDto = arbitraryBuilder.sample();
 
 		doThrow(new MemberException(MemberErrorCode.MEMBER_NOT_FOUND))
 			.when(fishingTripPostService).createFishingTripPost(anyLong(), any());
@@ -110,7 +110,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	@DisplayName("동출 게시글 저장 [존재하지 않는 FishPoint] [Controller] - Fail")
 	@WithMockCustomUser
 	void t03() throws Exception {
-		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
+		FishingTripPostRequest.create requestDto = arbitraryBuilder.sample();
 
 		doThrow(new FishPointException(FishPointErrorCode.FISH_POINT_NOT_FOUND))
 			.when(fishingTripPostService).createFishingTripPost(anyLong(), any());
@@ -129,7 +129,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	@DisplayName("동출 게시글 저장 [subject null] [Controller] - Fail")
 	@WithMockCustomUser
 	void t04() throws Exception {
-		FishingTripPostRequest.Form requestDto = arbitraryBuilder.set("subject", null).sample();
+		FishingTripPostRequest.create requestDto = arbitraryBuilder.set("subject", null).sample();
 
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fishing-trip-post")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -145,7 +145,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	@DisplayName("동출 게시글 저장 [fishingPointId null] [Controller] - Fail")
 	@WithMockCustomUser
 	void t05() throws Exception {
-		FishingTripPostRequest.Form requestDto = arbitraryBuilder.set("fishingPointId", null).sample();
+		FishingTripPostRequest.create requestDto = arbitraryBuilder.set("fishingPointId", null).sample();
 
 		ResultActions result = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/fishing-trip-post")
 			.contentType(MediaType.APPLICATION_JSON)
@@ -166,7 +166,7 @@ class FishingTripPostControllerTest extends BaseTest {
 		Long memberId = 1L;
 
 		List<Long> updatedFileIds = List.of(10L, 20L);
-		FishingTripPostRequest.Form requestDto = FishingTripPostRequest.Form.builder()
+		FishingTripPostRequest.create requestDto = FishingTripPostRequest.create.builder()
 			.subject("수정된 제목")
 			.content("수정된 내용")
 			.recruitmentCount(3)
@@ -200,7 +200,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	void t07() throws Exception {
 		// Given
 		Long postId = 999L;
-		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
+		FishingTripPostRequest.create requestDto = arbitraryBuilder.sample();
 
 		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND))
 			.when(fishingTripPostService).updateFishingTripPost(anyLong(), eq(postId), any());
@@ -225,7 +225,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	void t08() throws Exception {
 		// Given
 		Long postId = 999L;
-		FishingTripPostRequest.Form requestDto = arbitraryBuilder.sample();
+		FishingTripPostRequest.create requestDto = arbitraryBuilder.sample();
 
 		doThrow(new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_UNAUTHORIZED_AUTHOR))
 			.when(fishingTripPostService).updateFishingTripPost(anyLong(), eq(postId), any());
@@ -252,7 +252,7 @@ class FishingTripPostControllerTest extends BaseTest {
 	void t09() throws Exception {
 		// Given
 		Long postId = 1L;
-		FishingTripPostRequest.Form requestDto = arbitraryBuilder.set("subject", null).sample();
+		FishingTripPostRequest.create requestDto = arbitraryBuilder.set("subject", null).sample();
 
 		// When
 		ResultActions result = mockMvc.perform(

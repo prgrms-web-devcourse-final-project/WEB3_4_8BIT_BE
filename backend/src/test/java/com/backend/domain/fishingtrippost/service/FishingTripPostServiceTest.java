@@ -76,8 +76,11 @@ class FishingTripPostServiceTest extends BaseTest {
 	@Mock
 	private RoomService roomService;
 
-	private final ArbitraryBuilder<FishingTripPostRequest.Form> createRequestBuilder =
-		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.Form.class);
+	private final ArbitraryBuilder<FishingTripPostRequest.create> createRequestBuilder =
+		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.create.class);
+
+	private final ArbitraryBuilder<FishingTripPostRequest.update> updateRequestBuilder =
+		fixtureMonkeyValidation.giveMeBuilder(FishingTripPostRequest.update.class);
 
 	private final ArbitraryBuilder<FishingTripPost> postBuilder =
 		fixtureMonkeyBuilder.giveMeBuilder(FishingTripPost.class);
@@ -91,8 +94,8 @@ class FishingTripPostServiceTest extends BaseTest {
 			.set("memberId", 1L)
 			.sample();
 
-		FishingTripPostRequest.Form givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
-				FishingTripPostRequest.Form.class)
+		FishingTripPostRequest.create givenRequestDto = fixtureMonkeyValidation.giveMeBuilder(
+				FishingTripPostRequest.create.class)
 			.set("subject", "같이 낚시 가실 분~")
 			.set("content", "초보 환영합니다!")
 			.set("recruitmentCount", 5)
@@ -129,7 +132,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		// Given
 		Long memberId = 999L;
 
-		FishingTripPostRequest.Form requestDto = createRequestBuilder
+		FishingTripPostRequest.create requestDto = createRequestBuilder
 			.set("fishingTripPointId", 1L)
 			.sample();
 
@@ -151,7 +154,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		// Given
 		Long memberId = 1L;
 
-		FishingTripPostRequest.Form requestDto = createRequestBuilder
+		FishingTripPostRequest.create requestDto = createRequestBuilder
 			.set("subject", "같이 낚시 가실 분~")
 			.set("content", "초보 환영합니다!")
 			.set("recruitmentCount", 5)
@@ -181,47 +184,43 @@ class FishingTripPostServiceTest extends BaseTest {
 		Long memberId = 1L;
 		Long postId = 100L;
 
-		// 기존에 저장되어 있던 이미지 ID
-		List<Long> originalFileIds = List.of(10L, 30L); // 기존 이미지 10, 30
-		List<Long> updatedFileIds = List.of(10L, 20L);  // 새로 들어온 이미지 10, 20 → 30은 삭제 대상
+		List<Long> originalFileIds = List.of(10L, 30L); // 기존 이미지
+		List<Long> updatedFileIds = List.of(10L, 20L);  // 요청 이미지 (30 제거됨)
 
-		FishingTripPostRequest.Form requestDto = FishingTripPostRequest.Form.builder()
+		FishingTripPostRequest.update requestDto = FishingTripPostRequest.update.builder()
 			.subject("수정된 제목")
 			.content("수정된 내용")
 			.recruitmentCount(2)
 			.isShipFish(false)
 			.fishingDate(ZonedDateTime.now().plusDays(5))
-			.fishingPointId(42L)
 			.fileIdList(updatedFileIds)
 			.build();
 
-		FishingTripPost existingPost = mock(FishingTripPost.class);
-		when(existingPost.getMemberId()).thenReturn(memberId);
-		when(existingPost.getFileIdList()).thenReturn(originalFileIds);
-		when(existingPost.getFishingPointId()).thenReturn(42L);
+		FishingTripPost mockPost = mock(FishingTripPost.class);
+		when(mockPost.getMemberId()).thenReturn(memberId);
+		when(mockPost.getFileIdList()).thenReturn(originalFileIds);
+		when(mockPost.getFishingTripPostId()).thenReturn(postId);
 
-		when(fishingTripPostRepository.findById(postId)).thenReturn(Optional.of(existingPost));
-
-		// storageService 삭제 로직 모킹
+		when(fishingTripPostRepository.findById(postId)).thenReturn(Optional.of(mockPost));
 		doNothing().when(storageService).deleteFilesByIdList(eq(memberId), eq(List.of(30L)));
 
 		// When
 		Long result = fishingTripPostService.updateFishingTripPost(memberId, postId, requestDto);
 
 		// Then
-		assertThat(result).isEqualTo(requestDto.fishingPointId());
+		assertThat(result).isEqualTo(postId);
 		verify(fishingTripPostRepository).findById(postId);
 		verify(storageService).deleteFilesByIdList(memberId, List.of(30L));
-		verify(existingPost).updateFishingTripPost(
+		verify(mockPost).updateFishingTripPost(
 			eq("수정된 제목"),
 			eq("수정된 내용"),
 			eq(2),
 			eq(false),
-			any(),
-			eq(42L),
+			any(ZonedDateTime.class),
 			eq(updatedFileIds)
 		);
 	}
+
 
 	@Test
 	@DisplayName("동출 게시글 수정 [FISHING_TRIP_POST_NOT_FOUND] [Service] - Fail")
@@ -230,7 +229,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		Long memberId = 1L;
 		Long postId = 999L;
 
-		FishingTripPostRequest.Form requestDto = createRequestBuilder.sample();
+		FishingTripPostRequest.update requestDto = updateRequestBuilder.sample();
 
 		when(fishingTripPostRepository.findById(postId)).thenReturn(java.util.Optional.empty());
 
@@ -249,7 +248,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		Long memberId = 1L;
 		Long postId = 100L;
 
-		FishingTripPostRequest.Form requestDto = createRequestBuilder.sample();
+		FishingTripPostRequest.update requestDto = updateRequestBuilder.sample();
 
 		FishingTripPost existingPost = postBuilder
 			.set("fishingTripPostId", postId)
@@ -327,6 +326,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		assertThat(actual.fileUrlList()).containsExactlyElementsOf(fileUrls);
 		assertThat(actual.likeCount()).isEqualTo(3L);
 		assertThat(actual.isLiked()).isTrue();
+		assertThat(actual.isPostOwner()).isFalse();
 
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verify(storageRepository).findAllById(fileIds);

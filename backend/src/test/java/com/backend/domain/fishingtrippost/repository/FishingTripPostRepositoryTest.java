@@ -210,7 +210,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			.toList();
 
 		FishingTripPostResponse.Detail detail = FishingTripPostConverter.toDetail(
-			detailDto, fileUrlList, false);
+			detailDto, fileUrlList, false,false);
 
 		// then
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());
