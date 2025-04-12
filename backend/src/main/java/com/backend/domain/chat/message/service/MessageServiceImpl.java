@@ -4,11 +4,15 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.backend.domain.chat.dto.request.CursorRequest;
+import com.backend.domain.chat.dto.response.CursorResponse;
 import com.backend.domain.chat.message.converter.MessageConverter;
 import com.backend.domain.chat.message.dto.request.MessageRequest;
 import com.backend.domain.chat.message.dto.response.MessageResponse;
 import com.backend.domain.chat.message.entity.Message;
+import com.backend.domain.chat.message.repository.MessageQueryRepository;
 import com.backend.domain.chat.message.repository.MessageRepository;
+import com.backend.domain.member.service.MemberService;
 import com.backend.global.storage.service.StorageService;
 
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,8 @@ public class MessageServiceImpl implements MessageService {
 
 	private final MessageRepository messageRepository;
 	private final StorageService storageService;
+	private final MessageQueryRepository messageQueryRepository;
+	private final MemberService memberService;
 
 	@Override
 	public MessageResponse saveMessage(
@@ -41,5 +47,29 @@ public class MessageServiceImpl implements MessageService {
 
 		// 5. 응답 객체로 변환 후 반환
 		return MessageConverter.toResponse(saved, fileUrl);
+	}
+
+	@Override
+	public CursorResponse<MessageResponse> getMessagesByRoomId(
+		final Long roomId,
+		final CursorRequest cursorRequestDto
+	) {
+		// 1. 메시지 목록 조회
+		List<Message> messageList = messageQueryRepository.findMessagesByRoomId(roomId, cursorRequestDto);
+
+		// 2. Message → MessageResponse 변환 (getChatProfile 호출)
+		List<MessageResponse> responseList = messageList.stream()
+			.map(message -> {
+				String profileImageUrl = memberService.getChatProfile(message.getSenderId()).fileUrl();
+				return MessageConverter.toResponse(message, profileImageUrl);
+			})
+			.toList();
+
+		// 3. 다음 커서 설정
+		String nextCursorId = messageList.isEmpty() ? null
+			: messageList.get(messageList.size() - 1).getMessageId().toString();
+
+		// 4. 커서 응답 생성
+		return CursorResponse.of(responseList, nextCursorId);
 	}
 }
