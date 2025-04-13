@@ -30,7 +30,11 @@ public class LikeRepositoryImpl implements LikeRepository {
 		final LikeTargetType targetType,
 		final Long targetId
 	) {
-		return likeJpaRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, targetType, targetId);
+		return likeJpaRepository.existsByMemberIdAndTargetTypeAndTargetIdAndIsDeletedFalse(
+			memberId,
+			targetType,
+			targetId
+		);
 	}
 
 	@Override
@@ -97,5 +101,14 @@ public class LikeRepositoryImpl implements LikeRepository {
 	@Override
 	public Long countLikedPostsByType(final Long memberId, final LikeTargetType targetType) {
 		return likeQueryRepository.countLikedPostsByType(memberId, targetType);
+	}
+
+	@Override
+	public List<Long> findLikedTargetIdsByMemberIdAndTargetType(
+		final Long memberId,
+		final LikeTargetType targetType,
+		final List<Long> targetIds
+	) {
+		return likeQueryRepository.findLikedTargetIdsByMemberIdAndTargetType(memberId, targetType, targetIds);
 	}
 }
