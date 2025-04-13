@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 삭제된 좋아요 영구 삭제 스케줄러
  *
- * @implSpec isDeleted = true 좋아요 데이터를 1시간마다 영구 삭제한다.
+ * @implSpec isDeleted = true 좋아요 데이터를 10분마다 영구 삭제한다.
  */
 @Slf4j
 @Component
@@ -22,9 +22,9 @@ public class LikeCleanUpScheduler {
 	private final LikeRepository likeRepository;
 
 	/**
-	 * 매 시간 정각마다 소프트 삭제된 좋아요를 DB 영구 삭제
+	 * 10분마다마다 소프트 삭제된 좋아요를 DB 영구 삭제
 	 */
-	@Scheduled(cron = "0 0 * * * *")
+	@Scheduled(cron = "0 */10 * * * *")
 	@Transactional
 	public void cleanUpSoftDeletedLikes() {
 		try {
