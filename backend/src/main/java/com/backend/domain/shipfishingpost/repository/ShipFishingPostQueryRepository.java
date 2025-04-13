@@ -16,6 +16,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -62,49 +63,22 @@ public class ShipFishingPostQueryRepository {
 
 	public Optional<ShipFishingPostResponse.DetailAll> findDetailAllById(final Long shipFishingPostId) {
 
-		ShipFishingPostResponse.DetailAll detailAll = jpaQueryFactory
-			.select(Projections.constructor(
-				ShipFishingPostResponse.DetailAll.class,
-				Projections.constructor(
-					ShipFishingPostResponse.Detail.class,
-					shipFishingPost.shipFishingPostId,
-					shipFishingPost.subject,
-					shipFishingPost.content,
-					shipFishingPost.price,
-					shipFishingPost.fileIdList,
-					shipFishingPost.fishIdList,
-					shipFishingPost.startTime,
-					shipFishingPost.durationTime,
-					shipFishingPost.maxGuestCount,
-					shipFishingPost.reviewEverRate,
-					shipFishingPost.likeCount
-				),
-				Projections.constructor(
-					ShipResponse.Detail.class,
-					ship.shipId,
-					ship.shipName,
-					ship.shipNumber,
-					ship.departurePort,
-					ship.restroomType,
-					ship.loungeArea,
-					ship.kitchenFacility,
-					ship.fishingChair,
-					ship.passengerInsurance,
-					ship.fishingGearRental,
-					ship.mealProvided,
-					ship.parkingAvailable
-				),
-				Projections.constructor(
-					MemberResponse.ContactInfo.class,
-					member.memberId,
-					member.email,
-					member.name,
-					member.phone
-				)
-			))
+		ShipFishingPostResponse.DetailAll detailAll = jpaQueryFactory.select(
+				Projections.constructor(ShipFishingPostResponse.DetailAll.class,
+					Projections.constructor(ShipFishingPostResponse.Detail.class, shipFishingPost.shipFishingPostId,
+						shipFishingPost.subject, shipFishingPost.content, shipFishingPost.price, shipFishingPost.fileIdList,
+						shipFishingPost.fishIdList, shipFishingPost.startTime, shipFishingPost.durationTime,
+						shipFishingPost.maxGuestCount, shipFishingPost.reviewEverRate, shipFishingPost.likeCount),
+					Projections.constructor(ShipResponse.Detail.class, ship.shipId, ship.shipName, ship.shipNumber,
+						ship.departurePort, ship.restroomType, ship.loungeArea, ship.kitchenFacility, ship.fishingChair,
+						ship.passengerInsurance, ship.fishingGearRental, ship.mealProvided, ship.parkingAvailable),
+					Projections.constructor(MemberResponse.ContactInfo.class, member.memberId, member.email, member.name,
+						member.phone)))
 			.from(shipFishingPost)
-			.join(ship).on(shipFishingPost.shipId.eq(ship.shipId))
-			.join(member).on(shipFishingPost.memberId.eq(member.memberId))
+			.join(ship)
+			.on(shipFishingPost.shipId.eq(ship.shipId))
+			.join(member)
+			.on(shipFishingPost.memberId.eq(member.memberId))
 			.where(shipFishingPost.shipFishingPostId.eq(shipFishingPostId))
 			.fetchOne();
 
@@ -113,24 +87,13 @@ public class ShipFishingPostQueryRepository {
 
 	public List<ShipFishingPostResponse.MyPagePostList> findDetailMyPageListByMemberId(final Long memberId) {
 
-		List<ShipFishingPostResponse.DetailQueryDto> detailList = jpaQueryFactory
-			.select(Projections.constructor(
-				ShipFishingPostResponse.DetailQueryDto.class,
-				shipFishingPost.shipFishingPostId,
-				shipFishingPost.subject,
-				shipFishingPost.location,
-				shipFishingPost.price,
-				shipFishingPost.fileIdList,
-				shipFishingPost.fishIdList,
-				shipFishingPost.reviewEverRate,
-				shipFishingPost.createdAt,
-				shipFishingPost.likeCount,
-				Expressions.constant(false),
-				JPAExpressions
-					.select(review.count())
-					.from(review)
-					.where(review.shipFishingPostId.eq(shipFishingPost.shipFishingPostId))
-			))
+		List<ShipFishingPostResponse.DetailQueryDto> detailList = jpaQueryFactory.select(
+				Projections.constructor(ShipFishingPostResponse.DetailQueryDto.class, shipFishingPost.shipFishingPostId,
+					shipFishingPost.subject, shipFishingPost.location, shipFishingPost.price, shipFishingPost.fileIdList,
+					shipFishingPost.fishIdList, shipFishingPost.reviewEverRate, shipFishingPost.createdAt,
+					shipFishingPost.likeCount, Expressions.constant(false), JPAExpressions.select(review.count())
+						.from(review)
+						.where(review.shipFishingPostId.eq(shipFishingPost.shipFishingPostId))))
 			.distinct()
 			.from(shipFishingPost)
 			.where(shipFishingPost.memberId.eq(memberId))
@@ -140,28 +103,16 @@ public class ShipFishingPostQueryRepository {
 		return mapToMyPagePostList(detailList);
 	}
 
-	public ScrollResponse<ShipFishingPostResponse.DetailScroll> findDetailScrollBySearch(
-		final Long memberId,
-		final ShipFishingPostRequest.Search requestDto,
-		final GlobalRequest.CursorRequest cursorRequestDto) {
+	public ScrollResponse<ShipFishingPostResponse.DetailScroll> findDetailScrollBySearch(final Long memberId,
+		final ShipFishingPostRequest.Search requestDto, final GlobalRequest.CursorRequest cursorRequestDto) {
 
 		BooleanExpression conditionList = buildConditions(requestDto, cursorRequestDto);
 
-		List<ShipFishingPostResponse.DetailQueryDto> detailList = jpaQueryFactory
-			.select(Projections.constructor(
-				ShipFishingPostResponse.DetailQueryDto.class,
-				shipFishingPost.shipFishingPostId,
-				shipFishingPost.subject,
-				shipFishingPost.location,
-				shipFishingPost.price,
-				shipFishingPost.fileIdList,
-				shipFishingPost.fishIdList,
-				shipFishingPost.reviewEverRate,
-				shipFishingPost.createdAt,
-				shipFishingPost.likeCount,
-				likedExpression(memberId),
-				reviewCountExpression()
-			))
+		List<ShipFishingPostResponse.DetailQueryDto> detailList = jpaQueryFactory.select(
+				Projections.constructor(ShipFishingPostResponse.DetailQueryDto.class, shipFishingPost.shipFishingPostId,
+					shipFishingPost.subject, shipFishingPost.location, shipFishingPost.price, shipFishingPost.fileIdList,
+					shipFishingPost.fishIdList, shipFishingPost.reviewEverRate, shipFishingPost.createdAt,
+					shipFishingPost.likeCount, likedExpression(memberId), reviewCountExpression()))
 			.distinct()
 			.from(shipFishingPost)
 			.leftJoin(reservationDate1)
@@ -180,35 +131,27 @@ public class ShipFishingPostQueryRepository {
 
 		List<ShipFishingPostResponse.DetailScroll> content = mapToDetailScroll(detailList);
 
-		return ScrollResponse.from(
-			content,
-			cursorRequestDto.size(),
-			content.size(),
-			cursorRequestDto.fieldValue() == null,
-			hasNext);
+		if (GlobalRequest.CursorRequest.PREV.equalsIgnoreCase(cursorRequestDto.type())) {
+			Collections.reverse(content);
+		}
+
+		return ScrollResponse.from(content, cursorRequestDto.size(), content.size(),
+			cursorRequestDto.fieldValue() == null, hasNext);
 	}
 
 	public List<ShipFishingPostResponse.MainPageHotPost> findMainPageHotPostListWithSize(final int size) {
 
-		return jpaQueryFactory
-			.select(Projections.constructor(
-				ShipFishingPostResponse.MainPageHotPost.class,
-				shipFishingPost.shipFishingPostId,
-				shipFishingPost.subject,
-				shipFishingPost.startTime,
-				shipFishingPost.endTime,
-				shipFishingPost.location,
-				shipFishingPost.reviewEverRate
-			))
+		return jpaQueryFactory.select(
+				Projections.constructor(ShipFishingPostResponse.MainPageHotPost.class, shipFishingPost.shipFishingPostId,
+					shipFishingPost.subject, shipFishingPost.startTime, shipFishingPost.endTime, shipFishingPost.location,
+					shipFishingPost.reviewEverRate))
 			.distinct()
 			.from(shipFishingPost)
 			.leftJoin(reservationDate1)
 			.on(reservationDate1.shipFishingPostId.eq(shipFishingPost.shipFishingPostId)
 				.and(reservationDateCondition(LocalDate.now())))
 			.where(
-				Expressions.allOf(
-					shipFishingPost.startTime.gt(LocalTime.now()),
-					searchDateCondition(LocalDate.now())))
+				Expressions.allOf(shipFishingPost.startTime.gt(LocalTime.now()), searchDateCondition(LocalDate.now())))
 			.orderBy(shipFishingPost.reviewEverRate.desc())
 			.limit(size)
 			.fetch();
@@ -217,8 +160,7 @@ public class ShipFishingPostQueryRepository {
 	public void updateReviewEverRate(final ZonedDateTime now, final ZonedDateTime lastRun) {
 
 		// 현재 생성 & 수정된 이력이 있는 리뷰만 반영됨. 삭제는 리뷰 삭제시 직접 반영하거나 soft delete 를 적용한 후 반영해야 함
-		List<Long> changedIdList = jpaQueryFactory
-			.selectDistinct(review.shipFishingPostId)
+		List<Long> changedIdList = jpaQueryFactory.selectDistinct(review.shipFishingPostId)
 			.from(review)
 			.where(review.modifiedAt.between(lastRun, now))
 			.fetch();
@@ -233,8 +175,7 @@ public class ShipFishingPostQueryRepository {
 
 		NumberExpression<Double> avgExp = review.rating.avg();
 
-		List<Tuple> rateList = jpaQueryFactory
-			.select(review.shipFishingPostId, avgExp)
+		List<Tuple> rateList = jpaQueryFactory.select(review.shipFishingPostId, avgExp)
 			.from(review)
 			.where(review.shipFishingPostId.in(changedIdList))
 			.groupBy(review.shipFishingPostId)
@@ -251,14 +192,10 @@ public class ShipFishingPostQueryRepository {
 		});
 
 		// 리뷰개수가 한개 이상으로 집계된 id 리스트
-		Set<Long> updated = rateList.stream()
-			.map(t -> t.get(review.shipFishingPostId))
-			.collect(Collectors.toSet());
+		Set<Long> updated = rateList.stream().map(t -> t.get(review.shipFishingPostId)).collect(Collectors.toSet());
 
 		// 리뷰가 0개라서 집계되지 않은 id 리스트
-		List<Long> zeroIdList = changedIdList.stream()
-			.filter(id -> !updated.contains(id))
-			.toList();
+		List<Long> zeroIdList = changedIdList.stream().filter(id -> !updated.contains(id)).toList();
 
 		if (!zeroIdList.isEmpty()) {
 			jpaQueryFactory.update(shipFishingPost)
@@ -270,8 +207,7 @@ public class ShipFishingPostQueryRepository {
 
 	public void updateReviewEverRateByDeleteReview(final Long shipFishingPostId) {
 
-		Double avg = jpaQueryFactory
-			.select(review.rating.avg())
+		Double avg = jpaQueryFactory.select(review.rating.avg())
 			.from(review)
 			.where(review.shipFishingPostId.eq(shipFishingPostId))
 			.fetchOne();
@@ -295,8 +231,7 @@ public class ShipFishingPostQueryRepository {
 	 * 특정 게시글의 리뷰 개수를 서브쿼리로 반환 -> 추후 필드값으로 수정 예정
 	 */
 	private SubQueryExpression<Long> reviewCountExpression() {
-		return JPAExpressions
-			.select(review.count())
+		return JPAExpressions.select(review.count())
 			.from(review)
 			.where(review.shipFishingPostId.eq(shipFishingPost.shipFishingPostId));
 	}
@@ -311,107 +246,80 @@ public class ShipFishingPostQueryRepository {
 			return constant(false);
 		}
 
-		return JPAExpressions
-			.selectOne()
+		return JPAExpressions.selectOne()
 			.from(like)
-			.where(
-				like.targetType.eq(LikeTargetType.SHIP_FISHING_POST),
-				like.targetId.eq(shipFishingPost.shipFishingPostId),
-				like.memberId.eq(memberId),
-				like.isDeleted.eq(false)
-			)
+			.where(like.targetType.eq(LikeTargetType.SHIP_FISHING_POST),
+				like.targetId.eq(shipFishingPost.shipFishingPostId), like.memberId.eq(memberId),
+				like.isDeleted.eq(false))
 			.exists();
 	}
 
 	private List<ShipFishingPostResponse.MyPagePostList> mapToMyPagePostList(
-		final List<ShipFishingPostResponse.DetailQueryDto> detailQueryDtoList
-	) {
-		Set<Long> fileIdList = detailQueryDtoList.stream()
-			.flatMap(dto -> {
-				List<Long> ids = dto.fileIdList();
-				return (ids == null ? List.<Long>of() : ids).stream();
-			})
-			.collect(Collectors.toSet());
+		final List<ShipFishingPostResponse.DetailQueryDto> detailQueryDtoList) {
+		Set<Long> fileIdList = detailQueryDtoList.stream().flatMap(dto -> {
+			List<Long> ids = dto.fileIdList();
+			return (ids == null ? List.<Long>of() : ids).stream();
+		}).collect(Collectors.toSet());
 
-		Map<Long, String> fileUrlMap = jpaQueryFactory
-			.select(file.fileId, file.url)
+		Map<Long, String> fileUrlMap = jpaQueryFactory.select(file.fileId, file.url)
 			.from(file)
 			.where(file.fileId.in(fileIdList))
 			.fetch()
 			.stream()
-			.collect(Collectors.toMap(
-				tuple -> tuple.get(file.fileId),
-				tuple -> tuple.get(file.url)
-			));
+			.collect(Collectors.toMap(tuple -> tuple.get(file.fileId), tuple -> tuple.get(file.url)));
 
-		return detailQueryDtoList.stream()
-			.map(dto -> {
-				List<String> fileUrls = Stream.ofNullable(dto.fileIdList())
-					.flatMap(Collection::stream)
-					.map(fileUrlMap::get)
-					.filter(Objects::nonNull)
-					.collect(Collectors.toList());
+		return detailQueryDtoList.stream().map(dto -> {
+			List<String> fileUrls = Stream.ofNullable(dto.fileIdList())
+				.flatMap(Collection::stream)
+				.map(fileUrlMap::get)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
 
-				return ShipFishingPostResponse.MyPagePostList.fromMyPagePostList(dto, fileUrls);
-			})
-			.collect(Collectors.toList());
+			return ShipFishingPostResponse.MyPagePostList.fromMyPagePostList(dto, fileUrls);
+		}).collect(Collectors.toList());
 	}
 
 	private List<ShipFishingPostResponse.DetailScroll> mapToDetailScroll(
 		final List<ShipFishingPostResponse.DetailQueryDto> detailQueryDtoList) {
 
-		Set<Long> fileIdList = detailQueryDtoList.stream()
-			.flatMap(dto -> {
-				List<Long> ids = dto.fileIdList();
-				return (ids == null ? List.<Long>of() : ids).stream();
-			})
-			.collect(Collectors.toSet());
+		Set<Long> fileIdList = detailQueryDtoList.stream().flatMap(dto -> {
+			List<Long> ids = dto.fileIdList();
+			return (ids == null ? List.<Long>of() : ids).stream();
+		}).collect(Collectors.toSet());
 
-		Set<Long> fishIdList = detailQueryDtoList.stream()
-			.flatMap(dto -> {
-				List<Long> ids = dto.fishIdList();
-				return (ids == null ? List.<Long>of() : ids).stream();
-			})
-			.collect(Collectors.toSet());
+		Set<Long> fishIdList = detailQueryDtoList.stream().flatMap(dto -> {
+			List<Long> ids = dto.fishIdList();
+			return (ids == null ? List.<Long>of() : ids).stream();
+		}).collect(Collectors.toSet());
 
-		Map<Long, String> fileUrlMap = jpaQueryFactory
-			.select(file.fileId, file.url)
+		Map<Long, String> fileUrlMap = jpaQueryFactory.select(file.fileId, file.url)
 			.from(file)
 			.where(file.fileId.in(fileIdList))
 			.fetch()
 			.stream()
-			.collect(Collectors.toMap(
-				tuple -> tuple.get(file.fileId),
-				tuple -> tuple.get(file.url)
-			));
+			.collect(Collectors.toMap(tuple -> tuple.get(file.fileId), tuple -> tuple.get(file.url)));
 
-		Map<Long, String> fishNameMap = jpaQueryFactory
-			.select(fish.fishId, fish.name)
+		Map<Long, String> fishNameMap = jpaQueryFactory.select(fish.fishId, fish.name)
 			.from(fish)
 			.where(fish.fishId.in(fishIdList))
 			.fetch()
 			.stream()
-			.collect(Collectors.toMap(
-				tuple -> tuple.get(fish.fishId),
-				tuple -> tuple.get(fish.name)
-			));
+			.collect(Collectors.toMap(tuple -> tuple.get(fish.fishId), tuple -> tuple.get(fish.name)));
 
-		return detailQueryDtoList.stream()
-			.map(dto -> {
-				List<String> fileUrls = Stream.ofNullable(dto.fileIdList())
-					.flatMap(Collection::stream)
-					.map(fileUrlMap::get)
-					.filter(Objects::nonNull)
-					.collect(Collectors.toList());
+		return detailQueryDtoList.stream().map(dto -> {
+			List<String> fileUrls = Stream.ofNullable(dto.fileIdList())
+				.flatMap(Collection::stream)
+				.map(fileUrlMap::get)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
 
-				List<String> fishNames = Stream.ofNullable(dto.fishIdList())
-					.flatMap(Collection::stream)
-					.map(fishNameMap::get)
-					.filter(Objects::nonNull)
-					.collect(Collectors.toList());
-				return ShipFishingPostResponse.DetailScroll.fromDetailScroll(dto, fileUrls, fishNames);
-			})
-			.collect(Collectors.toList());
+			List<String> fishNames = Stream.ofNullable(dto.fishIdList())
+				.flatMap(Collection::stream)
+				.map(fishNameMap::get)
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+			return ShipFishingPostResponse.DetailScroll.fromDetailScroll(dto, fileUrls, fishNames);
+		}).collect(Collectors.toList());
 	}
 
 	public String findSubjectByShipFishingPostId(final Long shipFishingPostId) {
@@ -422,27 +330,17 @@ public class ShipFishingPostQueryRepository {
 			.fetchOne();
 	}
 
-	private BooleanExpression buildConditions(
-		final ShipFishingPostRequest.Search requestDto,
+	private BooleanExpression buildConditions(final ShipFishingPostRequest.Search requestDto,
 		final GlobalRequest.CursorRequest cursorRequestDto) {
 
-		List<BooleanExpression> expressions = Stream.of(
-				getCursorCondition(cursorRequestDto),
-				keywordBySubjectCondition(requestDto.keyword()),
-				minPriceCondition(requestDto.minPrice()),
-				maxPriceCondition(requestDto.maxPrice()),
-				guestCountCondition(requestDto.guestCount()),
-				reviewRatingCondition(requestDto.minRating()),
-				locationCondition(requestDto.location()),
-				durationTimeCondition(requestDto.duration()),
-				searchDateCondition(requestDto.searchDate()),
-				targetFishCondition(requestDto.fishId())
-			).filter(Objects::nonNull)
-			.toList();
+		List<BooleanExpression> expressions = Stream.of(getCursorCondition(cursorRequestDto),
+			keywordBySubjectCondition(requestDto.keyword()), minPriceCondition(requestDto.minPrice()),
+			maxPriceCondition(requestDto.maxPrice()), guestCountCondition(requestDto.guestCount()),
+			reviewRatingCondition(requestDto.minRating()), locationCondition(requestDto.location()),
+			durationTimeCondition(requestDto.duration()), searchDateCondition(requestDto.searchDate()),
+			targetFishCondition(requestDto.fishId())).filter(Objects::nonNull).toList();
 
-		return expressions.stream()
-			.reduce(BooleanExpression::and)
-			.orElse(null);
+		return expressions.stream().reduce(BooleanExpression::and).orElse(null);
 	}
 
 	private BooleanExpression keywordBySubjectCondition(final String keyword) {
@@ -472,8 +370,7 @@ public class ShipFishingPostQueryRepository {
 	}
 
 	private BooleanExpression locationCondition(final String location) {
-		return (location != null && !location.isEmpty()) ? shipFishingPost.location.containsIgnoreCase(location) :
-			null;
+		return (location != null && !location.isEmpty()) ? shipFishingPost.location.containsIgnoreCase(location) : null;
 	}
 
 	private BooleanExpression durationTimeCondition(final LocalTime duration) {
@@ -482,8 +379,7 @@ public class ShipFishingPostQueryRepository {
 
 	private BooleanExpression searchDateCondition(final LocalDate searchDate) {
 
-		return searchDate == null ? null : reservationDate1.isNull()
-			.or(reservationDate1.isBan.isFalse());
+		return searchDate == null ? null : reservationDate1.isNull().or(reservationDate1.isBan.isFalse());
 	}
 
 	private BooleanExpression reservationDateCondition(final LocalDate searchDate) {
@@ -519,7 +415,8 @@ public class ShipFishingPostQueryRepository {
 		StringTemplate fish4 = Expressions.stringTemplate("JSON_UNQUOTE(JSON_EXTRACT({0}, '$[4]'))",
 			shipFishingPost.fishIdList);
 
-		return fish0.isNotNull().and(fish0.eq(targetFishStr))
+		return fish0.isNotNull()
+			.and(fish0.eq(targetFishStr))
 			.or(fish1.isNotNull().and(fish1.eq(targetFishStr)))
 			.or(fish2.isNotNull().and(fish2.eq(targetFishStr)))
 			.or(fish3.isNotNull().and(fish3.eq(targetFishStr)))
@@ -542,7 +439,9 @@ public class ShipFishingPostQueryRepository {
 		// 정렬 순서 Order 객체로 변환
 		Order order = QuerydslUtil.getOrder(cursorRequestDto);
 
-		return getWhereBooleanExpression(sortField, fieldValue, idValue, order);
+		boolean isPrev = GlobalRequest.CursorRequest.PREV.equalsIgnoreCase(cursorRequestDto.type());
+
+		return getWhereBooleanExpression(sortField, fieldValue, idValue, order, isPrev);
 	}
 
 	/**
@@ -554,46 +453,30 @@ public class ShipFishingPostQueryRepository {
 	 * @param order             {@link Order}
 	 * @return
 	 */
-	private BooleanExpression getWhereBooleanExpression(
-		final String sortField,
-		final String sortFieldValueStr,
-		final Long idValue,
-		final Order order
-	) {
+	private BooleanExpression getWhereBooleanExpression(final String sortField, final String sortFieldValueStr,
+		final Long idValue, final Order order, final Boolean isPrev) {
 		try {
 			switch (sortField) {
 				case "price" -> {
 					Long fieldValue = Long.valueOf(sortFieldValueStr);
-
-					return QuerydslUtil.createFieldPredicate(
-						shipFishingPost.shipFishingPostId,
-						idValue,
+					return QuerydslUtil.buildLongCursorCondition(
 						shipFishingPost.price,
-						fieldValue,
-						order
-					);
+						shipFishingPost.shipFishingPostId,
+						fieldValue, idValue, order, isPrev);
 				}
 				case "reviewEverRate" -> {
 					Double fieldValue = Double.valueOf(sortFieldValueStr);
-
-					return QuerydslUtil.createFieldPredicate(
-						shipFishingPost.shipFishingPostId,
-						idValue,
+					return QuerydslUtil.buildDoubleCursorCondition(
 						shipFishingPost.reviewEverRate,
-						fieldValue,
-						order
-					);
-				}
-				default -> {//createdAT
-					ZonedDateTime parseFieldValue = ZonedDateTime.parse(sortFieldValueStr);
-
-					return QuerydslUtil.createFieldPredicate(
 						shipFishingPost.shipFishingPostId,
-						idValue,
+						fieldValue, idValue, order, isPrev);
+				}
+				default -> {
+					ZonedDateTime fieldValue = ZonedDateTime.parse(sortFieldValueStr);
+					return QuerydslUtil.buildDateCursorCondition(
 						shipFishingPost.createdAt,
-						parseFieldValue,
-						order
-					);
+						shipFishingPost.shipFishingPostId,
+						fieldValue, idValue, order, isPrev);
 				}
 			}
 		} catch (NumberFormatException | DateTimeParseException e) {
@@ -606,25 +489,26 @@ public class ShipFishingPostQueryRepository {
 		return validColumns.contains(column);
 	}
 
-	private OrderSpecifier<?>[] getSortCondition(
-		final GlobalRequest.CursorRequest cursorRequestDto) {
+	private OrderSpecifier<?>[] getSortCondition(final GlobalRequest.CursorRequest cursorRequestDto) {
 
-		if (cursorRequestDto.sort() == null ||
-			cursorRequestDto.sort().isEmpty() ||
-			!isValidColumn(cursorRequestDto.sort())) {
+		if (cursorRequestDto.sort() == null || cursorRequestDto.sort().isEmpty() || !isValidColumn(
+			cursorRequestDto.sort())) {
 			return new OrderSpecifier<?>[] {
 				new OrderSpecifier<>(Order.DESC, shipFishingPost.createdAt),
-				new OrderSpecifier<>(Order.DESC, shipFishingPost.shipFishingPostId)
-			};
+				new OrderSpecifier<>(Order.DESC, shipFishingPost.shipFishingPostId)};
 		}
 
 		Order order = QuerydslUtil.getOrder(cursorRequestDto);
+
+		if (GlobalRequest.CursorRequest.PREV.equalsIgnoreCase(cursorRequestDto.type())) {
+			order = order == Order.ASC ? Order.DESC : Order.ASC;
+		}
 
 		Expression<Comparable> path = Expressions.path(Comparable.class, shipFishingPost, cursorRequestDto.sort());
 
 		return new OrderSpecifier<?>[] {
 			new OrderSpecifier<>(order, path),
-			new OrderSpecifier<>(Order.DESC, shipFishingPost.shipFishingPostId)
+			new OrderSpecifier<>(order, shipFishingPost.shipFishingPostId)
 		};
 	}
 }

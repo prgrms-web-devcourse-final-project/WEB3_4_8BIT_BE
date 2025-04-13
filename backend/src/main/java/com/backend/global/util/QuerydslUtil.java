@@ -182,4 +182,87 @@ public class QuerydslUtil {
 			.or(sortExpression.eq(sortFieldValue).and(idField.gt(idFieldValue)));
 	}
 
+	public static BooleanExpression buildLongCursorCondition(
+		NumberPath<Long> sortField,
+		NumberExpression<Long> idField,
+		Long sortFieldValue,
+		Long idValue,
+		Order order,
+		boolean isPrev
+	) {
+		if (order == Order.ASC) {
+			if (isPrev) {
+				return sortField.lt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.lt(idValue)));
+			} else {
+				return sortField.gt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.gt(idValue)));
+			}
+		} else { // DESC
+			if (isPrev) {
+				return sortField.gt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.gt(idValue)));
+			} else {
+				return sortField.lt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.lt(idValue)));
+			}
+		}
+	}
+
+	// Double용 커서 조건
+	public static BooleanExpression buildDoubleCursorCondition(
+		NumberPath<Double> sortField,
+		NumberExpression<Long> idField,
+		Double sortFieldValue,
+		Long idValue,
+		Order order,
+		boolean isPrev
+	) {
+		if (order == Order.ASC) {
+			if (isPrev) {
+				return sortField.lt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.lt(idValue)));
+			} else {
+				return sortField.gt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.gt(idValue)));
+			}
+		} else { // DESC
+			if (isPrev) {
+				return sortField.gt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.gt(idValue)));
+			} else {
+				return sortField.lt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.lt(idValue)));
+			}
+		}
+	}
+
+	// ZonedDateTime
+	public static BooleanExpression buildDateCursorCondition(
+		DateTimePath<ZonedDateTime> sortField,
+		NumberExpression<Long> idField,
+		ZonedDateTime sortFieldValue,
+		Long idValue,
+		Order order,
+		boolean isPrev
+	) {
+		if (order == Order.ASC) {
+			if (isPrev) {
+				return sortField.lt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.lt(idValue)));
+			} else {
+				return sortField.gt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.gt(idValue)));
+			}
+		} else { // DESC
+			if (isPrev) {
+				return sortField.gt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.gt(idValue)));
+			} else {
+				return sortField.lt(sortFieldValue)
+					.or(sortField.eq(sortFieldValue).and(idField.lt(idValue)));
+			}
+		}
+	}
+
 }
