@@ -51,8 +51,10 @@ public class LikeServiceImpl implements LikeService {
 	public void toggleLike(final Long memberId, final LikeRequest requestDto) {
 		//게시글 존재 검증
 		validateLikeTarget(requestDto.targetType(), requestDto.targetId());
-		// 캐시가 없다면 DB 데이터로 초기화
-		likeCacheService.initializeLikeCache(requestDto.targetType(), requestDto.targetId());
+		// 캐시가 없다면 조회하면서 자동 저장
+		Long likeCount = likeCacheService.getLikeCount(requestDto.targetType(), requestDto.targetId());
+		log.debug("[Redis 좋아요 수 확인] - type: {}, targetId: {}, count: {}",
+			requestDto.targetType(), requestDto.targetId(), likeCount);
 
 		likeRepository.findByMemberIdAndTargetTypeAndTargetId(
 			memberId,
