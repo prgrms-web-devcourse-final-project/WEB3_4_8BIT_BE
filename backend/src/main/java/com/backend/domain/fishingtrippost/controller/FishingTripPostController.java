@@ -99,13 +99,14 @@ public class FishingTripPostController {
 	@Parameter(name = "keyword", description = "제목 키워드 검색", example = "해적")
 	@Parameter(name = "status", description = "게시글 상태 (예: RECRUITING, COMPLETED)", example = "RECRUITING")
 	public ResponseEntity<GenericResponse<ScrollResponse<FishingTripPostResponse.DetailPage>>> getFishingTripPostPages(
+		@AuthenticationPrincipal final CustomOAuth2User user,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto,
 		@RequestParam(required = false) final PostStatus status,
 		@RequestParam(required = false) final Long regionId,
 		@RequestParam(required = false) final String keyword
 	) {
 		ScrollResponse<FishingTripPostResponse.DetailPage> responseDto =
-			fishingTripPostService.getDetailPage(cursorRequestDto, status, regionId, keyword);
+			fishingTripPostService.getDetailPage(cursorRequestDto, user.getId(), status, regionId, keyword);
 
 		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
 	}
