@@ -441,7 +441,7 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		// When
 		ScrollResponse<FishingTripPostResponse.DetailPage> result =
-			fishingTripPostService.getDetailPage(cursorRequest, null, null, null);
+			fishingTripPostService.getDetailPage(cursorRequest, null, null, null, null);
 
 		// Then
 		assertThat(result).isNotNull();
@@ -496,7 +496,7 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		// When
 		ScrollResponse<FishingTripPostResponse.DetailPage> result =
-			fishingTripPostService.getDetailPage(cursorRequest, null, null, null);
+			fishingTripPostService.getDetailPage(cursorRequest, null, null, null, null);
 
 		// Then
 		assertThat(result).isNotNull();
