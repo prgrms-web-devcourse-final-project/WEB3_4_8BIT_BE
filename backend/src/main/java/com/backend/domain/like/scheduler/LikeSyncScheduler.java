@@ -30,7 +30,7 @@ public class LikeSyncScheduler {
 
 	private static final String PREFIX = "like_count::";
 
-	@Scheduled(cron = "0 */5 * * * *")
+	@Scheduled(cron = "0 */1 * * * *")
 	@Transactional
 	public void syncLikeCountsFromRedis() {
 		Map<String, Integer> likeMap = redisUtil.scanKeysAndValues(PREFIX);
