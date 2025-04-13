@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import com.backend.domain.captain.dto.response.CaptainResponse;
+import com.backend.domain.captain.dto.Response.CaptainResponse;
 import com.backend.domain.captain.entity.Captain;
 
 import lombok.RequiredArgsConstructor;

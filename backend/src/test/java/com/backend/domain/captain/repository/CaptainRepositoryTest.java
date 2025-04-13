@@ -13,7 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.context.annotation.Import;
 
-import com.backend.domain.captain.dto.response.CaptainResponse;
+import com.backend.domain.captain.dto.Response.CaptainResponse;
 import com.backend.domain.captain.entity.Captain;
 import com.backend.domain.member.domain.MemberRole;
 import com.backend.domain.member.entity.Member;

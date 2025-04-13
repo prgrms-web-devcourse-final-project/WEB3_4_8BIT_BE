@@ -20,8 +20,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import com.backend.domain.captain.dto.request.CaptainRequest;
-import com.backend.domain.captain.dto.response.CaptainResponse;
+import com.backend.domain.captain.dto.Request.CaptainRequest;
+import com.backend.domain.captain.dto.Response.CaptainResponse;
 import com.backend.domain.captain.exception.CaptainErrorCode;
 import com.backend.domain.captain.exception.CaptainException;
 import com.backend.domain.captain.service.CaptainService;

@@ -1,4 +1,4 @@
-package com.backend.domain.captain.dto.request;
+package com.backend.domain.captain.dto.Request;
 
 import java.util.List;
 
