@@ -43,7 +43,7 @@ public class CookieUtil {
 			.secure(secure)
 			.sameSite("None")
 			.path("/")
-			.domain(".mikki.kr")
+			.domain("mikki.kr")
 			.maxAge(refreshTokenValidityInSeconds)
 			.build();
 
@@ -55,7 +55,7 @@ public class CookieUtil {
 		return ResponseCookie.from("accessToken", "")
 			.httpOnly(httpOnly)
 			.secure(secure)
-			.domain(".mikki.kr")
+			.domain("mikki.kr")
 			.sameSite("None")
 			.path("/")
 			.maxAge(0)
