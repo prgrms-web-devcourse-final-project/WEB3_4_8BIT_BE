@@ -15,7 +15,7 @@ public interface LikeJpaRepository extends JpaRepository<Like, Long> {
 		final Long targetId
 	);
 
-	boolean existsByMemberIdAndTargetTypeAndTargetId(
+	boolean existsByMemberIdAndTargetTypeAndTargetIdAndIsDeletedFalse(
 		final Long memberId,
 		final LikeTargetType targetType,
 		final Long targetId
