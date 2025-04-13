@@ -28,11 +28,13 @@ public interface MessageService {
 	 * 채팅방의 이전 메시지 목록을 커서 기반으로 조회
 	 *
 	 * @param roomId 메시지를 조회할 채팅방 ID
+	 * @param memberId 메시지를 조회한 회원 ID
 	 * @param cursorRequestDto 커서 기반 페이지네이션 요청 정보
 	 * @return 메시지 목록과 다음 커서 정보
 	 */
 	ChatResponse.MessageCursorResponse<MessageResponse.Basic> getMessagesByRoomId(
 		final Long roomId,
+		final Long memberId,
 		final ChatRequest.MessageCursorRequest cursorRequestDto
 	);
 }
