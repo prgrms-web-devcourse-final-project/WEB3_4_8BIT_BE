@@ -88,26 +88,6 @@ public class RedisUtil {
 	}
 
 	/**
-	 * 해당 키가 Redis 존재 여부 확인
-	 *
-	 * @param key Redis 키
-	 * @return 존재하면 true, 없으면 false
-	 */
-	public boolean hasKey(final String key) {
-		return Boolean.TRUE.equals(redisTemplate.hasKey(key));
-	}
-
-	/**
-	 * Redis 해당 키값 value 세팅
-	 *
-	 * @param key   Redis 키
-	 * @param value 키에 넣을 값
-	 */
-	public void setValue(final String key, final String value) {
-		redisTemplate.opsForValue().set(key, value);
-	}
-
-	/**
 	 * key Redis 존재시 삭제
 	 *
 	 * @param key 삭제할 Redis key
