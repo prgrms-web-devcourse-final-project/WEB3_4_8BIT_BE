@@ -41,7 +41,7 @@ public class CookieUtil {
 		ResponseCookie cookie = ResponseCookie.from("accessToken", token)
 			.httpOnly(httpOnly)
 			.secure(secure)
-			.sameSite("Lax")
+			.sameSite("None")
 			.path("/")
 			.maxAge(refreshTokenValidityInSeconds)
 			.build();
