@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.backend.domain.captain.dto.Request.CaptainRequest;
-import com.backend.domain.captain.dto.Response.CaptainResponse;
+import com.backend.domain.captain.dto.request.CaptainRequest;
+import com.backend.domain.captain.dto.response.CaptainResponse;
 import com.backend.domain.captain.service.CaptainService;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.response.GenericResponse;

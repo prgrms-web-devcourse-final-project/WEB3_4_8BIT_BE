@@ -1,7 +1,7 @@
 package com.backend.domain.captain.service;
 
-import com.backend.domain.captain.dto.Request.CaptainRequest;
-import com.backend.domain.captain.dto.Response.CaptainResponse;
+import com.backend.domain.captain.dto.request.CaptainRequest;
+import com.backend.domain.captain.dto.response.CaptainResponse;
 import com.backend.domain.captain.exception.CaptainException;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.global.exception.GlobalException;

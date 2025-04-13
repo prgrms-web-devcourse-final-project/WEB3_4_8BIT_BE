@@ -4,8 +4,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.backend.domain.captain.converter.CaptainConverter;
-import com.backend.domain.captain.dto.Request.CaptainRequest;
-import com.backend.domain.captain.dto.Response.CaptainResponse;
+import com.backend.domain.captain.dto.request.CaptainRequest;
+import com.backend.domain.captain.dto.response.CaptainResponse;
 import com.backend.domain.captain.entity.Captain;
 import com.backend.domain.captain.exception.CaptainErrorCode;
 import com.backend.domain.captain.exception.CaptainException;

@@ -2,7 +2,7 @@ package com.backend.domain.captain.repository;
 
 import java.util.Optional;
 
-import com.backend.domain.captain.dto.Response.CaptainResponse;
+import com.backend.domain.captain.dto.response.CaptainResponse;
 import com.backend.domain.captain.entity.Captain;
 
 public interface CaptainRepository {

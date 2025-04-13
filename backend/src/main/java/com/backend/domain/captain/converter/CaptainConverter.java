@@ -1,6 +1,6 @@
 package com.backend.domain.captain.converter;
 
-import com.backend.domain.captain.dto.Request.CaptainRequest;
+import com.backend.domain.captain.dto.request.CaptainRequest;
 import com.backend.domain.captain.entity.Captain;
 
 public class CaptainConverter {
