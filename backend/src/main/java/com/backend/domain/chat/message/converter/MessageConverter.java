@@ -26,7 +26,11 @@ public class MessageConverter {
 			.build();
 	}
 
-	public static MessageResponse.Basic toResponse(final Message message, final String senderProfileImageUrl) {
+	public static MessageResponse.Basic toResponse(
+		final Message message,
+		final boolean isMine,
+		final String senderProfileImageUrl
+	) {
 		return MessageResponse.Basic.builder()
 			.messageId(message.getMessageId().toHexString())
 			.roomId(message.getRoomId())
@@ -36,6 +40,7 @@ public class MessageConverter {
 			.content(message.getContent())
 			.fileUrls(message.getFileUrls())
 			.type(message.getType())
+			.isMine(isMine)
 			.createdAt(message.getCreatedAt())
 			.build();
 	}

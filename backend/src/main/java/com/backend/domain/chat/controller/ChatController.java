@@ -46,9 +46,14 @@ public class ChatController {
 	@Operation(summary = "메세지 조회", description = "해당 채팅방의 이전 메세지를 조회하는 API")
 	public ResponseEntity<GenericResponse<ChatResponse.MessageCursorResponse<MessageResponse.Basic>>> getRoomDetail(
 		@PathVariable final Long roomId,
+		@AuthenticationPrincipal CustomOAuth2User user,
 		@Valid final ChatRequest.MessageCursorRequest cursorRequestDto
 	) {
-		ChatResponse.MessageCursorResponse<MessageResponse.Basic> messageScrollResponse = messageService.getMessagesByRoomId(roomId, cursorRequestDto);
+		ChatResponse.MessageCursorResponse<MessageResponse.Basic> messageScrollResponse = messageService.getMessagesByRoomId(
+			roomId,
+			user.getId(),
+			cursorRequestDto
+		);
 
 		return ResponseEntity.ok(GenericResponse.of(true, messageScrollResponse));
 	}

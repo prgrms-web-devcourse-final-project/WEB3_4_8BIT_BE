@@ -3,6 +3,7 @@ package com.backend.domain.chat.message.service;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -55,12 +56,13 @@ public class MessageServiceImpl implements MessageService {
 		roomService.updateLastMessageTime(saved.getRoomId(), saved.getCreatedAt().atZone(ZoneId.of("Asia/Seoul")));
 
 		// 5. 응답 객체로 변환 후 반환
-		return MessageConverter.toResponse(saved, fileUrl);
+		return MessageConverter.toResponse(saved, true,  fileUrl);
 	}
 
 	@Override
 	public ChatResponse.MessageCursorResponse<MessageResponse.Basic> getMessagesByRoomId(
 		final Long roomId,
+		final Long memberId,
 		final ChatRequest.MessageCursorRequest cursorRequestDto
 	) {
 		// 1. 메시지 목록 조회 (커서 기반 페이징)
@@ -78,7 +80,8 @@ public class MessageServiceImpl implements MessageService {
 		List<MessageResponse.Basic> responseList = messageList.stream()
 			.map(message -> {
 				String profileImageUrl = memberIdToProfileImageMap.getOrDefault(message.getSenderId(), null);
-				return MessageConverter.toResponse(message, profileImageUrl);
+				boolean isMine = Objects.equals(message.getSenderId(), memberId);
+				return MessageConverter.toResponse(message, isMine, profileImageUrl);
 			})
 			.toList();
 
