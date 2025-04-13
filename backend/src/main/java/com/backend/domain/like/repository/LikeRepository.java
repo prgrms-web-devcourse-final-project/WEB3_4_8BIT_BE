@@ -38,7 +38,7 @@ public interface LikeRepository {
 	 * @param targetId   대상 ID
 	 * @return 좋아요 여부 (soft delete 제외)
 	 */
-	boolean existsByMemberIdAndTargetTypeAndTargetId(
+	boolean existsByMemberIdAndTargetTypeAndTargetIdAndIsDeletedFalse(
 		final Long memberId,
 		final LikeTargetType targetType,
 		final Long targetId

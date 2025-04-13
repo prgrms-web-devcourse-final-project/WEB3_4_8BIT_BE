@@ -181,7 +181,7 @@ public class LikeQueryRepository {
 		final List<Long> targetIds
 	) {
 		return jpaQueryFactory
-			.select(like.targetId)
+			.select(like.targetId).distinct()
 			.from(like)
 			.where(
 				like.memberId.eq(memberId),

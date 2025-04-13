@@ -22,7 +22,7 @@ public class LikeCleanUpScheduler {
 	private final LikeRepository likeRepository;
 
 	/**
-	 * 10분마다마다 소프트 삭제된 좋아요를 DB 영구 삭제
+	 * 10분마다 소프트 삭제된 좋아요를 DB 영구 삭제
 	 */
 	@Scheduled(cron = "0 */10 * * * *")
 	@Transactional

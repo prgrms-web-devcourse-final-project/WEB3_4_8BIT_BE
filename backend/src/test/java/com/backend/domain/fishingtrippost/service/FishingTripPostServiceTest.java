@@ -311,7 +311,7 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		when(fishingTripPostRepository.findDetailQueryDtoById(postId)).thenReturn(Optional.of(queryDto));
 		when(storageRepository.findAllById(fileIds)).thenReturn(mockFiles);
-		when(likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST, postId)).thenReturn(true);
+		when(likeRepository.existsByMemberIdAndTargetTypeAndTargetIdAndIsDeletedFalse(memberId, LikeTargetType.FISHING_TRIP_POST, postId)).thenReturn(true);
 
 		// When
 		FishingTripPostResponse.Detail actual = fishingTripPostService.getFishingTripPostDetail(memberId, postId);
@@ -336,7 +336,7 @@ class FishingTripPostServiceTest extends BaseTest {
 
 		verify(fishingTripPostRepository).findDetailQueryDtoById(postId);
 		verify(storageRepository).findAllById(fileIds);
-		verify(likeRepository).existsByMemberIdAndTargetTypeAndTargetId(memberId, LikeTargetType.FISHING_TRIP_POST, postId);
+		verify(likeRepository).existsByMemberIdAndTargetTypeAndTargetIdAndIsDeletedFalse(memberId, LikeTargetType.FISHING_TRIP_POST, postId);
 	}
 
 	@Test

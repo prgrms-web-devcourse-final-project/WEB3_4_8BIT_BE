@@ -323,10 +323,12 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @param memberId          현재 로그인한 사용자의 ID (비로그인 시 null)
 	 * @param fishingTripPostId 대상 게시글의 ID
 	 * @return 사용자가 해당 게시글을 좋아요 했으면 true, 아니면 false
+	 * @implSpec soft delete 좋아요는 제외함 (isDeleted = false 조건 포함)
 	 */
 	private boolean getIsLiked(final Long memberId, final Long fishingTripPostId) {
 		return (memberId != null) &&
-			likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, TARGET_TYPE, fishingTripPostId);
+			likeRepository.existsByMemberIdAndTargetTypeAndTargetIdAndIsDeletedFalse(memberId, TARGET_TYPE,
+				fishingTripPostId);
 	}
 
 	/**
@@ -334,6 +336,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 *
 	 * <p>비로그인 상태(memberId == null)일 경우 빈 Set을 반환합니다.</p>
 	 * <p>리스트 조회 성능 최적화를 위해 QueryDSL로 ID 목록을 한 번에 가져옵니다.</p>
+	 * <p>쿼리 레벨에서 distinct 처리되며, 이 메서드에서는 contains 성능을 위해 Set 변환만 수행합니다.</p>
 	 *
 	 * @param memberId 현재 로그인한 사용자 ID (nullable)
 	 * @param posts    게시글 리스트 (DetailPageQueryDto) - 좋아요 대상이 될 게시글들
@@ -366,6 +369,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 *
 	 * @param fileId 조회할 파일의 ID
 	 * @return 파일이 존재하면 해당 파일의 URL, 존재하지 않으면 {@code null}
+	 * @implSpec 존재하지 않는 파일 ID일 경우 예외 없이 null 처리
 	 */
 	private String getImageUrlById(final Long fileId) {
 		return storageRepository.findById(fileId)

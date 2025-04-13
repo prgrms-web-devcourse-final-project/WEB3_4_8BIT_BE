@@ -25,7 +25,7 @@ public class LikeRepositoryImpl implements LikeRepository {
 	}
 
 	@Override
-	public boolean existsByMemberIdAndTargetTypeAndTargetId(
+	public boolean existsByMemberIdAndTargetTypeAndTargetIdAndIsDeletedFalse(
 		final Long memberId,
 		final LikeTargetType targetType,
 		final Long targetId
