@@ -93,6 +93,7 @@ public interface FishingTripPostService {
 	 * 존재하지 않을 경우 null이 할당됩니다.</p>
 	 *
 	 * @param cursorRequestDto 커서 기반 페이지네이션 요청 정보 (정렬 기준, 방향, 커서 값 등)
+	 *
 	 * @param status 게시글 상태 필터 (예: RECRUITING, COMPLETED), null일 경우 전체 조회
 	 * @param regionId 지역 ID 필터, null일 경우 전체 조회
 	 * @param keyword 제목 키워드 필터 (부분 일치 검색), null 또는 빈 값일 경우 전체 조회
@@ -100,6 +101,7 @@ public interface FishingTripPostService {
 	 */
 	ScrollResponse<FishingTripPostResponse.DetailPage> getDetailPage(
 		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long memberId,
 		final PostStatus status,
 		final Long regionId,
 		final String keyword
