@@ -93,13 +93,17 @@ public interface FishingTripPostService {
 	 * 존재하지 않을 경우 null이 할당됩니다.</p>
 	 *
 	 * @param cursorRequestDto 커서 기반 페이지네이션 요청 정보 (정렬 기준, 방향, 커서 값 등)
+	 * @param memberId 로그인한 사용자 ID (nullable)
 	 * @param status 게시글 상태 필터 (예: RECRUITING, COMPLETED), null일 경우 전체 조회
 	 * @param regionId 지역 ID 필터, null일 경우 전체 조회
 	 * @param keyword 제목 키워드 필터 (부분 일치 검색), null 또는 빈 값일 경우 전체 조회
 	 * @return 커서 기반 페이징된 {@link ScrollResponse} 객체로, 게시글 요약 정보 리스트를 포함합니다
+	 *
+	 * @implSpec 로그인된 경우, 각 게시글에 대해 좋아요 여부(`isLiked`)를 포함하여 응답을 가공합니다.
 	 */
 	ScrollResponse<FishingTripPostResponse.DetailPage> getDetailPage(
 		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long memberId,
 		final PostStatus status,
 		final Long regionId,
 		final String keyword

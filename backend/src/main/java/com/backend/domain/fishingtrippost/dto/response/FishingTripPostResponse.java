@@ -58,7 +58,7 @@ public class FishingTripPostResponse {
 		String fishPointName,
 		Double longitude,
 		Double latitude,
-		Map<Long,String> fileUrlList,
+		Map<Long, String> fileUrlList,
 		PostStatus postStatus,
 		Long likeCount,
 		boolean isLiked,
@@ -106,22 +106,26 @@ public class FishingTripPostResponse {
 	 *   "createdAt": "2025-04-01T11:45:00+09:00",
 	 *   "recruitmentCount": 4,
 	 *   "postStatus": "RECRUITING",
-	 *   "imageUrl": "https://cdn.example.com/대표이미지.jpg"
+	 *   "imageUrl": "https://cdn.example.com/대표이미지.jpg",
+	 *   "commentCount": 10,
+	 * 	 "likeCount": 10,
+	 * 	 "isLiked": true
 	 * }
 	 * }</pre>
 	 *
 	 * @param fishingTripPostId 게시글 ID
-	 * @param regionId 지역 ID
-	 * @param regionType 지역 구분 enum
-	 * @param subject 게시글 제목
-	 * @param content 게시글 내용 요약
-	 * @param fishingDate 출조 예정일
-	 * @param createdAt 게시글 생성일
-	 * @param recruitmentCount 모집 정원
-	 * @param postStatus 게시글 상태
-	 * @param imageUrl 대표 이미지 URL
-	 * @param commentCount 댓글수
-	 * @param likeCount 좋아요수
+	 * @param regionId          지역 ID
+	 * @param regionType        지역 구분 enum
+	 * @param subject           게시글 제목
+	 * @param content           게시글 내용 요약
+	 * @param fishingDate       출조 예정일
+	 * @param createdAt         게시글 생성일
+	 * @param recruitmentCount  모집 정원
+	 * @param postStatus        게시글 상태
+	 * @param imageUrl          대표 이미지 URL
+	 * @param commentCount      댓글수
+	 * @param likeCount         좋아요수
+	 * @param isLiked           유저의 좋아요 여부
 	 */
 	@Builder
 	public record DetailPage(
@@ -136,7 +140,8 @@ public class FishingTripPostResponse {
 		PostStatus postStatus,
 		String imageUrl,
 		Long commentCount,
-		Long likeCount
+		Long likeCount,
+		boolean isLiked
 	) {
 		@QueryProjection
 		public DetailPage {
@@ -200,16 +205,16 @@ public class FishingTripPostResponse {
 	 * }
 	 * }</pre>
 	 *
-	 * @param fishingTripPostId 게시글 ID
-	 * @param recruitmentCount 총 모집 인원
-	 * @param currentCount 현재 승인된 참여자 수
-	 * @param postStatus 게시글 상태 (RECRUITING, COMPLETED 등)
-	 * @param isApplicant 현재 로그인한 사용자가 참여자인지 여부
-	 * @param postOwnerId 게시글 작성자 ID
-	 * @param ownerNickname 작성자 닉네임
+	 * @param fishingTripPostId    게시글 ID
+	 * @param recruitmentCount     총 모집 인원
+	 * @param currentCount         현재 승인된 참여자 수
+	 * @param postStatus           게시글 상태 (RECRUITING, COMPLETED 등)
+	 * @param isApplicant          현재 로그인한 사용자가 참여자인지 여부
+	 * @param postOwnerId          게시글 작성자 ID
+	 * @param ownerNickname        작성자 닉네임
 	 * @param ownerProfileImageUrl 작성자 프로필 이미지 URL
-	 * @param isCurrentUserOwner 현재 로그인 유저가 작성자인지 여부
-	 * @param participants 승인된 참여자 리스트
+	 * @param isCurrentUserOwner   현재 로그인 유저가 작성자인지 여부
+	 * @param participants         승인된 참여자 리스트
 	 */
 
 	@Builder
@@ -261,8 +266,8 @@ public class FishingTripPostResponse {
 	 * }
 	 * }</pre>
 	 *
-	 * @param memberId 참여자 ID
-	 * @param nickname 참여자 닉네임
+	 * @param memberId        참여자 ID
+	 * @param nickname        참여자 닉네임
 	 * @param profileImageUrl 참여자 프로필 이미지 URL
 	 */
 
@@ -283,18 +288,18 @@ public class FishingTripPostResponse {
 	 * 커서 기반 스크롤 API 응답에서 사용되며, 게시글의 기본 정보와 상태를 포함합니다.
 	 * </p>
 	 *
-	 * @param fishingTripPostId 게시글 ID
-	 * @param subject 게시글 제목
-	 * @param fishingPointId 출조 포인트 ID
-	 * @param fishingPointName 출조 포인트 대분류 이름
+	 * @param fishingTripPostId      게시글 ID
+	 * @param subject                게시글 제목
+	 * @param fishingPointId         출조 포인트 ID
+	 * @param fishingPointName       출조 포인트 대분류 이름
 	 * @param fishingPointDetailName 출조 포인트 상세 이름
-	 * @param fishingDate 출조 예정 일자
-	 * @param createdAt 게시글 생성 시각
-	 * @param currentCount 현재 모집된 인원 수
-	 * @param recruitmentCount 총 모집 인원 수
-	 * @param postStatus 게시글 상태 (RECRUITING or COMPLETED)
-	 * @param commentCount 댓글 개수
-	 * @param likeCount 좋아요 수
+	 * @param fishingDate            출조 예정 일자
+	 * @param createdAt              게시글 생성 시각
+	 * @param currentCount           현재 모집된 인원 수
+	 * @param recruitmentCount       총 모집 인원 수
+	 * @param postStatus             게시글 상태 (RECRUITING or COMPLETED)
+	 * @param commentCount           댓글 개수
+	 * @param likeCount              좋아요 수
 	 */
 	public record MyFishingTripPostDetailPage(
 		Long fishingTripPostId,

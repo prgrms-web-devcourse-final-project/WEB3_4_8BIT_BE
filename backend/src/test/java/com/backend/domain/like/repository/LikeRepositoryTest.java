@@ -178,7 +178,7 @@ class LikeRepositoryTest extends BaseTest {
 			.sample());
 
 		// when
-		boolean exists = likeRepository.existsByMemberIdAndTargetTypeAndTargetId(
+		boolean exists = likeRepository.existsByMemberIdAndTargetTypeAndTargetIdAndIsDeletedFalse(
 			member.getMemberId(), LikeTargetType.FISHING_TRIP_POST, post.getFishingTripPostId());
 
 		// then

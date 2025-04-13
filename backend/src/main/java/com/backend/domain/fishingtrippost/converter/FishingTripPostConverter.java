@@ -52,7 +52,8 @@ public class FishingTripPostConverter {
 	 */
 	public static FishingTripPostResponse.DetailPage toDetailPage(
 		final FishingTripPostResponse.DetailPageQueryDto detailPageQueryDto,
-		final Function<Long, String> fileUrlResolver
+		final Function<Long, String> fileUrlResolver,
+		final boolean isLiked
 	) {
 		Long firstFileId = (detailPageQueryDto.fileIdList() != null && !detailPageQueryDto.fileIdList().isEmpty())
 			? detailPageQueryDto.fileIdList().get(0)
@@ -73,6 +74,7 @@ public class FishingTripPostConverter {
 			.imageUrl(imageUrl)
 			.commentCount(detailPageQueryDto.commentCount())
 			.likeCount(detailPageQueryDto.likeCount())
+			.isLiked(isLiked)
 			.build();
 	}
 

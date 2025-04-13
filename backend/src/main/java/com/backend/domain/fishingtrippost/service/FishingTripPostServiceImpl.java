@@ -3,11 +3,11 @@ package com.backend.domain.fishingtrippost.service;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -167,21 +167,28 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	@Transactional(readOnly = true)
 	public ScrollResponse<FishingTripPostResponse.DetailPage> getDetailPage(
 		final GlobalRequest.CursorRequest cursorRequestDto,
+		final Long memberId,
 		final PostStatus status,
 		final Long regionId,
-		final String keyword) {
-		List<FishingTripPostResponse.DetailPageQueryDto> detailPageDto = fishingTripPostRepository.findScrollDetailPageDto(
-			cursorRequestDto, status, regionId, keyword);
+		final String keyword
+	) {
+		List<FishingTripPostResponse.DetailPageQueryDto> detailPageDto =
+			fishingTripPostRepository.findScrollDetailPageDto(cursorRequestDto, status, regionId, keyword);
 
 		boolean isLast = detailPageDto.size() <= cursorRequestDto.size();
-
 		if (!isLast) {
 			detailPageDto.remove(detailPageDto.size() - 1);
 		}
 
-		List<FishingTripPostResponse.DetailPage> responseDto = new ArrayList<>(detailPageDto.stream()
-			.map(dto -> FishingTripPostConverter.toDetailPage(dto, this::getImageUrlById))
-			.toList());
+		// 좋아요 눌린 게시글 Id 리스트
+		Set<Long> likedPostIds = getLikedPostIdSet(memberId, detailPageDto);
+
+		List<FishingTripPostResponse.DetailPage> responseDto = detailPageDto.stream()
+			.map(dto -> {
+				boolean isLiked = likedPostIds.contains(dto.fishingTripPostId());
+				return FishingTripPostConverter.toDetailPage(dto, this::getImageUrlById, isLiked);
+			})
+			.toList();
 
 		log.debug("[동출 전체보기] : 조회 성공");
 
@@ -316,10 +323,42 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @param memberId          현재 로그인한 사용자의 ID (비로그인 시 null)
 	 * @param fishingTripPostId 대상 게시글의 ID
 	 * @return 사용자가 해당 게시글을 좋아요 했으면 true, 아니면 false
+	 * @implSpec soft delete 좋아요는 제외함 (isDeleted = false 조건 포함)
 	 */
 	private boolean getIsLiked(final Long memberId, final Long fishingTripPostId) {
 		return (memberId != null) &&
-			likeRepository.existsByMemberIdAndTargetTypeAndTargetId(memberId, TARGET_TYPE, fishingTripPostId);
+			likeRepository.existsByMemberIdAndTargetTypeAndTargetIdAndIsDeletedFalse(memberId, TARGET_TYPE,
+				fishingTripPostId);
+	}
+
+	/**
+	 * 현재 로그인한 사용자가 좋아요를 누른 게시글 ID 목록을 조회합니다.
+	 *
+	 * <p>비로그인 상태(memberId == null)일 경우 빈 Set을 반환합니다.</p>
+	 * <p>리스트 조회 성능 최적화를 위해 QueryDSL로 ID 목록을 한 번에 가져옵니다.</p>
+	 * <p>쿼리 레벨에서 distinct 처리되며, 이 메서드에서는 contains 성능을 위해 Set 변환만 수행합니다.</p>
+	 *
+	 * @param memberId 현재 로그인한 사용자 ID (nullable)
+	 * @param posts    게시글 리스트 (DetailPageQueryDto) - 좋아요 대상이 될 게시글들
+	 * @return 좋아요를 누른 게시글의 ID 목록 (Set)
+	 */
+	private Set<Long> getLikedPostIdSet(
+		final Long memberId,
+		final List<FishingTripPostResponse.DetailPageQueryDto> posts
+	) {
+		if (memberId == null || posts.isEmpty()) {
+			return Set.of();
+		}
+
+		List<Long> targetIds = posts.stream()
+			.map(FishingTripPostResponse.DetailPageQueryDto::fishingTripPostId)
+			.toList();
+
+		return new HashSet<>(likeRepository.findLikedTargetIdsByMemberIdAndTargetType(
+			memberId,
+			LikeTargetType.FISHING_TRIP_POST,
+			targetIds
+		));
 	}
 
 	/**
@@ -330,6 +369,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 *
 	 * @param fileId 조회할 파일의 ID
 	 * @return 파일이 존재하면 해당 파일의 URL, 존재하지 않으면 {@code null}
+	 * @implSpec 존재하지 않는 파일 ID일 경우 예외 없이 null 처리
 	 */
 	private String getImageUrlById(final Long fileId) {
 		return storageRepository.findById(fileId)

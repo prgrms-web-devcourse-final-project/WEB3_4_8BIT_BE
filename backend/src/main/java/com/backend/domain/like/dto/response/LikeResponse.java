@@ -117,6 +117,7 @@ public class LikeResponse {
 	 * @param imageUrl          대표 이미지 URL
 	 * @param commentCount      댓글 개수
 	 * @param likeCount         좋아요 수
+	 * @param isLiked           좋야요 여부
 	 */
 	@Builder
 	public record FishingTripPostLikedDetailResponse(
@@ -130,7 +131,8 @@ public class LikeResponse {
 		PostStatus postStatus,
 		String imageUrl,
 		Long commentCount,
-		Long likeCount
+		Long likeCount,
+		boolean isLiked
 	) {
 	}
 
@@ -160,7 +162,7 @@ public class LikeResponse {
 		ZonedDateTime likedAt,
 		Long likeCount,
 		Long reviewCount
-		) {
+	) {
 		@QueryProjection
 		public ShipFishingPostLikedQueryDto {
 		}
@@ -193,6 +195,7 @@ public class LikeResponse {
 	 * @param reviewEverRate    평점
 	 * @param reviewCount       리뷰 수
 	 * @param likeCount         좋아요 수
+	 * @param isLiked           유저 좋아요 여부
 	 */
 	@Builder
 	public record ShipFishingPostLikedDetailResponse(
@@ -204,7 +207,8 @@ public class LikeResponse {
 		List<String> fishNameList,
 		Double reviewEverRate,
 		Long reviewCount,
-		Long likeCount
+		Long likeCount,
+		boolean isLiked
 	) {
 	}
 }

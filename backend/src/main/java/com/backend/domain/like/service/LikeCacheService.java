@@ -59,25 +59,6 @@ public class LikeCacheService {
 	}
 
 	/**
-	 * 좋아요 수를 Redis 캐시에 초기화
-	 *
-	 * @param type     좋아요 대상 타입 (예: SHIP_FISHING_POST, FISHING_TRIP_POST)
-	 * @param targetId 좋아요 대상 ID
-	 */
-	public void initializeLikeCache(final LikeTargetType type, final Long targetId) {
-		String key = buildKey(type, targetId);
-
-		if (!redisUtil.hasKey(key)) {
-			Long count = likeRepository.countByTargetTypeAndTargetId(type, targetId);
-			redisUtil.setValue(key, count.toString());
-
-			log.debug("[LikeCache] 캐시 미존재 → DB 조회 후 저장: {} = {}", key, count);
-		}
-	}
-
-
-
-	/**
 	 * Redis key 생성 (like_count::{type}::{targetId} 형식)
 	 *
 	 * @param type     좋아요 대상 타입

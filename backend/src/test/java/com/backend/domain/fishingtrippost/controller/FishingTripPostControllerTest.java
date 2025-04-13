@@ -456,7 +456,7 @@ class FishingTripPostControllerTest extends BaseTest {
 			List.of(detailPage), 10, 1, true, true
 		);
 
-		when(fishingTripPostService.getDetailPage(any(), isNull(), isNull(), isNull()))
+		when(fishingTripPostService.getDetailPage(any(), isNull(), isNull(), isNull(), isNull()))
 			.thenReturn(response);
 
 		// When

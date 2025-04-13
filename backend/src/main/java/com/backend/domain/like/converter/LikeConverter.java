@@ -57,6 +57,7 @@ public class LikeConverter {
 			.imageUrl(imageUrl)
 			.commentCount(dto.commentCount())
 			.likeCount(dto.likeCount())
+			.isLiked(true)
 			.build();
 	}
 
@@ -88,6 +89,7 @@ public class LikeConverter {
 			.reviewEverRate(dto.reviewEverRate())
 			.reviewCount(dto.reviewCount())
 			.likeCount(dto.likeCount())
+			.isLiked(true)
 			.build();
 	}
 }
