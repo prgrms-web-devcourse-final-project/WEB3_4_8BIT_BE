@@ -110,11 +110,13 @@ public class FishingTripPostConverter {
 	 * 현재 사용자의 좋아요 여부를 받아 최종 응답 DTO인 {@link FishingTripPostResponse.Detail}을 생성합니다.</p>
 	 *
 	 * @param detailQueryDto 게시글의 상세 정보를 담은 DTO
+	 * @param likeCount      캐시에 저장된 likeCount
 	 * @param isLiked        현재 로그인한 사용자가 해당 게시글에 좋아요를 눌렀는지 여부
 	 * @return 게시글 상세 응답 DTO
 	 */
 	public static FishingTripPostResponse.Detail toDetail(
 		final FishingTripPostResponse.DetailQueryDto detailQueryDto,
+		final Long likeCount,
 		final boolean isLiked,
 		final boolean isPostOwner,
 		final Map<Long, String> fileUrlMap
@@ -134,7 +136,7 @@ public class FishingTripPostConverter {
 			.latitude(detailQueryDto.latitude())
 			.fileUrlList(fileUrlMap)
 			.postStatus(detailQueryDto.postStatus())
-			.likeCount(detailQueryDto.likeCount())
+			.likeCount(likeCount)
 			.isLiked(isLiked)
 			.isPostOwner(isPostOwner)
 			.build();

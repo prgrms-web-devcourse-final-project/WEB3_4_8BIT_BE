@@ -49,12 +49,11 @@ public class LikeServiceImpl implements LikeService {
 	@Override
 	@Transactional
 	public void toggleLike(final Long memberId, final LikeRequest requestDto) {
-		//게시글 존재 검증
+		// 게시글 존재 검증
 		validateLikeTarget(requestDto.targetType(), requestDto.targetId());
-		// 캐시가 없다면 조회하면서 자동 저장
-		Long likeCount = likeCacheService.getLikeCount(requestDto.targetType(), requestDto.targetId());
-		log.debug("[Redis 좋아요 수 확인] - type: {}, targetId: {}, count: {}",
-			requestDto.targetType(), requestDto.targetId(), likeCount);
+
+		// 캐시 초기화: 없으면 DB값 기준으로 Redis에 저장
+		likeCacheService.initializeLikeCache(requestDto.targetType(), requestDto.targetId());
 
 		likeRepository.findByMemberIdAndTargetTypeAndTargetId(
 			memberId,
@@ -76,6 +75,7 @@ public class LikeServiceImpl implements LikeService {
 			}
 		);
 	}
+
 
 	@Override
 	@Transactional(readOnly = true)

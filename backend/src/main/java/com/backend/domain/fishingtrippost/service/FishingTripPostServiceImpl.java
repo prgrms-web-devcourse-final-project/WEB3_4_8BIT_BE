@@ -33,6 +33,7 @@ import com.backend.domain.fishpoint.exception.FishPointException;
 import com.backend.domain.fishpoint.repository.FishPointRepository;
 import com.backend.domain.like.domain.LikeTargetType;
 import com.backend.domain.like.repository.LikeRepository;
+import com.backend.domain.like.service.LikeCacheService;
 import com.backend.domain.member.exception.MemberErrorCode;
 import com.backend.domain.member.exception.MemberException;
 import com.backend.domain.member.repository.MemberRepository;
@@ -58,6 +59,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	private final FishingTripPostRepository fishingTripPostRepository;
 	private final MemberRepository memberRepository;
 	private final FishPointRepository fishPointRepository;
+	private final LikeCacheService likeCacheService;
 	private final StorageService storageService;
 	private final StorageRepository storageRepository;
 	private final FishingTripPostNotifier fishingTripPostNotifier;
@@ -142,10 +144,11 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 		Map<Long, String> fileUrlMap = getFileUrlMap(detailQueryDto);
 
+		Long likeCount = likeCacheService.getLikeCount(TARGET_TYPE, fishingTripPostId);
 		boolean isLiked = getIsLiked(memberId, fishingTripPostId);
 		boolean isPostOwner = getIsPostOwner(memberId, fishingTripPostId);
 		FishingTripPostResponse.Detail responseDto = FishingTripPostConverter.toDetail(detailQueryDto,
-			isLiked, isPostOwner, fileUrlMap);
+			likeCount, isLiked, isPostOwner, fileUrlMap);
 		log.debug("[동출 상세보기] : 조회 성공");
 
 		return responseDto;
