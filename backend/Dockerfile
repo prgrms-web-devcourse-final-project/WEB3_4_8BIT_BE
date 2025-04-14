@@ -10,5 +10,8 @@ COPY --from=builder extracted/spring-boot-loader/ ./
 COPY --from=builder extracted/snapshot-dependencies/ ./
 COPY --from=builder extracted/application/ ./
 
+# 환경변수로 타임존 설정
+ENV TZ=Asia/Seoul
+
 EXPOSE 8080
-ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher", "--spring.profiles.active=dev"]
+ENTRYPOINT ["java", "-Duser.timezone=Asia/Seoul", "org.springframework.boot.loader.launch.JarLauncher", "--spring.profiles.active=dev"]
