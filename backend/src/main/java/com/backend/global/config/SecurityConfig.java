@@ -89,6 +89,8 @@ public class SecurityConfig {
 						"/api/v1/fishing-trip-post/**"
 					).permitAll()
 
+					.requestMatchers("/api/v1/likes/**").hasRole("USER")
+
 					.requestMatchers(HttpMethod.POST, "/api/v1/fishes/encyclopedias")
 					.hasAnyRole("USER", "CAPTAIN", "ADMIN")
 
