@@ -89,9 +89,13 @@ public class SecurityConfig {
 						"/api/v1/fishing-trip-post/**"
 					).permitAll()
 
-					.requestMatchers("/api/v1/likes/**").hasRole("USER")
+					.requestMatchers("/api/v1/likes/**").hasAnyRole("USER", "CAPTAIN", "ADMIN")
 
-					.requestMatchers(HttpMethod.POST, "/api/v1/fishes/encyclopedias")
+					.requestMatchers(
+						HttpMethod.POST,
+						"/api/v1/fishes/encyclopedias",
+						"/api/v1/fishing-trip-post"
+					)
 					.hasAnyRole("USER", "CAPTAIN", "ADMIN")
 
 					.requestMatchers(
@@ -103,7 +107,7 @@ public class SecurityConfig {
 
 					.requestMatchers(
 						"/api/v1/ship-fishing-posts/mypage"
-					).authenticated()
+					).hasAnyRole("USER", "CAPTAIN", "ADMIN")
 
 					.anyRequest().authenticated()
 			)
