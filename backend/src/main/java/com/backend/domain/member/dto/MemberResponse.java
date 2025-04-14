@@ -42,6 +42,7 @@ public class MemberResponse {
 		String nickname,
 		String phone,
 		String fileUrl,
+		Long fileId,
 		String description,
 		MemberRole role,
 		Boolean isAddInfo
