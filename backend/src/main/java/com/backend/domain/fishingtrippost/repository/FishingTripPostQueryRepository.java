@@ -362,7 +362,9 @@ public class FishingTripPostQueryRepository {
 				fishingTripPost.regionId,
 				region.type,
 				fishingTripPost.fileIdList,
-				fishingTripPost.likeCount.add(fishingTripPost.commentCount)
+				fishingTripPost.likeCount.add(fishingTripPost.commentCount),
+				fishingTripPost.likeCount,
+				fishingTripPost.commentCount
 			))
 			.from(fishingTripPost)
 			.leftJoin(region).on(region.regionId.eq(fishingTripPost.regionId))
