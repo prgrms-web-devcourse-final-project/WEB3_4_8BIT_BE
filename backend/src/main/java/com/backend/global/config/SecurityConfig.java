@@ -91,7 +91,8 @@ public class SecurityConfig {
 						"/api/v1/regions",
 						"/api/v1/fish-points",
 						"/api/v1/fish-points/**",
-						"/api/v1/chats"
+						"/api/v1/chats",
+						"/api/v1/reservation-dates/**"
 					).permitAll()
 
 					.requestMatchers("/api/v1/likes/**").hasAnyRole("USER", "CAPTAIN", "ADMIN")
