@@ -86,7 +86,12 @@ public class SecurityConfig {
 						"/api/v1/ship-fishing-posts",
 						"/api/v1/ship-fishing-posts/**",
 						"/api/v1/ship-fishing-posts/hot",
-						"/api/v1/fishing-trip-post/**"
+						"/api/v1/fishing-trip-post/**",
+						"/api/v1/ship-posts/{postId}/reviews",
+						"/api/v1/regions",
+						"/api/v1/fish-points",
+						"/api/v1/fish-points/**",
+						"/api/v1/chats"
 					).permitAll()
 
 					.requestMatchers("/api/v1/likes/**").hasAnyRole("USER", "CAPTAIN", "ADMIN")

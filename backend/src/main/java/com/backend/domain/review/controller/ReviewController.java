@@ -50,9 +50,11 @@ public class ReviewController {
 		@AuthenticationPrincipal final CustomOAuth2User user,
 		@Valid final GlobalRequest.CursorRequest cursorRequestDto
 	) {
+		Long userId = user != null ? user.getId() : null;
+
 		ScrollResponse<ReviewWithMemberResponse> reviewList = reviewService.getReviewListByPostIdWithCursor(
 			postId,
-			user.getId(),
+			userId,
 			cursorRequestDto);
 
 		return ResponseEntity.status(HttpStatus.OK)
