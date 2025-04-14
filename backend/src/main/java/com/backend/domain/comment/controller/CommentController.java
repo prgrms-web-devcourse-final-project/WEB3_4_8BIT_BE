@@ -59,8 +59,7 @@ public class CommentController {
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		Long memberId = user.getId() == null ? -1 : user.getId();
-
+		Long memberId = user != null ? user.getId() : null;
 		ScrollResponse<CommentResponse.Detail> getDetailList = commentService.getDetailList(
 			fishingTripPostId,
 			memberId,

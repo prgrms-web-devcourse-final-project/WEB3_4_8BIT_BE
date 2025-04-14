@@ -21,11 +21,13 @@ import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.exception.GlobalErrorCode;
 import com.backend.global.exception.GlobalException;
 import com.backend.global.util.QuerydslUtil;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryFactory;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparableExpressionBase;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
@@ -85,29 +87,28 @@ public class CommentQueryRepository {
 		final GlobalRequest.CursorRequest cursorRequestDto,
 		final CommentRequest.Search requestDto
 	) {
+		BooleanBuilder builder = new BooleanBuilder();
+		builder.and(whereCondition(requestDto, cursorRequestDto, fishingTripPostId));
+
 		List<CommentResponse.Detail> detailList = jpaQueryFactory
 			.select(new QCommentResponse_Detail(
 				comment.commentId,
 				comment.content,
 				member.nickname,
-				comment.memberId.eq(memberId),
+				memberId != null ? comment.memberId.eq(memberId) : Expressions.FALSE,
 				file.url,
 				comment.createdAt,
 				comment.childCount,
 				comment.parentId))
 			.from(comment)
-			.leftJoin(member)
-			.on(comment.memberId.eq(member.memberId))
-			.leftJoin(file)
-			.on(file.fileId.eq(member.fileId))
-			.where(whereCondition(requestDto, cursorRequestDto, fishingTripPostId))
+			.leftJoin(member).on(comment.memberId.eq(member.memberId))
+			.leftJoin(file).on(file.fileId.eq(member.fileId))
+			.where(builder)
 			.orderBy(getOrderBy(cursorRequestDto))
 			.limit(cursorRequestDto.size() + 1)
 			.fetch();
 
-		// 다음 페이지가 있는지 확인 마지막 페이지라면 True
 		boolean isLast = detailList.size() <= cursorRequestDto.size();
-
 		if (!isLast) {
 			detailList.remove(detailList.size() - 1);
 		}
