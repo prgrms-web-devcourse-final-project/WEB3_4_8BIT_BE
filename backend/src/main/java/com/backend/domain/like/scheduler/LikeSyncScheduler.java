@@ -61,8 +61,12 @@ public class LikeSyncScheduler {
 		}
 
 		grouped.forEach((type, dtoList) -> {
-			log.info("[Like 동기화 실행] 대상: {}, 건수: {}", type, dtoList.size());
-			likeService.updateLikeCounts(type, dtoList);
+			try {
+				log.info("[Like 동기화 실행] 대상: {}, 건수: {}", type, dtoList.size());
+				likeService.updateLikeCounts(type, dtoList);
+			} catch (Exception e) {
+				log.error("[Like 동기화 실패] 대상: {}", type, e);
+			}
 		});
 
 		log.debug("게시글 좋아요 업데이트 종료");
