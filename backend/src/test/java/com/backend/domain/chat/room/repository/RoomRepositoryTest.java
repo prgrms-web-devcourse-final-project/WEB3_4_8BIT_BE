@@ -27,6 +27,7 @@ class RoomRepositoryTest extends BaseTest {
 	private Room createRoom(Long targetId, TargetType targetType) {
 		return Room.builder()
 			.targetId(targetId)
+			.targetName("동출게시글 제목")
 			.targetType(targetType)
 			.status(Status.ACTIVE)
 			.build();
@@ -36,7 +37,7 @@ class RoomRepositoryTest extends BaseTest {
 	@DisplayName("채팅방 생성 [Repository] - Success")
 	void t01() {
 		// given
-		Room room = createRoom(1L, TargetType.FISHING_TRIP_POST);
+		Room room = createRoom(1L,TargetType.FISHING_TRIP_POST);
 
 		// when
 		Room savedRoom = roomRepository.save(room);

@@ -163,7 +163,7 @@ class CaptainControllerTest extends BaseTest {
 			.set("email", "test@naver.com")
 			.set("name", "루피")
 			.set("nickname", "해적왕")
-			.set("profileImg", "http://example.com/image.jpg")
+			.set("fileUrl", "http://example.com/image.jpg")
 			.set("description", "해적왕이 되고싶은 루피 입니다.")
 			.set("shipLicenseNumber", "1-2019123456")
 			.set("shipList", List.of(1L, 2L, 3L))
@@ -185,7 +185,7 @@ class CaptainControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data.memberId").value(1L))
 			.andExpect(jsonPath("$.data.nickname").value("해적왕"))
 			.andExpect(jsonPath("$.data.name").value("루피"))
-			.andExpect(jsonPath("$.data.profileImg").value("http://example.com/image.jpg"))
+			.andExpect(jsonPath("$.data.fileUrl").value("http://example.com/image.jpg"))
 			.andExpect(jsonPath("$.data.description").value("해적왕이 되고싶은 루피 입니다."))
 			.andExpect(jsonPath("$.data.shipLicenseNumber").value("1-2019123456"))
 			.andExpect(jsonPath("$.data.shipList", contains(1, 2, 3)));
