@@ -85,7 +85,8 @@ public class SecurityConfig {
 						"/api/v1/fishing-trip-post/hot-post/**",
 						"/api/v1/ship-fishing-posts",
 						"/api/v1/ship-fishing-posts/**",
-						"/api/v1/ship-fishing-posts/hot"
+						"/api/v1/ship-fishing-posts/hot",
+						"/api/v1/fishing-trip-post/**"
 					).permitAll()
 
 					.requestMatchers(HttpMethod.POST, "/api/v1/fishes/encyclopedias")
