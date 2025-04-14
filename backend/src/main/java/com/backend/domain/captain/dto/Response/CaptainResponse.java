@@ -17,7 +17,8 @@ public class CaptainResponse {
 	 * "name": "루피",
 	 * "nickname": "해적왕",
 	 * "phone": "010-1234-5678",
-	 * "profileImg": "http://example.com/profile.jpg",
+	 * "fileUrl": "http://example.com/profile.jpg",
+	 * "fileId": 1
 	 * "description": "해적왕이 되고싶은 루피 입니다.",
 	 * "role": "CAPTAIN",
 	 * "shipLicenseNumber": "1-2019123456",
