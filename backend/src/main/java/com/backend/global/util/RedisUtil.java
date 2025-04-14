@@ -29,11 +29,7 @@ public class RedisUtil {
 	 * @return 증가된 결과 값
 	 */
 	public Long increment(final String key) {
-		Long value = redisTemplate.opsForValue().increment(key);
-		//TTL 설정
-		setCacheExpire(key);
-
-		return value;
+		return redisTemplate.opsForValue().increment(key);
 	}
 
 	/**
@@ -43,11 +39,48 @@ public class RedisUtil {
 	 * @return 감소된 결과 값
 	 */
 	public Long decrement(final String key) {
-		Long value = redisTemplate.opsForValue().decrement(key);
-		//TTL 설정
-		setCacheExpire(key);
+		return redisTemplate.opsForValue().decrement(key);
+	}
 
-		return value;
+	/**
+	 * 해당 키가 Redis 존재 여부 확인
+	 *
+	 * @param key Redis 키
+	 * @return 존재하면 true, 없으면 false
+	 */
+	public boolean hasKey(final String key) {
+		return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+	}
+
+	/**
+	 * Redis 해당 키값 value 세팅
+	 *
+	 * @param key   Redis 키
+	 * @param value 키에 넣을 값
+	 */
+	public void setValue(final String key, final String value) {
+		redisTemplate.opsForValue().set(key, value, Duration.ofHours(1));
+	}
+
+	/**
+	 * Redis 해당 키값 value get
+	 *
+	 * @param key Redis 키
+	 * @return value 값
+	 */
+	public String getValue(final String key) {
+		return redisTemplate.opsForValue().get(key);
+	}
+
+	/**
+	 * key Redis 존재시 삭제
+	 *
+	 * @param key 삭제할 Redis key
+	 */
+	public void deleteKeyIfExists(final String key) {
+		if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+			redisTemplate.delete(key);
+		}
 	}
 
 	/**
@@ -64,8 +97,8 @@ public class RedisUtil {
 	 * @return key-value 쌍을 담은 Map
 	 */
 
-	public Map<String, Integer> scanKeysAndValues(final String prefix) {
-		Map<String, Integer> result = new HashMap<>();
+	public Map<String, Long> scanKeysAndValues(final String prefix) {
+		Map<String, Long> result = new HashMap<>();
 		ValueOperations<String, String> ops = redisTemplate.opsForValue();
 
 		redisTemplate.execute((RedisCallback<Void>)connection -> {
@@ -75,7 +108,7 @@ public class RedisUtil {
 					String key = new String(rawKey, StandardCharsets.UTF_8);
 					String value = ops.get(key);
 					if (value != null) {
-						result.put(key, Integer.parseInt(value));
+						result.put(key, Long.parseLong(value));
 					}
 				});
 			} catch (Exception e) {
@@ -85,28 +118,5 @@ public class RedisUtil {
 		});
 
 		return result;
-	}
-
-	/**
-	 * key Redis 존재시 삭제
-	 *
-	 * @param key 삭제할 Redis key
-	 */
-	public void deleteKeyIfExists(final String key) {
-		if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
-			redisTemplate.delete(key);
-		}
-	}
-
-	/**
-	 * 레디스에 캐싱 TTL 최초에만  6시간으로 설정
-	 *
-	 * @param key TTL 설정할 Redis key
-	 */
-
-	private void setCacheExpire(String key) {
-		if (Boolean.FALSE.equals(redisTemplate.getExpire(key) > 0)) {
-			redisTemplate.expire(key, Duration.ofHours(6));
-		}
 	}
 }

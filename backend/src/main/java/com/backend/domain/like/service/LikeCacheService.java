@@ -4,10 +4,14 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import com.backend.domain.fishingtrippost.exception.FishingTripPostErrorCode;
 import com.backend.domain.fishingtrippost.exception.FishingTripPostException;
+import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 import com.backend.domain.like.domain.LikeTargetType;
 import com.backend.domain.like.repository.LikeRepository;
+import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
+import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.util.RedisUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -23,6 +27,8 @@ public class LikeCacheService {
 
 	private final RedisUtil redisUtil;
 	private final LikeRepository likeRepository;
+	private final ShipFishingPostRepository shipFishingPostRepository;
+	private final FishingTripPostRepository fishingTripPostRepository;
 
 	private static final String PREFIX = "like_count::";
 
@@ -39,6 +45,7 @@ public class LikeCacheService {
 	 */
 	@Cacheable(value = "like_count", key = "#type.name() + '::' + #targetId")
 	public Long getLikeCount(final LikeTargetType type, final Long targetId) {
+		validateLikeTarget(type, targetId);
 		return likeRepository.countByTargetTypeAndTargetId(type, targetId);
 	}
 
@@ -54,8 +61,64 @@ public class LikeCacheService {
 	@CachePut(value = "like_count", key = "#type.name() + '::' + #targetId")
 	public Long updateLikeCountCache(final LikeTargetType type, final Long targetId, final Boolean isLike) {
 		String key = buildKey(type, targetId); // like_count::TYPE::ID
-
 		return isLike ? redisUtil.increment(key) : redisUtil.decrement(key);
+	}
+
+	/**
+	 * 좋아요 수를 Redis 캐시에 초기화
+	 *
+	 * @param type     좋아요 대상 타입 (예: SHIP_FISHING_POST, FISHING_TRIP_POST)
+	 * @param targetId 좋아요 대상 ID
+	 */
+	public void initializeLikeCache(final LikeTargetType type, final Long targetId) {
+		String key = buildKey(type, targetId);
+
+		if (!redisUtil.hasKey(key)) {
+			Long count = likeRepository.countByTargetTypeAndTargetId(type, targetId);
+			redisUtil.setValue(key, count.toString());
+
+			log.debug("[LikeCache] 캐시 미존재 → DB 조회 후 저장: {} = {}", key, count);
+		}
+	}
+
+	/**
+	 * Like 대상 존재 여부 검증
+	 *
+	 * @param targetType 좋아요 대상 타입
+	 * @param targetId   좋아요 대상 ID
+	 * @throws ShipFishingPostException 존재하지 않는 선상 낚시 게시글일 경우 예외 발생
+	 * @throws FishingTripPostException 존재하지 않는 동출 모집 게시글일 경우 예외 발생
+	 */
+	private void validateLikeTarget(final LikeTargetType targetType, final Long targetId) {
+		boolean exists = switch (targetType) {
+			case SHIP_FISHING_POST -> shipFishingPostRepository.existsById(targetId);
+			case FISHING_TRIP_POST -> fishingTripPostRepository.existsById(targetId);
+		};
+
+		validTargetTypeAndTargetId(targetType, targetId, exists);
+	}
+
+	/**
+	 * @param targetType 좋아요 대상 타입
+	 * @param targetId   좋아요 대상 ID
+	 * @param exists     게시글 존재 유무
+	 * @throws ShipFishingPostException 존재하지 않는 선상 낚시 게시글일 경우 예외 발생
+	 * @throws FishingTripPostException 존재하지 않는 동출 모집 게시글일 경우 예외 발생
+	 */
+
+	private void validTargetTypeAndTargetId(
+		final LikeTargetType targetType,
+		final Long targetId,
+		final boolean exists
+	) {
+		if (!exists) {
+			log.warn("[존재하지 게시글] 타입: {}, ID: {}", targetType, targetId);
+			throw switch (targetType) {
+				case SHIP_FISHING_POST -> new ShipFishingPostException(ShipFishingPostErrorCode.POSTS_NOT_FOUND);
+				case FISHING_TRIP_POST ->
+					new FishingTripPostException(FishingTripPostErrorCode.FISHING_TRIP_POST_NOT_FOUND);
+			};
+		}
 	}
 
 	/**
@@ -66,7 +129,6 @@ public class LikeCacheService {
 	 * @return Redis key 문자열
 	 */
 	private String buildKey(final LikeTargetType type, final Long targetId) {
-
 		return PREFIX + type.name() + "::" + targetId;
 	}
 }

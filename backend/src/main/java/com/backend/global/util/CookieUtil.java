@@ -41,9 +41,9 @@ public class CookieUtil {
 		ResponseCookie cookie = ResponseCookie.from("accessToken", token)
 			.httpOnly(httpOnly)
 			.secure(secure)
+			.domain("mikki.kr")
 			.sameSite("None")
 			.path("/")
-			.domain("mikki.kr")
 			.maxAge(refreshTokenValidityInSeconds)
 			.build();
 
