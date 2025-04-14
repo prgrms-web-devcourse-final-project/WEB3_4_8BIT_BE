@@ -19,6 +19,7 @@ public class MemberResponse {
 	 *   "nickname": "테스트닉",
 	 *   "phone": "010-1234-5678",
 	 *   "fileUrl": "http://example.com/profile.jpg",
+	 *   "fileId": 1,
 	 *   "description": "자기소개입니다.",
 	 *   "isAddInfo": true
 	 * }
@@ -30,6 +31,7 @@ public class MemberResponse {
 	 * @param nickname 닉네임
 	 * @param phone 전화번호
 	 * @param fileUrl 프로필 이미지 URL
+	 * @param fileId 프로필 이미지 파일 ID
 	 * @param description 자기소개
 	 * @param role 역할
 	 * @param isAddInfo 추가 정보 입력 여부 (true: 추가 정보 입력됨, false: 미입력)
@@ -42,6 +44,7 @@ public class MemberResponse {
 		String nickname,
 		String phone,
 		String fileUrl,
+		Long fileId,
 		String description,
 		MemberRole role,
 		Boolean isAddInfo

@@ -32,6 +32,7 @@ public class MemberQueryRepository {
 				member.nickname,
 				member.phone,
 				file.url,
+				file.fileId,
 				member.description,
 				member.role,
 				member.isAddInfo
