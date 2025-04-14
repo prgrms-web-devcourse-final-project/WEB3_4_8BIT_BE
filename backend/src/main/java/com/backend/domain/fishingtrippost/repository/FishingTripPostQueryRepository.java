@@ -282,8 +282,7 @@ public class FishingTripPostQueryRepository {
 		final GlobalRequest.CursorRequest cursorRequest
 	) {
 
-		List<FishingTripPostResponse.MyFishingTripPostDetailPage> pageList = new ArrayList<>(
-			MyFishingTripPostDetailPage);
+		List<FishingTripPostResponse.MyFishingTripPostDetailPage> pageList = new ArrayList<>(MyFishingTripPostDetailPage);
 		boolean isLast = pageList.size() <= cursorRequest.size();
 
 		if (!isLast) {
@@ -324,8 +323,7 @@ public class FishingTripPostQueryRepository {
 				fishingTripPost.postStatus,
 				fishingTripPost.commentCount,
 				fishingTripPost.likeCount
-			))
-			.distinct();
+			));
 
 		if (base == ParticipationType.APPLICANT) {
 			query.from(fishingTripRecruitment)

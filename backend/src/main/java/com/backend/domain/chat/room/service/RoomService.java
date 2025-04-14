@@ -16,7 +16,7 @@ public interface RoomService {
 	 * @param targetType 채팅방이 연결될 대상의 타입
 	 * @return 생성된 채팅방의 ID
 	 */
-	Long createRoom(final Long targetId, final TargetType targetType);
+	Long createRoom(final Long targetId, final String targetName, final TargetType targetType);
 
 	/**
 	 * 채팅방의 마지막 메시지 시간을 업데이트

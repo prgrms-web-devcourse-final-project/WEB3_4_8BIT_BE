@@ -82,7 +82,7 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 
 		Long fishingTripPostId = savedFishingTripPost.getFishingTripPostId();
 
-		roomService.createRoom(fishingTripPostId, TargetType.FISHING_TRIP_POST);
+		roomService.createRoom(fishingTripPostId, savedFishingTripPost.getSubject(), TargetType.FISHING_TRIP_POST);
 
 		activityHistoryService.createActivityHistory(savedFishingTripPost);
 
@@ -297,14 +297,20 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		final List<FishingTripPostResponse.HotPostDto> hotPostDtoList
 	) {
 		return hotPostDtoList.stream()
-			.map(dto -> new FishingTripPostResponse.HotPost(
-				dto.fishingTripPostId(),
-				dto.subject(),
-				dto.regionId(),
-				dto.regionType(),
-				getFirstImageUrl(dto.fileIdList()),
-				dto.hotScore()
-			))
+			.map(dto -> {
+				String imageUrl = (dto.fileIdList() != null && !dto.fileIdList().isEmpty())
+					? getImageUrlById(dto.fileIdList().get(0))
+					: null;
+
+				return new FishingTripPostResponse.HotPost(
+					dto.fishingTripPostId(),
+					dto.subject(),
+					dto.regionId(),
+					dto.regionType(),
+					imageUrl,
+					dto.hotScore()
+				);
+			})
 			.toList();
 	}
 
@@ -356,21 +362,6 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	}
 
 	/**
-	 * 파일 ID 리스트 중 첫 번째 파일의 URL을 가져옵니다.
-	 * <p>비어 있거나 null일 경우 null 반환</p>
-	 */
-	private String getFirstImageUrl(final List<Long> fileIdList) {
-		if (fileIdList == null || fileIdList.isEmpty()) {
-			return null;
-		}
-		Long firstFileId = fileIdList.get(0);
-		if (firstFileId == null) {
-			return null;
-		}
-		return getImageUrlById(firstFileId);
-	}
-
-	/**
 	 * 파일 ID를 통해 해당 파일의 이미지 URL을 조회합니다.
 	 *
 	 * <p> 파일을 조회하고, 존재할 경우 해당 파일의 URL을 반환합니다.
@@ -381,11 +372,23 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 	 * @implSpec 존재하지 않는 파일 ID일 경우 예외 없이 null 처리
 	 */
 	private String getImageUrlById(final Long fileId) {
-		if (fileId == null)
-			return null;
 		return storageRepository.findById(fileId)
 			.map(File::getUrl)
 			.orElse(null);
+	}
+
+	/**
+	 * 상세 조회용 DTO에서 이미지 파일 ID 리스트를 기반으로 실제 이미지 URL 목록을 조회합니다.
+	 *
+	 * <p>저장소에서 파일 엔티티를 조회하고, 각 파일의 URL만 추출하여 리스트로 반환합니다.</p>
+	 *
+	 * @param detailQueryDto 동출 게시글 상세 정보가 담긴 DTO
+	 * @return 이미지 URL 문자열 리스트
+	 */
+	private List<String> getFileUrlList(final FishingTripPostResponse.DetailQueryDto detailQueryDto) {
+		return storageRepository.findAllById(detailQueryDto.fileIdList()).stream()
+			.map(File::getUrl)
+			.toList();
 	}
 
 	/**

@@ -124,7 +124,7 @@ class FishingTripPostServiceTest extends BaseTest {
 		verify(memberRepository).existsById(givenMember.getMemberId());
 		verify(fishPointRepository).existsById(givenRequestDto.fishingPointId());
 		verify(fishingTripPostRepository).save(any(FishingTripPost.class));
-		verify(roomService).createRoom(savedId, TargetType.FISHING_TRIP_POST);
+		verify(roomService).createRoom(savedId, savedPost.getSubject(), TargetType.FISHING_TRIP_POST);
 	}
 
 	@Test

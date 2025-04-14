@@ -38,8 +38,8 @@ public class RoomServiceImpl implements RoomService {
 
 	@Override
 	@Transactional
-	public Long createRoom(final Long targetId, final TargetType targetType) {
-		Room room = RoomConverter.fromTargetIdAndTargetType(targetId, targetType);
+	public Long createRoom(final Long targetId, final String targetName, final TargetType targetType) {
+		Room room = RoomConverter.fromTargetIdAndTargetType(targetId, targetName, targetType);
 		return roomRepository.save(room).getRoomId();
 	}
 
