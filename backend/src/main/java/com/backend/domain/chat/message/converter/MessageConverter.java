@@ -28,7 +28,7 @@ public class MessageConverter {
 
 	public static MessageResponse.Basic toResponse(
 		final Message message,
-		final boolean isMine,
+		final boolean isOwn,
 		final String senderProfileImageUrl
 	) {
 		return MessageResponse.Basic.builder()
@@ -40,7 +40,7 @@ public class MessageConverter {
 			.content(message.getContent())
 			.fileUrls(message.getFileUrls())
 			.type(message.getType())
-			.isMine(isMine)
+			.isOwn(isOwn)
 			.createdAt(message.getCreatedAt())
 			.build();
 	}

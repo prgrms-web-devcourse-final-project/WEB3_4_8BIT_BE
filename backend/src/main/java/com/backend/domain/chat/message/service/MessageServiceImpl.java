@@ -80,8 +80,8 @@ public class MessageServiceImpl implements MessageService {
 		List<MessageResponse.Basic> responseList = messageList.stream()
 			.map(message -> {
 				String profileImageUrl = memberIdToProfileImageMap.getOrDefault(message.getSenderId(), null);
-				boolean isMine = Objects.equals(message.getSenderId(), memberId);
-				return MessageConverter.toResponse(message, isMine, profileImageUrl);
+				boolean isOwn = Objects.equals(message.getSenderId(), memberId);
+				return MessageConverter.toResponse(message, isOwn, profileImageUrl);
 			})
 			.toList();
 

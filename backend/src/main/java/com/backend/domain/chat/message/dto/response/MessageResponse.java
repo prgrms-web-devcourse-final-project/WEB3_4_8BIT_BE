@@ -19,7 +19,7 @@ public class MessageResponse {
 		String content,
 		List<String> fileUrls,
 		MessageType type,
-		boolean isMine,
+		boolean isOwn,
 		LocalDateTime createdAt
 	) {}
 

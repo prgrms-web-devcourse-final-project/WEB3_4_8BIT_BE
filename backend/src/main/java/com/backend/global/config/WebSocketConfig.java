@@ -30,7 +30,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/ws/chat")
 			.addInterceptors(jwtHandshakeInterceptor)
-			.setAllowedOriginPatterns("*")	// TODO 나중에 도메인 설정 필요
+			.setAllowedOriginPatterns("https://mikki.kr", "http://localhost:3000")
 			.withSockJS();
 	}
 
