@@ -105,8 +105,9 @@ public class FishingTripPostController {
 		@RequestParam(required = false) final Long regionId,
 		@RequestParam(required = false) final String keyword
 	) {
+		Long memberId = user != null ? user.getId() : null;
 		ScrollResponse<FishingTripPostResponse.DetailPage> responseDto =
-			fishingTripPostService.getDetailPage(cursorRequestDto, user.getId(), status, regionId, keyword);
+			fishingTripPostService.getDetailPage(cursorRequestDto, memberId, status, regionId, keyword);
 
 		return ResponseEntity.ok(GenericResponse.of(true, responseDto));
 	}
