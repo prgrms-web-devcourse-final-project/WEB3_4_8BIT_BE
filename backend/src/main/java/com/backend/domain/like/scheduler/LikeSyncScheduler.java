@@ -33,11 +33,12 @@ public class LikeSyncScheduler {
 	@Scheduled(cron = "0 */1 * * * *")
 	@Transactional
 	public void syncLikeCountsFromRedis() {
-		Map<String, Integer> likeMap = redisUtil.scanKeysAndValues(PREFIX);
+		log.debug("게시글 좋아요 업데이트 시작");
+		Map<String, Long> likeMap = redisUtil.scanKeysAndValues(PREFIX);
 
-		for (Map.Entry<String, Integer> entry : likeMap.entrySet()) {
+		for (Map.Entry<String, Long> entry : likeMap.entrySet()) {
 			String key = entry.getKey();
-			Integer redisLikeCount = entry.getValue();
+			Long redisLikeCount = entry.getValue();
 
 			if (redisLikeCount == null)
 				continue;
@@ -55,11 +56,9 @@ public class LikeSyncScheduler {
 
 			if (isUpdated) {
 				log.info("[Like 동기화 완료] 대상: {}, 좋아요 수: {}", key, redisLikeCount);
-				redisUtil.deleteKeyIfExists(key);
-			} else {
-				log.warn("[Like 동기화 실패] 존재하지 않는 {} 게시글 (ID: {})", type, targetId);
 			}
 		}
+		log.debug("게시글 좋아요 업데이트 종료");
 	}
 
 	/**
@@ -74,13 +73,13 @@ public class LikeSyncScheduler {
 	private boolean updateLikeCountToDB(
 		final LikeTargetType type,
 		final Long targetId,
-		final int redisLikeCount
+		final long redisLikeCount
 	) {
 		return switch (type) {
 			case SHIP_FISHING_POST -> shipFishingPostRepository.existsById(targetId)
-				&& shipFishingPostRepository.updateLikeCount(targetId, (long)redisLikeCount);
+				&& shipFishingPostRepository.updateLikeCount(targetId, redisLikeCount);
 			case FISHING_TRIP_POST -> fishingTripPostRepository.existsById(targetId)
-				&& fishingTripPostRepository.updateLikeCount(targetId, (long)redisLikeCount);
+				&& fishingTripPostRepository.updateLikeCount(targetId, redisLikeCount);
 		};
 	}
 }
