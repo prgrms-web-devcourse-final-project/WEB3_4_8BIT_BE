@@ -9,6 +9,7 @@ import static com.backend.domain.shipfishingpost.entity.QShipFishingPost.*;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.backend.domain.like.domain.LikeTargetType;
@@ -25,12 +26,15 @@ import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class LikeQueryRepository {
 
 	private final JPAQueryFactory jpaQueryFactory;
+	private final JdbcTemplate jdbcTemplate;
 
 	public Long countByTargetTypeAndTargetId(final LikeTargetType targetType, final Long targetId) {
 		return switch (targetType) {
@@ -197,6 +201,25 @@ public class LikeQueryRepository {
 			return null;
 		}
 		return getBooleanExpressionByCreatedAt(cursorRequestDto);
+	}
+
+	public void updateLikeCounts(final LikeTargetType type, final List<LikeResponse.LikeSyncDto> likeList) {
+		if (likeList == null || likeList.isEmpty()) {
+			log.debug("[{}] 업데이트할 좋아요 수 데이터가 없습니다.", type);
+			return;
+		}
+
+		log.debug("[{}] 업데이트할 좋아요 수 데이터 건수: {}", type, likeList.size());
+
+		String sql = String.format(
+			"UPDATE %s SET like_count = ? WHERE %s = ?",
+			type.getTableName(), type.getIdColumn()
+		);
+
+		jdbcTemplate.batchUpdate(sql, likeList, likeList.size(), (ps, dto) -> {
+			ps.setLong(1, dto.likeCount());
+			ps.setLong(2, dto.targetId());
+		});
 	}
 
 	/**
