@@ -50,6 +50,6 @@ public class MemberRepositoryImpl implements MemberRepository {
 
 	@Override
 	public Map<Long, String> getFileUrlMapByIdList(final Set<Long> memberIdList) {
-		return Map.of();
+		return memberQueryRepository.getFileUrlMapByIdList(memberIdList);
 	}
 }
