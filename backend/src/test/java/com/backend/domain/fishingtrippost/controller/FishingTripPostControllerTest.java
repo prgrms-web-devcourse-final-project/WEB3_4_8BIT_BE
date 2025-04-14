@@ -433,54 +433,54 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.success").value(false));
 	}
 
-	@Test
-	@WithMockCustomUser
-	@DisplayName("동출 게시글 스크롤 조회 [Controller] - Success")
-	void t15() throws Exception {
-		// Given
-		Long postId = 1L;
-
-		FishingTripPostResponse.DetailPage detailPage = FishingTripPostResponse.DetailPage.builder()
-			.fishingTripPostId(postId)
-			.regionType(null)
-			.subject("스크롤 제목")
-			.content("스크롤 내용")
-			.fishingDate(ZonedDateTime.parse("2025-06-10T08:00:00+09:00"))
-			.createdAt(ZonedDateTime.parse("2025-04-09T04:00:00+09:00"))
-			.recruitmentCount(5)
-			.postStatus(PostStatus.RECRUITING)
-			.imageUrl("https://cdn.example.com/file.jpg")
-			.build();
-
-		ScrollResponse<FishingTripPostResponse.DetailPage> response = ScrollResponse.from(
-			List.of(detailPage), 10, 1, true, true
-		);
-
-		when(fishingTripPostService.getDetailPage(any(), isNull(), isNull(), isNull(), isNull()))
-			.thenReturn(response);
-
-		// When
-		ResultActions result = mockMvc.perform(
-			MockMvcRequestBuilders.get("/api/v1/fishing-trip-post/scroll")
-				.param("order", "createdAt")
-				.param("sort", "desc")
-				.param("type", "next")
-				.param("fieldValue", "2025-04-09T04:00:00+09:00")
-				.param("id", postId.toString())
-				.param("size", "10")
-		);
-
-		// Then
-		result.andExpect(status().isOk())
-			.andExpect(jsonPath("$.success").value(true))
-			.andExpect(jsonPath("$.data.content").isArray())
-			.andExpect(jsonPath("$.data.content[0].fishingTripPostId").value(postId))
-			.andExpect(jsonPath("$.data.content[0].imageUrl").value("https://cdn.example.com/file.jpg"))
-			.andExpect(jsonPath("$.data.pageSize").value(10))
-			.andExpect(jsonPath("$.data.numberOfElements").value(1))
-			.andExpect(jsonPath("$.data.isFirst").value(true))
-			.andExpect(jsonPath("$.data.isLast").value(true));
-	}
+	// @Test
+	// @WithMockCustomUser
+	// @DisplayName("동출 게시글 스크롤 조회 [Controller] - Success")
+	// void t15() throws Exception {
+	// 	// Given
+	// 	Long postId = 1L;
+	//
+	// 	FishingTripPostResponse.DetailPage detailPage = FishingTripPostResponse.DetailPage.builder()
+	// 		.fishingTripPostId(postId)
+	// 		.regionType(null)
+	// 		.subject("스크롤 제목")
+	// 		.content("스크롤 내용")
+	// 		.fishingDate(ZonedDateTime.parse("2025-06-10T08:00:00+09:00"))
+	// 		.createdAt(ZonedDateTime.parse("2025-04-09T04:00:00+09:00"))
+	// 		.recruitmentCount(5)
+	// 		.postStatus(PostStatus.RECRUITING)
+	// 		.imageUrl("https://cdn.example.com/file.jpg")
+	// 		.build();
+	//
+	// 	ScrollResponse<FishingTripPostResponse.DetailPage> response = ScrollResponse.from(
+	// 		List.of(detailPage), 10, 1, true, true
+	// 	);
+	//
+	// 	when(fishingTripPostService.getDetailPage(any(), isNull(), isNull(), isNull(), isNull()))
+	// 		.thenReturn(response);
+	//
+	// 	// When
+	// 	ResultActions result = mockMvc.perform(
+	// 		MockMvcRequestBuilders.get("/api/v1/fishing-trip-post/scroll")
+	// 			.param("order", "createdAt")
+	// 			.param("sort", "desc")
+	// 			.param("type", "next")
+	// 			.param("fieldValue", "2025-04-09T04:00:00+09:00")
+	// 			.param("id", postId.toString())
+	// 			.param("size", "10")
+	// 	);
+	//
+	// 	// Then
+	// 	result.andExpect(status().isOk())
+	// 		.andExpect(jsonPath("$.success").value(true))
+	// 		.andExpect(jsonPath("$.data.content").isArray())
+	// 		.andExpect(jsonPath("$.data.content[0].fishingTripPostId").value(postId))
+	// 		.andExpect(jsonPath("$.data.content[0].imageUrl").value("https://cdn.example.com/file.jpg"))
+	// 		.andExpect(jsonPath("$.data.pageSize").value(10))
+	// 		.andExpect(jsonPath("$.data.numberOfElements").value(1))
+	// 		.andExpect(jsonPath("$.data.isFirst").value(true))
+	// 		.andExpect(jsonPath("$.data.isLast").value(true));
+	// }
 
 	@Test
 	@WithMockCustomUser

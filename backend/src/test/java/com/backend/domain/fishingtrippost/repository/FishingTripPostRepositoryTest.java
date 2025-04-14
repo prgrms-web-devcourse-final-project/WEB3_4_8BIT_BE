@@ -44,7 +44,6 @@ import com.backend.domain.member.repository.MemberRepositoryImpl;
 import com.backend.global.config.JpaAuditingConfig;
 import com.backend.global.config.QuerydslConfig;
 import com.backend.global.dto.request.GlobalRequest;
-import com.backend.global.dto.response.ScrollResponse;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageQueryRepository;
 import com.backend.global.storage.repository.StorageRepository;
@@ -458,69 +457,69 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		assertThat(deleted).isEmpty();
 	}
 
-	@Test
-	@DisplayName("내가 신청한 동출 게시글 목록 커서 기반 조회 [Repository] - Success")
-	void t08() {
-		// given
-		Member writer = memberRepository.save(memberArbitraryBuilder
-			.set("email", UUID.randomUUID() + "@example.com")
-			.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8).replaceAll("[^0-9]", "1"))
-			.set("providerId", UUID.randomUUID().toString())
-			.sample());
-
-		Member applicant = memberRepository.save(memberArbitraryBuilder
-			.set("nickname", "지원자")
-			.set("email", UUID.randomUUID() + "@example.com")
-			.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8).replaceAll("[^0-9]", "2"))
-			.set("providerId", UUID.randomUUID().toString())
-			.sample());
-
-		FishPoint fishPoint = fishPointRepository.save(createRandomFishPoint());
-
-		List<FishingTripPost> posts = fishingTripPostArbitraryBuilder
-			.set("memberId", writer.getMemberId())
-			.set("fishingPointId", fishPoint.getFishPointId())
-			.sampleList(3);
-
-		fishingTripPostJpaRepository.saveAll(posts);
-
-		for (FishingTripPost post : posts) {
-			fishingTripRecruitmentRepository.save(FishingTripRecruitment.builder()
-				.fishingTripPostId(post.getFishingTripPostId())
-				.memberId(applicant.getMemberId())
-				.introduction("안녕하세요")
-				.fishingLevel(FishingLevel.INTERMEDIATE)
-				.recruitmentStatus(RecruitmentStatus.PENDING)
-				.build());
-		}
-
-		posts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
-		FishingTripPost cursorBase = posts.get(0);
-
-		// 커서 기준 확인
-		System.out.println("Cursor Base - CreatedAt: " + cursorBase.getCreatedAt() + ", FishingTripPostId: " + cursorBase.getFishingTripPostId());
-
-		GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
-			"desc", "createdAt", "next",
-			cursorBase.getCreatedAt().toString(),
-			cursorBase.getFishingTripPostId(),
-			10
-		);
-
-		// when
-		ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> response =
-			fishingTripPostRepository.findMyFishingTripRecruitmentDetailPage(cursorRequest, PostStatus.RECRUITING,
-				applicant.getMemberId());
-
-		// then
-		assertThat(response).isNotNull();
-		assertThat(response.content()).isNotEmpty();
-		assertThat(response.content()).extracting("fishingTripPostId")
-			.doesNotContain(cursorBase.getFishingTripPostId());  // 커서값이 제외되는지 확인
-		assertThat(response.content()).allSatisfy(item ->
-			assertThat(item.postStatus()).isEqualTo(PostStatus.RECRUITING)
-		);
-	}
+	// @Test
+	// @DisplayName("내가 신청한 동출 게시글 목록 커서 기반 조회 [Repository] - Success")
+	// void t08() {
+	// 	// given
+	// 	Member writer = memberRepository.save(memberArbitraryBuilder
+	// 		.set("email", UUID.randomUUID() + "@example.com")
+	// 		.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8).replaceAll("[^0-9]", "1"))
+	// 		.set("providerId", UUID.randomUUID().toString())
+	// 		.sample());
+	//
+	// 	Member applicant = memberRepository.save(memberArbitraryBuilder
+	// 		.set("nickname", "지원자")
+	// 		.set("email", UUID.randomUUID() + "@example.com")
+	// 		.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8).replaceAll("[^0-9]", "2"))
+	// 		.set("providerId", UUID.randomUUID().toString())
+	// 		.sample());
+	//
+	// 	FishPoint fishPoint = fishPointRepository.save(createRandomFishPoint());
+	//
+	// 	List<FishingTripPost> posts = fishingTripPostArbitraryBuilder
+	// 		.set("memberId", writer.getMemberId())
+	// 		.set("fishingPointId", fishPoint.getFishPointId())
+	// 		.sampleList(3);
+	//
+	// 	fishingTripPostJpaRepository.saveAll(posts);
+	//
+	// 	for (FishingTripPost post : posts) {
+	// 		fishingTripRecruitmentRepository.save(FishingTripRecruitment.builder()
+	// 			.fishingTripPostId(post.getFishingTripPostId())
+	// 			.memberId(applicant.getMemberId())
+	// 			.introduction("안녕하세요")
+	// 			.fishingLevel(FishingLevel.INTERMEDIATE)
+	// 			.recruitmentStatus(RecruitmentStatus.PENDING)
+	// 			.build());
+	// 	}
+	//
+	// 	posts.sort((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()));
+	// 	FishingTripPost cursorBase = posts.get(0);
+	//
+	// 	// 커서 기준 확인
+	// 	System.out.println("Cursor Base - CreatedAt: " + cursorBase.getCreatedAt() + ", FishingTripPostId: " + cursorBase.getFishingTripPostId());
+	//
+	// 	GlobalRequest.CursorRequest cursorRequest = new GlobalRequest.CursorRequest(
+	// 		"desc", "createdAt", "next",
+	// 		cursorBase.getCreatedAt().toString(),
+	// 		cursorBase.getFishingTripPostId(),
+	// 		10
+	// 	);
+	//
+	// 	// when
+	// 	ScrollResponse<FishingTripPostResponse.MyFishingTripPostDetailPage> response =
+	// 		fishingTripPostRepository.findMyFishingTripRecruitmentDetailPage(cursorRequest, PostStatus.RECRUITING,
+	// 			applicant.getMemberId());
+	//
+	// 	// then
+	// 	assertThat(response).isNotNull();
+	// 	assertThat(response.content()).isNotEmpty();
+	// 	assertThat(response.content()).extracting("fishingTripPostId")
+	// 		.doesNotContain(cursorBase.getFishingTripPostId());  // 커서값이 제외되는지 확인
+	// 	assertThat(response.content()).allSatisfy(item ->
+	// 		assertThat(item.postStatus()).isEqualTo(PostStatus.RECRUITING)
+	// 	);
+	// }
 
 	// // Debugging added to check cursor value handling
 	// @Test

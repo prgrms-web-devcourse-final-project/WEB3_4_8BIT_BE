@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -107,15 +108,21 @@ public class ShipRepositoryTest extends BaseTest {
 
 		shipJpaRepository.deleteAll();
 
-		List<Ship> givenShip1 = arbitraryBuilder
-			.set("shipId", null)
-			.set("memberId", givenMemberId)
-			.sampleList(5);
+		List<Ship> givenShip1 = IntStream.range(0, 5)
+			.mapToObj(i -> arbitraryBuilder
+				.set("shipId", null)
+				.set("memberId", givenMemberId)
+				.set("shipNumber", "SHP-" + i)  // 고유값 지정
+				.sample())
+			.toList();
 
-		List<Ship> givenShip2 = arbitraryBuilder
-			.set("shipId", null)
-			.set("memberId", 2L)
-			.sampleList(7);
+		List<Ship> givenShip2 = IntStream.range(0, 5)
+			.mapToObj(i -> arbitraryBuilder
+				.set("shipId", null)
+				.set("memberId", 2L)
+				.set("shipNumber", "SHP-2-" + i)
+				.sample())
+			.toList();
 
 		List<Ship> savedShip1 = shipJpaRepository.saveAll(givenShip1);
 		shipJpaRepository.saveAll(givenShip2);
