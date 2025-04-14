@@ -106,7 +106,10 @@ public class FishingTripPostQueryRepository {
 	public boolean updateLikeCount(final Long postId, final Long likeCount) {
 		return jpaQueryFactory.update(fishingTripPost)
 			.set(fishingTripPost.likeCount, likeCount)
-			.where(fishingTripPost.fishingTripPostId.eq(postId))
+			.where(
+				fishingTripPost.fishingTripPostId.eq(postId),
+				fishingTripPost.likeCount.ne(likeCount)
+			)
 			.execute() > 0;
 	}
 
