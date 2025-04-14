@@ -2,6 +2,7 @@ package com.backend.domain.shipfishingpost.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,14 +12,10 @@ import com.backend.domain.fish.entity.Fish;
 import com.backend.domain.fish.exception.FishErrorCode;
 import com.backend.domain.fish.exception.FishException;
 import com.backend.domain.fish.repository.FishRepository;
-import com.backend.domain.like.domain.LikeTargetType;
-import com.backend.domain.like.repository.LikeRepository;
 import com.backend.domain.reservation.repository.ReservationRepository;
 import com.backend.domain.reservationdate.converter.ReservationDateConverter;
 import com.backend.domain.reservationdate.entity.ReservationDate;
 import com.backend.domain.reservationdate.repository.ReservationDateRepository;
-import com.backend.domain.reservationdate.service.ReservationDateService;
-import com.backend.domain.review.repository.ReviewRepository;
 import com.backend.domain.ship.entity.Ship;
 import com.backend.domain.ship.exception.ShipErrorCode;
 import com.backend.domain.ship.exception.ShipException;
@@ -27,11 +24,15 @@ import com.backend.domain.shipfishingpost.converter.ShipFishingPostConverter;
 import com.backend.domain.shipfishingpost.dto.request.ShipFishingPostRequest;
 import com.backend.domain.shipfishingpost.dto.response.ShipFishingPostResponse;
 import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
+import com.backend.domain.shipfishingpost.event.ShipFishingPostDeleteEvent;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
+import com.backend.global.aop.annotation.CacheDelete;
+import com.backend.global.aop.annotation.CustomCache;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
+import com.backend.global.event.publisher.DomainEventPublisher;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.S3StorageService;
@@ -45,17 +46,17 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
+	private static final String PREFIX = "ShipFishingPost";
 	private static final String LIKE_CACHE_KEY = "like_count::SHIP_FISHING_POST::";
+
+	private final DomainEventPublisher eventPublisher;
 
 	private final RedisUtil redisUtil;
 
 	private final S3StorageService s3StorageService;
-	private final ReservationDateService reservationDateService;
 
-	private final LikeRepository likeRepository;
 	private final FishRepository fishRepository;
 	private final ShipRepository shipRepository;
-	private final ReviewRepository reviewRepository;
 	private final StorageRepository storageRepository;
 	private final ReservationRepository reservationRepository;
 	private final ShipFishingPostRepository shipFishingPostRepository;
@@ -84,6 +85,7 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<ShipFishingPostResponse.MyPagePostList> getMyPageShipFishingPostList(final Long memberId) {
 
 		return shipFishingPostRepository.findMyPagePostList(memberId);
@@ -91,6 +93,7 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@CustomCache(prefix = PREFIX, key = "shipFishingPostId", id = "#shipFishingPostId", ttl = 10, ttlUnit = TimeUnit.SECONDS)
 	public ShipFishingPostResponse.DetailWithFileUrlAndFishName getShipFishingPostAll(final Long shipFishingPostId) {
 
 		ShipFishingPostResponse.DetailAll detailAll = shipFishingPostRepository.findDetailAllById(shipFishingPostId)
@@ -115,6 +118,7 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 	@Override
 	@Transactional(readOnly = true)
+	@CustomCache(prefix = PREFIX, key = "HotPostList", ttl = 20, ttlUnit = TimeUnit.SECONDS)
 	public List<ShipFishingPostResponse.MainPageHotPost> getMainPageHotShipFishingPostList(final Integer size) {
 
 		return shipFishingPostRepository.findMainPageHotPostWithSize(size);
@@ -122,6 +126,7 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 	@Override
 	@Transactional
+	@CacheDelete(prefix = PREFIX, key = "shipFishingPostId", id = "#shipFishingPostId")
 	public Long updateShipFishingPost(final Long shipFishingPostId, final ShipFishingPostRequest.Update requestDto,
 		final Long memberId) {
 
@@ -153,6 +158,7 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 	@Override
 	@Transactional
+	@CacheDelete(prefix = PREFIX, key = "shipFishingPostId", id = "#shipFishingPostId")
 	public void deleteShipFishingPost(final Long shipFishingPostId, final Long memberId) {
 
 		ShipFishingPost shipFishingPost = getShipFishingPostEntity(shipFishingPostId);
@@ -163,15 +169,14 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 		shipFishingPostRepository.deleteById(shipFishingPostId);
 
-		reservationDateService.deleteReservationDateList(shipFishingPostId);
-
-		s3StorageService.deleteFilesByIdList(memberId, shipFishingPost.getFileIdList());
-
-		reviewRepository.deleteAllByShipFishingPostId(shipFishingPostId);
-
-		likeRepository.deleteLikesByTargetTypeAndTargetId(LikeTargetType.SHIP_FISHING_POST, shipFishingPostId);
-
 		redisUtil.deleteKeyIfExists(LIKE_CACHE_KEY + shipFishingPostId);
+
+		eventPublisher.publish(ShipFishingPostDeleteEvent
+			.builder()
+			.shipFishingPostId(shipFishingPostId)
+			.fileIdList(shipFishingPost.getFileIdList())
+			.memberId(memberId)
+			.build());
 	}
 
 	/**
