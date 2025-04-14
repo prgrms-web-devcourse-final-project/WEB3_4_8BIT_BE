@@ -56,7 +56,8 @@ public class MessageServiceImpl implements MessageService {
 		roomService.updateLastMessageTime(saved.getRoomId(), saved.getCreatedAt().atZone(ZoneId.of("Asia/Seoul")));
 
 		// 5. 응답 객체로 변환 후 반환
-		return MessageConverter.toResponse(saved, true,  fileUrl);
+		boolean isMine = senderId.equals(saved.getSenderId());
+		return MessageConverter.toResponse(saved, isMine,  fileUrl);
 	}
 
 	@Override
