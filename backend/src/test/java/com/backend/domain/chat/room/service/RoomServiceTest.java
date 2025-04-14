@@ -33,7 +33,11 @@ class RoomServiceTest extends BaseTest {
 		when(roomRepository.save(any(Room.class))).thenReturn(givenRoom);
 
 		// when
-		Long roomId = roomService.createRoom(givenRoom.getTargetId(), TargetType.FISHING_TRIP_POST);
+		Long roomId = roomService.createRoom(
+			givenRoom.getTargetId(),
+			givenRoom.getTargetName(),
+			TargetType.FISHING_TRIP_POST
+		);
 
 		// then
 		assertThat(roomId).isEqualTo(givenRoom.getRoomId());
