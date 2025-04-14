@@ -86,7 +86,7 @@ public class ShipFishingPostController {
 		@AuthenticationPrincipal final CustomOAuth2User user
 	) {
 
-		Long memberId = user.getId() == null ? null : user.getId();
+		Long memberId = user != null ? user.getId() : null;
 
 		ScrollResponse<ShipFishingPostResponse.DetailScroll> response = shipFishingPostService
 			.getShipFishingPostScroll(memberId, requestDto, cursorRequestDto);
