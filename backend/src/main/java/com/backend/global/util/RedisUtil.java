@@ -59,7 +59,7 @@ public class RedisUtil {
 	 * @param value 키에 넣을 값
 	 */
 	public void setValue(final String key, final String value) {
-		redisTemplate.opsForValue().set(key, value, Duration.ofHours(1));
+		redisTemplate.opsForValue().set(key, value, Duration.ofMinutes(10));
 	}
 
 	/**

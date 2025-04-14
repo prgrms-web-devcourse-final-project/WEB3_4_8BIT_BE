@@ -287,7 +287,10 @@ public class ShipFishingPostQueryRepository {
 	public boolean updateLikeCount(final Long postId, final Long likeCount) {
 		return jpaQueryFactory.update(shipFishingPost)
 			.set(shipFishingPost.likeCount, likeCount)
-			.where(shipFishingPost.shipFishingPostId.eq(postId))
+			.where(
+				shipFishingPost.shipFishingPostId.eq(postId),
+				shipFishingPost.likeCount.ne(likeCount)
+			)
 			.execute() > 0;
 	}
 

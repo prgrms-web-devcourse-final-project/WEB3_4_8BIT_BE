@@ -1,5 +1,7 @@
 package com.backend.domain.like.service;
 
+import java.util.List;
+
 import com.backend.domain.like.domain.LikeTargetType;
 import com.backend.domain.like.dto.request.LikeRequest;
 import com.backend.domain.like.dto.response.LikeResponse;
@@ -59,4 +61,15 @@ public interface LikeService {
 	 * @return 사용자가 좋아요한 선상 낚시 게시글 개수
 	 */
 	Long getCountLikedShipFishingPosts(final Long memberId, final LikeTargetType targetType);
+
+	/**
+	 * 스케줄러에서 벌크성으로 캐시값 DB에 업데이트
+	 *
+	 * @param type     게시글 종류
+	 * @param likeList 게시글 Id, 좋아요 수가 담긴 리스트
+	 */
+	void updateLikeCounts(
+		final LikeTargetType type,
+		final List<LikeResponse.LikeSyncDto> likeList
+	);
 }

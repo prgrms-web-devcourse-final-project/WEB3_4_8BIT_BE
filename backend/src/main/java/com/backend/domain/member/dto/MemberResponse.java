@@ -1,5 +1,6 @@
 package com.backend.domain.member.dto;
 
+import com.backend.domain.member.domain.MemberRole;
 import com.querydsl.core.annotations.QueryProjection;
 
 import lombok.Builder;
@@ -30,6 +31,7 @@ public class MemberResponse {
 	 * @param phone 전화번호
 	 * @param fileUrl 프로필 이미지 URL
 	 * @param description 자기소개
+	 * @param role 역할
 	 * @param isAddInfo 추가 정보 입력 여부 (true: 추가 정보 입력됨, false: 미입력)
 	 */
 	@Builder
@@ -41,6 +43,7 @@ public class MemberResponse {
 		String phone,
 		String fileUrl,
 		String description,
+		MemberRole role,
 		Boolean isAddInfo
 	) {
 		@QueryProjection

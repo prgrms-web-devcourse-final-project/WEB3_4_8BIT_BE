@@ -111,4 +111,9 @@ public class LikeRepositoryImpl implements LikeRepository {
 	) {
 		return likeQueryRepository.findLikedTargetIdsByMemberIdAndTargetType(memberId, targetType, targetIds);
 	}
+
+	@Override
+	public void updateLikeCounts(final LikeTargetType type, final List<LikeResponse.LikeSyncDto> likeList) {
+		likeQueryRepository.updateLikeCounts(type, likeList);
+	}
 }

@@ -1,14 +1,17 @@
 package com.backend.domain.like.scheduler;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.backend.domain.fishingtrippost.repository.FishingTripPostRepository;
 import com.backend.domain.like.domain.LikeTargetType;
-import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
+import com.backend.domain.like.dto.response.LikeResponse;
+import com.backend.domain.like.service.LikeService;
 import com.backend.global.util.RedisUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -25,16 +28,17 @@ import lombok.extern.slf4j.Slf4j;
 public class LikeSyncScheduler {
 
 	private final RedisUtil redisUtil;
-	private final ShipFishingPostRepository shipFishingPostRepository;
-	private final FishingTripPostRepository fishingTripPostRepository;
 
 	private static final String PREFIX = "like_count::";
+	private final LikeService likeService;
 
-	@Scheduled(cron = "0 */1 * * * *")
+	@Scheduled(cron = "0 */3 * * * *")
 	@Transactional
 	public void syncLikeCountsFromRedis() {
 		log.debug("게시글 좋아요 업데이트 시작");
+
 		Map<String, Long> likeMap = redisUtil.scanKeysAndValues(PREFIX);
+		Map<LikeTargetType, List<LikeResponse.LikeSyncDto>> grouped = new HashMap<>();
 
 		for (Map.Entry<String, Long> entry : likeMap.entrySet()) {
 			String key = entry.getKey();
@@ -52,34 +56,19 @@ public class LikeSyncScheduler {
 			LikeTargetType type = LikeTargetType.valueOf(parts[1]);
 			Long targetId = Long.parseLong(parts[2]);
 
-			boolean isUpdated = updateLikeCountToDB(type, targetId, redisLikeCount);
-
-			if (isUpdated) {
-				log.info("[Like 동기화 완료] 대상: {}, 좋아요 수: {}", key, redisLikeCount);
-			}
+			grouped.computeIfAbsent(type, k -> new ArrayList<>())
+				.add(new LikeResponse.LikeSyncDto(targetId, redisLikeCount));
 		}
+
+		grouped.forEach((type, dtoList) -> {
+			try {
+				log.info("[Like 동기화 실행] 대상: {}, 건수: {}", type, dtoList.size());
+				likeService.updateLikeCounts(type, dtoList);
+			} catch (Exception e) {
+				log.error("[Like 동기화 실패] 대상: {}", type, e);
+			}
+		});
+
 		log.debug("게시글 좋아요 업데이트 종료");
-	}
-
-	/**
-	 * Redis 저장된 좋아요 수를 DB에 반영한다.
-	 *
-	 * @param type           좋아요 대상 타입 (예: SHIP_FISHING_POST, FISHING_TRIP_POST)
-	 * @param targetId       좋아요 대상 ID
-	 * @param redisLikeCount Redis 저장된 좋아요 수
-	 * @return 업데이트가 성공적으로 이루어진 경우 true, 대상 게시글이 존재하지 않아 실패한 경우 false
-	 */
-
-	private boolean updateLikeCountToDB(
-		final LikeTargetType type,
-		final Long targetId,
-		final long redisLikeCount
-	) {
-		return switch (type) {
-			case SHIP_FISHING_POST -> shipFishingPostRepository.existsById(targetId)
-				&& shipFishingPostRepository.updateLikeCount(targetId, redisLikeCount);
-			case FISHING_TRIP_POST -> fishingTripPostRepository.existsById(targetId)
-				&& fishingTripPostRepository.updateLikeCount(targetId, redisLikeCount);
-		};
 	}
 }
