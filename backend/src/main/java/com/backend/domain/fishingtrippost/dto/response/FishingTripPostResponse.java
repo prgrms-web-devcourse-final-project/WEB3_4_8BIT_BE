@@ -327,7 +327,9 @@ public class FishingTripPostResponse {
 		Long regionId,
 		RegionType regionType,
 		String imageUrl,
-		Long hotScore
+		Long hotScore,
+		Long likeCount,
+		Long commentCount
 	) {
 	}
 
@@ -337,7 +339,9 @@ public class FishingTripPostResponse {
 		Long regionId,
 		RegionType regionType,
 		List<Long> fileIdList,
-		Long hotScore
+		Long hotScore,
+		Long likeCount,
+		Long commentCount
 	) {
 		@QueryProjection
 		public HotPostDto {

@@ -668,15 +668,19 @@ class FishingTripPostControllerTest extends BaseTest {
 				1L,
 				RegionType.JEJU,
 				"https://cdn.example.com/image1.jpg",
-				30L
+				30L,
+				20L, // likeCount
+				10L  // commentCount
 			),
 			new FishingTripPostResponse.HotPost(
 				101L,
 				"혼자 낚시 금지",
 				2L,
 				RegionType.SEOUL,
-				null, // 이미지 없는 케이스
-				27L
+				null,
+				27L,
+				17L, // likeCount
+				10L  // commentCount
 			)
 		);
 
@@ -699,8 +703,13 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.data[0].regionType").value("JEJU"))
 			.andExpect(jsonPath("$.data[0].imageUrl").value("https://cdn.example.com/image1.jpg"))
 			.andExpect(jsonPath("$.data[0].hotScore").value(30))
+			.andExpect(jsonPath("$.data[0].likeCount").value(20))
+			.andExpect(jsonPath("$.data[0].commentCount").value(10))
+
 			.andExpect(jsonPath("$.data[1].fishingTripPostId").value(101L))
-			.andExpect(jsonPath("$.data[1].imageUrl").doesNotExist()) // null 처리
-			.andExpect(jsonPath("$.data[1].hotScore").value(27));
+			.andExpect(jsonPath("$.data[1].imageUrl").doesNotExist())
+			.andExpect(jsonPath("$.data[1].hotScore").value(27))
+			.andExpect(jsonPath("$.data[1].likeCount").value(17))
+			.andExpect(jsonPath("$.data[1].commentCount").value(10));
 	}
 }
