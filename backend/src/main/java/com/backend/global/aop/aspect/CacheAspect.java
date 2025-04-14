@@ -1,5 +1,7 @@
 package com.backend.global.aop.aspect;
 
+import java.lang.reflect.Method;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Component;
 import com.backend.global.aop.annotation.CacheDelete;
 import com.backend.global.aop.annotation.CustomCache;
 import com.backend.global.auth.oauth2.CustomOAuth2User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,10 +29,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CacheAspect {
 
+	private final ObjectMapper objectMapper;
 	private final RedisTemplate<String, Object> redisTemplate;
 
 	/**
-	 * 메서드 반환 값 캐시 처리 메서드
+	 * 메서드 반환 값 캐시 어노테이션 메서드
 	 *
 	 * @param joinPoint 감싸진 메서드
 	 * @param customCache 어노테이션
@@ -44,13 +48,14 @@ public class CacheAspect {
 		Object result = null;
 
 		try {
-
 			Object cachedData = redisTemplate.opsForValue().get(cacheKey);
 
 			if (cachedData != null) {
 				proceedLogMessage(cachedData.toString());
 
-				return cachedData;
+				Class<?> returnType = getMethodReturnType(joinPoint);
+
+				return objectMapper.convertValue(cachedData, returnType);
 			}
 
 			result = joinPoint.proceed();
@@ -130,7 +135,20 @@ public class CacheAspect {
 	}
 
 	/**
+	 * 메서드 반환 타입 정보 추출 메서드
 	 *
+	 * @param joinPoint 실행 시점
+	 * @return 메서드 반환 타입
+	 */
+	private Class<?> getMethodReturnType(ProceedingJoinPoint joinPoint) {
+		MethodSignature methodSignature = (MethodSignature)joinPoint.getSignature();
+		Method method = methodSignature.getMethod();
+
+		return method.getReturnType();
+	}
+
+	/**
+	 * SpEL 표현식을 파싱하여 Long 타입 ID 값으로 변환하는 메서드
 	 *
 	 * @param spel
 	 * @param joinPoint
@@ -149,6 +167,7 @@ public class CacheAspect {
 	}
 
 	/**
+	 * SpEL 문자열을 메서드 인자 값으로 변환하는 메서드
 	 *
 	 * @param spel
 	 * @param joinPoint

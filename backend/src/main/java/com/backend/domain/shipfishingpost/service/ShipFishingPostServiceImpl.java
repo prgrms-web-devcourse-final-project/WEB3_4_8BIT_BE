@@ -93,7 +93,7 @@ public class ShipFishingPostServiceImpl implements ShipFishingPostService {
 
 	@Override
 	@Transactional(readOnly = true)
-	@CustomCache(prefix = PREFIX, key = "shipFishingPostId", id = "#shipFishingPostId", ttl = 10, ttlUnit = TimeUnit.SECONDS)
+	@CustomCache(prefix = PREFIX, key = "shipFishingPostId", id = "#shipFishingPostId", ttl = 20, ttlUnit = TimeUnit.SECONDS)
 	public ShipFishingPostResponse.DetailWithFileUrlAndFishName getShipFishingPostAll(final Long shipFishingPostId) {
 
 		ShipFishingPostResponse.DetailAll detailAll = shipFishingPostRepository.findDetailAllById(shipFishingPostId)
