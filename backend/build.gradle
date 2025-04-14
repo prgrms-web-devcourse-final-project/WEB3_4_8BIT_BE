@@ -72,6 +72,13 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+    // AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    // Retry
+    implementation 'org.springframework.retry:spring-retry'
+    implementation 'org.springframework:spring-aspects'
+
     // 테스트용 H2
     runtimeOnly 'com.h2database:h2'
 
@@ -86,7 +93,7 @@ dependencies {
     testImplementation 'com.navercorp.fixturemonkey:fixture-monkey-jakarta-validation:1.1.10'
 
     // Spring Security Test 라이브러리
-	testImplementation 'org.springframework.security:spring-security-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 
     // 메일 라이브러리
     implementation 'org.springframework.boot:spring-boot-starter-mail'
