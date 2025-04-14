@@ -1,11 +1,12 @@
 package com.backend.global.baseentity;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
-import java.time.ZonedDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 /**
  * BaseEntity
  * <p>엔티티 생성, 수정 일자를 관리하는 BaseEntity 입니다.</p>
+ *
  * @author Kim Dong O
  */
 @Getter
@@ -36,12 +38,12 @@ public abstract class BaseEntity {
 
 	@PrePersist
 	public void prePersist() {
-		this.createdAt = ZonedDateTime.now();
-		this.modifiedAt = ZonedDateTime.now();
+		this.createdAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
+		this.modifiedAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
 	}
 
 	@PreUpdate
 	public void preUpdate() {
-		this.modifiedAt = ZonedDateTime.now();
+		this.modifiedAt = ZonedDateTime.now(ZoneId.of("Asia/Seoul"));
 	}
 }
