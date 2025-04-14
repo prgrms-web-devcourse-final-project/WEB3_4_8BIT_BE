@@ -12,28 +12,30 @@ public class CaptainResponse {
 	/**
 	 * {@code
 	 * {
-	 *   "memberId": 1,
-	 *   "email": "test@naver.com",
-	 *   "name": "루피",
-	 *   "nickname": "해적왕",
-	 *   "phone": "010-1234-5678",
-	 *   "profileImg": "http://example.com/profile.jpg",
-	 *   "description": "해적왕이 되고싶은 루피 입니다.",
-	 *   "role": "CAPTAIN",
-	 *   "shipLicenseNumber": "1-2019123456",
-	 *   "shipList": [1L, 2L, 3L]
+	 * "memberId": 1,
+	 * "email": "test@naver.com",
+	 * "name": "루피",
+	 * "nickname": "해적왕",
+	 * "phone": "010-1234-5678",
+	 * "profileImg": "http://example.com/profile.jpg",
+	 * "description": "해적왕이 되고싶은 루피 입니다.",
+	 * "role": "CAPTAIN",
+	 * "shipLicenseNumber": "1-2019123456",
+	 * "shipList": [1L, 2L, 3L]
 	 * }
-	 *}
-	 * @param memberId 회원 ID
-	 * @param email 이메일
-	 * @param name 이름
-	 * @param nickname 닉네임
-	 * @param phone 전화번호
-	 * @param profileImg 프로필 이미지 URL
-	 * @param description 자기소개
-	 * @param role 역할
+	 * }
+	 *
+	 * @param memberId          회원 ID
+	 * @param email             이메일
+	 * @param name              이름
+	 * @param nickname          닉네임
+	 * @param phone             전화번호
+	 * @param fileUrl           프로필 이미지 URL
+	 * @param fileId            프로필 이미지 파일 Id
+	 * @param description       자기소개
+	 * @param role              역할
 	 * @param shipLicenseNumber 선박 운전 면허 번호
-	 * @param shipList 선장 보유 배 Id 목록
+	 * @param shipList          선장 보유 배 Id 목록
 	 */
 	@Builder
 	public record Detail(
@@ -42,7 +44,8 @@ public class CaptainResponse {
 		String name,
 		String nickname,
 		String phone,
-		String profileImg,
+		String fileUrl,
+		Long fileId,
 		String description,
 		MemberRole role,
 		String shipLicenseNumber,

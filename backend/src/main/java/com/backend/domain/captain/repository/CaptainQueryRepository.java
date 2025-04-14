@@ -30,6 +30,7 @@ public class CaptainQueryRepository {
 				member.nickname,
 				member.phone,
 				file.url,
+				file.fileId,
 				member.description,
 				member.role,
 				captain.shipLicenseNumber,
