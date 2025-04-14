@@ -1,5 +1,8 @@
 package com.backend.domain.member.repository;
 
+import static com.backend.domain.member.entity.QMember.*;
+import static com.backend.global.storage.entity.QFile.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -7,9 +10,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Repository;
-
-import static com.backend.domain.member.entity.QMember.*;
-import static com.backend.global.storage.entity.QFile.*;
 
 import com.backend.domain.member.dto.MemberResponse;
 import com.backend.domain.member.dto.QMemberResponse_Detail;
@@ -33,6 +33,7 @@ public class MemberQueryRepository {
 				member.phone,
 				file.url,
 				member.description,
+				member.role,
 				member.isAddInfo
 			))
 			.from(member)
