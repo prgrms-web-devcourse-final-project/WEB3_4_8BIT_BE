@@ -76,7 +76,6 @@ public class LikeServiceImpl implements LikeService {
 		);
 	}
 
-
 	@Override
 	@Transactional(readOnly = true)
 	public ScrollResponse<LikeResponse.FishingTripPostLikedDetailResponse> getLikedFishingTripPosts(
@@ -162,6 +161,11 @@ public class LikeServiceImpl implements LikeService {
 		likeCacheService.updateLikeCountCache(
 			requestDto.targetType(), requestDto.targetId(), false
 		);
+	}
+
+	@Transactional
+	public void updateLikeCounts(final LikeTargetType type, final List<LikeResponse.LikeSyncDto> likeList) {
+		likeRepository.updateLikeCounts(type, likeList);
 	}
 
 	/**
