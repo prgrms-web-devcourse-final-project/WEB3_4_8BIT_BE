@@ -211,4 +211,16 @@ public class LikeResponse {
 		boolean isLiked
 	) {
 	}
+
+	/**
+	 * @param targetId  게시글 ID
+	 * @param likeCount 좋아요수
+	 */
+
+	@Builder
+	public record LikeSyncDto(
+		Long targetId,
+		Long likeCount
+	) {
+	}
 }
