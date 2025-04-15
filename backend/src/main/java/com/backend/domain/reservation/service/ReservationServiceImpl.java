@@ -42,6 +42,7 @@ public class ReservationServiceImpl implements ReservationService {
 	private final TossPaymentHttpClient tossPaymentHttpClient;
 
 	@Override
+	@Transactional
 	public ReservationResponse.Detail prepareReservation(
 		final ReservationRequest.Reserve requestDto,
 		final Long memberId) {
@@ -133,6 +134,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Long getReservationCount(final Long memberId) {
 
 		return reservationRepository.getReservationCount(memberId);
@@ -147,6 +149,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ScrollResponse<ReservationResponse.DetailReservationList> getUserReservationListWithImage(
 		final Long memberId,
 		final Boolean afterToday,
@@ -168,6 +171,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ReservationResponse.DashBoard getDashBoard(final Long memberId, final Integer limitDays) {
 
 		return reservationRepository.findDashBoardByMemberId(memberId, limitDays);
@@ -231,7 +235,7 @@ public class ReservationServiceImpl implements ReservationService {
 	 *
 	 * @param reservationDate 예약 날짜
 	 */
-	void verifyTodayAfterDate(final LocalDate reservationDate) {
+	private void verifyTodayAfterDate(final LocalDate reservationDate) {
 
 		if (!reservationDate.isAfter(LocalDate.now())) {
 			throw new ReservationException(ReservationErrorCode.NOT_AVAILABLE_DATE_RESERVATION);
