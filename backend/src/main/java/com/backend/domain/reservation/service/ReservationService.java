@@ -4,8 +4,25 @@ import com.backend.domain.reservation.dto.request.ReservationRequest;
 import com.backend.domain.reservation.dto.response.ReservationResponse;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
+import com.backend.global.payment.dto.request.TossPaymentRequest;
 
 public interface ReservationService {
+
+	/**
+	 * 예약 전에 주문서를 생성하는 메서드
+	 *
+	 * @param requestDto 예약 정보
+	 * @param memberId 유저 ID
+	 * @return 주문서 정보
+	 */
+	ReservationResponse.Detail prepareReservation(final ReservationRequest.Reserve requestDto, final Long memberId);
+
+	/**
+	 * 결제 요청 후 재고 차감 여부로 결제 메서드
+	 *
+	 * @param requestDto 토스 결제 정보
+	 */
+	void confirmReservationPayment(final TossPaymentRequest requestDto, final Long memberId);
 
 	/**
 	 * 예약을 생성하는 메서드

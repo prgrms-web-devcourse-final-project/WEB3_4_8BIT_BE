@@ -1,8 +1,10 @@
 package com.backend.domain.reservation.entity;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 import com.backend.global.baseentity.BaseEntity;
+import com.backend.global.payment.dto.response.TossPaymentResponse;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -58,7 +60,28 @@ public class Reservation extends BaseEntity {
 	@Builder.Default
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
-	private ReservationStatus status = ReservationStatus.CONFIRMED;
+	private ReservationStatus status = ReservationStatus.PENDING;
+
+	@Column(length = 100)
+	private String paymentKey;
+
+	@Column(length = 20)
+	private String paymentMethod;
+
+	@Column(length = 50)
+	private String cardNumber;
+
+	@Column(length = 20)
+	private String cardApproveNo;
+
+	@Column(length = 1024)
+	private String receiptUrl;
+
+	@Column
+	private Long totalAmount;
+
+	@Column
+	private OffsetDateTime approvedAt;
 
 	public void updatePending(final Boolean isSuccess) {
 		this.status = isSuccess ? ReservationStatus.CONFIRMED : ReservationStatus.REJECTED;
@@ -66,5 +89,19 @@ public class Reservation extends BaseEntity {
 
 	public void updateCanceled() {
 		this.status = this.status == ReservationStatus.CONFIRMED ? ReservationStatus.CANCELLED : this.status;
+	}
+
+	public void updateTossPaymentInfo(final TossPaymentResponse response) {
+		this.paymentKey = response.getPaymentKey();
+		this.approvedAt = response.getApprovedAt();
+		this.paymentMethod = response.getMethod();
+		this.totalAmount = response.getTotalAmount();
+		if (response.getCard() != null) {
+			this.cardNumber = response.getCard().getNumber();
+			this.cardApproveNo = response.getCard().getApproveNo();
+		}
+		if (response.getReceipt() != null) {
+			this.receiptUrl = response.getReceipt().getUrl();
+		}
 	}
 }

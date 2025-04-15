@@ -33,6 +33,12 @@ public class ReservationRepositoryImpl implements ReservationRepository {
 	}
 
 	@Override
+	public Optional<Reservation> findByReservationNumber(final String reservationNumber) {
+
+		return reservationJpaRepository.findByReservationNumber(reservationNumber);
+	}
+
+	@Override
 	public Long getReservationCount(final Long memberId) {
 
 		return reservationJpaRepository.countByMemberIdAndStatus(memberId, ReservationStatus.CONFIRMED);
