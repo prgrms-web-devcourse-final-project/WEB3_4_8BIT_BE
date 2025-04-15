@@ -51,6 +51,11 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 				FishingTripRecruitmentErrorCode.FISHING_TRIP_RECRUITMENT_ALREADY_APPLIED);
 		}
 
+		if (isPostOwner(memberId, requestDto.fishingTripPostId())) {
+			throw new FishingTripRecruitmentException(
+				FishingTripRecruitmentErrorCode.FISHING_TRIP_RECRUITMENT_AUTHOR_DO_NOT_APPLIED);
+		}
+
 		FishingTripRecruitment recruitment = FishingTripRecruitmentConverter.fromFishingTripRecruitmentCreate(
 			memberId,
 			requestDto
