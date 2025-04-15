@@ -120,6 +120,7 @@ public class FishingTripPostConverter {
 		final Long likeCount,
 		final boolean isLiked,
 		final boolean isPostOwner,
+		final String profileImgUrl,
 		final Map<Long, String> fileUrlMap
 	) {
 		return FishingTripPostResponse.Detail.builder()
@@ -127,6 +128,7 @@ public class FishingTripPostConverter {
 			.nickname(detailQueryDto.nickname())
 			.subject(detailQueryDto.subject())
 			.content(detailQueryDto.content())
+			.profileImgUrl(profileImgUrl)
 			.currentCount(detailQueryDto.currentCount())
 			.recruitmentCount(detailQueryDto.recruitmentCount())
 			.createDate(detailQueryDto.createDate())
