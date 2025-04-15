@@ -74,6 +74,7 @@ public class FishingTripPostConverter {
 			.imageUrl(imageUrl)
 			.commentCount(detailPageQueryDto.commentCount())
 			.likeCount(detailPageQueryDto.likeCount())
+			.popularityScore(detailPageQueryDto.likeCount() + detailPageQueryDto.commentCount())
 			.isLiked(isLiked)
 			.build();
 	}
