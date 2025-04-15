@@ -58,7 +58,8 @@ class ShipControllerTest extends BaseTest {
 		.giveMeBuilder(ShipRequest.Form.class)
 		.set("shipName", englishStringLength)
 		.set("shipNumber", englishStringLength)
-		.set("departurePort", englishStringLength)
+		.set("departurePort", "제주특별자치도 제주시 애월읍 애월리 407-4")
+		.set("portName","제주 애월항")
 		.set("passengerCapacity", 50);
 
 	@Test
@@ -176,7 +177,7 @@ class ShipControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.timestamp").exists())
 			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("shipNumber"))
-			.andExpect(jsonPath("$.data[0].reason").value("선박 번호는 필수 항목입니다,"))
+			.andExpect(jsonPath("$.data[0].reason").value("선박 번호는 필수 항목입니다."))
 			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
 			.andExpect(jsonPath("$.success").value(false));
 	}
@@ -222,7 +223,7 @@ class ShipControllerTest extends BaseTest {
 			.andExpect(jsonPath("$.timestamp").exists())
 			.andExpect(jsonPath("$.code").value(GlobalErrorCode.NOT_VALID.getCode()))
 			.andExpect(jsonPath("$.data[0].field").value("departurePort"))
-			.andExpect(jsonPath("$.data[0].reason").value("선박 이름은 필수 항목입니다,"))
+			.andExpect(jsonPath("$.data[0].reason").value("출항장소는 필수 항목입니다."))
 			.andExpect(jsonPath("$.message").value("요청하신 유효성 검증에 실패하였습니다."))
 			.andExpect(jsonPath("$.success").value(false));
 	}

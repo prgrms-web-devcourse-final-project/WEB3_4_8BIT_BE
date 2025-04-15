@@ -40,8 +40,11 @@ public class Ship extends BaseEntity {
 	@Column(nullable = false)
 	private Long memberId;
 
-	@Column(nullable = false, length = 30)
+	@Column(nullable = false, length = 40)
 	private String departurePort;
+
+	@Column(nullable = false, length = 30)
+	private String portName;
 
 	@Column(nullable = false)
 	private Integer passengerCapacity;
@@ -76,6 +79,7 @@ public class Ship extends BaseEntity {
 		final String shipName,
 		final String shipNumber,
 		final String departurePort,
+		final String portName,
 		final Integer passengerCapacity,
 		final RestroomType restroomType,
 		final Boolean loungeArea,
@@ -89,6 +93,7 @@ public class Ship extends BaseEntity {
 		this.shipName = shipName;
 		this.shipNumber = shipNumber;
 		this.departurePort = departurePort;
+		this.portName = portName;
 		this.passengerCapacity = passengerCapacity;
 		this.restroomType = restroomType;
 		this.loungeArea = loungeArea;

@@ -49,14 +49,19 @@ public class ShipRequest {
 		String shipName,
 
 		@Size(max = 30, message = "선박 번호는 30자 이하여야 합니다.")
-		@NotBlank(message = "선박 번호는 필수 항목입니다,")
+		@NotBlank(message = "선박 번호는 필수 항목입니다.")
 		@Schema(description = "선박 번호", example = "123456")
 		String shipNumber,
 
 		@Size(max = 30, message = "선박 이름은 30자 이하여야 합니다.")
-		@NotBlank(message = "선박 이름은 필수 항목입니다,")
-		@Schema(description = "출항지", example = "동해항")
+		@NotBlank(message = "출항장소는 필수 항목입니다.")
+		@Schema(description = "출항장소", example = "제주특별자치도 제주시 애월읍 애월리 407-4")
 		String departurePort,
+
+		@Size(max = 30, message = "선박 이름은 30자 이하여야 합니다.")
+		@NotBlank(message = "출항지는 필수 항목입니다.")
+		@Schema(description = "출항지", example = "제주 애월항 ")
+		String portName,
 
 		@Min(value = 1, message = "선박 정원은 1명 이상이어야 합니다.")
 		@Max(value = 100, message = "선박 정원은 100명 이하여야 합니다.")

@@ -12,6 +12,7 @@ public class ShipConverter {
 			.shipNumber(requestDto.shipNumber())
 			.memberId(memberId)
 			.departurePort(requestDto.departurePort())
+			.portName(requestDto.portName())
 			.passengerCapacity(requestDto.passengerCapacity())
 			.restroomType(requestDto.restroomType())
 			.loungeArea(requestDto.loungeArea())
