@@ -213,7 +213,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 			.collect(Collectors.toMap(File::getFileId, File::getUrl));
 
 		FishingTripPostResponse.Detail detail = FishingTripPostConverter.toDetail(
-			detailDto, 0L,false, false, fileUrlMap);
+			detailDto, 0L, false, false, null, fileUrlMap);
 
 		// then
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());
