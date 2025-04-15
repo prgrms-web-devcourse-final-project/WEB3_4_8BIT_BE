@@ -37,7 +37,7 @@ class MemberServiceTest extends BaseTest {
 		.set("phone", "010-1234-5678")
 		.set("email", "test@naver.com")
 		.set("role", MemberRole.USER)
-		.set("name", "test");
+		.set("nickname", "test");
 
 	@Test
 	@DisplayName("회원 추가 정보 저장 [Service] - Success")
@@ -53,7 +53,7 @@ class MemberServiceTest extends BaseTest {
 			.set("email", "test@naver.com")
 			.set("nickname", "테스트")
 			.set("role", MemberRole.USER)
-			.set("name", "test")
+			.set("nickname", "test")
 			.sample();
 
 		when(memberRepository.findById(givenMember.getMemberId())).thenReturn(Optional.of(givenMember));

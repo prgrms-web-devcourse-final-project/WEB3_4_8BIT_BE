@@ -104,7 +104,7 @@ class CommentRepositoryTest extends BaseTest {
 					.set("email", "unique_email_" + i + "@test.com")
 					.set("phone", "phone_" + i)
 					.set("nickname", "nickname_" + i)
-					.set("name", englishStringLength)
+					.set("nickname", englishStringLength)
 					.set("description", englishStringLength)
 					.set("fileId", file.getFileId())
 					.set("providerId", String.valueOf(i))

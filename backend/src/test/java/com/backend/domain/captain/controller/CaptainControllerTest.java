@@ -161,7 +161,7 @@ class CaptainControllerTest extends BaseTest {
 		CaptainResponse.Detail givenResponse = fixtureMonkeyValidation.giveMeBuilder(CaptainResponse.Detail.class)
 			.set("memberId", memberId)
 			.set("email", "test@naver.com")
-			.set("name", "루피")
+			.set("nickname", "루피")
 			.set("nickname", "해적왕")
 			.set("fileUrl", "http://example.com/image.jpg")
 			.set("description", "해적왕이 되고싶은 루피 입니다.")

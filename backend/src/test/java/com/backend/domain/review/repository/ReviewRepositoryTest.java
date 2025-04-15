@@ -89,7 +89,7 @@ class ReviewRepositoryTest extends BaseTest {
 			fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 				.set("memberId", null)
 				.set("nickname", "강태공" + suffix)
-				.set("name", "강태공" + suffix)
+				.set("nickname", "강태공" + suffix)
 				.set("email", "test" + suffix + "@gmail.com")
 				.set("phone", suffix)
 				.sample()

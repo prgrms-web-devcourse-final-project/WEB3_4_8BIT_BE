@@ -53,7 +53,7 @@ class CaptainRepositoryTest extends BaseTest {
 		.set("email", "test@naver.com")
 		.set("nickname", "테스트")
 		.set("role", MemberRole.USER)
-		.set("name", "test");
+		.set("nickname", "test");
 
 	final ArbitraryBuilder<Captain> captainArbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(Captain.class)
 		.set("memberId", 1L)

@@ -68,7 +68,7 @@ class FishRepositoryTest extends BaseTest {
 		.ofMinLength(1).ofMaxLength(30);
 
 	final ArbitraryBuilder<Fish> arbitraryBuilder = fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
-		.set("name", englishString)
+		.set("nickname", englishString)
 		.set("icon", englishString)
 		.set("spawnLocation", englishString);
 
@@ -165,7 +165,7 @@ class FishRepositoryTest extends BaseTest {
 		// Given
 		List<Fish> givenFishList = fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
 			.set("fishId", null)
-			.set("name", "fish")
+			.set("nickname", "fish")
 			.set("spawnLocation", englishString)
 			.set("popularityScore", 0L)
 			.sampleList(5);

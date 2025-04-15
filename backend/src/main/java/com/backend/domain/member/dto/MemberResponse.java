@@ -15,7 +15,7 @@ public class MemberResponse {
 	 * {
 	 *   "memberId": 1,
 	 *   "email": "test@naver.com",
-	 *   "name": "홍길동",
+	 *   "nickname": "홍길동",
 	 *   "nickname": "테스트닉",
 	 *   "phone": "010-1234-5678",
 	 *   "fileUrl": "http://example.com/profile.jpg",
@@ -58,7 +58,7 @@ public class MemberResponse {
 	 * {
 	 *   "memberId": 1,
 	 *   "email": "test@naver.com",
-	 *   "name": "홍길동",
+	 *   "nickname": "홍길동",
 	 *   "phone": "010-1234-5678",
 	 * }
 	 *

@@ -109,7 +109,7 @@ class CaptainServiceTest extends BaseTest {
 		// Given
 		CaptainResponse.Detail givenResponseDto = fixtureMonkeyValidation.giveMeBuilder(CaptainResponse.Detail.class)
 			.set("memberId", 1L)
-			.set("name", "루피")
+			.set("nickname", "루피")
 			.set("nickname", "해적왕")
 			.set("description", "해적왕이 되고싶은 루피 입니다.")
 			.set("role", MemberRole.CAPTAIN)

@@ -92,7 +92,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		for (int i = 1; i <= 19; i++) {
 			Fish fish = fixtureMonkeyBuilder.giveMeBuilder(Fish.class)
 				.set("fishId", null)
-				.set("name", "test" + i)
+				.set("nickname", "test" + i)
 				.set("description", "test" + i)
 				.set("fileId", i + 1L)
 				.set("spawnLocation", "test" + i)
@@ -172,7 +172,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test.com")
-			.set("name", "member")
+			.set("nickname", "member")
 			.set("nickname", "nickname")
 			.set("phone", "telephone")
 			.sample();

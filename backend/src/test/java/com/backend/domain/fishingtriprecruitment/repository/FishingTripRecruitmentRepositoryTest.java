@@ -90,7 +90,7 @@ class FishingTripRecruitmentRepositoryTest extends BaseTest {
 		.giveMeBuilder(Member.class)
 		.set("memberId", null)
 		.set("nickname", "강태공")
-		.set("name", "테스트")
+		.set("nickname", "테스트")
 		.set("email", "test@example.com")
 		.set("phone", "010-1111-2222")
 		.set("role", MemberRole.USER);

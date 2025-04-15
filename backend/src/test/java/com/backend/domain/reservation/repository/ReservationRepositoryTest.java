@@ -88,7 +88,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test.com")
-			.set("name", "member")
+			.set("nickname", "member")
 			.set("nickname", "nickname")
 			.set("phone", "telephone")
 			.sample();
@@ -131,7 +131,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test.com")
-			.set("name", "member")
+			.set("nickname", "member")
 			.set("nickname", "nickname")
 			.set("phone", "telephone")
 			.sample();
@@ -202,7 +202,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Member givenCaptain = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test.com1")
-			.set("name", "member1")
+			.set("nickname", "member1")
 			.set("nickname", "nickname1")
 			.set("phone", "telephone1")
 			.sample();
@@ -230,7 +230,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test2.com")
-			.set("name", "member2")
+			.set("nickname", "member2")
 			.set("nickname", "nickname2")
 			.set("phone", "telephone2")
 			.sample();
@@ -287,7 +287,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Member givenCaptain = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test.com1")
-			.set("name", "member1")
+			.set("nickname", "member1")
 			.set("nickname", "nickname1")
 			.set("phone", "telephone1")
 			.sample();
@@ -315,7 +315,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test2.com")
-			.set("name", "member2")
+			.set("nickname", "member2")
 			.set("nickname", "nickname2")
 			.set("phone", "telephone2")
 			.sample();
@@ -417,7 +417,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test.com")
-			.set("name", "member")
+			.set("nickname", "member")
 			.set("nickname", "nickname")
 			.set("phone", "010-1234-5678")
 			.sample();
@@ -513,7 +513,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test.com")
-			.set("name", "member")
+			.set("nickname", "member")
 			.set("nickname", "nickname")
 			.set("phone", "010-1234-5678")
 			.sample();
@@ -586,7 +586,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test.com")
-			.set("name", "member")
+			.set("nickname", "member")
 			.set("nickname", "nickname")
 			.set("phone", "010-1234-5678")
 			.sample();
@@ -659,7 +659,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Member givenMember = fixtureMonkeyBuilder.giveMeBuilder(Member.class)
 			.set("memberId", null)
 			.set("email", "test@test.com")
-			.set("name", "member")
+			.set("nickname", "member")
 			.set("nickname", "nickname")
 			.set("phone", "010-1234-5678")
 			.sample();

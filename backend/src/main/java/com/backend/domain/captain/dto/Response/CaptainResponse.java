@@ -14,7 +14,7 @@ public class CaptainResponse {
 	 * {
 	 * "memberId": 1,
 	 * "email": "test@naver.com",
-	 * "name": "루피",
+	 * "nickname": "루피",
 	 * "nickname": "해적왕",
 	 * "phone": "010-1234-5678",
 	 * "fileUrl": "http://example.com/profile.jpg",

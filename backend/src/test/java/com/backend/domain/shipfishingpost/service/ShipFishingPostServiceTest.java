@@ -230,7 +230,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 			givenFishList.add(fixtureMonkeyBuilder
 				.giveMeBuilder(Fish.class)
 				.set("fishId", 200L + i)
-				.set("name", String.format("test%d", i))
+				.set("nickname", String.format("test%d", i))
 				.sample());
 		}
 

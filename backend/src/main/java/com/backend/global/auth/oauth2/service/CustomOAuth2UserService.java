@@ -59,7 +59,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 				.getProviderDetails()
 				.getUserInfoEndpoint()
 				.getUserNameAttributeName();
-			log.debug("Username attribute name: {}", usernameAttributeName);
+			log.debug("Username attribute nickname: {}", usernameAttributeName);
 
 			// OAuth2UserInfo 객체 생성
 			OAuth2UserInfo userInfo = switch (registrationId.toLowerCase()) {

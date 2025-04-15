@@ -111,7 +111,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 		.giveMeBuilder(Member.class)
 		.set("memberId", null)
 		.set("nickname", "강태공")
-		.set("name", "테스트")
+		.set("nickname", "테스트")
 		.set("email", UUID.randomUUID() + "@example.com")
 		.set("phone", "010-" + UUID.randomUUID().toString().substring(0, 8))
 		.set("role", MemberRole.USER)
@@ -217,7 +217,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 		// then
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());
-		assertThat(detail.name()).isEqualTo(savedMember.getName());
+		assertThat(detail.nickname()).isEqualTo(savedMember.getName());
 		assertThat(detail.subject()).isEqualTo(savedPost.getSubject());
 		assertThat(detail.content()).isEqualTo(savedPost.getContent());
 		assertThat(detail.currentCount()).isEqualTo(savedPost.getCurrentCount());

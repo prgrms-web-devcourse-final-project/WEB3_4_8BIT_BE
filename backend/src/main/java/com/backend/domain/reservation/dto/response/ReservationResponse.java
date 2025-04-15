@@ -50,7 +50,7 @@ public class ReservationResponse {
 	 * 	 	"reservationId": 12345,
 	 * 	 	"shipFishingPostId": 1,
 	 * 	 	"memberId": 67890,
-	 * 	 	"name": "이름"
+	 * 	 	"nickname": "이름"
 	 * 	 	"phone": "01012345678",
 	 * 	 	"reservationNumber": "20250402-202345",
 	 * 	 	"guestCount": 4,
@@ -97,7 +97,7 @@ public class ReservationResponse {
 	 * {
 	 * 	 	"reservationId": 12345,
 	 * 	 	"shipFishingPostId": 1,
-	 * 	 	"name": "이름"
+	 * 	 	"nickname": "이름"
 	 * 	 	"reservationNumber": "20250402-202345",
 	 * 	 	"guestCount": 4,
 	 * 	 	"reservationDate": "2025-04-01",

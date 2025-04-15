@@ -316,7 +316,7 @@ class FishingTripPostServiceTest extends BaseTest {
 	//
 	// 	// Then
 	// 	assertThat(actual.fishingTripPostId()).isEqualTo(postId);
-	// 	assertThat(actual.name()).isEqualTo("루피");
+	// 	assertThat(actual.nickname()).isEqualTo("루피");
 	// 	assertThat(actual.subject()).isEqualTo("같이 갑시다");
 	// 	assertThat(actual.content()).isEqualTo("초보 환영");
 	// 	assertThat(actual.currentCount()).isEqualTo(1);

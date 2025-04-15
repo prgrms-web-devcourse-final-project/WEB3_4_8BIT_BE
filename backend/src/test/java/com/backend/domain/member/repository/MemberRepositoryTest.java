@@ -35,7 +35,7 @@ class MemberRepositoryTest extends BaseTest {
 		.set("email", "test@naver.com")
 		.set("nickname", "테스트")
 		.set("role", MemberRole.USER)
-		.set("name", "test");
+		.set("nickname", "test");
 
 	@Test
 	@DisplayName("회원 정보 저장 [Repository] - Success")

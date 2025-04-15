@@ -37,7 +37,7 @@ public class EnumValidatorForEnum implements ConstraintValidator<ValidEnum, Enum
 		for (Object constant : enumConstants) {
 			Enum<?> enumConstant = (Enum<?>)constant;
 
-			// 기본적으로 name() 으로 비교
+			// 기본적으로 nickname() 으로 비교
 			if (enumConstant.name().equals(value.name())) {
 				return true;
 			}
