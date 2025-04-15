@@ -109,6 +109,7 @@ public class FishingTripPostResponse {
 	 *   "imageUrl": "https://cdn.example.com/대표이미지.jpg",
 	 *   "commentCount": 10,
 	 * 	 "likeCount": 10,
+	 * 	 "popularity": 20,
 	 * 	 "isLiked": true
 	 * }
 	 * }</pre>
@@ -125,6 +126,7 @@ public class FishingTripPostResponse {
 	 * @param imageUrl          대표 이미지 URL
 	 * @param commentCount      댓글수
 	 * @param likeCount         좋아요수
+	 * @param popularityScore   인기 점수
 	 * @param isLiked           유저의 좋아요 여부
 	 */
 	@Builder
@@ -141,6 +143,7 @@ public class FishingTripPostResponse {
 		String imageUrl,
 		Long commentCount,
 		Long likeCount,
+		Long popularityScore,
 		boolean isLiked
 	) {
 		@QueryProjection
