@@ -25,6 +25,7 @@ public class ShipQueryRepository {
 			.where(ship.memberId.eq(memberId))
 			.fetchOne();
 	}
+
 	public List<ShipResponse.Detail> findDetailAll(final Long memberId) {
 		return jpaQueryFactory
 			.select(new QShipResponse_Detail(
@@ -32,6 +33,7 @@ public class ShipQueryRepository {
 				ship.shipName,
 				ship.shipNumber,
 				ship.departurePort,
+				ship.portName,
 				ship.restroomType,
 				ship.loungeArea,
 				ship.kitchenFacility,

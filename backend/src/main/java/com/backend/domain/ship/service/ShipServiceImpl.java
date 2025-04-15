@@ -72,6 +72,7 @@ public class ShipServiceImpl implements ShipService {
 			requestDto.shipName(),
 			requestDto.shipNumber(),
 			requestDto.departurePort(),
+			requestDto.portName(),
 			requestDto.passengerCapacity(),
 			requestDto.restroomType(),
 			requestDto.loungeArea(),
