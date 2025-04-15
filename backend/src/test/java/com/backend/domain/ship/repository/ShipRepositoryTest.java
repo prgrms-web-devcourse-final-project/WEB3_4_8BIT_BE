@@ -61,7 +61,8 @@ public class ShipRepositoryTest extends BaseTest {
 		.giveMeBuilder(Ship.class)
 		.set("shipName", englishStringLength)
 		.set("shipNumber", englishStringLength)
-		.set("departurePort", "부산항");
+		.set("departurePort", "제주특별자치도 제주시 애월읍 애월리 407-4")
+		.set("portName","제주 애월항");
 
 	@AfterEach
 	void tearDown() {
