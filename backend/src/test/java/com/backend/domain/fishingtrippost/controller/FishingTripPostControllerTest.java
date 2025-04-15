@@ -285,7 +285,7 @@ class FishingTripPostControllerTest extends BaseTest {
 
 		FishingTripPostResponse.Detail responseDto = FishingTripPostResponse.Detail.builder()
 			.fishingTripPostId(postId)
-			.name("루피")
+			.nickname("루피")
 			.subject("같이 갑시다")
 			.content("초보 환영")
 			.currentCount(1)
@@ -317,7 +317,7 @@ class FishingTripPostControllerTest extends BaseTest {
 			.andExpect(status().isOk())
 			.andExpect(jsonPath("$.success").value(true))
 			.andExpect(jsonPath("$.data.fishingTripPostId").value(postId))
-			.andExpect(jsonPath("$.data.name").value("루피"))
+			.andExpect(jsonPath("$.data.nickname").value("루피"))
 			.andExpect(jsonPath("$.data.subject").value("같이 갑시다"))
 			.andExpect(jsonPath("$.data.content").value("초보 환영"))
 			.andExpect(jsonPath("$.data.currentCount").value(1))

@@ -48,7 +48,7 @@ public class FishingTripPostQueryRepository {
 				.select(Projections.constructor(
 					FishingTripPostResponse.DetailQueryDto.class,
 					fishingTripPost.fishingTripPostId,
-					member.name,
+					member.nickname,
 					fishingTripPost.subject,
 					fishingTripPost.content,
 					fishingTripPost.currentCount,

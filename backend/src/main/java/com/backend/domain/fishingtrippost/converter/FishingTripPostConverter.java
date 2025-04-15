@@ -124,7 +124,7 @@ public class FishingTripPostConverter {
 	) {
 		return FishingTripPostResponse.Detail.builder()
 			.fishingTripPostId(detailQueryDto.fishingTripPostId())
-			.name(detailQueryDto.name())
+			.nickname(detailQueryDto.nickname())
 			.subject(detailQueryDto.subject())
 			.content(detailQueryDto.content())
 			.currentCount(detailQueryDto.currentCount())

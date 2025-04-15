@@ -217,7 +217,7 @@ class FishingTripPostRepositoryTest extends BaseTest {
 
 		// then
 		assertThat(detail.fishingTripPostId()).isEqualTo(savedPost.getFishingTripPostId());
-		assertThat(detail.name()).isEqualTo(savedMember.getName());
+		assertThat(detail.nickname()).isEqualTo(savedMember.getNickname());
 		assertThat(detail.subject()).isEqualTo(savedPost.getSubject());
 		assertThat(detail.content()).isEqualTo(savedPost.getContent());
 		assertThat(detail.currentCount()).isEqualTo(savedPost.getCurrentCount());

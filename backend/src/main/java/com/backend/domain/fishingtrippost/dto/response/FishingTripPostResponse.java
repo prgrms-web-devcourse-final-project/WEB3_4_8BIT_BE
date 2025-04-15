@@ -25,7 +25,7 @@ public class FishingTripPostResponse {
 	 * <pre>{@code
 	 * {
 	 *   "fishingTripPostId": 1,
-	 *   "name": "루피",
+	 *   "nickname": "루피",
 	 *   "subject": "해적왕과 함께하는 낚시",
 	 *   "content": "고무고무 낚시왕!",
 	 *   "currentCount": 2,
@@ -47,7 +47,7 @@ public class FishingTripPostResponse {
 	@Builder
 	public record Detail(
 		Long fishingTripPostId,
-		String name,
+		String nickname,
 		String subject,
 		String content,
 		Integer currentCount,
@@ -68,7 +68,7 @@ public class FishingTripPostResponse {
 
 	public record DetailQueryDto(
 		Long fishingTripPostId,
-		String name,
+		String nickname,
 		String subject,
 		String content,
 		Integer currentCount,
