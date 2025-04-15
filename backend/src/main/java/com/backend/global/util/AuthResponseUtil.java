@@ -22,7 +22,7 @@ public class AuthResponseUtil {
 
 		response.addHeader("Set-Cookie", accessTokenCookie.toString());
 		writeJsonResponse(response, status, rsData, om);
-		response.sendRedirect("https://mikki.kr/");
+		response.sendRedirect("http://localhost:3000/");
 	}
 
 	/**
@@ -34,6 +34,7 @@ public class AuthResponseUtil {
 		ObjectMapper om) throws IOException {
 
 		writeJsonResponse(response, status, rsData, om);
+		response.sendRedirect("http://localhost:3000/auth/login");
 	}
 
 	/**
