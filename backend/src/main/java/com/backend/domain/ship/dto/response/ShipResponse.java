@@ -42,6 +42,7 @@ public class ShipResponse {
 		String shipName,
 		String shipNumber,
 		String departurePort,
+		String portName,
 		RestroomType restroomType,
 		Boolean loungeArea,
 		Boolean kitchenFacility,
