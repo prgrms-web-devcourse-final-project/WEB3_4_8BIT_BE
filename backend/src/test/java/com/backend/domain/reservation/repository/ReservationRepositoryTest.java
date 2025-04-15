@@ -98,6 +98,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		Reservation givenReservation = fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
 			.set("reservationId", null)
 			.set("memberId", savedMember.getMemberId())
+			.set("reservationDate", LocalDate.of(2025, 1, 1))
 			.set("guestCount", 1)
 			.sample();
 
@@ -145,7 +146,7 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("reservationId", null)
 				.set("memberId", memberId)
 				.set("guestCount", 1)
-				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("reservationDate", LocalDate.of(2025, 1, 1).plusDays(i))
 				.sampleStream()
 				.limit(2)
 				.forEach(reservation -> {
@@ -166,7 +167,8 @@ public class ReservationRepositoryTest extends BaseTest {
 		ScrollResponse<ReservationResponse.DetailWithName> findResponseDto1 = reservationRepository.findDetailWithNameByMemberId(
 			memberId, givenCursorRequest1);
 
-		assertThat(findResponseDto1.content().get(0).reservationDate()).isEqualTo(LocalDate.now().plusDays(7));
+		assertThat(findResponseDto1.content().get(0).reservationDate())
+			.isEqualTo(LocalDate.of(2025, 1, 1).plusDays(7));
 		assertThat(findResponseDto1.pageSize()).isEqualTo(givenCursorRequest1.size());
 		assertThat(findResponseDto1.numberOfElements()).isEqualTo(6);
 		assertThat(findResponseDto1.isFirst()).isTrue();
@@ -188,7 +190,8 @@ public class ReservationRepositoryTest extends BaseTest {
 		ScrollResponse<ReservationResponse.DetailWithName> findResponseDto2 = reservationRepository.findDetailWithNameByMemberId(
 			memberId, givenCursorRequest2);
 
-		assertThat(findResponseDto2.content().get(0).reservationDate()).isEqualTo(LocalDate.now().plusDays(4));
+		assertThat(findResponseDto2.content().get(0).reservationDate())
+			.isEqualTo(LocalDate.of(2025, 1, 1).plusDays(4));
 		assertThat(findResponseDto2.pageSize()).isEqualTo(givenCursorRequest2.size());
 		assertThat(findResponseDto2.numberOfElements()).isEqualTo(6);
 		assertThat(findResponseDto2.isFirst()).isFalse();
@@ -247,7 +250,7 @@ public class ReservationRepositoryTest extends BaseTest {
 					.set("memberId", memberId)
 					.set("guestCount", 1)
 					.set("status", ReservationStatus.CONFIRMED)
-					.set("reservationDate", LocalDate.now().plusDays(j))
+					.set("reservationDate", LocalDate.of(2030, 1, 1).plusDays(j))
 					.sampleStream()
 					.limit(2)
 					.forEach(reservation -> {
@@ -269,7 +272,8 @@ public class ReservationRepositoryTest extends BaseTest {
 			.findDetailWithNameByMemberIdAndShipFishingPostId(
 				captainId, savedShipFishingPostIdList.get(0), true, givenCursorRequest1);
 
-		assertThat(findResponseDto1.content().get(0).reservationDate()).isEqualTo(LocalDate.now().plusDays(7));
+		assertThat(findResponseDto1.content().get(0).reservationDate())
+			.isEqualTo(LocalDate.of(2030, 1, 1).plusDays(7));
 		assertThat(findResponseDto1.content().get(0).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(0));
 		assertThat(findResponseDto1.content().get(1).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(0));
 		assertThat(findResponseDto1.content().get(2).shipFishingPostId()).isEqualTo(savedShipFishingPostIdList.get(0));
@@ -332,7 +336,7 @@ public class ReservationRepositoryTest extends BaseTest {
 					.set("memberId", memberId)
 					.set("guestCount", 1)
 					.set("status", ReservationStatus.CONFIRMED)
-					.set("reservationDate", LocalDate.now().plusDays(j))
+					.set("reservationDate", LocalDate.of(2030, 1, 1).plusDays(j))
 					.sampleStream()
 					.limit(2)
 					.forEach(reservation -> {
@@ -357,7 +361,7 @@ public class ReservationRepositoryTest extends BaseTest {
 
 		log.debug(" {} ", findResponseDto1.content().toString());
 
-		assertThat(findResponseDto1.content().get(0).reservationDate()).isEqualTo(LocalDate.now().plusDays(7));
+		assertThat(findResponseDto1.content().get(0).reservationDate()).isEqualTo(LocalDate.of(2030, 1, 1).plusDays(7));
 		assertThat(findResponseDto1.pageSize()).isEqualTo(givenCursorRequest1.size());
 		assertThat(findResponseDto1.numberOfElements()).isEqualTo(6);
 		assertThat(findResponseDto1.isFirst()).isTrue();
@@ -442,7 +446,7 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("guestCount", 2)
 				.set("totalPrice", 40000L)
 				.set("status", ReservationStatus.CONFIRMED)
-				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("reservationDate", LocalDate.of(2033, 1, 1).plusDays(i))
 				.sampleStream()
 				.limit(2)
 				.forEach(reservationRepository::save);
@@ -470,7 +474,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		log.debug("{}", page1.content().toString());
 
 		assertThat(page1.content().get(0).reservationDate())
-			.isEqualTo(LocalDate.now().plusDays(7));
+			.isEqualTo(LocalDate.of(2033, 1, 1).plusDays(7));
 		assertThat(page1.pageSize()).isEqualTo(6);
 		assertThat(page1.numberOfElements()).isEqualTo(6);
 		assertThat(page1.isFirst()).isTrue();
@@ -499,7 +503,7 @@ public class ReservationRepositoryTest extends BaseTest {
 		log.debug("{}", page2.content().toString());
 
 		assertThat(page2.content().get(0).reservationDate())
-			.isEqualTo(LocalDate.now().plusDays(4));
+			.isEqualTo(LocalDate.of(2033, 1, 1).plusDays(4));
 		assertThat(page2.pageSize()).isEqualTo(6);
 		assertThat(page2.numberOfElements()).isEqualTo(6);
 		assertThat(page2.isFirst()).isFalse();

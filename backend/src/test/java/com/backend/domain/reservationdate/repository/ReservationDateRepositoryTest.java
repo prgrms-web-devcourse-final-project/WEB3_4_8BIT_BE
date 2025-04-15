@@ -67,7 +67,7 @@ public class ReservationDateRepositoryTest extends BaseTest {
 		for (long i = 0; i < 100; i++) {
 			givenResrvationList.add(fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
 				.set("shipFishingPostId", i)
-				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("reservationDate", LocalDate.of(2035, 1, 1).plusDays(i))
 				.set("remainCount", 10)
 				.sample());
 		}
@@ -127,9 +127,11 @@ public class ReservationDateRepositoryTest extends BaseTest {
 	@DisplayName("예약 일자 조회 [Repository] - Success")
 	void t03() {
 		// Given
+		LocalDate givenDate = LocalDate.of(2037, 1, 1);
+
 		ReservationDate givenReservationDate = fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
 			.set("shipFishingPostId", 1L)
-			.set("reservationDate", LocalDate.now())
+			.set("reservationDate", givenDate)
 			.set("remainCount", 10)
 			.set("isBan", false)
 			.sample();
@@ -138,7 +140,7 @@ public class ReservationDateRepositoryTest extends BaseTest {
 
 		// When
 		Optional<ReservationDate> savedReservationDate = reservationDateRepository.findByIdWithPessimistic(1L,
-			LocalDate.now());
+			givenDate);
 
 		// Then
 		assertThat(savedReservationDate).isPresent();
@@ -149,9 +151,11 @@ public class ReservationDateRepositoryTest extends BaseTest {
 	@DisplayName("예약 일자 저장 [Repository] - Success")
 	void t04() {
 		// Given
+		LocalDate givenDate = LocalDate.of(2038, 1, 1);
+
 		ReservationDate givenReservationDate = fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
 			.set("shipFishingPostId", 1L)
-			.set("reservationDate", LocalDate.now().plusDays(1))
+			.set("reservationDate", givenDate)
 			.set("remainCount", 10)
 			.sample();
 
@@ -166,9 +170,11 @@ public class ReservationDateRepositoryTest extends BaseTest {
 	@DisplayName("예약 일자 조회 [Repository] - Success")
 	void t05() {
 		// Given
+		LocalDate givenDate = LocalDate.of(2039, 1, 1);
+
 		ReservationDate givenReservationDate = fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
 			.set("shipFishingPostId", 1L)
-			.set("reservationDate", LocalDate.now().plusDays(1))
+			.set("reservationDate", givenDate)
 			.set("remainCount", 10)
 			.sample();
 
@@ -198,7 +204,7 @@ public class ReservationDateRepositoryTest extends BaseTest {
 		for (long i = 0; i < 100; i++) {
 			givenResrvationList.add(fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
 				.set("shipFishingPostId", givenShipFishingPostId)
-				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("reservationDate", LocalDate.of(2040, 1, 1).plusDays(i))
 				.set("remainCount", 10)
 				.sample());
 		}
@@ -226,7 +232,7 @@ public class ReservationDateRepositoryTest extends BaseTest {
 		for (long i = 0; i < 100; i++) {
 			givenResrvationList.add(fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
 				.set("shipFishingPostId", givenShipFishingPostId)
-				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("reservationDate", LocalDate.of(2041, 1, 1).plusDays(i))
 				.set("remainCount", 10)
 				.sample());
 		}
@@ -245,9 +251,12 @@ public class ReservationDateRepositoryTest extends BaseTest {
 	@Test
 	@DisplayName("선상 낚시 게시글 예약 일자 업데이트 [잔여 인원 증가] [Repository] - Success")
 	void t08() {
+		// Given
+		LocalDate givenDate = LocalDate.of(2043, 1, 1);
+
 		ReservationDate givenReservationDate = fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
 			.set("shipFishingPostId", 1L)
-			.set("reservationDate", LocalDate.now().plusDays(1))
+			.set("reservationDate", givenDate)
 			.set("remainCount", 10)
 			.set("isBan", false)
 			.sample();
@@ -271,9 +280,12 @@ public class ReservationDateRepositoryTest extends BaseTest {
 	@Test
 	@DisplayName("선상 낚시 게시글 예약 일자 업데이트 [잔여 인원 감소] [Repository] - Success")
 	void t09() {
+		// Given
+		LocalDate givenDate = LocalDate.of(2044, 1, 1);
+
 		ReservationDate givenReservationDate = fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
 			.set("shipFishingPostId", 1L)
-			.set("reservationDate", LocalDate.now().plusDays(1))
+			.set("reservationDate", givenDate)
 			.set("remainCount", 10)
 			.set("isBan", false)
 			.sample();

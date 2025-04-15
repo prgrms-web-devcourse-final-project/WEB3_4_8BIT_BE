@@ -115,7 +115,7 @@ public class ReservationConcurrencyTest extends BaseTest {
 	@DisplayName("동일 예약일에 2명이 동시 예약 요청 시 비관적 락을 통한 동시성 제어 테스트 [1명 실패] [Service] - Success")
 	void t01() throws Exception {
 		// Given
-		LocalDate reservationDateValue = LocalDate.now().plusDays(1);
+		LocalDate reservationDateValue = LocalDate.now().plusDays(3);
 		int initialRemainCount = 12;
 		int guestCount1 = 7;
 		int guestCount2 = 7;
@@ -159,7 +159,7 @@ public class ReservationConcurrencyTest extends BaseTest {
 	@DisplayName("동일 예약일에 8명이 동시 예약 요청 시 비관적 락을 통한 동시성 제어 테스트 [6명 실패] [Service] - Success")
 	void t02() throws Exception {
 		// Given
-		LocalDate reservationDateValue = LocalDate.now().plusDays(1);
+		LocalDate reservationDateValue = LocalDate.now().plusDays(7);
 		int initialRemainCount = 14;
 
 		ShipFishingPost shipFishingPost = createShipFishingPost(initialRemainCount);
@@ -194,7 +194,7 @@ public class ReservationConcurrencyTest extends BaseTest {
 	@DisplayName("동일 예약일에 4명이 동시 예약 취소 시 비관적 락을 통한 동시성 제어 테스트 [Service] - Success")
 	void t03() throws Exception {
 		// Given
-		LocalDate reservationDateValue = LocalDate.now().plusDays(1);
+		LocalDate reservationDateValue = LocalDate.now().plusDays(12);
 		int initialRemainCount = 30;
 
 		ShipFishingPost shipFishingPost = createShipFishingPost(initialRemainCount);
@@ -260,7 +260,7 @@ public class ReservationConcurrencyTest extends BaseTest {
 	@DisplayName("동일 예약일에 4명이 동시 예약 취소 & 2명이 동시 예약 비관적 락을 통한 동시성 제어 테스트 [Service] - Success")
 	void t04() throws Exception {
 		// Given
-		LocalDate reservationDateValue = LocalDate.now().plusDays(1);
+		LocalDate reservationDateValue = LocalDate.now().plusDays(14);
 		int initialRemainCount = 36;
 		int guestCount = 6;
 
