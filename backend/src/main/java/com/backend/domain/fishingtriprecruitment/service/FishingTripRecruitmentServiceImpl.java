@@ -43,7 +43,13 @@ public class FishingTripRecruitmentServiceImpl implements FishingTripRecruitment
 		final FishingTripRecruitmentRequest.Create requestDto
 	) {
 		// 회원 및 동출 모집 게시글 유효성 검사
+		Long fishingTripPostId = requestDto.fishingTripPostId();
+
 		validMemberAndFishPoint(memberId, requestDto.fishingTripPostId());
+		if (isPostApplicant(memberId, fishingTripPostId)) {
+			throw new FishingTripRecruitmentException(
+				FishingTripRecruitmentErrorCode.FISHING_TRIP_RECRUITMENT_ALREADY_APPLIED);
+		}
 
 		FishingTripRecruitment recruitment = FishingTripRecruitmentConverter.fromFishingTripRecruitmentCreate(
 			memberId,
