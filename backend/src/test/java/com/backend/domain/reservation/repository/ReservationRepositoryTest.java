@@ -81,6 +81,11 @@ public class ReservationRepositoryTest extends BaseTest {
 		Reservation givenReservation = fixtureMonkeyBuilder.giveMeBuilder(Reservation.class)
 			.set("reservationId", null)
 			.set("guestCount", 1)
+			.set("paymentKey", "test")
+			.set("paymentMethod", "test")
+			.set("cardNumber", "121354556")
+			.set("cardApproveNo", "21354")
+			.set("receiptUrl", "testurl")
 			.sample();
 
 		// When
@@ -109,6 +114,11 @@ public class ReservationRepositoryTest extends BaseTest {
 			.set("memberId", savedMember.getMemberId())
 			.set("reservationDate", LocalDate.of(2025, 1, 1))
 			.set("guestCount", 1)
+			.set("paymentKey", "test")
+			.set("paymentMethod", "test")
+			.set("cardNumber", "121354556")
+			.set("cardApproveNo", "21354")
+			.set("receiptUrl", "testurl")
 			.sample();
 
 		Reservation savedReservation = reservationRepository.save(givenReservation);
@@ -156,6 +166,13 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("memberId", memberId)
 				.set("guestCount", i)
 				.set("reservationDate", LocalDate.of(2025, 1, 1).plusDays(i))
+				.set("guestCount", 1)
+				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sampleStream()
 				.limit(2)
 				.forEach(reservation -> {
@@ -262,6 +279,11 @@ public class ReservationRepositoryTest extends BaseTest {
 					.set("guestCount", j)
 					.set("status", ReservationStatus.CONFIRMED)
 					.set("reservationDate", LocalDate.of(2030, 1, 1).plusDays(j))
+					.set("paymentKey", "test")
+					.set("paymentMethod", "test")
+					.set("cardNumber", "121354556")
+					.set("cardApproveNo", "21354")
+					.set("receiptUrl", "testurl")
 					.sampleStream()
 					.limit(2)
 					.forEach(reservation -> {
@@ -349,6 +371,11 @@ public class ReservationRepositoryTest extends BaseTest {
 					.set("guestCount", j)
 					.set("status", ReservationStatus.CONFIRMED)
 					.set("reservationDate", LocalDate.of(2030, 1, 1).plusDays(j))
+					.set("paymentKey", "test")
+					.set("paymentMethod", "test")
+					.set("cardNumber", "121354556")
+					.set("cardApproveNo", "21354")
+					.set("receiptUrl", "testurl")
 					.sampleStream()
 					.limit(2)
 					.forEach(reservation -> {
@@ -393,6 +420,11 @@ public class ReservationRepositoryTest extends BaseTest {
 			.set("reservationDate", LocalDate.now())
 			.set("guestCount", 1)
 			.set("status", ReservationStatus.CANCELLED)
+			.set("paymentKey", "test")
+			.set("paymentMethod", "test")
+			.set("cardNumber", "121354556")
+			.set("cardApproveNo", "21354")
+			.set("receiptUrl", "testurl")
 			.sampleStream()
 			.limit(1)
 			.forEach(reservation ->
@@ -404,6 +436,11 @@ public class ReservationRepositoryTest extends BaseTest {
 			.set("reservationDate", LocalDate.now().plusDays(10))
 			.set("guestCount", 1)
 			.set("status", ReservationStatus.CANCELLED)
+			.set("paymentKey", "test")
+			.set("paymentMethod", "test")
+			.set("cardNumber", "121354556")
+			.set("cardApproveNo", "21354")
+			.set("receiptUrl", "testurl")
 			.sampleStream()
 			.limit(5)
 			.forEach(reservation ->
@@ -415,6 +452,11 @@ public class ReservationRepositoryTest extends BaseTest {
 			.set("reservationDate", LocalDate.now().minusDays(10))
 			.set("guestCount", 1)
 			.set("status", ReservationStatus.CANCELLED)
+			.set("paymentKey", "test")
+			.set("paymentMethod", "test")
+			.set("cardNumber", "121354556")
+			.set("cardApproveNo", "21354")
+			.set("receiptUrl", "testurl")
 			.sampleStream()
 			.limit(5)
 			.forEach(reservation ->
@@ -460,6 +502,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("totalPrice", 40000L)
 				.set("status", ReservationStatus.CONFIRMED)
 				.set("reservationDate", LocalDate.of(2033, 1, 1).plusDays(i))
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sampleStream()
 				.limit(2)
 				.forEach(reservationRepository::save);
@@ -558,6 +605,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("totalPrice", 40000L)
 				.set("status", ReservationStatus.CONFIRMED)
 				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sampleStream()
 				.limit(1)
 				.forEach(reservationRepository::save);
@@ -572,6 +624,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("totalPrice", 40000L)
 				.set("status", ReservationStatus.CANCELLED)
 				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sampleStream()
 				.limit(1)
 				.forEach(reservationRepository::save);
@@ -631,6 +688,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("totalPrice", 40000L)
 				.set("status", ReservationStatus.CONFIRMED)
 				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sampleStream()
 				.limit(1)
 				.forEach(reservationRepository::save);
@@ -645,6 +707,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("totalPrice", 40000L)
 				.set("status", ReservationStatus.CANCELLED)
 				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sampleStream()
 				.limit(1)
 				.forEach(reservationRepository::save);
@@ -704,6 +771,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("totalPrice", 40000L)
 				.set("status", ReservationStatus.CONFIRMED)
 				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sampleStream()
 				.limit(1)
 				.forEach(reservationRepository::save);
@@ -718,6 +790,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("totalPrice", 40000L)
 				.set("status", ReservationStatus.CANCELLED)
 				.set("reservationDate", LocalDate.now().plusDays(i))
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sampleStream()
 				.limit(1)
 				.forEach(reservationRepository::save);
@@ -757,6 +834,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("shipFishingPostId", (long)i)
 				.set("memberId", givenMemberId)
 				.set("status", ReservationStatus.CONFIRMED)
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sample();
 
 			reservationRepository.save(givenReservation);
@@ -769,6 +851,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("shipFishingPostId", (long)i)
 				.set("memberId", givenMemberId)
 				.set("status", ReservationStatus.CANCELLED)
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sample();
 
 			reservationRepository.save(givenReservation);
@@ -816,6 +903,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("reservationDate", LocalDate.now().plusDays(i))
 				.set("status", ReservationStatus.CONFIRMED)
 				.set("createdAt", ZonedDateTime.now().minusDays(2L * i))
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sample();
 
 			reservationRepository.save(givenReservation);
@@ -831,6 +923,11 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("reservationDate", LocalDate.now().plusDays(i * 6L))
 				.set("status", ReservationStatus.CONFIRMED)
 				.set("createdAt", ZonedDateTime.now())
+				.set("paymentKey", "test")
+				.set("paymentMethod", "test")
+				.set("cardNumber", "121354556")
+				.set("cardApproveNo", "21354")
+				.set("receiptUrl", "testurl")
 				.sample();
 
 			reservationRepository.save(givenReservation);
