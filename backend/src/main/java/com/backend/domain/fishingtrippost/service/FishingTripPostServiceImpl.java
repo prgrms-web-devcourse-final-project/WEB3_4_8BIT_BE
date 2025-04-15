@@ -141,14 +141,14 @@ public class FishingTripPostServiceImpl implements FishingTripPostService {
 		final Long fishingTripPostId) {
 
 		FishingTripPostResponse.DetailQueryDto detailQueryDto = getDetailDtoById(fishingTripPostId);
-
+		String profileImgUrl = getImageUrlById(detailQueryDto.fileUrlId());
 		Map<Long, String> fileUrlMap = getFileUrlMap(detailQueryDto);
 
 		Long likeCount = likeCacheService.getLikeCount(TARGET_TYPE, fishingTripPostId);
 		boolean isLiked = getIsLiked(memberId, fishingTripPostId);
 		boolean isPostOwner = getIsPostOwner(memberId, fishingTripPostId);
 		FishingTripPostResponse.Detail responseDto = FishingTripPostConverter.toDetail(detailQueryDto,
-			likeCount, isLiked, isPostOwner, fileUrlMap);
+			likeCount, isLiked, isPostOwner, profileImgUrl, fileUrlMap);
 		log.debug("[동출 상세보기] : 조회 성공");
 
 		return responseDto;
