@@ -3,9 +3,11 @@ package com.backend.domain.reservation.service;
 import static org.assertj.core.api.AssertionsForClassTypes.*;
 
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -13,11 +15,11 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +36,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @SpringBootTest
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ReservationConcurrencyTest extends BaseTest {
 
 	@Autowired
@@ -113,6 +114,14 @@ public class ReservationConcurrencyTest extends BaseTest {
 		return exceptions;
 	}
 
+	@BeforeAll
+	static void beforeAll() {
+		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+		log.debug("현재 JVM 타임존: {}", TimeZone.getDefault());
+		log.debug("현재 시간: {}", ZonedDateTime.now());
+		log.debug("현재 날짜: {}", LocalDate.now());
+	}
+
 	@Test
 	@DisplayName("동일 예약일에 2명이 동시 예약 요청 시 비관적 락을 통한 동시성 제어 테스트 [1명 실패] [Service] - Success")
 	void t01() throws Exception {
@@ -129,7 +138,10 @@ public class ReservationConcurrencyTest extends BaseTest {
 		ReservationDate reservationDate = createReservationDate(shipFishingPostId, reservationDateValue,
 			initialRemainCount);
 
-		reservationDateRepository.save(reservationDate);
+		ReservationDate reservationDateLog = reservationDateRepository.save(reservationDate);
+
+		log.info("제공된 예약 날짜 : {}", reservationDateValue);
+		log.info("db에 저장된 예약 날짜: {}", reservationDateLog.getReservationDate());
 
 		// 두 개의 예약 요청 DTO 생성
 		ReservationRequest.Reserve requestDto1 = createReservationRequest(shipFishingPostId, reservationDateValue,
