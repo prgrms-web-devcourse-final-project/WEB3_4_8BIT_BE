@@ -15,13 +15,17 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.backend.domain.reservation.dto.request.ReservationRequest;
 import com.backend.domain.reservation.dto.response.ReservationResponse;
@@ -31,12 +35,16 @@ import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.util.BaseTest;
 
+import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest
-@Transactional(propagation = Propagation.NOT_SUPPORTED)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public class ReservationConcurrencyTest extends BaseTest {
+
+	@Autowired
+	private EntityManager em;
 
 	@Autowired
 	private ReservationService reservationService;
@@ -46,6 +54,9 @@ public class ReservationConcurrencyTest extends BaseTest {
 
 	@Autowired
 	private ShipFishingPostRepository shipFishingPostRepository;
+
+	@Autowired
+	private PlatformTransactionManager transactionManager;
 
 	private ShipFishingPost createShipFishingPost(int initialRemainCount) {
 
@@ -78,6 +89,56 @@ public class ReservationConcurrencyTest extends BaseTest {
 			.price(1000L)
 			.totalPrice(1000L * guestCount)
 			.build();
+	}
+
+	private static final LocalDate givenDate = LocalDate.of(2040, 1, 2);
+
+	private static Long givenShipFishingPostId;
+
+	@BeforeAll
+	static void beforeAll() {
+		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+		log.debug("현재 JVM 타임존: {}", TimeZone.getDefault());
+		log.debug("현재 시간: {}", ZonedDateTime.now());
+		log.debug("현재 날짜: {}", LocalDate.now());
+	}
+
+	@BeforeEach
+	void createDataBefore() {
+		TransactionStatus tx = transactionManager.getTransaction(new DefaultTransactionDefinition());
+
+		int initialRemainCount = 14;
+
+		ShipFishingPost givenShipFishingPost = createShipFishingPost(initialRemainCount);
+
+		ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenShipFishingPost);
+
+		givenShipFishingPostId = savedShipFishingPost.getShipFishingPostId();
+
+		ReservationDate givenReservationDate = createReservationDate(givenShipFishingPostId, givenDate,
+			initialRemainCount);
+
+		ReservationDate savedReservationDate = reservationDateRepository.save(givenReservationDate);
+
+		log.debug("제공된 예약 일자 : {}", givenDate);
+		log.debug("저장된 예약 일자 : {}", savedReservationDate.getReservationDate());
+
+		em.flush();
+		em.clear();
+
+		transactionManager.commit(tx);
+	}
+
+	@AfterEach
+	void clearTableAfter() {
+		TransactionStatus tx = transactionManager.getTransaction(new DefaultTransactionDefinition());
+		em.createNativeQuery("TRUNCATE TABLE reservations").executeUpdate();
+		em.createNativeQuery("TRUNCATE TABLE reservation_dates").executeUpdate();
+		em.createNativeQuery("TRUNCATE TABLE ship_fishing_posts RESTART IDENTITY").executeUpdate();
+		em.flush();
+		em.clear();
+
+		transactionManager.commit(tx);
 	}
 
 	/**
@@ -114,40 +175,19 @@ public class ReservationConcurrencyTest extends BaseTest {
 		return exceptions;
 	}
 
-	@BeforeAll
-	static void beforeAll() {
-		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
-		log.debug("현재 JVM 타임존: {}", TimeZone.getDefault());
-		log.debug("현재 시간: {}", ZonedDateTime.now());
-		log.debug("현재 날짜: {}", LocalDate.now());
-	}
-
 	@Test
 	@DisplayName("동일 예약일에 2명이 동시 예약 요청 시 비관적 락을 통한 동시성 제어 테스트 [1명 실패] [Service] - Success")
 	void t01() throws Exception {
 		// Given
-		LocalDate reservationDateValue = LocalDate.now().plusDays(3);
-		int initialRemainCount = 12;
-		int guestCount1 = 7;
-		int guestCount2 = 7;
 
-		ShipFishingPost shipFishingPost = createShipFishingPost(initialRemainCount);
-
-		Long shipFishingPostId = shipFishingPostRepository.save(shipFishingPost).getShipFishingPostId();
-
-		ReservationDate reservationDate = createReservationDate(shipFishingPostId, reservationDateValue,
-			initialRemainCount);
-
-		ReservationDate reservationDateLog = reservationDateRepository.save(reservationDate);
-
-		log.info("제공된 예약 날짜 : {}", reservationDateValue);
-		log.info("db에 저장된 예약 날짜: {}", reservationDateLog.getReservationDate());
+		int guestCount1 = 8;
+		int guestCount2 = 8;
 
 		// 두 개의 예약 요청 DTO 생성
-		ReservationRequest.Reserve requestDto1 = createReservationRequest(shipFishingPostId, reservationDateValue,
+		ReservationRequest.Reserve requestDto1 = createReservationRequest(givenShipFishingPostId, givenDate,
 			guestCount1);
 
-		ReservationRequest.Reserve requestDto2 = createReservationRequest(shipFishingPostId, reservationDateValue,
+		ReservationRequest.Reserve requestDto2 = createReservationRequest(givenShipFishingPostId, givenDate,
 			guestCount2);
 
 		List<Runnable> tasks = Arrays.asList(
@@ -158,11 +198,11 @@ public class ReservationConcurrencyTest extends BaseTest {
 		List<AtomicReference<Throwable>> exceptions = runConcurrentTasks(tasks);
 
 		ReservationDate updatedReservationDate = reservationDateRepository.findByShipFishingPostIdAndReservationDate(
-				shipFishingPostId, reservationDateValue)
+				givenShipFishingPostId, givenDate)
 			.orElseThrow(() -> new RuntimeException("ReservationDate not found"));
 
 		// Then
-		assertThat(updatedReservationDate.getRemainCount()).isEqualTo(5);
+		assertThat(updatedReservationDate.getRemainCount()).isEqualTo(6);
 
 		// 둘중 한 요청은 remainCount 부족으로 예외가 발생해야 함
 		boolean exceptionOccurred = exceptions.stream().anyMatch(ref -> ref.get() != null);
@@ -173,24 +213,14 @@ public class ReservationConcurrencyTest extends BaseTest {
 	@DisplayName("동일 예약일에 8명이 동시 예약 요청 시 비관적 락을 통한 동시성 제어 테스트 [6명 실패] [Service] - Success")
 	void t02() throws Exception {
 		// Given
-		LocalDate reservationDateValue = LocalDate.now().plusDays(7);
-		int initialRemainCount = 14;
-
-		ShipFishingPost shipFishingPost = createShipFishingPost(initialRemainCount);
-		Long shipFishingPostId = shipFishingPostRepository.save(shipFishingPost).getShipFishingPostId();
-
-		ReservationDate reservationDate = createReservationDate(shipFishingPostId, reservationDateValue,
-			initialRemainCount);
-		reservationDateRepository.save(reservationDate);
-
 		int threadCount = 8;
 
 		List<Runnable> tasks = new ArrayList<>();
 
 		for (int i = 0; i < threadCount; i++) {
 			tasks.add(() -> {
-				ReservationRequest.Reserve requestDto = createReservationRequest(shipFishingPostId,
-					reservationDateValue, 6);
+				ReservationRequest.Reserve requestDto = createReservationRequest(givenShipFishingPostId,
+					givenDate, 6);
 
 				reservationService.createReservation(requestDto, ThreadLocalRandom.current().nextLong(1000));
 			});
@@ -201,37 +231,23 @@ public class ReservationConcurrencyTest extends BaseTest {
 
 		// Then
 		long errorCount = exceptions.stream().filter(ref -> ref.get() != null).count();
-		assertThat(errorCount).isEqualTo(threadCount - 2);
+		assertThat(errorCount).isEqualTo(6);
 	}
 
 	@Test
 	@DisplayName("동일 예약일에 4명이 동시 예약 취소 시 비관적 락을 통한 동시성 제어 테스트 [Service] - Success")
 	void t03() throws Exception {
 		// Given
-		LocalDate reservationDateValue = LocalDate.now().plusDays(12);
-		log.debug("제공된 예약 날짜 : {}", reservationDateValue);
-
-		int initialRemainCount = 30;
-
-		ShipFishingPost shipFishingPost = createShipFishingPost(initialRemainCount);
-		Long shipFishingPostId = shipFishingPostRepository.save(shipFishingPost).getShipFishingPostId();
-
-		ReservationDate givenReservationDate = createReservationDate(shipFishingPostId, reservationDateValue,
-			initialRemainCount);
-		ReservationDate reservationDate = reservationDateRepository.save(givenReservationDate);
-
-		log.debug("저장된 예약 날짜 : {}", reservationDate.getReservationDate());
-
-		log.debug("생성 후 : {}", reservationDate.getRemainCount());
-
 		int threadCount = 4;
+
+		int guestCount = 2;
 
 		List<Long> reservationIdList = new ArrayList<>();
 		List<Long> memberIdList = new ArrayList<>();
 
 		for (long i = 1; i <= threadCount; i++) {
-			ReservationRequest.Reserve requestDto = createReservationRequest(shipFishingPostId, reservationDateValue,
-				6);
+			ReservationRequest.Reserve requestDto = createReservationRequest(givenShipFishingPostId, givenDate,
+				guestCount);
 
 			ReservationResponse.Detail detail = reservationService.createReservation(requestDto, i);
 
@@ -242,7 +258,7 @@ public class ReservationConcurrencyTest extends BaseTest {
 		}
 
 		ReservationDate savedReservationDate = reservationDateRepository.findByShipFishingPostIdAndReservationDate(
-				shipFishingPostId, reservationDateValue)
+				givenShipFishingPostId, givenDate)
 			.orElseThrow(() -> new RuntimeException("ReservationDate not found"));
 
 		log.debug("차감 후 : {}", savedReservationDate.getRemainCount());
@@ -264,39 +280,30 @@ public class ReservationConcurrencyTest extends BaseTest {
 
 		// Then
 		ReservationDate updatedReservationDate = reservationDateRepository.findByShipFishingPostIdAndReservationDate(
-				shipFishingPostId, reservationDateValue)
+				givenShipFishingPostId, givenDate)
 			.orElseThrow(() -> new RuntimeException("ReservationDate not found"));
 
 		long errorCount = exceptions.stream().filter(ref -> ref.get() != null).count();
 
 		log.debug("에러 개수 : {}", errorCount);
 
-		assertThat(updatedReservationDate.getRemainCount()).isEqualTo(30);
+		assertThat(updatedReservationDate.getRemainCount()).isEqualTo(14);
 	}
 
 	@Test
 	@DisplayName("동일 예약일에 4명이 동시 예약 취소 & 2명이 동시 예약 비관적 락을 통한 동시성 제어 테스트 [Service] - Success")
 	void t04() throws Exception {
 		// Given
-		LocalDate reservationDateValue = LocalDate.now().plusDays(14);
-		int initialRemainCount = 36;
-		int guestCount = 6;
-
-		ShipFishingPost shipFishingPost = createShipFishingPost(initialRemainCount);
-		Long shipFishingPostId = shipFishingPostRepository.save(shipFishingPost).getShipFishingPostId();
-
-		ReservationDate reservationDate = createReservationDate(shipFishingPostId, reservationDateValue,
-			initialRemainCount);
-		reservationDateRepository.save(reservationDate);
-
-		List<Long> reservationIdList = new ArrayList<>();
-		List<Long> memberIdList = new ArrayList<>();
+		int guestCount = 2;
 
 		int cancelCount = 4;
 		int createCount = 2;
 
+		List<Long> reservationIdList = new ArrayList<>();
+		List<Long> memberIdList = new ArrayList<>();
+
 		for (long i = 1; i <= cancelCount; i++) {
-			ReservationRequest.Reserve requestDto = createReservationRequest(shipFishingPostId, reservationDateValue,
+			ReservationRequest.Reserve requestDto = createReservationRequest(givenShipFishingPostId, givenDate,
 				guestCount);
 
 			ReservationResponse.Detail detail = reservationService.createReservation(requestDto, i);
@@ -306,10 +313,10 @@ public class ReservationConcurrencyTest extends BaseTest {
 		}
 
 		ReservationDate savedReservationDate = reservationDateRepository.findByShipFishingPostIdAndReservationDate(
-				shipFishingPostId, reservationDateValue)
+				givenShipFishingPostId, givenDate)
 			.orElseThrow(() -> new RuntimeException("ReservationDate not found"));
 
-		assertThat(savedReservationDate.getRemainCount()).isEqualTo(12);
+		assertThat(savedReservationDate.getRemainCount()).isEqualTo(6);
 
 		List<Runnable> tasks = new ArrayList<>();
 
@@ -322,8 +329,8 @@ public class ReservationConcurrencyTest extends BaseTest {
 
 		for (int i = 0; i < createCount; i++) {
 			tasks.add(() -> {
-				ReservationRequest.Reserve requestDto = createReservationRequest(shipFishingPostId,
-					reservationDateValue, guestCount);
+				ReservationRequest.Reserve requestDto = createReservationRequest(givenShipFishingPostId, givenDate,
+					guestCount);
 
 				reservationService.createReservation(requestDto, ThreadLocalRandom.current().nextLong(1000));
 			});
@@ -333,10 +340,10 @@ public class ReservationConcurrencyTest extends BaseTest {
 
 		// Then
 		ReservationDate updatedReservationDate = reservationDateRepository.findByShipFishingPostIdAndReservationDate(
-				shipFishingPostId, reservationDateValue)
+				givenShipFishingPostId, givenDate)
 			.orElseThrow(() -> new RuntimeException("ReservationDate not found"));
 
-		assertThat(updatedReservationDate.getRemainCount()).isEqualTo(24);
+		assertThat(updatedReservationDate.getRemainCount()).isEqualTo(10);
 	}
 
 }
