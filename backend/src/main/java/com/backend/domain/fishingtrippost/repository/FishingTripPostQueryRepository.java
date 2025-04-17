@@ -79,29 +79,26 @@ public class FishingTripPostQueryRepository {
 		final String keyword
 	) {
 		return jpaQueryFactory
-			.select(new QFishingTripPostResponse_DetailPageQueryDto(
-				fishingTripPost.fishingTripPostId,
-				fishingTripPost.regionId,
-				region.type,
-				fishingTripPost.subject,
-				fishingTripPost.content,
-				fishingTripPost.fishingDate,
-				fishingTripPost.createdAt,
-				fishingTripPost.recruitmentCount,
-				fishingTripPost.postStatus,
-				fishingTripPost.fileIdList,
-				fishingTripPost.commentCount,
-				fishingTripPost.likeCount
-			))
-			.from(fishingTripPost)
-			.leftJoin(region).on(fishingTripPost.regionId.eq(region.regionId))
-			.where(
-				whereCondition(regionId, status, keyword),
-				cursorCondition(cursorRequestDto)
-			)
-			.orderBy(getOrderBy(cursorRequestDto))
-			.limit(cursorRequestDto.size() + 1)
-			.fetch();
+            .select(new QFishingTripPostResponse_DetailPageQueryDto(
+                fishingTripPost.fishingTripPostId,
+                fishingTripPost.regionId,
+                region.type,
+                fishingTripPost.subject,
+                fishingTripPost.content,
+                fishingTripPost.fishingDate,
+                fishingTripPost.createdAt,
+                fishingTripPost.recruitmentCount,
+                fishingTripPost.postStatus,
+                fishingTripPost.fileIdList,
+                fishingTripPost.commentCount,
+                fishingTripPost.likeCount
+            ))
+            .from(fishingTripPost)
+            .leftJoin(region).on(fishingTripPost.regionId.eq(region.regionId))
+            .orderBy(fishingTripPost.createdAt.desc(), fishingTripPost.fishingTripPostId.desc())
+            .offset(1000044)
+            .limit(10)
+            .fetch();
 	}
 
 	public boolean updateLikeCount(final Long postId, final Long likeCount) {
