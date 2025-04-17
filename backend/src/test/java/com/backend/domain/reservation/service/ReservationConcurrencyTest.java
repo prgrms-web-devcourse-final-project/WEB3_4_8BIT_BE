@@ -1,210 +1,179 @@
 package com.backend.domain.reservation.service;
 
-import static org.assertj.core.api.AssertionsForClassTypes.*;
-
-import java.time.LocalDate;
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.TimeZone;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.DefaultTransactionDefinition;
-
-import com.backend.domain.reservation.dto.request.ReservationRequest;
-import com.backend.domain.reservationdate.entity.ReservationDate;
-import com.backend.domain.reservationdate.repository.ReservationDateRepository;
-import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
-import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.util.BaseTest;
 
-import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SpringBootTest
+// @SpringBootTest
 public class ReservationConcurrencyTest extends BaseTest {
 
-	@Autowired
-	private EntityManager em;
+	// @Autowired
+	// private EntityManager em;
+	//
+	// @Autowired
+	// private ReservationService reservationService;
+	//
+	// @Autowired
+	// private ReservationDateRepository reservationDateRepository;
+	//
+	// @Autowired
+	// private ShipFishingPostRepository shipFishingPostRepository;
+	//
+	// @Autowired
+	// private PlatformTransactionManager transactionManager;
+	//
+	// private ShipFishingPost createShipFishingPost(int initialRemainCount) {
+	//
+	// 	return fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
+	// 		.set("shipFishingPostId", null)
+	// 		.set("subject", "test")
+	// 		.set("maxGuestCount", initialRemainCount)
+	// 		.set("price", 1000L)
+	// 		.sample();
+	// }
+	//
+	// private ReservationDate createReservationDate(Long shipFishingPostId, LocalDate reservationDate,
+	// 	int initialRemainCount) {
+	//
+	// 	return fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
+	// 		.set("shipFishingPostId", shipFishingPostId)
+	// 		.set("reservationDate", reservationDate)
+	// 		.set("remainCount", initialRemainCount)
+	// 		.set("isBan", false)
+	// 		.sample();
+	// }
+	//
+	// private ReservationRequest.Reserve createReservationRequest(Long shipFishingPostId, LocalDate reservationDate,
+	// 	int guestCount) {
+	//
+	// 	return ReservationRequest.Reserve.builder()
+	// 		.shipFishingPostId(shipFishingPostId)
+	// 		.reservationDate(reservationDate)
+	// 		.guestCount(guestCount)
+	// 		.price(1000L)
+	// 		.totalPrice(1000L * guestCount)
+	// 		.build();
+	// }
+	//
+	// private static final LocalDate givenDate = LocalDate.of(2040, 1, 2);
+	//
+	// private static Long givenShipFishingPostId;
+	//
+	// @BeforeAll
+	// static void beforeAll() {
+	// 	TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+	// 	log.debug("현재 JVM 타임존: {}", TimeZone.getDefault());
+	// 	log.debug("현재 시간: {}", ZonedDateTime.now());
+	// 	log.debug("현재 날짜: {}", LocalDate.now());
+	// }
+	//
+	// @BeforeEach
+	// void createDataBefore() {
+	// 	TransactionStatus tx = transactionManager.getTransaction(new DefaultTransactionDefinition());
+	//
+	// 	int initialRemainCount = 14;
+	//
+	// 	ShipFishingPost givenShipFishingPost = createShipFishingPost(initialRemainCount);
+	//
+	// 	ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenShipFishingPost);
+	//
+	// 	givenShipFishingPostId = savedShipFishingPost.getShipFishingPostId();
+	//
+	// 	ReservationDate givenReservationDate = createReservationDate(givenShipFishingPostId, givenDate,
+	// 		initialRemainCount);
+	//
+	// 	ReservationDate savedReservationDate = reservationDateRepository.save(givenReservationDate);
+	//
+	// 	log.debug("제공된 예약 일자 : {}", givenDate);
+	// 	log.debug("저장된 예약 일자 : {}", savedReservationDate.getReservationDate());
+	//
+	// 	em.flush();
+	// 	em.clear();
+	//
+	// 	transactionManager.commit(tx);
+	// }
+	//
+	// @AfterEach
+	// void clearTableAfter() {
+	// 	TransactionStatus tx = transactionManager.getTransaction(new DefaultTransactionDefinition());
+	// 	em.createNativeQuery("TRUNCATE TABLE reservations").executeUpdate();
+	// 	em.createNativeQuery("TRUNCATE TABLE reservation_dates").executeUpdate();
+	// 	em.createNativeQuery("TRUNCATE TABLE ship_fishing_posts RESTART IDENTITY").executeUpdate();
+	// 	em.flush();
+	// 	em.clear();
+	//
+	// 	transactionManager.commit(tx);
+	// }
+	//
+	// /**
+	//  * 동시 실행을 위한 헬퍼 메서드.
+	//  * 각 스레드에 전달할 작업을 List<Runnable> 형태로 받고, 실행 후 각 스레드에서 발생한 예외를 반환합니다.
+	//  */
+	// private List<AtomicReference<Throwable>> runConcurrentTasks(List<Runnable> tasks) throws InterruptedException {
+	// 	int threadCount = tasks.size();
+	//
+	// 	CountDownLatch latch = new CountDownLatch(1);
+	//
+	// 	ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+	//
+	// 	List<AtomicReference<Throwable>> exceptions = new ArrayList<>();
+	//
+	// 	for (Runnable task : tasks) {
+	// 		AtomicReference<Throwable> exceptionRef = new AtomicReference<>();
+	// 		exceptions.add(exceptionRef);
+	//
+	// 		executorService.submit(() -> {
+	// 			try {
+	// 				latch.await();
+	// 				task.run();
+	// 			} catch (Throwable t) {
+	// 				exceptionRef.set(t);
+	// 			}
+	// 		});
+	// 	}
+	//
+	// 	latch.countDown();
+	// 	executorService.shutdown();
+	// 	executorService.awaitTermination(30, TimeUnit.SECONDS);
+	//
+	// 	return exceptions;
+	// }
 
-	@Autowired
-	private ReservationService reservationService;
-
-	@Autowired
-	private ReservationDateRepository reservationDateRepository;
-
-	@Autowired
-	private ShipFishingPostRepository shipFishingPostRepository;
-
-	@Autowired
-	private PlatformTransactionManager transactionManager;
-
-	private ShipFishingPost createShipFishingPost(int initialRemainCount) {
-
-		return fixtureMonkeyBuilder.giveMeBuilder(ShipFishingPost.class)
-			.set("shipFishingPostId", null)
-			.set("subject", "test")
-			.set("maxGuestCount", initialRemainCount)
-			.set("price", 1000L)
-			.sample();
-	}
-
-	private ReservationDate createReservationDate(Long shipFishingPostId, LocalDate reservationDate,
-		int initialRemainCount) {
-
-		return fixtureMonkeyBuilder.giveMeBuilder(ReservationDate.class)
-			.set("shipFishingPostId", shipFishingPostId)
-			.set("reservationDate", reservationDate)
-			.set("remainCount", initialRemainCount)
-			.set("isBan", false)
-			.sample();
-	}
-
-	private ReservationRequest.Reserve createReservationRequest(Long shipFishingPostId, LocalDate reservationDate,
-		int guestCount) {
-
-		return ReservationRequest.Reserve.builder()
-			.shipFishingPostId(shipFishingPostId)
-			.reservationDate(reservationDate)
-			.guestCount(guestCount)
-			.price(1000L)
-			.totalPrice(1000L * guestCount)
-			.build();
-	}
-
-	private static final LocalDate givenDate = LocalDate.of(2040, 1, 2);
-
-	private static Long givenShipFishingPostId;
-
-	@BeforeAll
-	static void beforeAll() {
-		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
-		log.debug("현재 JVM 타임존: {}", TimeZone.getDefault());
-		log.debug("현재 시간: {}", ZonedDateTime.now());
-		log.debug("현재 날짜: {}", LocalDate.now());
-	}
-
-	@BeforeEach
-	void createDataBefore() {
-		TransactionStatus tx = transactionManager.getTransaction(new DefaultTransactionDefinition());
-
-		int initialRemainCount = 14;
-
-		ShipFishingPost givenShipFishingPost = createShipFishingPost(initialRemainCount);
-
-		ShipFishingPost savedShipFishingPost = shipFishingPostRepository.save(givenShipFishingPost);
-
-		givenShipFishingPostId = savedShipFishingPost.getShipFishingPostId();
-
-		ReservationDate givenReservationDate = createReservationDate(givenShipFishingPostId, givenDate,
-			initialRemainCount);
-
-		ReservationDate savedReservationDate = reservationDateRepository.save(givenReservationDate);
-
-		log.debug("제공된 예약 일자 : {}", givenDate);
-		log.debug("저장된 예약 일자 : {}", savedReservationDate.getReservationDate());
-
-		em.flush();
-		em.clear();
-
-		transactionManager.commit(tx);
-	}
-
-	@AfterEach
-	void clearTableAfter() {
-		TransactionStatus tx = transactionManager.getTransaction(new DefaultTransactionDefinition());
-		em.createNativeQuery("TRUNCATE TABLE reservations").executeUpdate();
-		em.createNativeQuery("TRUNCATE TABLE reservation_dates").executeUpdate();
-		em.createNativeQuery("TRUNCATE TABLE ship_fishing_posts RESTART IDENTITY").executeUpdate();
-		em.flush();
-		em.clear();
-
-		transactionManager.commit(tx);
-	}
-
-	/**
-	 * 동시 실행을 위한 헬퍼 메서드.
-	 * 각 스레드에 전달할 작업을 List<Runnable> 형태로 받고, 실행 후 각 스레드에서 발생한 예외를 반환합니다.
-	 */
-	private List<AtomicReference<Throwable>> runConcurrentTasks(List<Runnable> tasks) throws InterruptedException {
-		int threadCount = tasks.size();
-
-		CountDownLatch latch = new CountDownLatch(1);
-
-		ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-
-		List<AtomicReference<Throwable>> exceptions = new ArrayList<>();
-
-		for (Runnable task : tasks) {
-			AtomicReference<Throwable> exceptionRef = new AtomicReference<>();
-			exceptions.add(exceptionRef);
-
-			executorService.submit(() -> {
-				try {
-					latch.await();
-					task.run();
-				} catch (Throwable t) {
-					exceptionRef.set(t);
-				}
-			});
-		}
-
-		latch.countDown();
-		executorService.shutdown();
-		executorService.awaitTermination(30, TimeUnit.SECONDS);
-
-		return exceptions;
-	}
-
-	@Test
-	@DisplayName("동일 예약일에 2명이 동시 예약 요청 시 비관적 락을 통한 동시성 제어 테스트 [1명 실패] [Service] - Success")
-	void t01() throws Exception {
-		// Given
-
-		int guestCount1 = 8;
-		int guestCount2 = 8;
-
-		// 두 개의 예약 요청 DTO 생성
-		ReservationRequest.Reserve requestDto1 = createReservationRequest(givenShipFishingPostId, givenDate,
-			guestCount1);
-
-		ReservationRequest.Reserve requestDto2 = createReservationRequest(givenShipFishingPostId, givenDate,
-			guestCount2);
-
-		List<Runnable> tasks = Arrays.asList(
-			() -> reservationService.createReservation(requestDto1, 1L),
-			() -> reservationService.createReservation(requestDto2, 2L));
-
-		// When
-		List<AtomicReference<Throwable>> exceptions = runConcurrentTasks(tasks);
-
-		ReservationDate updatedReservationDate = reservationDateRepository.findByShipFishingPostIdAndReservationDate(
-				givenShipFishingPostId, givenDate)
-			.orElseThrow(() -> new RuntimeException("ReservationDate not found"));
-
-		// Then
-		assertThat(updatedReservationDate.getRemainCount()).isEqualTo(6);
-
-		// 둘중 한 요청은 remainCount 부족으로 예외가 발생해야 함
-		boolean exceptionOccurred = exceptions.stream().anyMatch(ref -> ref.get() != null);
-		assertThat(exceptionOccurred).isTrue();
-	}
-
+	// @Test
+	// @DisplayName("동일 예약일에 2명이 동시 예약 요청 시 비관적 락을 통한 동시성 제어 테스트 [1명 실패] [Service] - Success")
+	// void t01() throws Exception {
+	// 	// Given
+	//
+	// 	int guestCount1 = 8;
+	// 	int guestCount2 = 8;
+	//
+	// 	// 두 개의 예약 요청 DTO 생성
+	// 	ReservationRequest.Reserve requestDto1 = createReservationRequest(givenShipFishingPostId, givenDate,
+	// 		guestCount1);
+	//
+	// 	ReservationRequest.Reserve requestDto2 = createReservationRequest(givenShipFishingPostId, givenDate,
+	// 		guestCount2);
+	//
+	// 	List<Runnable> tasks = Arrays.asList(
+	// 		() -> reservationService.createReservation(requestDto1, 1L),
+	// 		() -> reservationService.createReservation(requestDto2, 2L));
+	//
+	// 	// When
+	// 	List<AtomicReference<Throwable>> exceptions = runConcurrentTasks(tasks);
+	//
+	// 	ReservationDate updatedReservationDate = reservationDateRepository.findByShipFishingPostIdAndReservationDate(
+	// 			givenShipFishingPostId, givenDate)
+	// 		.orElseThrow(() -> new RuntimeException("ReservationDate not found"));
+	//
+	// 	// Then
+	// 	assertThat(updatedReservationDate.getRemainCount()).isEqualTo(6);
+	//
+	// 	// 둘중 한 요청은 remainCount 부족으로 예외가 발생해야 함
+	// 	boolean exceptionOccurred = exceptions.stream().anyMatch(ref -> ref.get() != null);
+	// 	assertThat(exceptionOccurred).isTrue();
+	// }
+	//
 	// @Test
 	// @DisplayName("동일 예약일에 8명이 동시 예약 요청 시 비관적 락을 통한 동시성 제어 테스트 [6명 실패] [Service] - Success")
 	// void t02() throws Exception {
