@@ -6,11 +6,13 @@ import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservationDateId implements Serializable {
@@ -20,3 +22,5 @@ public class ReservationDateId implements Serializable {
 	private LocalDate reservationDate;
 
 }
+
+

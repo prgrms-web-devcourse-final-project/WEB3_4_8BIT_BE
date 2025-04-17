@@ -8,8 +8,10 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -58,6 +60,13 @@ public class ReservationRepositoryTest extends BaseTest {
 
 	@Autowired
 	private ShipFishingPostRepository shipFishingPostRepository;
+
+	@BeforeAll
+	static void beforeAll() {
+		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+		log.debug("현재 JVM 타임존: {}", TimeZone.getDefault());
+		log.debug("현재 시간: {}", ZonedDateTime.now());
+	}
 
 	@AfterEach
 	public void tearDown() {
