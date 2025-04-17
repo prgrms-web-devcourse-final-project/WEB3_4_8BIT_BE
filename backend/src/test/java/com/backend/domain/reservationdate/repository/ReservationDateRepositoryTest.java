@@ -51,8 +51,7 @@ public class ReservationDateRepositoryTest extends BaseTest {
 
 	@AfterEach
 	public void tearDown() {
-		reservationDateJpaRepository.deleteAll();
-		em.flush();
+		reservationDateJpaRepository.deleteAllInBatch();
 		em.clear();
 	}
 

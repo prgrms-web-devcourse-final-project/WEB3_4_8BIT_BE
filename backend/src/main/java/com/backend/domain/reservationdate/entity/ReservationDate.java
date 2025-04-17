@@ -30,11 +30,11 @@ import lombok.experimental.SuperBuilder;
 public class ReservationDate extends BaseEntity {
 
 	@Id
-	@Column(insertable = false, updatable = false)
+	@Column(nullable = false)
 	private Long shipFishingPostId;
 
 	@Id
-	@Column(insertable = false, updatable = false)
+	@Column(nullable = false)
 	private LocalDate reservationDate;
 
 	@Min(0)
