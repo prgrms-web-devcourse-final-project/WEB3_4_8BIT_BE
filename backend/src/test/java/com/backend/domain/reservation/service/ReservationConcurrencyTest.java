@@ -195,14 +195,18 @@ public class ReservationConcurrencyTest extends BaseTest {
 	void t03() throws Exception {
 		// Given
 		LocalDate reservationDateValue = LocalDate.now().plusDays(12);
+		log.debug("제공된 예약 날짜 : {}", reservationDateValue);
+
 		int initialRemainCount = 30;
 
 		ShipFishingPost shipFishingPost = createShipFishingPost(initialRemainCount);
 		Long shipFishingPostId = shipFishingPostRepository.save(shipFishingPost).getShipFishingPostId();
 
-		ReservationDate reservationDate = createReservationDate(shipFishingPostId, reservationDateValue,
+		ReservationDate givenReservationDate = createReservationDate(shipFishingPostId, reservationDateValue,
 			initialRemainCount);
-		reservationDateRepository.save(reservationDate);
+		ReservationDate reservationDate = reservationDateRepository.save(givenReservationDate);
+
+		log.debug("저장된 예약 날짜 : {}", reservationDate.getReservationDate());
 
 		log.debug("생성 후 : {}", reservationDate.getRemainCount());
 
