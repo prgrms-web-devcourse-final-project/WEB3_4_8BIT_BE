@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -78,7 +77,6 @@ public class ReservationDateServiceImpl implements ReservationDateService {
 		reservation.updateBan();
 	}
 
-	@Async
 	@Override
 	@Transactional
 	public void deleteReservationDateList(final Long shipFishingPostId) {

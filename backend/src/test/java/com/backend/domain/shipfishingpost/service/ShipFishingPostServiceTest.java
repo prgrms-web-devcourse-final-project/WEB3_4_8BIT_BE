@@ -35,6 +35,7 @@ import com.backend.domain.shipfishingpost.entity.ShipFishingPost;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostErrorCode;
 import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
+import com.backend.global.event.publisher.DomainEventPublisher;
 import com.backend.global.storage.entity.File;
 import com.backend.global.storage.repository.StorageRepository;
 import com.backend.global.storage.service.S3StorageService;
@@ -43,6 +44,9 @@ import com.backend.global.util.RedisUtil;
 
 @ExtendWith(MockitoExtension.class)
 public class ShipFishingPostServiceTest extends BaseTest {
+
+	@Mock
+	private DomainEventPublisher publisher;
 
 	@Mock
 	private ShipRepository shipRepository;
@@ -280,8 +284,7 @@ public class ShipFishingPostServiceTest extends BaseTest {
 			.thenReturn(Optional.ofNullable(givenShipFishingPost));
 		when(reservationRepository.findByShipFishingPostIdAndTodayAfter(any(Long.class), any(LocalDate.class)))
 			.thenReturn(false);
-		doNothing().when(s3StorageService).deleteFilesByIdList(any(Long.class), any(List.class));
-		doNothing().when(reviewRepository).deleteAllByShipFishingPostId(any(Long.class));
+		doNothing().when(publisher).publish(any());
 
 		// Then
 		shipFishingPostServiceImpl.deleteShipFishingPost(givenShipFishingPostId, givenMemberId);

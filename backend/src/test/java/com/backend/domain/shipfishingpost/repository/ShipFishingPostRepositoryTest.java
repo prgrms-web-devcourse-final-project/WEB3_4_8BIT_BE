@@ -184,6 +184,7 @@ public class ShipFishingPostRepositoryTest extends BaseTest {
 			.set("shipName", "나로호")
 			.set("shipNumber", "12345-6789")
 			.set("departurePort", "선착장")
+			.set("portName", "부산항")
 			.sample();
 
 		Ship savedShip = shipRepository.save(givenShip);
