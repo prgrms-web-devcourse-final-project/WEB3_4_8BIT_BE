@@ -129,6 +129,21 @@ public class ReservationResponse {
 	) {
 	}
 
+	/**
+	 *
+	 * @param reservationId
+	 * @param shipFishingPostId
+	 * @param reservationNumber
+	 * @param subject
+	 * @param reservationDate
+	 * @param startTime
+	 * @param location
+	 * @param guestCount
+	 * @param totalPrice
+	 * @param reservationStatus
+	 * @param fileIdList
+	 * @param createdAt
+	 */
 	@Builder
 	public record DetailQueryDto(
 		Long reservationId,
@@ -149,6 +164,21 @@ public class ReservationResponse {
 		}
 	}
 
+	/**
+	 *
+	 * @param reservationId
+	 * @param shipFishingPostId
+	 * @param reservationNumber
+	 * @param subject
+	 * @param reservationDate
+	 * @param startTime
+	 * @param location
+	 * @param guestCount
+	 * @param totalPrice
+	 * @param reservationStatus
+	 * @param fileUrlList
+	 * @param createdAt
+	 */
 	@Builder
 	public record DetailReservationList(
 		Long reservationId,

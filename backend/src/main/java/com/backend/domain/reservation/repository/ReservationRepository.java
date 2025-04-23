@@ -29,6 +29,15 @@ public interface ReservationRepository {
 	Optional<Reservation> findById(final Long reservationId);
 
 	/**
+	 * 예약 번호로 예약 정보 조회 메서드
+	 *
+	 * @param reservationNumber 예약번호
+	 * @return 예약 데이터
+	 * @implSpec 예약 번호와 일치하는 예약 정보를 조회합니다.
+	 */
+	Optional<Reservation> findByReservationNumber(final String reservationNumber);
+
+	/**
 	 * 유저의 예약 내역 횟수를 조회합니다.
 	 *
 	 * @param memberId 유저 ID

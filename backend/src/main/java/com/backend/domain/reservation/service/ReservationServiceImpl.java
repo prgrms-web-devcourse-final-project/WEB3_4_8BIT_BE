@@ -10,6 +10,7 @@ import com.backend.domain.reservation.converter.ReservationConverter;
 import com.backend.domain.reservation.dto.request.ReservationRequest;
 import com.backend.domain.reservation.dto.response.ReservationResponse;
 import com.backend.domain.reservation.entity.Reservation;
+import com.backend.domain.reservation.entity.ReservationStatus;
 import com.backend.domain.reservation.exception.ReservationErrorCode;
 import com.backend.domain.reservation.exception.ReservationException;
 import com.backend.domain.reservation.repository.ReservationRepository;
@@ -21,6 +22,9 @@ import com.backend.domain.shipfishingpost.exception.ShipFishingPostException;
 import com.backend.domain.shipfishingpost.repository.ShipFishingPostRepository;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.ScrollResponse;
+import com.backend.global.payment.TossPaymentHttpClient;
+import com.backend.global.payment.dto.request.TossPaymentRequest;
+import com.backend.global.payment.dto.response.TossPaymentResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +39,56 @@ public class ReservationServiceImpl implements ReservationService {
 	private final ReservationRepository reservationRepository;
 	private final ReservationDateRepository reservationDateRepository;
 	private final ShipFishingPostRepository shipFishingPostRepository;
+	private final TossPaymentHttpClient tossPaymentHttpClient;
+
+	@Override
+	@Transactional
+	public ReservationResponse.Detail prepareReservation(
+		final ReservationRequest.Reserve requestDto,
+		final Long memberId) {
+
+		verifyTodayAfterDate(requestDto.reservationDate());
+
+		ShipFishingPost shipFishingPost = getShipFishingPostEntity(requestDto.shipFishingPostId());
+
+		verifyPriceValue(requestDto.price(), requestDto.totalPrice(), shipFishingPost.getPrice(),
+			shipFishingPost.getPrice() * requestDto.guestCount());
+
+		ReservationDate reservationDate = getReservationDate(shipFishingPost.getShipFishingPostId(),
+			requestDto.reservationDate());
+
+		verifyReservationDate(reservationDate, requestDto.guestCount());
+
+		Reservation reservation = reservationRepository.save(
+			ReservationConverter.fromReservationRequest(requestDto, memberId));
+
+		return ReservationConverter.fromReservationResponseDetail(reservation);
+	}
+
+	@Override
+	@Transactional
+	public void confirmReservationPayment(final TossPaymentRequest requestDto, final Long memberId) {
+
+		Reservation reservation = verifyPayment(requestDto, memberId);
+
+		try {
+			TossPaymentResponse response = tossPaymentHttpClient.sendPaymentConfirmRequest(requestDto);
+
+			updateReservationDateWithRemainCount(reservation.getShipFishingPostId(), reservation.getReservationDate(),
+				reservation.getGuestCount(), false);
+
+			reservation.updatePending(true);
+			reservation.updateTossPaymentInfo(response);
+
+			activityHistoryService.createActivityHistory(reservation);
+		} catch (ReservationException e) {
+			tossPaymentHttpClient.cancelPayment(requestDto.paymentKey(), "예약 불가: 재고 부족", requestDto.amount());
+
+			reservation.updatePending(false);
+
+			throw e;
+		}
+	}
 
 	@Override
 	@Transactional
@@ -80,6 +134,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public Long getReservationCount(final Long memberId) {
 
 		return reservationRepository.getReservationCount(memberId);
@@ -94,6 +149,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ScrollResponse<ReservationResponse.DetailReservationList> getUserReservationListWithImage(
 		final Long memberId,
 		final Boolean afterToday,
@@ -115,6 +171,7 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public ReservationResponse.DashBoard getDashBoard(final Long memberId, final Integer limitDays) {
 
 		return reservationRepository.findDashBoardByMemberId(memberId, limitDays);
@@ -161,11 +218,24 @@ public class ReservationServiceImpl implements ReservationService {
 	}
 
 	/**
+	 * 예약 날짜 데이터 조회 메서드
+	 *
+	 * @param shipFishingPostId 게시글 ID
+	 * @param reservationDate 예약 일자
+	 * @return 예약 일자 데이터
+	 */
+	private ReservationDate getReservationDate(final Long shipFishingPostId, final LocalDate reservationDate) {
+
+		return reservationDateRepository.findByShipFishingPostIdAndReservationDate(shipFishingPostId, reservationDate)
+			.orElseThrow(() -> new ReservationException(ReservationErrorCode.NOT_AVAILABLE_DATE_RESERVATION));
+	}
+
+	/**
 	 * 오늘포함 이전 예약 신청, 수정 불가 검증 메서드
 	 *
 	 * @param reservationDate 예약 날짜
 	 */
-	void verifyTodayAfterDate(final LocalDate reservationDate) {
+	private void verifyTodayAfterDate(final LocalDate reservationDate) {
 
 		if (!reservationDate.isAfter(LocalDate.now())) {
 			throw new ReservationException(ReservationErrorCode.NOT_AVAILABLE_DATE_RESERVATION);
@@ -227,6 +297,33 @@ public class ReservationServiceImpl implements ReservationService {
 			log.debug("권한이 없습니다.");
 			throw new ReservationException(ReservationErrorCode.NOT_AUTHORITY_RESERVATION);
 		}
+	}
+
+	/**
+	 * 토스 페이먼츠 주문서 검증 메서드
+	 *
+	 * @param requestDto 토스페이먼츠 데이터
+	 * @param memberId 유저 ID
+	 * @return {@link Reservation} 예약정보
+	 */
+	private Reservation verifyPayment(final TossPaymentRequest requestDto, final Long memberId) {
+
+		Reservation reservation = reservationRepository.findByReservationNumber(requestDto.orderId())
+			.orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+		if (reservation.getStatus() != ReservationStatus.PENDING) {
+			throw new ReservationException(ReservationErrorCode.ALREADY_CONFIRMED_RESERVATION);
+		}
+
+		if (!memberId.equals(reservation.getMemberId())) {
+			throw new ReservationException(ReservationErrorCode.NOT_AUTHORITY_RESERVATION);
+		}
+
+		if (!reservation.getTotalPrice().equals(requestDto.amount())) {
+			throw new ReservationException(ReservationErrorCode.WRONG_PRICE_VALUE);
+		}
+
+		return reservation;
 	}
 
 	/**

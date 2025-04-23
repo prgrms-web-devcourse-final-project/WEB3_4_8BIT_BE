@@ -116,6 +116,10 @@ sourceSets {
     main.java.srcDirs += [generated]
 }
 
+test {
+    maxParallelForks = 1
+}
+
 // gradle clean 시에 QClass 디렉토리 삭제
 clean {
     delete file(generated)

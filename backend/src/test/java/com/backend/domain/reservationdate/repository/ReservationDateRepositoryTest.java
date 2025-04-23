@@ -7,8 +7,10 @@ import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TimeZone;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -48,6 +50,11 @@ public class ReservationDateRepositoryTest extends BaseTest {
 
 	@Autowired
 	private ReservationDateJpaRepository reservationDateJpaRepository;
+
+	@BeforeAll
+	static void beforeAll() {
+		TimeZone.setDefault(TimeZone.getTimeZone("Asia/Seoul"));
+	}
 
 	@AfterEach
 	public void tearDown() {
@@ -240,6 +247,9 @@ public class ReservationDateRepositoryTest extends BaseTest {
 
 		// When
 		reservationDateRepository.deleteOrphanReservationDate();
+
+		em.flush();
+		em.clear();
 
 		// Then
 		List<ReservationDate> findReservationDateList = reservationDateRepository.findAll();

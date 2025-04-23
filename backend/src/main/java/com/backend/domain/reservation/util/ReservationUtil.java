@@ -12,7 +12,7 @@ public class ReservationUtil {
 	 */
 	public static String generateReservationNumber() {
 		LocalDate now = LocalDate.now();
-		String UUIDNumber = UUID.randomUUID().toString().substring(0, 6);
+		String UUIDNumber = UUID.randomUUID().toString().substring(0, 8);
 
 		return String.format("%s-%s", now, UUIDNumber);
 	}

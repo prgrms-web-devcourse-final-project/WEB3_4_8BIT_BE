@@ -5,6 +5,7 @@ import java.net.URI;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import com.backend.global.auth.oauth2.CustomOAuth2User;
 import com.backend.global.dto.request.GlobalRequest;
 import com.backend.global.dto.response.GenericResponse;
 import com.backend.global.dto.response.ScrollResponse;
+import com.backend.global.payment.dto.request.TossPaymentRequest;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,6 +37,29 @@ import lombok.RequiredArgsConstructor;
 public class ReservationController {
 
 	private final ReservationService reservationService;
+
+	@PostMapping("/prepare")
+	@Operation(summary = "예약 준비 - 주문서 생성", description = "결제를 위한 예약 주문서 생성")
+	public ResponseEntity<GenericResponse<ReservationResponse.Detail>> prepareReservation(
+		@RequestBody @Valid final ReservationRequest.Reserve requestDto,
+		@AuthenticationPrincipal final CustomOAuth2User user) {
+
+		ReservationResponse.Detail response = reservationService.prepareReservation(requestDto, user.getId());
+
+		return ResponseEntity.created(URI.create("/api/v1/reservations/" + response.reservationId()))
+			.body(GenericResponse.of(true, response));
+	}
+
+	@GetMapping("/confirm")
+	@Operation(summary = "결제 승인 및 예약 확정", description = "Toss 결제 성공 후 결제 승인 API 호출")
+	public ResponseEntity<GenericResponse<Void>> confirmReservationPayment(
+		@ModelAttribute final TossPaymentRequest request,
+		@AuthenticationPrincipal final CustomOAuth2User user) {
+
+		reservationService.confirmReservationPayment(request, user.getId());
+
+		return ResponseEntity.ok(GenericResponse.of(true));
+	}
 
 	@PostMapping
 	@Operation(summary = "예약 신청 및 생성", description = "유저가 선상 낚시를 예약 할 때 사용하는 API")
