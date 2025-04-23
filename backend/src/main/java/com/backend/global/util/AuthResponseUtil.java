@@ -2,6 +2,7 @@ package com.backend.global.util;
 
 import java.io.IOException;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 
 import com.backend.global.dto.response.GenericResponse;
@@ -10,6 +11,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class AuthResponseUtil {
+
+	@Value("${auth.redirect.url}")
+	private static String redirectUrl;
 
 	/**
 	 * 로그인 성공 시: accessToken은 ResponseCookie로 내려주고 JSON 응답
@@ -22,7 +26,7 @@ public class AuthResponseUtil {
 
 		response.addHeader("Set-Cookie", accessTokenCookie.toString());
 		writeJsonResponse(response, status, rsData, om);
-		response.sendRedirect("https://mikki.kr/");
+		response.sendRedirect(redirectUrl);
 	}
 
 	/**
