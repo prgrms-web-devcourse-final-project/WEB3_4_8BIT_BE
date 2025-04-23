@@ -248,6 +248,9 @@ public class ReservationDateRepositoryTest extends BaseTest {
 		// When
 		reservationDateRepository.deleteOrphanReservationDate();
 
+		em.flush();
+		em.clear();
+
 		// Then
 		List<ReservationDate> findReservationDateList = reservationDateRepository.findAll();
 

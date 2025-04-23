@@ -166,7 +166,6 @@ public class ReservationRepositoryTest extends BaseTest {
 				.set("memberId", memberId)
 				.set("guestCount", i)
 				.set("reservationDate", LocalDate.of(2025, 1, 1).plusDays(i))
-				.set("guestCount", 1)
 				.set("paymentKey", "test")
 				.set("paymentMethod", "test")
 				.set("cardNumber", "121354556")
