@@ -20,12 +20,6 @@ public class CookieUtil {
 	@Value("${cookie.secure}")
 	private boolean secure;
 
-	@Value("${cookie.samesite}")
-	private String samesite;
-
-	@Value("${cookie.domain}")
-	private String domain;
-
 	@Value("${jwt.refresh-token-expire-time-seconds}")
 	private long refreshTokenValidityInSeconds;
 
@@ -61,8 +55,8 @@ public class CookieUtil {
 		return ResponseCookie.from("accessToken", "")
 			.httpOnly(httpOnly)
 			.secure(secure)
-			.domain(domain)
-			.sameSite(domain)
+			.domain("mikki.kr")
+			.sameSite("None")
 			.path("/")
 			.maxAge(0)
 			.build();
