@@ -36,8 +36,8 @@ public class RedisConfig {
 	@Value("${spring.data.redis.port}")
 	private String REDIS_PORT;
 
-	@Value("${spring.data.redis.password}")
-	private String REDIS_PASSWORD;
+	// @Value("${spring.data.redis.password}")
+	// private String REDIS_PASSWORD;
 
 	private static final String REDISSON_HOST_PREFIX = "redis://";
 
