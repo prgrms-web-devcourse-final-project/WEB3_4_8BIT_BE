@@ -26,20 +26,18 @@ public class RedisUtil {
 	 * 지정된 key 값을 1 증가시킨다.
 	 *
 	 * @param key Redis 저장된 key
-	 * @return 증가된 결과 값
 	 */
-	public Long increment(final String key) {
-		return redisTemplate.opsForValue().increment(key);
+	public void increment(final String key) {
+		redisTemplate.opsForValue().increment(key);
 	}
 
 	/**
 	 * 지정된 key 값을 1 감소시킨다.
 	 *
 	 * @param key Redis 저장된 key
-	 * @return 감소된 결과 값
 	 */
-	public Long decrement(final String key) {
-		return redisTemplate.opsForValue().decrement(key);
+	public void decrement(final String key) {
+		redisTemplate.opsForValue().decrement(key);
 	}
 
 	/**
@@ -49,7 +47,7 @@ public class RedisUtil {
 	 * @return 존재하면 true, 없으면 false
 	 */
 	public boolean hasKey(final String key) {
-		return Boolean.TRUE.equals(redisTemplate.hasKey(key));
+		return redisTemplate.hasKey(key);
 	}
 
 	/**
@@ -78,7 +76,7 @@ public class RedisUtil {
 	 * @param key 삭제할 Redis key
 	 */
 	public void deleteKeyIfExists(final String key) {
-		if (Boolean.TRUE.equals(redisTemplate.hasKey(key))) {
+		if (redisTemplate.hasKey(key)) {
 			redisTemplate.delete(key);
 		}
 	}
@@ -102,7 +100,7 @@ public class RedisUtil {
 		ValueOperations<String, String> ops = redisTemplate.opsForValue();
 
 		redisTemplate.execute((RedisCallback<Void>)connection -> {
-			ScanOptions options = ScanOptions.scanOptions().match(prefix + "*").count(100).build();
+			ScanOptions options = ScanOptions.scanOptions().match(prefix + "*").count(1000).build();
 			try (var cursor = connection.scan(options)) {
 				cursor.forEachRemaining(rawKey -> {
 					String key = new String(rawKey, StandardCharsets.UTF_8);
