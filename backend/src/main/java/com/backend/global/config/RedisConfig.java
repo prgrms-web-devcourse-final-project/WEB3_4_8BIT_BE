@@ -2,6 +2,10 @@ package com.backend.global.config;
 
 import java.util.List;
 
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +29,17 @@ import lombok.extern.slf4j.Slf4j;
 @Configuration
 @EnableRedisRepositories
 public class RedisConfig {
+
+	@Value("${spring.data.redis.host}")
+	private String REDIS_HOST;
+
+	@Value("${spring.data.redis.port}")
+	private String REDIS_PORT;
+
+	// @Value("${spring.data.redis.password}")
+	// private String REDIS_PASSWORD;
+
+	private static final String REDISSON_HOST_PREFIX = "redis://";
 
 	/**
 	 * RedisTemplate 설정
@@ -69,6 +84,16 @@ public class RedisConfig {
 		template.setKeySerializer(new StringRedisSerializer());
 		template.setValueSerializer(new GenericJackson2JsonRedisSerializer(objectMapper));
 		return template;
+	}
+
+	@Bean
+	public RedissonClient redissonClient() {
+		Config config = new Config();
+		config.useSingleServer()
+			.setAddress(REDISSON_HOST_PREFIX + REDIS_HOST + ":" + REDIS_PORT);
+			// .setPassword(REDIS_PASSWORD);
+
+		return Redisson.create(config);
 	}
 
 }
